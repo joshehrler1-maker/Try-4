@@ -1,0 +1,26 @@
+/* Try 4 cross-platform presentation layer: phone, tablet and desktop */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+canvas, img, video, svg { max-width: 100%; }
+button, select, input, textarea { font: inherit; }
+button { min-height: 44px; touch-action: manipulation; }
+button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #f7d67c; outline-offset: 3px; }
+.controls, .actions, .bar, nav { min-width: 0; }
+.controls > *, .actions > * { min-width: 0; }
+.dpad button, [data-dir], [data-action] { user-select:none; -webkit-user-select:none; touch-action:none; }
+@media (max-width: 600px) {
+  main { max-width: 100%; }
+  .controls { justify-content:center; align-items:center; gap:12px; }
+  .dpad { flex-shrink:0; }
+  .actions { flex:1 1 125px; }
+  .actions button { min-height:44px; }
+}
+@media (min-width: 900px) {
+  .controls { justify-content: space-around; }
+}
+@media (hover: none) and (pointer: coarse) {
+  button { -webkit-tap-highlight-color:transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration:.01ms !important; animation-duration:.01ms !important; }
+}

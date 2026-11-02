@@ -1,0 +1,66 @@
+{
+  "series": "Super Paw Heroes",
+  "version": "1.0",
+  "status": "creative planning reference; not generated media",
+  "premise": "Whisker and Luna restore the six Power Crystals to Pawtopia through courageous, kind choices. Their ultimate challenge is to save, not destroy, the Shadow King.",
+  "characters": {
+    "Whisker": {
+      "role": "brave, playful leader",
+      "visual": "orange-golden tabby, red/blue/gold suit, cape, utility belt",
+      "voice": "energetic, warm, expressive; consistent across releases",
+      "flaw": "rushes before thinking"
+    },
+    "Luna": {
+      "role": "inventive, strategic partner",
+      "visual": "silver-white cat, purple/silver suit, moon motif, utility belt",
+      "voice": "clear, confident, witty; consistent across releases",
+      "flaw": "hesitates to ask for help"
+    }
+  },
+  "rules": [
+    "Every release fits the canonical timeline.",
+    "Kid-safe jokes never humiliate or exclude others.",
+    "Consequences matter; honest apologies and repair matter.",
+    "Gadgets and powers remain consistent with previously released stories.",
+    "No external website redirects targeting children without family-safe review.",
+    "Any new cross-media continuity event requires human approval."
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "name": "The First Spark",
+      "value": "Kindness",
+      "synopsis": "Whisker helps a frightened young robot despite pressure to fight."
+    },
+    {
+      "number": 2,
+      "name": "The Moonlit Promise",
+      "value": "Honesty",
+      "synopsis": "Luna admits a mistake and earns the team\u2019s trust."
+    },
+    {
+      "number": 3,
+      "name": "The Bridge of Friends",
+      "value": "Teamwork",
+      "synopsis": "The heroes unite rivals to rescue their neighbors."
+    },
+    {
+      "number": 4,
+      "name": "Shadows of Doubt",
+      "value": "Courage",
+      "synopsis": "Whisker asks for help when he feels afraid."
+    },
+    {
+      "number": 5,
+      "name": "The Crystal Choice",
+      "value": "Wisdom",
+      "synopsis": "Luna protects friends instead of chasing a crystal."
+    },
+    {
+      "number": 6,
+      "name": "The Dawn of Pawtopia",
+      "value": "Hope",
+      "synopsis": "The heroes offer the Shadow King a chance to change."
+    }
+  ]
+}
