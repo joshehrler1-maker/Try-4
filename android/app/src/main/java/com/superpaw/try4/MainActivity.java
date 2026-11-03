@@ -121,12 +121,13 @@ public final class MainActivity extends Activity {
                     while((n=input.read(buffer))!=-1){if(out.size()+n>LIMIT)throw new Exception();out.write(buffer,0,n);}
                     String raw=out.toString(StandardCharsets.UTF_8.name());
                     JSONObject envelope=new JSONObject(raw);if(!"Try4 Core".equals(envelope.optString("app"))||envelope.optInt("version")!=2)throw new Exception();
-                    runOnUiThread(()->{web.evaluateJavascript("window.__try4Incoming='';",v->sendImport(raw,0));});
+                    runOnUiThread(()->{if(web==null||isDestroyed()||isFinishing())return;web.evaluateJavascript("window.__try4Incoming='';",v->sendImport(raw,0));});
                 } catch(Exception e){runOnUiThread(()->finishTransfer("Backup rejected or unreadable. Existing records kept."));}
             }).start();
         } else finishTransfer("Unknown operation.");
     }
     private void collectBackup(Uri uri,int length,int offset,StringBuilder content) {
+        if(web==null||isDestroyed()||isFinishing())return;
         int end=Math.min(length,offset+CHUNK);
         web.evaluateJavascript("window.__try4Backup.slice("+offset+","+end+")",value->{
             try {Object decoded=new JSONTokener(value).nextValue();if(!(decoded instanceof String))throw new Exception();content.append((String)decoded);
@@ -136,13 +137,14 @@ public final class MainActivity extends Activity {
         });
     }
     private void sendImport(String raw,int offset) {
+        if(web==null||isDestroyed()||isFinishing())return;
         int end=Math.min(raw.length(),offset+CHUNK);
         web.evaluateJavascript("window.__try4Incoming+="+JSONObject.quote(raw.substring(offset,end))+";true",v->{
             if(end<raw.length()){sendImport(raw,end);return;}
             web.evaluateJavascript("(()=>{try{window.try4Import(window.__try4Incoming);return 'ok';}catch(e){return 'error';}finally{delete window.__try4Incoming;}})()",result->finishTransfer("\"ok\"".equals(result)?"Backup restored with emergency lock on.":"Backup rejected. Existing records kept."));
         });
     }
-    private void finishTransfer(String message) {transferring=false;web.evaluateJavascript("delete window.__try4Backup;delete window.__try4Incoming;",null);toast(message);}
+    private void finishTransfer(String message) {transferring=false;if(web==null||isDestroyed()||isFinishing())return;web.evaluateJavascript("delete window.__try4Backup;delete window.__try4Incoming;",null);toast(message);}
     @Override protected void onPause(){super.onPause();if(web!=null){web.evaluateJavascript("if(window.try4Pause)window.try4Pause();window.dispatchEvent(new Event('blur'));",null);web.onPause();web.pauseTimers();}}
     @Override protected void onResume(){super.onResume();if(web!=null){web.onResume();web.resumeTimers();}}
     @Override public void onBackPressed(){if(transferring){toast("Wait for the backup operation to finish.");return;}if(web.canGoBack())web.goBack();else finish();}

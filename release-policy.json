@@ -20,7 +20,7 @@
   "verifiedIntegrations": [],
   "blockers": [
     "Physical Android studio, gameplay, backup and offline tests are pending.",
-    "Android source is implemented but SDK compilation and release signing are not verified.",
+    "Android SDK compilation passed for the initial native source; final-head verification, install tests and release signing remain pending.",
     "Optional loopback worker is tested; hosted backend, secure owner account and Android connection are not implemented.",
     "Remote AI providers, verified free quotas and publishing integrations are not implemented.",
     "Canonical animated character models, rendered films and consistent character audio are not implemented.",
