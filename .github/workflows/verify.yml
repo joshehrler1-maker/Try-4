@@ -39,6 +39,9 @@ jobs:
         with:
           gradle-version: '8.13'
           cache-disabled: true
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
       - name: Check SDK availability
         run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
       - name: Compile Android source without packaging or publishing
