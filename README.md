@@ -13,3 +13,10 @@ No paid APIs, subscriptions, cloud upgrades, credits, paid ads, publication fees
 
 ## Status
 See [implementation status](IMPLEMENTATION-STATUS.md), [pre-build requirements](PRE-BUILD.md), [phone readiness](readiness.html) and [what remains](BUILD-REMAINING.md). Native source is not an installed APK. Public deployment and production release are not certified. ChatGPT plan adaptation, AI animation, real publication and earnings integrations remain incomplete.
+
+
+## Shared villain continuity
+
+The owner-approved cross-media villain rules live in `story-bible.json` under `cross_media_villain_policy`. Apply them to the Android app, games, movies, cartoons, Shorts, stories, books, coloring products, character songs, website and promotional art. Each level or story arc uses a distinct mini-boss dog breed, separate from ordinary dog villains and Baron Brasswhirl. Preserve the approved roster, character designs and signature powers; vary maps and encounters between arcs. Whisker and Luna remain cats. Baron remains the separate main boss, with `assets/baron-brasswhirl-master.webp` as his approved visual reference.
+
+Implemented: six breed-specific mini-bosses and separate final boss in Crystal Catacombs. Other media inherit the creative specification; this update does not regenerate existing films, books or other media.
