@@ -60,11 +60,20 @@ await button.click();assert.equal(button.textContent,'✕ Exit Full Screen');awa
 test('RPG district requires crystals, defeated bots and reaching the rescue beacon',()=>{
 const html=Core.generate({type:'game',title:'Quest'})[0].content;
 const source=html.match(/function step\(dt\)\{[\s\S]*?(?=function loop)/)[0];
-const c={dashTime:0,dashCooldown:0,strikeCooldown:0,energy:100,comboTime:0,combo:0,burstEffect:0,stickX:0,stickY:0,keys:new Set(),hero:{x:0,z:0,hp:5,mode:'whisker'},crystals:[],bots:[],hitEffect:0,chapter:1,CHAPTERS:6,rescueBeacon:{x:0,z:-12},updateHud(){},notify(){},distance:(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),completed:0,finished:0,nextChapter(){this.completed++;},finish(){this.finished++;}};
+const c={routeClock:1,chestOpened:true,treasure:{x:10,z:11},updateRoutes(){},chaseDungeon(){},moveDungeon(){},dashTime:0,dashCooldown:0,strikeCooldown:0,energy:100,comboTime:0,combo:0,burstEffect:0,stickX:0,stickY:0,keys:new Set(),hero:{x:0,z:0,hp:5,mode:'whisker'},crystals:[],bots:[],hitEffect:0,chapter:1,CHAPTERS:6,rescueBeacon:{x:0,z:-12},updateHud(){},notify(){},distance:(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),completed:0,finished:0,nextChapter(){this.completed++;},finish(){this.finished++;}};
 c.nextChapter=()=>c.completed++;c.finish=()=>c.finished++;vm.createContext(c);vm.runInContext(source,c);
 vm.runInContext('step(.016)',c);assert.equal(c.completed,0);
 c.hero.z=-12;c.crystals=[{x:8,z:8}];vm.runInContext('step(.016)',c);assert.equal(c.completed,0);
 c.crystals=[];c.bots=[{x:12,z:12,cool:1,hp:1}];vm.runInContext('step(.016)',c);assert.equal(c.completed,0);
 c.bots=[];vm.runInContext('step(.016)',c);assert.equal(c.completed,1);
 c.chapter=6;vm.runInContext('step(.016)',c);assert.equal(c.finished,1);
+});
+
+test('dungeon rooms, treasure and crystals are reachable; walls block movement and attacks',()=>{
+const html=Core.generate({type:'game',title:'Quest'})[0].content;
+const source=html.slice(html.indexOf('const dungeonRooms='),html.indexOf('function render(){'));
+const c={hero:{x:0,z:0},distance:(a,b)=>Math.hypot(a.x-b.x,a.z-b.z)};vm.createContext(c);vm.runInContext(source+';updateRoutes();this.reachable=(x,z)=>routeMap.has(x+","+z);this.walk=canWalk;this.move=moveDungeon;this.line=clearPath;',c);
+for(const [x,z] of [[-11,-11],[-8,-9],[9,-10],[11,-8],[-10,9],[-8,11],[10,10],[0,-12],[10,11]])assert.ok(c.reachable(x,z),'Reachable '+x+','+z);
+assert.equal(c.walk(5,5),false);const actor={x:0,z:0};c.move(actor,5,5);assert.equal(actor.x,5);assert.equal(actor.z,0);
+assert.equal(c.line({x:-10,z:-10},{x:10,z:-10}),false);
 });
