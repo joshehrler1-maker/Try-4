@@ -32,16 +32,16 @@ handlers.pointerup(event(2,0,0));assert.equal(context.read().p,1);
 handlers.pointercancel(event(1,0,0));assert.equal(context.read().x,0);assert.equal(context.read().p,null);
 });
 
-test('character speech excludes remote voices, assigns profiles, and cancels queued speech',()=>{
+
+test('approved recorded voices replace device speech and cancel cleanly',()=>{
 const html=Core.generate({type:'game',title:'Quest'})[0].content;
-const source=html.slice(html.indexOf('function setupCharacterVoices(){'),html.indexOf('\nconst vs='));
-const fields={};const $=id=>fields[id]||(fields[id]={value:'',style:{},children:[],replaceChildren(){this.children=[];this.value='';},append(o){this.children.push(o);if(!this.value)this.value=o.value;},addEventListener(t,f){this[t]=f;}});
-const spoken=[];let cancelled=0;
-const engine={getVoices:()=>[{name:'Remote',voiceURI:'remote',lang:'en-US',localService:false},{name:'Local A',voiceURI:'a',lang:'en-US',localService:true},{name:'Local B',voiceURI:'b',lang:'en-US',localService:true}],addEventListener(){},speak:u=>spoken.push(u),cancel:()=>cancelled++};
-const context={$,window:{speechSynthesis:engine},SpeechSynthesisUtterance:function(t){this.text=t;},localStorage:{getItem:()=>null,setItem(){}},document:{hidden:false,createElement:()=>({})},hero:{mode:'whisker'},voiceOn:true};
+assert.ok(!html.includes('SpeechSynthesisUtterance'));assert.ok(html.includes('id="joystick"'));
+const source=html.slice(html.indexOf('function setupCharacterVoices(){'),html.indexOf('const vs='));
+const fields={},played=[];const $=id=>fields[id]||(fields[id]={addEventListener(t,f){this[t]=f;}});
+const context={$,Audio:function(src){this.src=src;this.play=()=>{played.push(this);return Promise.resolve();};this.pause=()=>this.paused=true;},hero:{mode:'whisker'},voiceOn:true,document:{hidden:false}};
 vm.createContext(context);vm.runInContext(source+';this.api=characterSpeech;',context);
-assert.equal(fields['whisker-voice'].children.length,2);assert.equal(fields['luna-voice'].value,'b');
-context.api.say('Hello','luna');assert.equal(spoken[0].voice.voiceURI,'b');assert.equal(spoken[0].pitch,1.08);
-context.api.say('Second','whisker');assert.equal(spoken.length,1);spoken[0].onend();assert.equal(spoken.length,2);
-assert.equal(spoken[1].voice.voiceURI,'a');context.api.cancel();assert.ok(cancelled>0);context.api.say('A new adventure','narrator');assert.equal(spoken[2].pitch,1);assert.equal(spoken[2].rate,.92);assert.equal(fields['speech-caption'].textContent,'Narrator: A new adventure');assert.equal(fields['narrator-voice'].children.length,2);
+context.api.say('Super paw power!','whisker');assert.ok(played[0].src.startsWith('data:audio/mpeg;base64,'));
+context.api.say('Moon blast!','luna');assert.equal(played.length,1);played[0].onended();assert.equal(played.length,2);
+context.api.cancel();assert.equal(played[1].paused,true);
+fields['sample-narrator'].click();assert.equal(played.length,3);assert.ok(fields['speech-caption'].textContent.startsWith('Narrator:'));
 });
