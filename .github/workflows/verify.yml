@@ -8,6 +8,10 @@ on:
       - 'tests/**'
       - 'server/**'
       - 'core.js'
+      - 'assets/**'
+      - 'super-paw-3d.html'
+      - 'hero-models.html'
+      - 'story-bible.json'
       - 'studio.*'
       - 'scripts/**'
       - '.github/workflows/verify.yml'
@@ -29,6 +33,7 @@ jobs:
       - name: Source and functional checks
         run: |
           node scripts/validate.mjs
+          node tests/heroes.test.cjs
           node --test tests/core.test.cjs tests/server.test.mjs
           python3 scripts/check_android.py
       - uses: actions/setup-java@v6
@@ -47,3 +52,4 @@ jobs:
       - name: Compile Android source without packaging or publishing
         run: gradle --no-daemon -p android :app:compileDebugJavaWithJavac
       # No artifact uploads, cache uploads, APK distribution, release signing or deployment.
+

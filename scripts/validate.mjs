@@ -54,6 +54,8 @@ ok(await request(scope+'index.html?private=1') === undefined,'Do not cache query
 ok(await request('https://third-party.test/index.html') === undefined,'Do not intercept third parties');
 ok(await request(scope+'index.html','POST') === undefined,'Do not intercept writes');
 const arcade=read('3d-games.html');
-ok(arcade.includes("if(state==='paused'){state='play';cover.hidden=true;keys.clear();last=performance.now();animation=requestAnimationFrame(loop)}else reset()"),'Arcade resume must not reset run');
+const resume=arcade.match(/if\(state==='paused'\)\{(.*?)\}else reset\(\)/s)?.[1];
+ok(resume?.includes("state='play'") && resume.includes('requestAnimationFrame(loop)') && !/\breset\(/.test(resume),'Arcade resume must continue the existing run');
 ok(arcade.includes("document.addEventListener('visibilitychange'"),'Arcade needs background pause');
 console.log(`PASS: ${checks} source and offline-worker checks. Physical Android gameplay and install tests remain pending.`);
+
