@@ -45,3 +45,14 @@ context.api.say('Moon blast!','luna');assert.equal(played.length,1);played[0].on
 context.api.cancel();assert.equal(played[1].paused,true);
 fields['sample-narrator'].click();assert.equal(played.length,3);assert.ok(fields['speech-caption'].textContent.startsWith('Narrator:'));
 });
+
+test('fullscreen enters, exits and falls back when browser denies it',async()=>{
+const html=Core.generate({type:'game',title:'Quest'})[0].content;
+const code=html.match(/<script>\(function installGameFullscreen\(\)\{[\s\S]*?<\/script>/)[0].slice(8,-9);
+async function run(denied){const events={},nodes=[];const make=()=>{const x={style:{},classList:{add(){},remove(){}},append(){},prepend(){},setAttribute(){},addEventListener(n,f){this[n]=f;}};nodes.push(x);return x;};
+const stage=make(),doc={body:{style:{overflow:'auto'}},head:{append(){}},fullscreenElement:null,createElement:make,getElementById:()=>stage,addEventListener(n,f){events[n]=f;},async exitFullscreen(){this.fullscreenElement=null;}};
+stage.requestFullscreen=async()=>{if(denied)throw Error('denied');doc.fullscreenElement=stage;};
+const c={document:doc};vm.createContext(c);vm.runInContext(code,c);const button=nodes.find(x=>x.textContent==='⛶ Full Screen');
+await button.click();assert.equal(button.textContent,'✕ Exit Full Screen');await button.click();assert.equal(button.textContent,'⛶ Full Screen');assert.equal(doc.body.style.overflow,'auto');
+}await run(false);await run(true);
+});
