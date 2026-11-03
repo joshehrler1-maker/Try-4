@@ -59,35 +59,39 @@ const rx=a=>{const c=Math.cos(a),s=Math.sin(a);return new Float32Array([1,0,0,0,
 function pivot(x,y,z,a){return api.mul(model(x,y,z,1,1,1),api.mul(rx(a),model(-x,-y,-z,1,1,1)))}
 const rz=a=>{const c=Math.cos(a),v=Math.sin(a);return new Float32Array([c,v,0,0,-v,c,0,0,0,0,1,0,0,0,0,1])};
 function pivotZ(x,y,z,a){return api.mul(model(x,y,z,1,1,1),api.mul(rz(a),model(-x,-y,-z,1,1,1)))}
-const torso=api.mul(model(0,-drop,0,1,1,1,blade),pivot(0,1.35,0,-lean));
+const sway=Math.sin(phase)*run*.012,torso=api.mul(model(sway,-drop,0,1,1,1,blade),pivot(0,1.35,0,-lean));
+const feet=new Map();for(const side of [-1,1]){const cycle=((phase/(Math.PI*2)+(side>0?0:.5))%1+1)%1,swing=cycle>.62,u=swing?(cycle-.62)/.38:cycle/.62,stride=(swing?1-2*smoothCombat(u):-1+2*u)*run*(wingChun?.13:.19),lift=swing?Math.sin(Math.PI*u)*run*.105:0;feet.set(side,{stride,lift});}
 for(const part of parts){const label=part.node.name,region=part.node.extras?.region,side=part.node.extras?.side||1;let extra=torso;
 if(region==='leg'){
-const stride=Math.sin(phase+(side>0?0:Math.PI))*run*(wingChun?.065:.11),thigh=(wingChun?.76:.83)+stride,knee=(wingChun?-1.30:-1.40)-Math.max(0,-stride)*.20;
-extra=api.mul(model(side*(wingChun?.015:.075),-drop,side*(wingChun?.035:.23),1,1,1,wingChun?-side*.055:side*.12),pivot(side*.37,1.35,0,thigh));
-if(/shin|boot/.test(label))extra=api.mul(extra,pivot(side*.38,.77,0,knee));
-// Keep the paw sole level while the shin bends above it.
-if(/boot toe/.test(label))extra=api.mul(extra,pivot(part.node.translation[0],.14,part.node.translation[2],-thigh-knee));
+const foot=feet.get(side),rest=api.decode(name).doc.nodes,thighNode=rest.find(n=>n.name==='thigh'&&n.extras.side===side),hipX=thighNode.translation[0],hipY=1.35,kneeY=.73,ankleY=.14,L1=hipY-kneeY,L2=kneeY-ankleY;
+// Solve hip and knee angles together for the requested foot height and reach.
+const dz=foot.stride,dy=hipY-drop-ankleY-foot.lift,length=Math.max(.05,Math.min(L1+L2-.01,Math.hypot(dy,dz))),thigh=Math.atan2(-dz,dy)+Math.acos(Math.max(-1,Math.min(1,(L1*L1+length*length-L2*L2)/(2*L1*length)))),knee=-Math.acos(Math.max(-1,Math.min(1,(length*length-L1*L1-L2*L2)/(2*L1*L2))));
+// Build every segment from rest so the knee stays connected to the thigh.
+part.world=part.node.restWorld;part.normal=part.node.restNormal;
+extra=api.mul(model(side*(wingChun?.015:.075),-drop,side*(wingChun?.035:.23),1,1,1,wingChun?-side*.055:side*.12),pivot(hipX,hipY,0,thigh));
+if(/shin|boot/.test(label))extra=api.mul(extra,pivot(hipX,kneeY,0,knee));
+if(/boot toe/.test(label))extra=api.mul(extra,pivot(part.node.translation[0],ankleY,part.node.translation[2],-thigh-knee));
 }else if(region==='arm'||/forearm gauntlet/.test(label)){
 const lead=side<0,guard=(wingChun?(lead?.65:.49):(lead?.67:.34))-Math.sin(phase+(side>0?0:Math.PI))*run*.018;
 // Luna keeps elbows tucked and hands at the centreline; Whisker carries a staggered lead/rear guard.
-extra=api.mul(torso,api.mul(pivotZ(side*.63,2.34,0,-side*(wingChun?.48:.14)),pivot(side*.63,2.34,0,guard)));
-if(/forearm|gauntlet|glove|knuckle/.test(label))extra=api.mul(extra,pivot(side*.75,1.98,-.02,wingChun?(lead?.82:1.05):(lead?.70:1.12)));
+extra=api.mul(torso,api.mul(pivotZ(side*.58,2.42,0,-side*(wingChun?.48:.14)),pivot(side*.58,2.42,0,guard)));
+if(/forearm|gauntlet|glove|knuckle/.test(label))extra=api.mul(extra,pivot(side*.68,2.00,-.02,wingChun?(lead?.82:1.05):(lead?.70:1.12)));
 }else if(region==='head')extra=api.mul(torso,api.mul(model(0,0,0,1,1,1,-blade*.85),pivot(0,2.7,-.13,lean*.8)));
 else if(region==='tail')extra=api.mul(torso,pivot(0,1.38,.2,-.12-run*.1));
 part.world=api.mul(extra,part.world);part.normal=api.mul(extra,part.normal);part.normal[12]=part.normal[13]=part.normal[14]=0;
 }
 // Ground each boot using its transformed mesh extent, avoiding a floating stance.
-for(const side of [-1,1]){const toe=parts.find(p=>p.node.name==='boot toe'&&p.node.extras?.side===side);if(!toe)continue;const m=toe.world,sole=m[13]-Math.hypot(m[1],m[5],m[9]),lift=.015-sole;for(const part of parts)if(part.node.extras?.region==='leg'&&part.node.extras.side===side)part.world[13]+=lift;}
+for(const side of [-1,1]){const toe=parts.find(p=>p.node.name==='boot toe'&&p.node.extras?.side===side);if(!toe)continue;const m=toe.world,sole=m[13]-Math.hypot(m[1],m[5],m[9]),lift=.015+feet.get(side).lift-sole;for(const part of parts)if(part.node.extras?.region==='leg'&&part.node.extras.side===side)part.world[13]+=lift;}
 return parts;}
 function combatPose(api,name,base){const heavy=combat.kind==='melee';const parts=fightingPose(api,name,heavy?{...base,speed:0,phase:0,turn:0}:base);if(!combat.kind)return parts;const t=Math.min(1,combat.time/combat.duration),p=combatCurve(t),ranged=combat.kind==='ranged',side=ranged?1:combat.side;
 function rotation(axis,a){const c=Math.cos(a),v=Math.sin(a);return new Float32Array(axis==='x'?[1,0,0,0,0,c,v,0,0,-v,c,0,0,0,0,1]:[c,0,-v,0,0,1,0,0,v,0,c,0,0,0,0,1]);}
 function pivot(y,rot,x=0,z=0){const a=model(x,y,z,1,1,1),b=model(-x,-y,-z,1,1,1);return api.mul(a,api.mul(rot,b));}
 const twist=ranged?-.1*p:side*p*.52,weight=heavy?Math.max(0,-p)*.14+Math.max(0,p)*.07:0,body=api.mul(model(0,-weight,-(heavy?Math.max(0,p)*.10:0),1,1,1),api.mul(pivot(1.4,rotation('y',twist)),pivot(1.4,rotation('x',heavy?-p*.13:0))));
 for(const part of parts){let extra=body;const region=part.node.extras?.region,armSide=part.node.extras?.side||1;
-if(region==='arm'){
-const striking=armSide===side,reach=striking?p*(heavy?.92:.80):(heavy?.48:.22)*Math.sin(Math.PI*t),arm=pivot(2.34,rotation('x',reach),armSide*.63);
+if(region==='arm'||/forearm gauntlet/.test(part.node.name)){
+const striking=armSide===side,reach=striking?p*(heavy?.92:.80):(heavy?.48:.22)*Math.sin(Math.PI*t),arm=pivot(2.42,rotation('x',reach),armSide*.58);
 extra=api.mul(body,arm);
-if(striking&&/forearm|gauntlet|glove|knuckle/.test(part.node.name))extra=api.mul(extra,pivot(1.98,rotation('x',-.74*Math.max(0,p)),armSide*.75,-.02));
+if(striking&&/forearm|gauntlet|glove|knuckle/.test(part.node.name))extra=api.mul(extra,pivot(2.00,rotation('x',-.74*Math.max(0,p)),armSide*.68,-.02));
 }else if(region==='head')extra=api.mul(body,pivot(2.7,rotation('y',-twist*.65)));
 else if(region==='leg')extra=model(heavy?armSide*.055*Math.sin(Math.PI*t):0,0,heavy?armSide*side*.12*Math.sin(Math.PI*t):0,1,1,1);
 part.world=api.mul(extra,part.world);part.normal=api.mul(extra,part.normal);part.normal[12]=part.normal[13]=part.normal[14]=0;
