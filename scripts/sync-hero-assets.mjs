@@ -6,7 +6,7 @@ const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 let game=read('super-paw-3d.html');
 const rig=read('assets/super-paw-rig.js');
 const poster='data:image/webp;base64,'+fs.readFileSync(path.join(root,'assets/whisker-luna-master.webp')).toString('base64');
-game=game.replace('<script src="assets/super-paw-rig.js"></script>','<script>'+rig+'</script>');
+game=game.replace(/<script src="assets\/super-paw-rig\.js(?:\?[^"]*)?"><\/script>/,'<script>'+rig+'</script>');
 game=game.replace('src="assets/whisker-luna-master.webp"','data-master-poster="true"');
 game=game.replaceAll("'assets/whisker-luna-master.webp'",'window.SuperPawMasterPoster');
 const posterBootstrap='<script>window.SuperPawMasterPoster='+JSON.stringify(poster)+';document.querySelectorAll("[data-master-poster]").forEach(image=>image.src=window.SuperPawMasterPoster);</script>';
