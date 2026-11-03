@@ -310,7 +310,7 @@ const style=document.createElement('style');style.textContent=`
 document.head.append(style);
 const tools=document.createElement('div');tools.className='fs-tools';const button=document.createElement('button');button.type='button';button.textContent='⛶ Full Screen';button.setAttribute('aria-pressed','false');const status=document.createElement('span');status.className='fs-status';status.setAttribute('role','status');tools.append(document.getElementById('pause'),document.getElementById('restart'),document.getElementById('controller-settings'),button,status);tools.setAttribute('role','group');tools.setAttribute('aria-label','Game menu');stage.prepend(tools);const topButton=document.getElementById('fullscreen-top');if(topButton)topButton.addEventListener('click',()=>button.click());
 let oldOverflow='',fallback=false,busy=false;
-function sync(){const on=document.fullscreenElement===stage||fallback;button.textContent=on?'✕ Exit Full Screen':'⛶ Full Screen';button.setAttribute('aria-pressed',String(on));}
+function sync(){const on=document.fullscreenElement===stage||fallback;button.textContent=on?'✕ Exit':'⛶ Full Screen';button.setAttribute('aria-pressed',String(on));}
 function expand(){oldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';fallback=true;stage.classList.add('fs-expanded');status.textContent='Expanded view. Browser bars may remain.';sync();}
 function collapse(){fallback=false;stage.classList.remove('fs-expanded');document.body.style.overflow=oldOverflow;status.textContent='';sync();}
 button.addEventListener('click',async()=>{if(busy)return;busy=true;try{if(fallback)collapse();else if(document.fullscreenElement===stage){await document.exitFullscreen();}else if(stage.requestFullscreen){try{await stage.requestFullscreen();status.textContent='';}catch(_){expand();}}else expand();}finally{busy=false;sync();}});
@@ -491,4 +491,9 @@ for(const [id,message] of [['restart','Start a new campaign? This resets your cu
 #game-fullscreen-stage:is(:fullscreen,.fs-expanded)>.fs-tools>button{width:auto!important;min-width:44px!important;min-height:44px!important;height:44px!important;flex:0 1 auto!important;padding:6px 9px!important;font-size:11px!important;white-space:nowrap}
 #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .fs-status{display:none!important}
 @media(max-width:400px){#game-fullscreen-stage>.fs-tools #pause,#game-fullscreen-stage>.fs-tools #restart,#game-fullscreen-stage>.fs-tools #controller-settings,#game-fullscreen-stage:is(:fullscreen,.fs-expanded)>.fs-tools>button{font-size:10px!important;padding:6px 7px!important}}
+</style><style id="compact-top-game-menu">
+#game-fullscreen-stage:is(:fullscreen,.fs-expanded)>.fs-tools{min-height:40px!important;padding:max(2px,env(safe-area-inset-top)) max(5px,env(safe-area-inset-right)) 2px max(5px,env(safe-area-inset-left))!important;justify-content:flex-end!important;gap:4px!important}
+#game-fullscreen-stage>.fs-tools #pause,#game-fullscreen-stage>.fs-tools #restart,#game-fullscreen-stage>.fs-tools #controller-settings,#game-fullscreen-stage:is(:fullscreen,.fs-expanded)>.fs-tools>button{width:auto!important;min-width:0!important;max-width:90px!important;height:34px!important;min-height:34px!important;padding:4px 8px!important;margin:0!important;font-size:10px!important;line-height:1.15!important;border-radius:9px!important;flex:0 0 auto!important;box-shadow:none!important}
+#game-fullscreen-stage:is(:fullscreen,.fs-expanded) #hud{top:max(42px,calc(env(safe-area-inset-top) + 40px))!important}
+#game-fullscreen-stage:is(:fullscreen,.fs-expanded) #map,#game-fullscreen-stage:is(:fullscreen,.fs-expanded) #vitals{top:max(78px,calc(env(safe-area-inset-top) + 76px))!important}
 </style></body></html>
