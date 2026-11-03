@@ -56,3 +56,15 @@ const c={document:doc};vm.createContext(c);vm.runInContext(code,c);const button=
 await button.click();assert.equal(button.textContent,'✕ Exit Full Screen');await button.click();assert.equal(button.textContent,'⛶ Full Screen');assert.equal(doc.body.style.overflow,'auto');
 }await run(false);await run(true);
 });
+
+test('RPG district requires crystals, defeated bots and reaching the rescue beacon',()=>{
+const html=Core.generate({type:'game',title:'Quest'})[0].content;
+const source=html.match(/function step\(dt\)\{[\s\S]*?(?=function loop)/)[0];
+const c={dashTime:0,dashCooldown:0,strikeCooldown:0,energy:100,comboTime:0,combo:0,burstEffect:0,stickX:0,stickY:0,keys:new Set(),hero:{x:0,z:0,hp:5,mode:'whisker'},crystals:[],bots:[],hitEffect:0,chapter:1,CHAPTERS:6,rescueBeacon:{x:0,z:-12},updateHud(){},notify(){},distance:(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),completed:0,finished:0,nextChapter(){this.completed++;},finish(){this.finished++;}};
+c.nextChapter=()=>c.completed++;c.finish=()=>c.finished++;vm.createContext(c);vm.runInContext(source,c);
+vm.runInContext('step(.016)',c);assert.equal(c.completed,0);
+c.hero.z=-12;c.crystals=[{x:8,z:8}];vm.runInContext('step(.016)',c);assert.equal(c.completed,0);
+c.crystals=[];c.bots=[{x:12,z:12,cool:1,hp:1}];vm.runInContext('step(.016)',c);assert.equal(c.completed,0);
+c.bots=[];vm.runInContext('step(.016)',c);assert.equal(c.completed,1);
+c.chapter=6;vm.runInContext('step(.016)',c);assert.equal(c.finished,1);
+});
