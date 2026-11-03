@@ -31,3 +31,17 @@ handlers.pointerdown(event(2,0,0));assert.equal(context.read().p,1);
 handlers.pointerup(event(2,0,0));assert.equal(context.read().p,1);
 handlers.pointercancel(event(1,0,0));assert.equal(context.read().x,0);assert.equal(context.read().p,null);
 });
+
+test('character speech excludes remote voices, assigns profiles, and cancels queued speech',()=>{
+const html=Core.generate({type:'game',title:'Quest'})[0].content;
+const source=html.slice(html.indexOf('function setupCharacterVoices(){'),html.indexOf('\nconst vs='));
+const fields={};const $=id=>fields[id]||(fields[id]={value:'',style:{},children:[],replaceChildren(){this.children=[];this.value='';},append(o){this.children.push(o);if(!this.value)this.value=o.value;},addEventListener(t,f){this[t]=f;}});
+const spoken=[];let cancelled=0;
+const engine={getVoices:()=>[{name:'Remote',voiceURI:'remote',lang:'en-US',localService:false},{name:'Local A',voiceURI:'a',lang:'en-US',localService:true},{name:'Local B',voiceURI:'b',lang:'en-US',localService:true}],addEventListener(){},speak:u=>spoken.push(u),cancel:()=>cancelled++};
+const context={$,window:{speechSynthesis:engine},SpeechSynthesisUtterance:function(t){this.text=t;},localStorage:{getItem:()=>null,setItem(){}},document:{hidden:false,createElement:()=>({})},hero:{mode:'whisker'},voiceOn:true};
+vm.createContext(context);vm.runInContext(source+';this.api=characterSpeech;',context);
+assert.equal(fields['whisker-voice'].children.length,2);assert.equal(fields['luna-voice'].value,'b');
+context.api.say('Hello','luna');assert.equal(spoken[0].voice.voiceURI,'b');assert.equal(spoken[0].pitch,1.08);
+context.api.say('Second','whisker');assert.equal(spoken.length,1);spoken[0].onend();assert.equal(spoken.length,2);
+assert.equal(spoken[1].voice.voiceURI,'a');context.api.cancel();assert.ok(cancelled>0);
+});
