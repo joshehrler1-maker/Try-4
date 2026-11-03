@@ -43,5 +43,5 @@ vm.createContext(context);vm.runInContext(source+';this.api=characterSpeech;',co
 assert.equal(fields['whisker-voice'].children.length,2);assert.equal(fields['luna-voice'].value,'b');
 context.api.say('Hello','luna');assert.equal(spoken[0].voice.voiceURI,'b');assert.equal(spoken[0].pitch,1.08);
 context.api.say('Second','whisker');assert.equal(spoken.length,1);spoken[0].onend();assert.equal(spoken.length,2);
-assert.equal(spoken[1].voice.voiceURI,'a');context.api.cancel();assert.ok(cancelled>0);
+assert.equal(spoken[1].voice.voiceURI,'a');context.api.cancel();assert.ok(cancelled>0);context.api.say('A new adventure','narrator');assert.equal(spoken[2].pitch,1);assert.equal(spoken[2].rate,.92);assert.equal(fields['speech-caption'].textContent,'Narrator: A new adventure');assert.equal(fields['narrator-voice'].children.length,2);
 });
