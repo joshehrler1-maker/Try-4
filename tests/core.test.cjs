@@ -60,7 +60,7 @@ await button.click();assert.equal(button.textContent,'✕ Exit Full Screen');awa
 test('RPG district requires crystals, defeated bots and reaching the rescue beacon',()=>{
 const html=Core.generate({type:'game',title:'Quest'})[0].content;
 const source=html.match(/function step\(dt\)\{[\s\S]*?(?=function loop)/)[0];
-const c={cameraYaw:0,routeClock:1,chestOpened:true,treasure:{x:10,z:11},updateRoutes(){},chaseDungeon(){},moveDungeon(){},dashTime:0,dashCooldown:0,strikeCooldown:0,energy:100,comboTime:0,combo:0,burstEffect:0,stickX:0,stickY:0,keys:new Set(),hero:{x:0,z:0,hp:5,mode:'whisker'},crystals:[],bots:[],hitEffect:0,chapter:1,CHAPTERS:6,rescueBeacon:{x:0,z:-12},updateHud(){},notify(){},distance:(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),completed:0,finished:0,nextChapter(){this.completed++;},finish(){this.finished++;}};
+const c={moveHero(){},motion:{recoil:0},cameraYaw:0,routeClock:1,chestOpened:true,treasure:{x:10,z:11},updateRoutes(){},chaseDungeon(){},moveDungeon(){},dashTime:0,dashCooldown:0,strikeCooldown:0,energy:100,comboTime:0,combo:0,burstEffect:0,stickX:0,stickY:0,keys:new Set(),hero:{x:0,z:0,hp:5,mode:'whisker'},crystals:[],bots:[],hitEffect:0,chapter:1,CHAPTERS:6,rescueBeacon:{x:0,z:-12},updateHud(){},notify(){},distance:(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),completed:0,finished:0,nextChapter(){this.completed++;},finish(){this.finished++;}};
 c.nextChapter=()=>c.completed++;c.finish=()=>c.finished++;vm.createContext(c);vm.runInContext(source,c);
 vm.runInContext('step(.016)',c);assert.equal(c.completed,0);
 c.hero.z=-12;c.crystals=[{x:8,z:8}];vm.runInContext('step(.016)',c);assert.equal(c.completed,0);
@@ -76,4 +76,12 @@ const c={hero:{x:0,z:0},distance:(a,b)=>Math.hypot(a.x-b.x,a.z-b.z)};vm.createCo
 for(const [x,z] of [[-11,-11],[-8,-9],[9,-10],[11,-8],[-10,9],[-8,11],[10,10],[0,-12],[10,11]])assert.ok(c.reachable(x,z),'Reachable '+x+','+z);
 assert.equal(c.walk(5,5),false);const actor={x:0,z:0};c.move(actor,5,5);assert.equal(actor.x,5);assert.equal(actor.z,0);
 assert.equal(c.line({x:-10,z:-10},{x:10,z:-10}),false);
+});
+
+test('hero locomotion accelerates, eases turns, stops and advances gait by distance',()=>{
+const html=Core.generate({type:'game',title:'Quest'})[0].content,source=html.slice(html.indexOf('const motion='),html.indexOf('function heroDraw()'));
+const c={hero:{x:0,z:0,dir:0},moveDungeon(a,x,z){a.x+=x;a.z+=z;}};vm.createContext(c);vm.runInContext(source+';this.m=motion;',c);
+vm.runInContext('moveHero(1/60,1,0,6)',c);assert.ok(c.m.vx>0&&c.m.vx<6);assert.ok(c.hero.dir<0&&c.hero.dir>-Math.PI/2);assert.ok(c.m.phase>0);
+for(let i=0;i<60;i++)vm.runInContext('moveHero(1/60,0,0,6)',c);assert.equal(c.m.vx,0);
+vm.runInContext('resetMotion()',c);assert.equal(c.m.phase,0);
 });
