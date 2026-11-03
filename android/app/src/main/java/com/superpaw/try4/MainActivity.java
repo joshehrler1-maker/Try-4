@@ -13,6 +13,8 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebChromeClient;
+import android.webkit.JsResult;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -72,6 +74,13 @@ public final class MainActivity extends Activity {
                 return new WebResourceResponse("text/plain","UTF-8",403,"Blocked",java.util.Collections.emptyMap(),new ByteArrayInputStream(new byte[0]));
             }
         });
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override public boolean onJsConfirm(WebView view,String url,String message,JsResult result) {
+                if(!allowed(Uri.parse(url))){result.cancel();return true;}
+                new AlertDialog.Builder(MainActivity.this).setMessage(message.length()>400?message.substring(0,400):message).setPositiveButton("Continue",(d,w)->result.confirm()).setNegativeButton("Cancel",(d,w)->result.cancel()).setOnCancelListener(d->result.cancel()).show();return true;
+            }
+        });
+        if(android.os.Build.VERSION.SDK_INT>=33)getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,this::onBackPressed);
         web.setDownloadListener((url,agent,disposition,mime,length) -> toast("Use Export in the native toolbar to save your workspace and drafts."));
         navigate("studio.html");
     }
@@ -79,7 +88,7 @@ public final class MainActivity extends Activity {
         return "https".equals(uri.getScheme()) && "appassets.androidplatform.net".equals(uri.getHost()) && uri.getPort()==-1 && uri.getUserInfo()==null && uri.getPath()!=null && uri.getPath().startsWith("/assets/web/") && !uri.getPath().contains("..");
     }
     private void addButton(LinearLayout row,String title,Runnable action) {
-        Button b=new Button(this);b.setText(title);b.setTextSize(12);b.setMinHeight(48);b.setOnClickListener(v->action.run());row.addView(b,new LinearLayout.LayoutParams(0,-2,1));
+        Button b=new Button(this);b.setText(title);b.setTextSize(12);b.setMinHeight((int)(48*getResources().getDisplayMetrics().density));b.setOnClickListener(v->action.run());row.addView(b,new LinearLayout.LayoutParams(0,-2,1));
     }
     private void navigate(String file) { if(transferring){toast("Wait for the backup operation to finish.");return;}web.loadUrl(BASE+file); }
     private boolean inStudio() { return web.getUrl()!=null && (BASE+"studio.html").equals(web.getUrl().split("#",2)[0]); }
@@ -136,6 +145,6 @@ public final class MainActivity extends Activity {
     private void finishTransfer(String message) {transferring=false;web.evaluateJavascript("delete window.__try4Backup;delete window.__try4Incoming;",null);toast(message);}
     @Override protected void onPause(){super.onPause();if(web!=null){web.evaluateJavascript("if(window.try4Pause)window.try4Pause();window.dispatchEvent(new Event('blur'));",null);web.onPause();web.pauseTimers();}}
     @Override protected void onResume(){super.onResume();if(web!=null){web.onResume();web.resumeTimers();}}
-    @Override public void onBackPressed(){if(transferring){toast("Wait for the backup operation to finish.");return;}if(web.canGoBack())web.goBack();else super.onBackPressed();}
+    @Override public void onBackPressed(){if(transferring){toast("Wait for the backup operation to finish.");return;}if(web.canGoBack())web.goBack();else finish();}
     @Override protected void onDestroy(){if(web!=null){web.stopLoading();web.destroy();web=null;}super.onDestroy();}
 }
