@@ -1,6 +1,6 @@
 {
   "series": "Super Paw Heroes",
-  "version": "1.1",
+  "version": "1.2",
   "status": "Approved character design and creative planning reference; not proof of generated games or films",
   "premise": "Whisker and Luna restore the six Power Crystals to Pawtopia through courageous, kind choices. Their ultimate challenge is to save, not destroy, the Baron Brasswhirl.",
   "characters": {
@@ -79,5 +79,50 @@
     }
   ],
   "main_antagonist": "Baron Brasswhirl",
-  "character_reference_policy": "Whisker and Luna remain canonical cat heroes. Dogs are permitted as villains under the current owner direction. Baron Brasswhirl uses the approved master poster as the cross-media visual reference."
+  "character_reference_policy": "Whisker and Luna remain canonical cat heroes. Dogs are permitted as villains under the current owner direction. Baron Brasswhirl uses the approved master poster as the cross-media visual reference.",
+  "mini_bosses": [
+    {
+      "level": 1,
+      "name": "Captain Cogpaw",
+      "breed": "Dalmatian",
+      "visual": "White coat with distinct black spots; folded ears; brass drill equipment",
+      "attack": "Telegraphed charge"
+    },
+    {
+      "level": 2,
+      "name": "Madam Inkveil",
+      "breed": "Poodle",
+      "visual": "Curly lavender coat; rounded topknot, ear and wrist puffs; magician hat",
+      "attack": "Projectile fan"
+    },
+    {
+      "level": 3,
+      "name": "Archprism Glint",
+      "breed": "Dachshund",
+      "visual": "Chocolate coat, tan muzzle, long body and muzzle, short legs and long ears; crystal armor",
+      "attack": "Marked crystal blast"
+    },
+    {
+      "level": 4,
+      "name": "Admiral Rivetwake",
+      "breed": "Chow Chow",
+      "visual": "Fluffy golden coat, broad build and thick circular mane; admiral armor and shield",
+      "attack": "Summoned reinforcements"
+    },
+    {
+      "level": 5,
+      "name": "Duchess Bramblecoil",
+      "breed": "Greyhound",
+      "visual": "Silver coat, narrow muzzle, slim body and long legs; coil armor",
+      "attack": "Marked pulse"
+    },
+    {
+      "level": 6,
+      "name": "Marshal Shortstack",
+      "breed": "Corgi",
+      "visual": "Orange-white coat, white face blaze, large upright ears and short legs; crown",
+      "attack": "Alternating volleys, pulses and charges; defeat reveals Baron Brasswhirl"
+    }
+  ],
+  "mini_boss_policy": "Every district uses its own reserved mini-boss breed and silhouette, different from regular enemies and from Baron Brasswhirl's brown floppy-eared hound design. Baron remains the separate main boss, not a mini-boss."
 }
