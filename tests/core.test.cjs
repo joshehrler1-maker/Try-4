@@ -16,3 +16,18 @@ test('pending and refunds total separately; CSV prevents spreadsheet formula exe
 test('corrupt review and ledger records cannot be restored',()=>{const s=draft();s.jobs[0].status='approved';assert.throws(()=>Core.backup(s));s.jobs[0].status='review';s.ledger=[{cents:999}];assert.throws(()=>Core.backup(s));});
 
 test('game artifacts require WebGL and remain self-contained',()=>{const a=Core.generate({type:'game',title:'Quest'})[0];assert.equal(a.name,'super-paw-3d-quest.html');assert.ok(a.content.includes("getContext('webgl'"));assert.ok(!a.content.includes("getContext('2d'"));assert.ok(!/<script[^>]+src=|<link/.test(a.content));});
+
+test('joystick supports analog movement, clamps speed, tracks one finger, and resets on cancel',()=>{
+const html=Core.generate({type:'game',title:'Quest'})[0].content;
+const code=html.slice(html.indexOf("const stick=$('joystick')"),html.indexOf("document.addEventListener('keydown'"));
+const handlers={},knob={style:{}},stick={getBoundingClientRect:()=>({left:0,top:0,width:140,height:140}),setPointerCapture:()=>{},addEventListener:(name,fn)=>handlers[name]=fn};
+const context={$:id=>id==='joystick'?stick:knob,playing:true,paused:false};vm.createContext(context);
+vm.runInContext(code+";this.read=()=>({x:stickX,y:stickY,p:stickPointer});",context);
+const event=(id,x,y)=>({pointerId:id,clientX:x,clientY:y,preventDefault(){}});
+handlers.pointerdown(event(1,70,70));assert.equal(context.read().x,0);
+handlers.pointermove(event(1,90,70));assert.ok(context.read().x>0&&context.read().x<1);
+handlers.pointermove(event(1,500,70));assert.equal(context.read().x,1);
+handlers.pointerdown(event(2,0,0));assert.equal(context.read().p,1);
+handlers.pointerup(event(2,0,0));assert.equal(context.read().p,1);
+handlers.pointercancel(event(1,0,0));assert.equal(context.read().x,0);assert.equal(context.read().p,null);
+});
