@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "Super Paw Heroes \u2014 Try 4",
+  "short_name": "Super Paw",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#081640",
+  "theme_color": "#071b51",
+  "icons": [
+    {
+      "src": "app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

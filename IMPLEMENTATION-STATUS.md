@@ -14,7 +14,7 @@
 - End-to-end testing on physical phone, tablet, PC and all browsers.
 
 ## Release blockers
-1. Secure access to canonical Try 4 source and confirm licensing and owner authorization.
+1. GitHub source access is confirmed. Confirm asset licensing and audit any separate Android/backend source.
 2. Run real Android and browser tests, fix gameplay bugs, validate all win conditions.
 3. Provide a hosted HTTPS deployment before offering installation/offline web-app behavior.
 4. Implement consent, child safety, privacy and platform policies before publishing.
@@ -22,3 +22,6 @@
 6. Add safe and authenticated account services before integrating real payments.
 
 Never treat a checklist completion as proof of automated testing or legal clearance.
+
+## Pre-build preparation update
+Manifest, offline public game cache, phone setup/readiness screen and source validator added. Arcade resume/background pause and duplicate gamepad dispatch fixed. Static validation is separate from physical Android verification; physical tests remain pending. See PRE-BUILD.md for outstanding systems and release evidence.

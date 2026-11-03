@@ -12,8 +12,7 @@
   function fire(key,down) {
     const code = key === ' ' ? 'Space' : key;
     const event = new KeyboardEvent(down?'keydown':'keyup', {key,code,bubbles:true,cancelable:true});
-    window.dispatchEvent(event);
-    if (quest) document.dispatchEvent(event);
+    document.dispatchEvent(event);
   }
   function sync(target) {
     for(const key of Array.from(pressed)) if(!target.has(key)) {fire(key,false);pressed.delete(key)}

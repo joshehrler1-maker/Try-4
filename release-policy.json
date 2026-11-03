@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "paidSpendAllowed": false,
+  "paidServicesAllowed": false,
+  "paymentAccessAllowed": false,
+  "adsEnabled": false,
+  "autonomousPublishingEnabled": false,
+  "autonomousGenerationEnabled": false,
+  "nativeAndroidBuildReady": false,
+  "releaseReady": false,
+  "characters": {
+    "heroes": [
+      "Whisker",
+      "Luna"
+    ],
+    "species": "cats",
+    "dogsAllowed": false,
+    "reference": "super-paw-heroes.png"
+  },
+  "verifiedIntegrations": [],
+  "blockers": [
+    "Physical Android gameplay and offline tests are pending.",
+    "Native Android project, signing and secure backend are not implemented.",
+    "Owner authentication and server-side authorization are not implemented.",
+    "No AI production or publishing integration has verified free availability and hard quota enforcement.",
+    "Canonical animated character models and consistent character audio are not implemented.",
+    "Privacy, content licensing and child-directed monetization review are pending."
+  ],
+  "note": "This file describes disabled capabilities and readiness. Client-side flags are not security or billing enforcement for a future backend."
+}
