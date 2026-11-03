@@ -1,0 +1,50 @@
+{
+  "version": "2.0",
+  "master_reference": "assets/whisker-luna-master.png",
+  "display_reference": "assets/whisker-luna-master.webp",
+  "reference_sha256": "743c87bedd935c4d92fa737199abdc0e62204ef9384be103492a1a788dcb7830",
+  "source_status": "User-supplied approved artwork; exact original retained",
+  "runtime": "assets/super-paw-rig.js",
+  "characters": {
+    "Whisker": {
+      "species": "cat",
+      "fur": "Orange/gold tabby; cream muzzle; warm brown forehead and cheek stripes",
+      "face": "Green eyes, pink cat nose, white whiskers, swept orange crest, confident friendly expression",
+      "costume": "Midnight navy and red suit with gold piping; gold pauldrons, bracers and knee guards; dark gloves; red cape with gold trim; paw shield and paw belt buckle",
+      "model": "assets/whisker-master.glb",
+      "heart_colors": [
+        "blue",
+        "red"
+      ]
+    },
+    "Luna": {
+      "species": "cat",
+      "fur": "Silver/white with charcoal tabby markings and pale lavender highlights",
+      "face": "Violet eyes, pink cat nose, fine whiskers, pale silver/lavender side-swept hair, friendly confident expression",
+      "costume": "Deep purple suit, layered silver shoulder armor, silver bracers and boot guards, cyan piping, crescent chest emblem and belt buckle; purple gloves",
+      "model": "assets/luna-master.glb",
+      "heart_colors": [
+        "pink",
+        "purple"
+      ]
+    }
+  },
+  "consistency_rules": [
+    "Use the same approved identities, facial proportions, coat markings, costume colors and emblem assignments in all newly created media.",
+    "Use this shared model source in supported 3D games and previews; update it centrally rather than authoring unrelated replacements.",
+    "Existing movies, images or other media are not automatically remade by changing this registry.",
+    "Unseen surfaces are interpretations; do not present current procedural models as an exact sculpted or textured replica.",
+    "Retain existing Whisker and Luna voice assignments."
+  ],
+  "quality_status": {
+    "geometry": "Refined procedural 3D study",
+    "animation": "Shared runtime procedural node rig with head, arms, legs, cape and tail motion",
+    "exports": "Static GLB geometry; no exported skinning skeleton or animation clips",
+    "remaining": [
+      "Sculpted fur and production texture maps",
+      "Production retopology, skinned skeleton and facial blendshapes",
+      "Physical Android frame-time and battery verification",
+      "Human visual approval against the poster"
+    ]
+  }
+}
