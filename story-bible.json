@@ -1,8 +1,8 @@
 {
   "series": "Super Paw Heroes",
-  "version": "1.0",
-  "status": "creative planning reference; not generated media",
-  "premise": "Whisker and Luna restore the six Power Crystals to Pawtopia through courageous, kind choices. Their ultimate challenge is to save, not destroy, the Shadow King.",
+  "version": "1.1",
+  "status": "Approved character design and creative planning reference; not proof of generated games or films",
+  "premise": "Whisker and Luna restore the six Power Crystals to Pawtopia through courageous, kind choices. Their ultimate challenge is to save, not destroy, the Baron Brasswhirl.",
   "characters": {
     "Whisker": {
       "role": "brave, playful leader",
@@ -15,6 +15,21 @@
       "visual": "silver-white cat, purple/silver suit, moon motif, utility belt",
       "voice": "clear, confident, witty; consistent across releases",
       "flaw": "hesitates to ask for help"
+    },
+    "Baron Brasswhirl": {
+      "role": "Main antagonist and final boss across Super Paw Heroes",
+      "species": "anthropomorphic brown floppy-eared hound dog",
+      "visual_reference": "assets/baron-brasswhirl-master.webp",
+      "design_status": "User-approved master concept; playable procedural model is an approximation",
+      "visual": "Brown fur, tan muzzle, amber eyes, large dark canine nose, long floppy ears, confident smirk; navy/charcoal suit, brass/copper armor and cog chest emblem; burgundy cape, gadget utility belt, brass spiral gauntlet, armored boots, canine tail",
+      "personality": "Clever, theatrical, boastful gadget inventor; mischievous and kid-friendly",
+      "powers": [
+        "Wind-up charge",
+        "Clockwork projectile volley",
+        "Marked clockwork pulse"
+      ],
+      "continuity": "Use this same face, fur, ears, costume, colors and gadgets in game art, stories, films, books, posters and website artwork. Do not substitute a generic dog or rename him Regent Nullstar.",
+      "voice": "Not yet selected; do not invent an approved voice profile"
     }
   },
   "rules": [
@@ -36,7 +51,7 @@
       "number": 2,
       "name": "The Moonlit Promise",
       "value": "Honesty",
-      "synopsis": "Luna admits a mistake and earns the team\u2019s trust."
+      "synopsis": "Luna admits a mistake and earns the team’s trust."
     },
     {
       "number": 3,
@@ -60,7 +75,9 @@
       "number": 6,
       "name": "The Dawn of Pawtopia",
       "value": "Hope",
-      "synopsis": "The heroes offer the Shadow King a chance to change."
+      "synopsis": "The heroes offer the Baron Brasswhirl a chance to change."
     }
-  ]
+  ],
+  "main_antagonist": "Baron Brasswhirl",
+  "character_reference_policy": "Whisker and Luna remain canonical cat heroes. Dogs are permitted as villains under the current owner direction. Baron Brasswhirl uses the approved master poster as the cross-media visual reference."
 }
