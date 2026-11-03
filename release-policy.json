@@ -19,12 +19,15 @@
   },
   "verifiedIntegrations": [],
   "blockers": [
-    "Physical Android gameplay and offline tests are pending.",
-    "Native Android project, signing and secure backend are not implemented.",
-    "Owner authentication and server-side authorization are not implemented.",
-    "No AI production or publishing integration has verified free availability and hard quota enforcement.",
-    "Canonical animated character models and consistent character audio are not implemented.",
+    "Physical Android studio, gameplay, backup and offline tests are pending.",
+    "Android source is implemented but SDK compilation and release signing are not verified.",
+    "Optional loopback worker is tested; hosted backend, secure owner account and Android connection are not implemented.",
+    "Remote AI providers, verified free quotas and publishing integrations are not implemented.",
+    "Canonical animated character models, rendered films and consistent character audio are not implemented.",
     "Privacy, content licensing and child-directed monetization review are pending."
   ],
-  "note": "This file describes disabled capabilities and readiness. Client-side flags are not security or billing enforcement for a future backend."
+  "note": "This file describes disabled capabilities and readiness. Client-side flags are not security or billing enforcement for a future backend.",
+  "nativeAndroidSourcePresent": true,
+  "localTemplateGenerationEnabled": true,
+  "localWorkerSourcePresent": true
 }

@@ -1,0 +1,46 @@
+name: Try4 source and Android compile checks
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'tests/**'
+      - 'server/**'
+      - 'core.js'
+      - 'studio.*'
+      - 'scripts/**'
+      - '.github/workflows/verify.yml'
+permissions:
+  contents: read
+concurrency:
+  group: try4-verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    # Hard cost guard: standard public-repository runner only. Never use larger runners.
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Source and functional checks
+        run: |
+          node scripts/validate.mjs
+          node --test tests/core.test.cjs tests/server.test.mjs
+          python3 scripts/check_android.py
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.13'
+          cache-disabled: true
+      - name: Check SDK availability
+        run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0'
+      - name: Compile Android source without packaging or publishing
+        run: gradle --no-daemon -p android :app:compileDebugJavaWithJavac
+      # No artifact uploads, cache uploads, APK distribution, release signing or deployment.

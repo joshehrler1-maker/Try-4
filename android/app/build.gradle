@@ -1,0 +1,24 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.superpaw.try4'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'com.superpaw.try4'
+        minSdk 26
+        targetSdk 36
+        versionCode 1
+        versionName '0.2.0-preflight'
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    sourceSets { main { assets.srcDirs = [layout.buildDirectory.dir('generated/try4Assets')] } }
+    buildTypes { release { minifyEnabled false } }
+}
+dependencies { implementation 'androidx.webkit:webkit:1.14.0' }
+// Explicit public content list: never package backend state, tests, credentials or Git metadata.
+tasks.register('syncWebAssets', Copy) {
+    from(rootProject.file('..')) {
+        include '*.html', '*.css', '*.js', '*.json', '*.svg', '*.png', '*.webmanifest'
+    }
+    into(layout.buildDirectory.dir('generated/try4Assets/web'))
+}
+tasks.named('preBuild').configure { dependsOn 'syncWebAssets' }

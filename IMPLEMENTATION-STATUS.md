@@ -1,27 +1,21 @@
-# Try 4: implementation and launch status
+# Try 4 verified implementation status
 
-## Implemented in this browser prototype
-- Standalone studio and several locally running browser games.
-- Mobile controls, keyboard input, responsive screens and optional device speech.
-- In Super Paw Heroes 3D Rescue Quest: **chapter-boundary local checkpoint saving**. The Resume saved chapter button restores progression after a completed district if browser localStorage is available. Clear campaign save removes it. Restart begins a fresh game and replaces the previous save.
-- Planning, manual audit and growth tools. These do not certify the content.
+## Implemented source
+- Existing website, browser games and original canonical poster assets.
+- Creator Studio: Start/Pause/Stop, emergency lock, manual/approval/auto local drafting modes, bounded queue, review gates, per-platform preferences, activity log, local persistence, JSON export/restore and explicit data erasure.
+- Offline template generators: short story Markdown, 20 printable symbol activity SVGs, a standalone playable memory game, original song lyrics, and a 30-second production storyboard. These are fixed templates, not AI-generated animation, singing or cinematic characters. Different titles do not create entirely new story plots.
+- Sandboxed draft preview; browser file export; owner-entered USD bookkeeping, pending/received/refund totals and CSV export. No earnings values are fabricated or provider verified.
+- Native Android project: bundled offline WebView assets, external-load restrictions, no Internet or sensitive device permissions, native document-picker studio backup/restore and lifecycle pause handling. Source present does not mean compiled APK.
+- Optional local Node worker: bearer-authenticated, loopback-only, single-process lock, checksummed durable snapshots, startup emergency lock and bounded local drafting. Not hosted or connected to the Android app.
+- Public-repository-only standard-runner GitHub verification workflow: source tests and Android Java compilation, no cache/artifact upload or distribution. Its run result must be inspected separately.
 
-## Not implemented / not verified
-- Original Android APK; proprietary Android code has not been accessed.
-- State-of-the-art cinematic 3D characters or professional recorded voices.
-- Automatic AI content creation or publishing; account integrations and verified earnings.
-- Universal cloud sync, encryption of locally stored checkpoints, or cross-device saves.
-- End-to-end testing on physical phone, tablet, PC and all browsers.
+## Checks actually completed locally
+- 14 functional engine and worker tests passed: locks, modes, review gating, queue limits, generators, escaping, restore validation, bookkeeping, CSV formula neutralization, API authentication, durable state and integrity rejection.
+- 131 static source/offline-worker checks passed with the two unchanged repository image assets verified by inventory rather than local binary download.
+- Android manifest/resource/WebView restrictions check passed. Not an SDK compilation.
+- Desktop browser smoke test: unlock, queue game, Start, generated HTML preview, reveal two cards, restart to 12 hidden cards. No physical Android performance result is claimed.
 
-## Release blockers
-1. GitHub source access is confirmed. Confirm asset licensing and audit any separate Android/backend source.
-2. Run real Android and browser tests, fix gameplay bugs, validate all win conditions.
-3. Provide a hosted HTTPS deployment before offering installation/offline web-app behavior.
-4. Implement consent, child safety, privacy and platform policies before publishing.
-5. Verify $0 eligibility and quota guards for every required third-party service.
-6. Add safe and authenticated account services before integrating real payments.
+## Still incomplete
+Android SDK compilation result, installed APK, owner-controlled release signing, physical-phone testing, real backend hosting and app connection, secure account/email/biometric authentication, encrypted cloud backups, provider authorization and quota adapters, autonomous publishing, AI content generation, cinematic models and animation, singing/character audio, ad approval/serving, verified earnings and payouts.
 
-Never treat a checklist completion as proof of automated testing or legal clearance.
-
-## Pre-build preparation update
-Manifest, offline public game cache, phone setup/readiness screen and source validator added. Arcade resume/background pause and duplicate gamepad dispatch fixed. Static validation is separate from physical Android verification; physical tests remain pending. See PRE-BUILD.md for outstanding systems and release evidence.
+ChatGPT plan adaptation is not implemented. No ChatGPT subscription/API access is inferred. No paid services are connected. Client-side policy records are not server-side billing or authorization controls. Source access is confirmed; source and asset rights still need review before public production launch.

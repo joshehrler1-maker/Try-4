@@ -2,6 +2,7 @@
   'use strict';
   const info = document.getElementById('app-status');
   const show = text => { if (info) info.textContent = text; };
+  if (location.hostname === 'appassets.androidplatform.net') { show('Bundled offline Android content. No network connection required.'); return; }
   if ('serviceWorker' in navigator && window.isSecureContext && location.protocol !== 'file:') {
     navigator.serviceWorker.register('./sw.js').then(() => {
       navigator.serviceWorker.ready.then(() => show('Offline game files saved. Reopen after closing this tab to use them offline.'));

@@ -2,7 +2,7 @@
 'use strict';
 fetch('./release-policy.json', {cache:'no-store'}).then(r => {if (!r.ok) throw Error(); return r.json();}).then(policy => {
   // A config toggle cannot unlock a release; evidence and implementation are required.
-  document.getElementById('gate').textContent = 'BLOCKED — native build and public launch are not verified. Ads, payments and autonomous publishing are disconnected.';
+  document.getElementById('gate').textContent = 'BLOCKED — Android source is present; compiled APK and public launch are not verified. Ads, payments and autonomous publishing are disconnected.';
   const list = document.getElementById('blockers');
   for (const reason of policy.blockers || []) { const li = document.createElement('li'); li.textContent = reason; list.append(li); }
 }).catch(() => {document.getElementById('gate').textContent = 'BLOCKED — release record unavailable. No release can be verified.';});

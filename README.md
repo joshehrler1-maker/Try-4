@@ -1,5 +1,15 @@
-# Try-4
-Try #4 is a browser MVP for a planned Android app and secure backend automation to build and manage original digital content and business workflows using free resources. Core rules: $0/free-only operation. No paid APIs, subscriptions, paid hosting upgrades, paid credits, paid ads, or publishing fees. Respect hard free-tier limits. Stop or use an approved free alternative when a required service is not genuinely free. Protect user accounts, credentials, data, and content. Super Paw Heroes is the canonical universe. Core characters are Whisker and Luna. Approved character designs, assets, costumes, colors, logos, voices, and other creative references must remain consistent across videos, games, stories, music, digital products, branding, and promotions. Try #4 uses an MVP-first approach. Build and validate the core system before activating additional features. All publishing, monetization, quality, originality, child safety, platform rule, security, and file integrity requirements must be checked before release.
+# Try 4 / Super Paw Heroes
 
-## Current build
-Open `index.html` on an HTTPS host. See [Setup and readiness](readiness.html), [implementation status](IMPLEMENTATION-STATUS.md) and [pre-build requirements](PRE-BUILD.md). The native Android app and backend are not built. Run source checks with `node scripts/validate.mjs` (Node 22+). No paid services, ad network, payment integration or cloud jobs are connected.
+Offline Creator Studio and browser games, plus a native Android source project and an optional local worker. Whisker and Luna are cats; no dogs. Preserve the approved master poster designs, costumes, utility belts and creative continuity.
+
+## Open
+Serve the public top-level HTML/assets over HTTPS and open [Creator Studio](studio.html) or [games](index.html). Studio drafts with built-in templates at no cost: stories, symbol coloring activities, a memory game, song lyrics and storyboards. Preview, manually review, export and back up the results. Browser/local Android workspaces are not secure owner accounts.
+
+## Verify
+Node 22+: `node scripts/validate.mjs` and `node --test tests/core.test.cjs tests/server.test.mjs`. Python: `python3 scripts/check_android.py`. The two tracked PNGs must be present for full validation. The optional worker has its own [setup notes](server/README.md). Android source and compilation requirements are in [android/README.md](android/README.md).
+
+## Absolute $0
+No paid APIs, subscriptions, cloud upgrades, credits, paid ads, publication fees or AI financial access. Unknown cost/quota means stop. There are no external AI, ad, publishing or payment adapters in this implementation. The verification workflow runs only on a standard public-repository runner, uploads no cache/artifacts, and skips private repositories. Current GitHub billing reference: https://docs.github.com/en/actions/concepts/billing-and-usage
+
+## Status
+See [implementation status](IMPLEMENTATION-STATUS.md), [pre-build requirements](PRE-BUILD.md), [phone readiness](readiness.html) and [what remains](BUILD-REMAINING.md). Native source is not an installed APK. Public deployment and production release are not certified. ChatGPT plan adaptation, AI animation, real publication and earnings integrations remain incomplete.
