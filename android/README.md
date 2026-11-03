@@ -1,6 +1,6 @@
 # Try4 Android source — offline studio and games
 
-Android app source is present. APK compilation and physical-device verification are separate release blockers. No APK is supplied until the readiness requirements are met.
+Android app source is present. Android Java compilation passed for source commit `1bf4b66c64f8210884336b40d4b70800e38fa6d7` in https://github.com/joshehrler1-maker/Try-4/actions/runs/41584281235. APK packaging and physical-device verification remain release blockers. No APK is supplied until the readiness requirements are met.
 
 Toolchain: Java 17, Gradle 8.13, Android Gradle Plugin 8.13.2, compile/target SDK 36, minimum Android 8 (API 26), AndroidX WebKit 1.14.0. These fixed versions are compatibility choices, not claims to be the latest versions.
 

@@ -2,7 +2,7 @@
 
 This is an implementation boundary, not a list of completed features.
 
-1. Inspect the Android compile workflow. Resolve any SDK/Java/asset failures. No APK is uploaded by this workflow.
+1. The Android compile workflow passed at source commit `1bf4b66c64f8210884336b40d4b70800e38fa6d7`. Keep it green as code changes. No APK is uploaded by this workflow.
 2. Test the browser studio and games on the owner’s Android phone. Record actual device/browser versions, backup restore, offline relaunch, every game win condition, long-session frame pacing, heat and battery behavior. Keep the pre-build gate blocked until the evidence passes.
 3. Prepare owner-controlled signing and install a test APK only after the required readiness review. Back up the signing key outside the public repository. Reproducible builds and install/update checks are still required.
 4. Build a secure hosted owner account and connect the Android app to it. The current loopback worker is a tested starting implementation, not an Internet-facing backend or remote authentication system. Add TLS, encrypted secrets/backups, provider token revocation, account recovery, security review and deployment-specific budget enforcement.

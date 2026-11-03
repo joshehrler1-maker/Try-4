@@ -20,7 +20,7 @@
   "verifiedIntegrations": [],
   "blockers": [
     "Physical Android studio, gameplay, backup and offline tests are pending.",
-    "Android SDK compilation passed for the initial native source; final-head verification, install tests and release signing remain pending.",
+    "Android source compilation passed. APK packaging, installation tests and owner-controlled release signing remain pending.",
     "Optional loopback worker is tested; hosted backend, secure owner account and Android connection are not implemented.",
     "Remote AI providers, verified free quotas and publishing integrations are not implemented.",
     "Canonical animated character models, rendered films and consistent character audio are not implemented.",
@@ -29,5 +29,7 @@
   "note": "This file describes disabled capabilities and readiness. Client-side flags are not security or billing enforcement for a future backend.",
   "nativeAndroidSourcePresent": true,
   "localTemplateGenerationEnabled": true,
-  "localWorkerSourcePresent": true
+  "localWorkerSourcePresent": true,
+  "nativeAndroidSourceCompiled": true,
+  "verifiedSourceCommit": "1bf4b66c64f8210884336b40d4b70800e38fa6d7"
 }
