@@ -15,7 +15,8 @@
       "heart_colors": [
         "blue",
         "red"
-      ]
+      ],
+      "turnaround_details": "Layered gold shoulder plates, navy gauntlets with gold bands, utility belt pouches, gold boot toes and knee plates, orange ringed tail, and red cape with a gold hem and rear paw clasp. Leave clearance around the tail root."
     },
     "Luna": {
       "species": "cat",
@@ -26,14 +27,15 @@
       "heart_colors": [
         "pink",
         "purple"
-      ]
+      ],
+      "turnaround_details": "Swept silver-lavender hair, wraparound silver shoulder armor, cyan curves along the back and thighs, a crescent utility belt clasp, and a curled silver-white tail. Keep the back clear of a cape."
     }
   },
   "consistency_rules": [
     "Use the same approved identities, facial proportions, coat markings, costume colors and emblem assignments in all newly created media.",
     "Use this shared model source in supported 3D games and previews; update it centrally rather than authoring unrelated replacements.",
-    "Existing movies, images or other media are not automatically remade by changing this registry.",
-    "Unseen surfaces are interpretations; do not present current procedural models as an exact sculpted or textured replica.",
+    "Use the approved turnaround and original poster for new artwork across games, videos, stories, books, covers, music artwork, promotional art and the website. Existing media require explicit asset replacement.",
+    "Use the approved turnaround for unseen costume surfaces; validate new production models against all three views.",
     "Retain existing Whisker and Luna voice assignments."
   ],
   "quality_status": {
@@ -46,5 +48,15 @@
       "Physical Android frame-time and battery verification",
       "Human visual approval against the poster"
     ]
+  },
+  "turnaround_reference": {
+    "title": "Whisker and Luna 3D hero turnaround",
+    "url": "https://chatgpt.com/library?file_id=libfile_2e0ffd2f87fc81919e92635b2b7608c5&account_id=personal",
+    "views": [
+      "front",
+      "left side",
+      "rear"
+    ],
+    "role": "Approved shared design for proportions, costume construction and previously unseen surfaces. Use the original poster for facial identity, colors and emblems."
   }
 }
