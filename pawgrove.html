@@ -7,7 +7,7 @@
 <details id="poster"><summary>Meet Whisker and Luna</summary><img src="assets/whisker-luna-master.webp" alt="Super Paw Heroes character poster" loading="lazy"></details><div class="hud"><strong id="area"></strong><span id="status"></span></div>
 <canvas width="720" height="410" aria-label="Third-person view of Pawgrove"></canvas>
 <p id="quest"></p><div id="kit" aria-label="Adventure gear"></div><div class="controls"><div id="stick" aria-label="Movement joystick"><i id="knob"></i></div><div class="actions"><button id="target" aria-pressed="false" title="Focus">Z</button><button id="guard" aria-pressed="false" title="Guard">R</button><button id="map" aria-pressed="false" title="Map">L</button><button id="pause" aria-pressed="false">Start</button><button id="talk" title="Talk or roll">A</button><button id="attack" title="Pawblade">B</button><button id="pulse" title="Comet Launcher">C ←</button><button id="look" aria-pressed="false" title="Look ahead">C ↑</button><button id="lantern" title="Lantern">C ↓</button><button id="compass" title="Trail Compass">C →</button></div></div><small>Joystick to move · A talk or roll · B strike · R hold shield · Z focus · C ← launch · C ↑ look · Start pause</small></main>
-<script>
+<style>canvas{outline:1px solid #9482d7;box-shadow:0 0 26px #6754d455}button{border-color:#9c86da}h1{color:#ffe1a0;text-shadow:0 2px #4a2858}</style><script src="assets/animated-game-art.js?v=1"></script><script>
 'use strict';
 const $=id=>document.getElementById(id), canvas=document.querySelector('canvas'), ctx=canvas.getContext('2d');
 const keys=new Set(), p={x:0,z:0,face:0,hp:5}, joy={x:0,z:0,id:null};
@@ -182,11 +182,11 @@ const trees=Array.from({length:76},(_,i)=>({x:(i%2?-1:1)*(8+(i*13%14)),z:Math.fl
 let kitText='';
 function render(){
  const cavern=p.z>=43;
- const sky=ctx.createLinearGradient(0,0,0,260);sky.addColorStop(0,cavern?'#181126':'#466e9d');sky.addColorStop(1,cavern?'#614566':'#f9c88e');ctx.fillStyle=sky;ctx.fillRect(0,0,720,410);
+ const sky=ctx.createLinearGradient(0,0,0,260);sky.addColorStop(0,cavern?'#181126':'#466e9d');sky.addColorStop(1,cavern?'#614566':'#f9c88e');ctx.fillStyle=sky;ctx.fillRect(0,0,720,410);window.SuperPawAnimatedArt?.paintSky(ctx,720,410,cavern?'cavern':'forest');
  poly([[0,150],[75,105],[141,132],[226,74],[340,142],[434,89],[548,143],[658,80],[720,126],[720,410],[0,410]],cavern?'#372947':'#49647c');
  for(let z=Math.ceil((p.z+68)/3)*3;z>p.z-8;z-=3){
   const cave=z>=43;
-  surface([project(-100,0,z),project(100,0,z),project(100,0,z-3),project(-100,0,z-3)],cave?'#514059':'#527b57',cave?'cave':'grass',.48,Math.max(.25,8/(z-p.z+8)));
+  surface([project(-100,0,z),project(100,0,z),project(100,0,z-3),project(-100,0,z-3)],cave?'#514059':'#4e7864',cave?'cave':'grass',.48,Math.max(.25,8/(z-p.z+8)));
   surface([project(-3,0,z),project(3,0,z),project(3,0,z-3),project(-3,0,z-3)],cave?'#645271':'#8e825d',cave?'cave':'path',.45,Math.max(.25,8/(z-p.z+8)));
  }
  const objects=[...loot.map((item,i)=>({...item,type:'chest',open:has(i)})),...(!gate?[{x:0,z:gateZ,type:'gate'},{...gateSwitch,type:'switch'}]:[]),...trees.map(t=>({...t,type:'tree'})),...gems.filter(g=>!g.taken).map(g=>({...g,type:'gem'})),...foes.filter(f=>f.hp).map(f=>({...f,type:'foe'})),...npcs.map(n=>({...n,type:'npc'})),{...lantern,type:'lantern'},{...p,type:'hero'}];
