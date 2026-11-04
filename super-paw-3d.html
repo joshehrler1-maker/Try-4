@@ -900,32 +900,37 @@ add('rock',overlook.x-1,.22,overlook.z,.56,.40,.54,[.41,.44,.42]);
 // Structural pedestals and lamps remain at the room perimeter, keeping the route open.
 for(const r of dungeonRooms){for(const side of [-1,1]){const x=r.x+side*(r.w/2-.5),z=r.z-2;add('cube',x,.10,z,.37,.10,.37,art.trim);add('cylinder',x,.64,z,.14,.45,.14,art.stone);add('cube',x,1.12,z,.27,.06,.27,art.trim);}for(const side of [-1,1])add('cube',r.x,r===dungeonRooms[0]?.048:.041,r.z+side*(r.d/2-.32),r.w/2-.4,.018,.045,art.trim,true);}
 function free(x,z,r=1.1){for(const dx of [-r,0,r])for(const dz of [-r,0,r])if(onDungeon(x+dx,z+dz))return false;return true;}
-// A compact kit of plaster facades, masonry plinths, pitched roofs and shopfronts.
+// Stepped Pawtopia towers with inset amber windows and purple banners.
 function building(x,z,h,variant=0){
-const paints=[[.69,.60,.46],[.53,.62,.60],[.70,.55,.43],[.65,.65,.59]],plaster=paints[variant%4],stone=[.43,.42,.38],wood=[.23,.18,.14],roofColor=variant%2?[.31,.35,.36]:[.46,.27,.20],w=1.15+(variant%3)*.16,d=1.0,top=h+.12;
-add('cube',x,h/2,z,w,h/2,d,plaster);add('cube',x,.22,z,w+.045,.22,d+.045,stone);
-add('cube',x,top,z,w+.17,.10,d+.18,wood);add('roof',x,top+.63,z,w+.24,.57,d+.22,roofColor);
-add('cube',x,top+1.21,z,.045,.045,d+.24,roofColor,true);
-add('cube',x+w*.54,top+.91,z+.33,.16,.62,.19,stone);add('cube',x+w*.54,top+1.55,z+.33,.21,.055,.23,[.30,.29,.27],true);
-for(const side of [-1,1]){
-const front=z+side*(d+.025);add('cube',x,.72,front,.28,.72,.035,wood);add('cube',x,.80,front+side*.045,.20,.55,.02,[.31,.24,.18],true);add('sphere',x+.16,.67,front+side*.075,.025,.025,.025,[.78,.64,.37],true);
-add('cube',x,.045,front+side*.14,.39,.045,.20,stone);
-for(let floor=0;floor<Math.max(1,Math.floor(h/1.15));floor++){
-const y=.94+floor*1.14;for(const dx of [-w*.66,w*.66]){
-add('cube',x+dx,y,front,.27,.34,.035,wood);
-add('cube',x+dx,y,front+side*.04,.21,.28,.018,n===2?[.72,.57,.33]:[.19,.30,.35]);
-add('cube',x+dx,y,front+side*.065,.017,.28,.018,[.73,.67,.54],true);add('cube',x+dx,y,front+side*.065,.21,.018,.018,[.73,.67,.54],true);
-add('cube',x+dx,y-.35,front+side*.08,.30,.035,.12,stone,true);
-for(const shutter of [-1,1])add('cube',x+dx+shutter*.31,y,front+side*.035,.055,.32,.035,variant%2?[.24,.36,.34]:[.38,.27,.20],true);
-if(floor===1){add('cube',x+dx,y-.42,front+side*.12,.28,.085,.16,[.36,.25,.18],true);for(let j=-1;j<=1;j++){add('sphere',x+dx+j*.14,y-.30,front+side*.15,.11,.12,.10,[.24,.39,.22],true);add('sphere',x+dx+j*.14,y-.19,front+side*.17,.045,.045,.04,variant%2?[.74,.38,.47]:[.87,.70,.35],true);}}
-}}
-// Shop awning, projecting sign and timber framing give the ground floor a use.
-if(variant%3===0){add('canopy',x,1.76,front+side*.22,w*.84,.21,.46,[.36,.47,.43]);add('cube',x,1.59,front+side*.65,w*.84,.10,.03,[.74,.66,.47],true);}
-add('cube',x+w*.81,1.88,front+side*.23,.04,.035,.26,wood,true);add('cube',x+w*.81,1.62,front+side*.44,.20,.23,.045,[.34,.27,.18],true);add('oct',x+w*.81,1.63,front+side*.50,.10,.12,.015,art.trim,true);
-for(const edge of [-1,1])add('cube',x+edge*(w-.06),h/2,front,.045,h/2,.035,wood,true);
-}
-for(const side of [-1,1]){for(let floor=1;floor<h;floor+=1.14){add('cube',x+side*(w+.02),floor,z,.035,.28,.24,[.20,.29,.31],true);add('cube',x+side*(w+.06),floor-.31,z,.08,.03,.29,stone,true);}}
-sceneryLandmarks.push({x,z,kind:'detailed townhouse'});
+ const stone=[[.43,.42,.59],[.36,.39,.57],[.48,.41,.58]][variant%3];
+ const shadow=[.22,.24,.40],silver=[.57,.53,.67],gold=[.93,.62,.25],windowLight=[1,.78,.39];
+ const w=1.15+(variant%3)*.16,d=1.02,top=h+1.1;
+ add('cube',x,top/2,z,w,top/2,d,stone);
+ add('cube',x,.23,z,w+.13,.23,d+.11,shadow);
+ add('cube',x,top,z,w+.12,.12,d+.12,silver);
+ add('cube',x,top+.4,z,w*.79,.4,d*.82,shadow);
+ add('cube',x,top+.82,z,w*.82,.055,d*.86,gold);
+ add('cube',x,top+1.1,z,w*.44,.26,d*.44,stone);
+ add('oct',x,top+1.55,z,.1,.26,.1,gold,true);
+ for(const side of [-1,1]){
+  const front=z+side*d;
+  for(const edge of [-1,1]){
+   add('cube',x+edge*(w-.13),top*.5,front,.11,top*.5,.11,silver);
+  }
+  for(let y=.9;y<top-.45;y+=1.18){
+   for(const offset of [-.46,.46]){
+    add('cube',x+offset,y,front,.29,.45,.075,shadow);
+    add('cube',x+offset,y,front+side*.079,.22,.34,.018,windowLight);
+    add('oct',x+offset,y+.32,front+side*.09,.22,.18,.025,windowLight);
+    add('cube',x+offset,y,front+side*.115,.025,.41,.02,gold,true);
+   }
+  }
+  if(variant%3===0){
+   add('cube',x,top-1.34,front+side*.12,.24,.73,.04,[.37,.18,.64]);
+   add('oct',x,top-1.35,front+side*.18,.14,.18,.03,gold);
+  }
+ }
+ sceneryLandmarks.push({x,z,kind:'Pawtopia tower'});
 }
 function tree(x,z){add('cylinder',x,.80,z,.13,1.1,.13,[.28,.20,.13]);add('cylinder',x+.15,1.65,z,.06,.55,.06,[.31,.23,.15],true);for(const [dx,dy,dz,r]of [[0,2.3,0,.88],[-.45,2.15,.17,.62],[.43,2.55,.12,.68],[.1,3.02,-.1,.55]])add('rock',x+dx,dy,z+dz,r,r*.85,r,[.20,.36,.24]);add('cylinder',x,-.32,z,.85,.13,.85,[.28,.34,.24]);}
 function stall(x,z){add('cube',x,.35,z,.9,.35,.6,[.33,.23,.17]);for(const side of [-1,1])add('cylinder',x+side*.82,1.1,z,.045,.9,.045,[.28,.22,.18]);add('canopy',x,1.65,z,1,.45,.85,[.30,.38,.52]);add('canopy',x,1.66,z,1.01,.45,.27,[.79,.68,.49],true);for(let i=-1;i<=1;i++)add('oct',x+i*.34,.85,z-.1,.13,.15,.13,[.81,.51,.22],true);}
@@ -989,7 +994,7 @@ let i=0;for(const group of groups.values()){const name='district-batch-'+i++;mak
 }
 function drawDungeon(){const art=districtArt[chapter-1],low=isLowDetail();worldSurface=chapter===4?2:1;
 draw('cube',0,-.75,0,WORLD+4,.3,WORLD+4,chapter===4?[.08,.22,.26]:chapter===5?[.16,.24,.18]:chapter===3?[.12,.14,.18]:[.19,.22,.26]);worldSurface=1;
-for(const r of dungeonRects)draw('cube',r.x,-.184,r.z,r.w/2,.18,r.d/2,art.stone.map((v,i)=>inEcho?v*.64+[.04,.11,.19][i]:v*.88));
+for(const r of dungeonRects)draw('cube',r.x,-.184,r.z,r.w/2,.18,r.d/2,chapter===1&&!inEcho?[.49,.44,.63]:art.stone.map((v,i)=>inEcho?v*.64+[.04,.11,.19][i]:v*.88));
 for(const b of sceneryBatches)if((!low||!b.detail)&&Math.hypot(b.x-hero.x,b.z-hero.z)<(low?24:48)&&visibleAt(b.x,1,b.z,12))draw(b.name,0,0,0,1,1,1,b.color);
 worldSurface=3;for(const b of landscapeBatches)draw(b.name,0,0,0,1,1,1,b.color);worldSurface=0;for(const r of dungeonRooms)for(const side of [-1,1])draw('oct',r.x+side*(r.w/2-.5),1.4,r.z-2,.12,.20,.12,side<0?[1,.64,.26]:[.42,.78,1]);
 if(chapter===7){
