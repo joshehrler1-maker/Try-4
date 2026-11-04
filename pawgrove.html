@@ -23,13 +23,32 @@ const gateSwitch={x:3,z:44.5};
 let gear,gate,guarding,seeds,windup;
 function has(i){return gear.has(i)}
 function guard(on){guarding=on;$('guard').setAttribute('aria-pressed',on)}
-let foes,luna=false,won,spoken,hit,shot,flash,note,noteTime,last=0;
+const chapterTwo=new URLSearchParams(location.search).get('chapter')==='ember-hollow';
+let savedHero='';
+try{savedHero=localStorage.getItem('pawgrove-hero')||''}catch{}
+let foes,luna=chapterTwo&&savedHero==='luna',won,spoken,hit,shot,flash,note,noteTime,last=0;
 function reset(){
  Object.assign(p,{x:0,z:0,face:0,hp:5}); for(const g of gems)g.taken=false;
  foes=[{x:0,z:16,hp:2},{x:3,z:28,hp:2},{x:-3,z:39,hp:2},{x:0,z:54,hp:7,boss:true}];
  gear=new Set();gate=false;seeds=0;windup=0;guard(false);won=spoken=false;hit=shot=flash=noteTime=0;note='';
 }
-reset();
+function startChapter(){
+ reset();
+ if(!chapterTwo)return;
+ Object.assign(p,{x:0,z:40});
+ for(const g of gems)g.taken=true;
+ gear=new Set([0,1,2,3]);seeds=12;spoken=true;
+ foes=foes.filter(f=>f.boss);
+ say('The shrine revealed Ember Hollow. Aim for the glowing gate switch.');
+}
+startChapter();
+if(chapterTwo){
+ document.querySelector('h1').textContent='Chapter 2 · Ember Hollow';
+ document.querySelector('header a').href='pawgrove-forest.html';
+ document.querySelector('header a').textContent='← Return to the forest';
+ $('hero').textContent=luna?'Luna':'Whisker';
+ $('hero').setAttribute('aria-pressed',luna);
+}
 const count=()=>gems.filter(g=>g.taken).length, dist=o=>Math.hypot(o.x-p.x,o.z-p.z);
 function say(line){note=line;noteTime=5}
 function talk(){
@@ -49,7 +68,7 @@ function attack(ranged){
  if(target){target.hp=Math.max(0,target.hp-(ranged?1:2));target.flash=.2;if(!target.hp&&has(2))seeds=Math.min(16,seeds+3)}
 }
 $('hero').onclick=()=>{luna=!luna;$('hero').textContent=luna?'Luna':'Whisker';$('hero').setAttribute('aria-pressed',luna)};
-$('reset').onclick=reset;$('talk').onclick=talk;$('attack').onclick=()=>attack(false);$('pulse').onclick=()=>attack(true);
+$('reset').onclick=startChapter;$('talk').onclick=talk;$('attack').onclick=()=>attack(false);$('pulse').onclick=()=>attack(true);
 const shield=$('guard');
 shield.onpointerdown=e=>{if(!has(1)){say('Find the Crescent Shield by the trail.');return}shield.setPointerCapture(e.pointerId);guard(true)};
 shield.onpointerup=shield.onpointercancel=shield.onlostpointercapture=()=>guard(false);
@@ -170,7 +189,7 @@ function render(){
   if(o.type==='gem')mesh(o.x,.22,o.z,.37,['#fff392','#ffac44','#fffbd2']);
   if(o.type==='lantern'){mesh(o.x,0,o.z,1.25,['#6b5378','#423653','#876c90']);mesh(o.x,1.4,o.z,.58,won?['#fff3a1','#ffb640','#fffbd2']:['#8fa2b7','#59677d','#b5cada'])}
   if(o.type==='foe')actor(o,o.flash?'#fff0bc':o.boss&&windup>.25?'#ffac56':'#b56a7b','#39294c','#692e57',o.boss?1.9:.9);
-  if(o.type==='foe'&&o.boss){const a=project(o.x,3.2,o.z);if(a){ctx.textAlign='center';ctx.font='bold 14px system-ui';ctx.fillStyle='#ffe1ac';ctx.fillText('Queen Ember · '+o.hp+'/7',a[0],a[1])}}
+  if(o.type==='foe'&&o.boss){const a=project(o.x,3.2,o.z);if(a){ctx.textAlign='center';ctx.font='bold 14px system-ui';ctx.fillStyle='#ffe1ac';ctx.fillText((chapterTwo?'Cinder Warden':'Queen Ember')+' · '+o.hp+'/7',a[0],a[1])}}
   if(o.type==='npc'){actor(o,o.name==='Poppy'?'#ffc079':'#bbb9d9','#31768a','#60a69b',.86);const a=project(o.x,1.65,o.z);if(a){ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillStyle='#fff';ctx.fillText(o.name,a[0],a[1])}}
   if(o.type==='hero'){actor(o,luna?'#e9eafa':'#ef994f',luna?'#51439a':'#213358',luna?'#9f65dc':'#c6354c',1,true);if(hit||shot){const a=project(o.x,1,o.z);ctx.strokeStyle=shot?'#a2f8ff':'#ffdf8a';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(a[0],a[1],shot?55:30,13,0,0,7);ctx.stroke()}}
  }
@@ -178,7 +197,7 @@ function render(){
  $('status').textContent='♥ '+p.hp+'/5   ·   Sparks '+count()+'/3';
  const gearText=loot.filter((_,i)=>has(i)).map(i=>i.name).join(' · ')+(has(2)?' · Star seeds '+seeds:'');
  if(kitText!==gearText){kitText=gearText;$('kit').textContent=gearText}
- $('quest').textContent=won?'You relit the shrine! Pawgrove is safe.':!p.hp?'The curse knocked you out. Tap Restart to try again.':noteTime?note:!spoken&&p.z<10?'Find Poppy by the path and tap Talk.':!gate&&p.z>33?(has(3)?'Stand near the gate and tap Launch to hit its switch.':'Find the Ember Key in the gold chest beside the gate.'):count()<3?'Collect the three golden lantern sparks along the trail.':foes.at(-1).hp?'Defeat Queen Ember at the far end of Ember Hollow.':'Walk up to the shrine to restore its light.';
+ $('quest').textContent=won?(chapterTwo?'Chapter complete! You defeated the Cinder Warden and restored the heart of Ember Hollow.':'You relit the shrine! Pawgrove is safe.'):!p.hp?'The curse knocked you out. Tap Restart to try again.':noteTime?note:!spoken&&p.z<10?'Find Poppy by the path and tap Talk.':!gate&&p.z>33?(has(3)?'Stand near the gate and tap Launch to hit its switch.':'Find the Ember Key in the gold chest beside the gate.'):count()<3?'Collect the three golden lantern sparks along the trail.':foes.at(-1).hp?(chapterTwo?'Defeat the Cinder Warden at the far end of Ember Hollow.':'Defeat Queen Ember at the far end of Ember Hollow.'):'Walk up to the shrine to restore its light.';
 }
 function frame(now){update(Math.min(.05,(now-last)/1000));last=now;render();requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
