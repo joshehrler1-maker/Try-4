@@ -9,8 +9,8 @@
 <main>
 <a href="pawgrove-forest.html">← Super Paw forest quest</a>
 <h1>Classic Adventure</h1>
-<p>Play your original Nintendo 64 game in this browser. In Android Files, extract your ZIP first and select the <strong>.z64</strong> file inside. Your game file is read on this device.</p>
-<form id="launch"><label for="rom">Nintendo 64 game file</label><input id="rom" type="file" accept=".z64,.n64,.v64"><button>Load game</button></form>
+<p>Play your original Nintendo 64 game in this browser. In Android Files, extract your ZIP first and select the <strong>.z64</strong> file inside. Your game file is read on this device. Super Paw names mode requires the U v1.2 file and changes English text. The original character models are still displayed.</p>
+<form id="launch"><label for="rom">Nintendo 64 game file</label><input id="rom" type="file" accept=".z64,.n64,.v64"><label><input id="cast" type="checkbox"> Use Super Paw character names</label><button>Load game</button></form>
 <p id="status" role="status"></p>
 <div id="game" hidden></div>
 </main>
@@ -18,13 +18,32 @@
 'use strict';
 const form=document.getElementById('launch'),input=document.getElementById('rom'),status=document.getElementById('status'),game=document.getElementById('game'),button=form.querySelector('button');
 const cdn='https://cdn.emulatorjs.org/stable/data/';
+const cast=document.getElementById('cast');
+const patch=atob('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YXdnkfNlAAhvdmUgR2xlbpH00wAETHVuYZH1NgAETHVuYZH3HgAFRW1iZXKR92IABUVtYmVykfgwAAlFbGRlciBPYWuR/SsABVBvcHB5kf4aAAFskf44AAVQb3BweZH+VwABbJIAVAAFUG9wcHmSAkgABVBvcHB5kgXbAAVQb3BweZILhwAFRWxkZXKSC40AAk9hkguQAAEgkguSAAQgICAgkgvyAAFskgxyAAVFbGRlcpIMeAACT2GSDHsAASCSDH0ABCAgICCSD4EACUVsZGVyIE9ha5IdEwANQ2FwdGFpbiBBdXJvcpIkngAJQnJhc3NmYW5nki5AAAlCcmFzc2ZhbmeSLsMACUJyYXNzZmFuZ5Iz7wAJQnJhc3NmYW5nkjUIAAlCcmFzc2ZhbmeSPcsACUJyYXNzZmFuZ5I+aQAJQnJhc3NmYW5nkkEeAAlCcmFzc2ZhbmeSU/IACUJyYXNzZmFuZ5JU/QAJQnJhc3NmYW5nklW7AAlCcmFzc2ZhbmeSZgYADUNhcHRhaW4gQXVyb3KSh78ACUJyYXNzZmFuZ5KH9gAJQnJhc3NmYW5nkozVAAlCcmFzc2ZhbmeSjUcACUJyYXNzZmFuZ5KNlgAJQnJhc3NmYW5nkpAnAAlCcmFzc2ZhbmeSmRsACUJyYXNzZmFuZ5KvagAFUG9wcHmSvE0ADUNhcHRhaW4gQXVyb3KSvzIACUJyYXNzZmFuZ5LMvgANQ2FwdGFpbiBBdXJvcpLW+QANQ2FwdGFpbiBBdXJvcpMTEQAJQnJhc3NmYW5nkxWXAAlCcmFzc2ZhbmeTFsMADUNhcHRhaW4gQXVyb3KTGQQADUNhcHRhaW4gQXVyb3KTIPMADUNhcHRhaW4gQXVyb3KTIwUACUJyYXNzZmFuZ5MjVwAJQnJhc3NmYW5nkyP7AAlCcmFzc2ZhbmeTJLcADUNhcHRhaW4gQXVyb3KTKHcADUNhcHRhaW4gQXVyb3KTORcAAk1pk0FFAAlCcmFzc2ZhbmeTWpgACUJyYXNzZmFuZ5NbYgAJQnJhc3NmYW5nk2ivAAlCcmFzc2ZhbmeTaO4ACUJyYXNzZmFuZ5NpXQAJQnJhc3NmYW5nk2p/AAlCcmFzc2ZhbmeTbcwACUJyYXNzZmFuZ5Nu/QAJQnJhc3NmYW5nk3EnAAlCcmFzc2ZhbmeTci0ACUJyYXNzZmFuZ5N0SgAJQnJhc3NmYW5nk3X0AAlCcmFzc2ZhbmeTe6IACUJyYXNzZmFuZ5OFEwAJQnJhc3NmYW5nk4ZOAAlCcmFzc2ZhbmeTlC4AAk1pk5jNAAZTdW5wYXeTnNcACUJyYXNzZmFuZ5OdfwAJQnJhc3NmYW5nk57NAAlCcmFzc2ZhbmeTpg8ADUNhcHRhaW4gQXVyb3KTqX8ADUNhcHRhaW4gQXVyb3KTrAUADUNhcHRhaW4gQXVyb3KTrZ0ADUNhcHRhaW4gQXVyb3KTt60ADUNhcHRhaW4gQXVyb3KTuYwADUNhcHRhaW4gQXVyb3KTuhYACUJyYXNzZmFuZ5O9RAAJQnJhc3NmYW5nk8CyAAlCcmFzc2ZhbmeTyKkACUJyYXNzZmFuZ5PNCgAJQnJhc3NmYW5nk8+wAAlCcmFzc2ZhbmeT0DkADUNhcHRhaW4gQXVyb3KT0UUACUJyYXNzZmFuZ5PR3QANQ2FwdGFpbiBBdXJvcpPTYQAJQnJhc3NmYW5nk9r2AAlCcmFzc2ZhbmeT27EACUJyYXNzZmFuZ5PcMwAJQnJhc3NmYW5nk90FAAlCcmFzc2ZhbmeT3UIACUJyYXNzZmFuZ5PeUAAJQnJhc3NmYW5nk96mAAlCcmFzc2ZhbmeT3xQACUJyYXNzZmFuZ5PkrAANQ2FwdGFpbiBBdXJvcpPmgQANQ2FwdGFpbiBBdXJvcpP+OQAJQnJhc3NmYW5nk/5lAAlCcmFzc2ZhbmeT/yAACUJyYXNzZmFuZ5QIEgAJQnJhc3NmYW5nlCUbAAJNaZQl2AABbJQm2wABbJQnCAABbJQnbgABbJQn2AABbJQoQQABbJQoigAFUG9wcHlFT0Y=');
+async function castRom(file){
+ const rom=new Uint8Array(await file.arrayBuffer());
+ const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',rom));
+ const hash=Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('');
+ if(hash!=='49acd3885f13b0730119b78fb970911cc8aba614fe383368015c21565983368d'){
+  throw new Error('Super Paw names require the original Ocarina of Time U v1.2 .z64 file.');
+ }
+ for(let p=5;patch.slice(p,p+3)!=='EOF';){
+  const byte=i=>patch.charCodeAt(i);
+  const offset=(byte(p)<<16)|(byte(p+1)<<8)|byte(p+2);
+  const size=(byte(p+3)<<8)|byte(p+4);
+  p+=5;
+  for(let i=0;i<size;i++)rom[offset+i]=byte(p+i);
+  p+=size;
+ }
+ return new Blob([rom],{type:'application/octet-stream'});
+}
 let busy=false;
 form.onsubmit=async event=>{
  event.preventDefault();
  if(busy)return;
  const rom=input.files[0];
  if(!rom){status.textContent='Choose the extracted game file first.';return}
- busy=button.disabled=input.disabled=true;
+ busy=button.disabled=input.disabled=cast.disabled=true;
  let url,loader;
  try{
   const bytes=new Uint8Array(await rom.slice(0,4).arrayBuffer());
@@ -32,10 +51,10 @@ form.onsubmit=async event=>{
   if(rom.size<4096||!['80371240','37804012','40123780'].includes(signature)){
    throw new Error('Choose the Nintendo 64 game file inside the ZIP.');
   }
-  url=URL.createObjectURL(rom);
+  url=URL.createObjectURL(cast.checked?await castRom(rom):rom);
   window.EJS_player='#game';
   window.EJS_core='mupen64plus';
-  window.EJS_gameName=rom.name.replace(/\.[^.]+$/,'');
+  window.EJS_gameName=cast.checked?'Super Paw cast preview':rom.name.replace(/\.[^.]+$/,'');
   window.EJS_gameUrl=url;
   window.EJS_pathtodata=cdn;
   window.EJS_threads=false;
@@ -52,7 +71,7 @@ form.onsubmit=async event=>{
  }catch(error){
   if(url)URL.revokeObjectURL(url);
   loader?.remove();game.hidden=true;
-  busy=button.disabled=input.disabled=false;
+  busy=button.disabled=input.disabled=cast.disabled=false;
   status.textContent=error.message;
  }
 };
