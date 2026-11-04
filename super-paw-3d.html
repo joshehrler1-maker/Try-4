@@ -309,7 +309,30 @@ b.footContacts=b.footContacts||{};let contact=b.footContacts[side];
 if(!contact||!moving||contact.swing&&!swing||Math.hypot(b.x-contact.actorX,b.z-contact.actorZ)>2){contact={x:b.x+(c*x*wide+sn*z*depth)*k,z:b.z+(-sn*x*wide+c*z*depth)*k,swing,actorX:b.x,actorZ:b.z};b.footContacts[side]=contact;}
 if(!swing&&moving){const dx=(contact.x-b.x)/k,dz=(contact.z-b.z)/k;x=(c*dx-sn*dz)/wide;z=(sn*dx+c*dz)/depth;}
 contact.swing=swing;contact.actorX=b.x;contact.actorZ=b.z;return {x,y,z,lift:(y-.12)*short*k};}
-function drawPosterHero(){const api=window.SuperPawRig,name=hero.mode==='luna'?'Luna':'Whisker',low=isLowDetail(),gpu=posterHeroModels[name][low?'low':'high'],pose=combatPose(api,name,{time:motion.time,phase:motion.phase,speed:motion.pace,turn:motion.turn||0,punch:0,recoil:motion.recoil,dash:dashTime>0,neutral:true}),root=model(hero.x,groundedHeroHeight(api,name,pose),hero.z,.64,.64,.64,hero.dir),normalRoot=model(0,0,0,1,1,1,hero.dir);for(const foot of pose.filter(p=>p.node.name==='boot toe')){const m=api.mul(root,foot.world);draw('sphere',m[12],.001,m[14],.15,.001,.21,[.12,.13,.14]);}gl.disable(gl.CULL_FACE);for(const part of pose){if(low&&part.node.extras?.lod)continue;const mesh=gpu[part.node.mesh],world=api.mul(root,part.world),normal=api.mul(normalRoot,part.normal);gl.bindBuffer(gl.ARRAY_BUFFER,mesh.buffers[0]);gl.vertexAttribPointer(posLoc,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ARRAY_BUFFER,mesh.buffers[1]);gl.vertexAttribPointer(normLoc,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,mesh.buffers[2]);gl.uniformMatrix4fv(modelLoc,false,world);gl.uniformMatrix4fv(mvpLoc,false,matMul(vp,world));gl.uniformMatrix3fv(normalMatrixLoc,false,new Float32Array([normal[0],normal[1],normal[2],normal[4],normal[5],normal[6],normal[8],normal[9],normal[10]]));gl.uniform3fv(colorLoc,mesh.material.baseColorFactor.slice(0,3));gl.uniform1f(surfaceLoc,/fur|hair/i.test(mesh.materialName)?4:/armor|piping/i.test(mesh.materialName)?5:0);gl.drawElements(gl.TRIANGLES,mesh.count,gl.UNSIGNED_SHORT,0);}gl.enable(gl.CULL_FACE);lastMesh=null;lastIdentity=false;worldSurface=0;}
+function posterPartScale(node,luna){
+ const label=node.name;
+ if(/shoulder.*(?:armor|plate)|pauldron/i.test(label))return luna?[1.12,.90,1.09]:[1.20,.91,1.13];
+ if(/gauntlet|shin armor|knee.*plate/i.test(label))return [1.09,1.03,1.09];
+ if(/hair strand|swept.*hair/i.test(label)&&luna)return [1.10,1.06,1.07];
+ if(/cheek.*fur/i.test(label))return [1.10,1.01,1.05];
+ return null;
+}
+function posterMaterial(materialName,nodeName,luna,base){
+ const armor=/armor|piping|gold|silver|metal/i.test(materialName);
+ if(luna&&/piping|cyan/i.test(materialName))return {color:[.26,.81,1],surface:5};
+ if(armor&&/gold/i.test(materialName))return {color:[1,.69,.24],surface:5};
+ if(armor&&/silver/i.test(materialName))return {color:[.76,.82,1],surface:5};
+ if(/cape/i.test(nodeName)&&/red|cloth|cape/i.test(materialName))return {color:[.67,.032,.095],surface:0};
+ return {color:base,surface:/fur|hair/i.test(materialName)?4:armor?5:0};
+}
+function drawPosterHero(){const api=window.SuperPawRig,name=hero.mode==='luna'?'Luna':'Whisker',low=isLowDetail(),gpu=posterHeroModels[name][low?'low':'high'],pose=combatPose(api,name,{time:motion.time,phase:motion.phase,speed:motion.pace,turn:motion.turn||0,punch:0,recoil:motion.recoil,dash:dashTime>0,neutral:true}),root=model(hero.x,groundedHeroHeight(api,name,pose),hero.z,.64,.64,.64,hero.dir),normalRoot=model(0,0,0,1,1,1,hero.dir);for(const foot of pose.filter(p=>p.node.name==='boot toe')){const m=api.mul(root,foot.world);draw('sphere',m[12],.001,m[14],.15,.001,.21,[.12,.13,.14]);}gl.disable(gl.CULL_FACE);for(const part of pose){if(low&&part.node.extras?.lod)continue;const mesh=gpu[part.node.mesh],luna=name==='Luna',scale=posterPartScale(part.node,luna);
+let world=api.mul(root,part.world),normal=api.mul(normalRoot,part.normal);
+if(scale){
+ const [x,y,z]=scale;
+ world=api.mul(world,model(0,0,0,x,y,z));
+ normal=api.mul(normal,model(0,0,0,1/x,1/y,1/z));
+}
+const finish=posterMaterial(mesh.materialName,part.node.name,luna,mesh.material.baseColorFactor.slice(0,3));gl.bindBuffer(gl.ARRAY_BUFFER,mesh.buffers[0]);gl.vertexAttribPointer(posLoc,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ARRAY_BUFFER,mesh.buffers[1]);gl.vertexAttribPointer(normLoc,3,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,mesh.buffers[2]);gl.uniformMatrix4fv(modelLoc,false,world);gl.uniformMatrix4fv(mvpLoc,false,matMul(vp,world));gl.uniformMatrix3fv(normalMatrixLoc,false,new Float32Array([normal[0],normal[1],normal[2],normal[4],normal[5],normal[6],normal[8],normal[9],normal[10]]));gl.uniform3fv(colorLoc,finish.color);gl.uniform1f(surfaceLoc,finish.surface);gl.drawElements(gl.TRIANGLES,mesh.count,gl.UNSIGNED_SHORT,0);}gl.enable(gl.CULL_FACE);lastMesh=null;lastIdentity=false;worldSurface=0;}
 function heroDraw(){if(posterHeroModels){drawPosterHero();return;}
 const luna=hero.mode==='luna',fur=luna?[.87,.89,.96]:[.96,.51,.15],suit=luna?[.22,.08,.48]:[.035,.075,.20],accent=luna?[.43,.14,.68]:[.72,.025,.065],gold=luna?[.76,.82,.94]:[1,.67,.12],cyan=[.18,.82,1];
 const moving=motion.pace>.05,run=Math.min(1,motion.pace/6.2),phase=motion.phase,bob=(moving?Math.cos(phase*2)*.026*run:Math.sin(motion.time*2)*.014);const sway=Math.sin(phase)*.022*run-(motion.turn||0)*.065,blink=Math.pow(Math.max(0,Math.cos(motion.time*1.1)),80),eyeOpen=Math.max(.16,1-blink*.84);
