@@ -2,7 +2,7 @@
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pawgrove | Super Paw Heroes</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#101831;color:#fff3d0;font:16px system-ui}main{max-width:980px;margin:auto;padding:12px}header,.hud,.controls{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}h1{margin:.2em 0;font-size:clamp(22px,5vw,34px)}a{color:#a9efff}button{font:inherit;font-weight:bold;color:#fff3d0;background:#29365e;border:1px solid #8e9dcc;border-radius:12px;padding:10px;touch-action:manipulation}button[aria-pressed=true]{background:#644792}canvas{width:100%;height:auto;max-height:60dvh;display:block;background:#93b7ce;border-radius:10px}.hud{padding:8px 0}.controls{padding:10px 3px;user-select:none}#stick{width:106px;height:106px;border:2px solid #65769b;border-radius:50%;position:relative;background:#202b49;touch-action:none}#knob{position:absolute;left:33px;top:33px;width:36px;height:36px;background:#ffd57e;border-radius:50%;pointer-events:none}.actions{display:flex;gap:6px}.actions button{min-height:54px}#quest{min-height:2.8em;margin:6px 0;color:#cbeafa}small{color:#c8d0e2}
-#poster{margin:0 0 12px;padding:9px 12px;border:1px solid #64658c;border-radius:10px;background:#202747}#poster img{display:block;margin:8px auto 0;width:min(100%,310px);border-radius:8px}#kit{display:flex;gap:5px;flex-wrap:wrap;padding:5px 0;color:#a9efff;font-size:.83em}.actions{flex-wrap:wrap;max-width:calc(100% - 114px)}#guard[aria-pressed=true]{background:#256384}canvas{touch-action:none}.n64{display:grid;grid-template-columns:repeat(4,minmax(36px,1fr));gap:5px;flex:1;max-width:380px}.n64 button{min-height:38px;padding:4px;touch-action:none}.n64 .c{background:#775b15;color:#fff2a1}.n64 #action{background:#214c94}.n64 #blade{background:#16694d}.n64 button[aria-pressed=true]{outline:2px solid #fff3d0}#gear-menu[hidden]{display:none}#gear-menu{padding:8px;background:#202747;border-radius:8px}#gear-menu label{display:inline-block;margin:4px}#gear-menu select{font:inherit;max-width:125px}</style>
+#poster{margin:0 0 12px;padding:9px 12px;border:1px solid #64658c;border-radius:10px;background:#202747}#poster img{display:block;margin:8px auto 0;width:min(100%,310px);border-radius:8px}#kit{display:flex;gap:5px;flex-wrap:wrap;padding:5px 0;color:#a9efff;font-size:.83em}.actions{flex-wrap:wrap;max-width:calc(100% - 114px)}#guard[aria-pressed=true]{background:#256384}canvas{touch-action:none}.controls{touch-action:none}.n64 button[data-held]{filter:brightness(1.35);transform:translateY(1px)}.n64{display:grid;grid-template-columns:repeat(4,minmax(36px,1fr));gap:5px;flex:1;max-width:380px}.n64 button{min-height:38px;padding:4px;touch-action:none}.n64 .c{background:#775b15;color:#fff2a1}.n64 #action{background:#214c94}.n64 #blade{background:#16694d}.n64 button[aria-pressed=true]{outline:2px solid #fff3d0}#gear-menu[hidden]{display:none}#gear-menu{padding:8px;background:#202747;border-radius:8px}#gear-menu label{display:inline-block;margin:4px}#gear-menu select{font:inherit;max-width:125px}</style>
 <main><header><div><a href="pawgrove.html">← Pawgrove adventure</a><h1>Pawgrove · Kokiri Forest</h1></div><div><button id="hero" aria-pressed="false">Whisker</button> <button id="reset">Restart</button></div></header>
 <details id="poster"><summary>Meet Whisker and Luna</summary><img src="assets/whisker-luna-master.webp" alt="Super Paw Heroes character poster" loading="lazy"></details><div class="hud"><strong id="area"></strong><span id="status"></span></div>
 <canvas width="720" height="410" aria-label="Third-person view of Pawgrove"></canvas>
@@ -107,8 +107,26 @@ function guard(on){shield=on&&!paused&&!looking;pressed('shield',shield)}
 $('start').onclick=pause;$('map').onclick=toggleMap;$('cup').onclick=look;
 $('target').onclick=target;$('action').onclick=action;$('blade').onclick=blade;
 const shieldButton=$('shield');
-shieldButton.onpointerdown=e=>{shieldButton.setPointerCapture(e.pointerId);guard(true)};
-shieldButton.onpointerup=shieldButton.onpointercancel=shieldButton.onlostpointercapture=()=>guard(false);
+const pointers=new Map();
+for(const id of ['action','blade','target','map','start','cup',...slots]){
+ const button=$(id),activate=button.onclick;
+ button.onpointerdown=e=>{
+  if(e.button!==0||pointers.has(e.pointerId))return;
+  pointers.set(e.pointerId,id);button.setPointerCapture(e.pointerId);button.dataset.held='';
+  activate();
+ };
+ button.onpointerup=button.onpointercancel=button.onlostpointercapture=e=>{
+  if(pointers.get(e.pointerId)!==id)return;
+  pointers.delete(e.pointerId);
+  if(![...pointers.values()].includes(id))delete button.dataset.held;
+ };
+ button.onclick=e=>{if(!e||e.detail===0)activate()};
+}
+const shieldPointers=new Set();
+shieldButton.onpointerdown=e=>{shieldPointers.add(e.pointerId);shieldButton.setPointerCapture(e.pointerId);guard(true)};
+shieldButton.onpointerup=shieldButton.onpointercancel=shieldButton.onlostpointercapture=e=>{
+ shieldPointers.delete(e.pointerId);guard(shieldPointers.size>0||keys.has('shift'));
+};
 shieldButton.onkeydown=e=>{if(e.key===' '||e.key==='Enter')guard(true)};
 shieldButton.onkeyup=shieldButton.onblur=()=>guard(false);
 let lookPointer=null,lookX=0;
@@ -148,8 +166,8 @@ addEventListener('keydown',e=>{
  if(k==='shift')guard(true);
  if(!e.repeat)bindings[k]?.();
 });
-addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k==='shift')guard(false)});
-addEventListener('blur',()=>{keys.clear();guard(false);joy.x=joy.z=0});
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k==='shift')guard(shieldPointers.size>0)});
+addEventListener('blur',()=>{keys.clear();shieldPointers.clear();for(const id of pointers.values())delete $(id).dataset.held;pointers.clear();guard(false);joy.x=joy.z=0});
 function update(dt){
  if(paused||!health)return;
  gearCooldown=Math.max(0,gearCooldown-dt);
@@ -187,8 +205,12 @@ function update(dt){
   if(Number.isFinite(y)){Object.assign(p,{x:nx,y,z:nz});break}
  }
 }
-const palettes=[[118,148,88],[128,111,87],[96,138,79]];
-const fog=[171,198,170];
+const palettes=[[83,124,76],[125,99,72],[62,108,77]];
+const fog=[145,180,166];
+const patterns=[];
+for(const [i,url] of ["data:image/png;base64,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", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAYAAAB3AH1ZAAADyUlEQVR4nEWVoZIcORBEnx0DUqyKtZgbjpnNDO+g4R08dtC/cN9kw4VrNsummQV7mZpJTMV8QL27EzExoHuqVJkvS+/++/blt5JACQmiD7ZSYIBcQOK6GrV1yl7xBGaGBIlM7ZV1/Ug2gQA0f4B7uQEJl6EEtUIQSEEESMbFsgPgvlDuGwNYlkx6qQLE6PSj4UmYhJTIMspzRQatVfJyRQliQOtB2W+4OZZEAH0EvTfWqwMLrQXrmrkkCfOFiJgTj8CSQMIt0XqjlIoEZo67YZqH5rniliDg17bRYxABZpzN7WUE7lvl76+faTGICHrvQOaiJIjO48ON9ZpREtK0BEStFZNwy5Agm78qY5YYMYho9NoJxPU6lZD02rzujZyd2gfSfJYX8ePHA5cf3x8wNxDUWvl8/cgA3EUQRAQ5Z8ScCgnzs/g+SAqig2UjerBkJ2K8crDXDiTyImIEZpr+JxERvDc3TIm8ZCISciPnhVorj98fAGEy3BxpAhYB223Ds6PkTPqEzOi14ZZI57eUgqazrx+3hJlYF+Migec3X8t9m7IymZhTJ8yNYMq33TdmZCbJvsJocPRBHJX92AHorQMiyVASZm+HSEpYzrznLIpgcUe+4JbJlgFovRExABGjs92f5rynzzoVej7qlIYJa7bMklfcjfpckRJJs7EQjz8fiWi8+/bv9XfOC1J6i91JarSgHvVEKYgRXNcF5CxupBNCAn5uG2YZk8g+o8d8ROsdAj5/WTEXjw83fHHaMbhMqYIlA6Qz/wk3Z1hQj4YUrwtmPzpS0I5Kvq6seSVGwAjyhwWlAJ1vv+wmjHZ0BNxud2SOkpHXhUvOK7019v1gzeuU1WcU99uGLCGlWSjG5IA52V526l7nYSPYnwufPn2eW/F8Z0RgCUpr3J4qvqwo2RnHxMVNRIj9uXIcja9//Dn/3Dr73liyk85MS6L1IEm45sZLJkYEiRmzbbtRZJg565qJaGyl0AIswJLQCVGSuIyICXSDQZ/5HJ16VFrvLGtmcX8FMaczTxKrJ3o0StmRz6YS9D7oR+Vp36f/En4O4eYMeB3qEh22UpALw7jdnyAGyRwIjqPy8bri2JmKPuliQhtjerx+eNuQvtjEts99X48GApMwt2nhCFpvXLZyw86ATi/BTdSjsp7Et17JeQWm1EpGtE6LQdk25MaSMy/GR4wZbYceAb0h6XWTEsG+75Syc5k33zyAgJd7prcOaS4bQpRfGyPmjfbX13/ogqgDywtm67lwZpEUOvvMRmZvHJVSuF4/UcrOko3/ATcUAvJ7zw7vAAAAAElFTkSuQmCC", "data:image/png;base64,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"].entries()){
+ const tile=new Image();tile.onload=()=>{patterns[i]=ctx.createPattern(tile,'repeat')};tile.src=url;
+}
 function surfaceColor(tone,depth){
  const haze=Math.min(.63,Math.max(0,(depth-500)/4300));
  return 'rgb('+tone.map((value,i)=>Math.round(value+(fog[i]-value)*haze)).join(',')+')';
@@ -199,8 +221,9 @@ const surfaces=faces.map(f=>{
  const ny=Math.abs(u[0]*v[2]-u[2]*v[0]);
  const length=Math.hypot(ny,u[1]*v[2]-u[2]*v[1],u[0]*v[1]-u[1]*v[0]);
  const style=ny>length*.72?(a[1]>220?2:0):1;
- const shade=length ? .88+.17*ny/length : 1;
- return {f,tone:palettes[style].map(value=>value*shade)};
+ const sun=length?Math.abs((u[1]*v[2]-u[2]*v[1])*.35+ny*.86+(u[0]*v[1]-u[1]*v[0])*.28)/length:0;
+ const shade=.77+sun*.36;
+ return {f,style,tone:palettes[style].map(value=>value*shade)};
 });
 function poly(points,color){
  ctx.fillStyle=color;ctx.beginPath();
@@ -221,42 +244,73 @@ function clipNear(points){
 function oval(x,y,rx,ry,color){
  ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill();
 }
-function hero(){
- const x=360,y=325,fur=luna?'#edeafa':'#ffae53',suit=luna?'#564093':'#253966',cape=luna?'#9d6adc':'#b83243',trim=luna?'#c1dcf6':'#ffd16c';
- oval(x,y,27,7,'#14201a88');
- oval(x-12,y-9,9,13,suit);oval(x+12,y-9,9,13,suit);
- oval(x,y-32,21,26,suit);
- poly([[x-17,y-49],[x+17,y-49],[x+23,y-9],[x-25,y-11]],cape);
- oval(x,y-51,19,7,trim);
- poly([[x-19,y-65],[x-21,y-92],[x-3,y-72]],fur);
- poly([[x+19,y-65],[x+21,y-92],[x+3,y-72]],fur);
- oval(x,y-66,21,16,fur);
- if(shield){oval(x-24,y-32,12,20,'#b8ddf1');oval(x-24,y-32,8,15,'#526cad')}
- if(swing){ctx.strokeStyle='#ffe39a';ctx.lineWidth=5;ctx.beginPath();ctx.arc(x+18,y-38,29,-1.2,1.15);ctx.stroke()}
- if(effect&&activeGear!=='Trail Compass'){oval(x+28,y-43-effect*42,7,7,activeGear==='Lantern'?'#ffd477':'#a8f5ff')}
- if(roll){ctx.strokeStyle='#fff5bc88';ctx.beginPath();ctx.ellipse(x,y-31,32,31,0,0,Math.PI*2);ctx.stroke()}
+const heroPalettes=[
+ {fur:[234,139,57],muzzle:[255,205,139],suit:[34,53,104],trim:[250,192,68],cape:[174,31,56],inner:[222,103,105]},
+ {fur:[214,215,239],muzzle:[246,239,253],suit:[79,48,148],trim:[171,214,248],cape:[103,64,177],inner:[204,135,183]}
+];
+const heroParts=[];
+function sphere(x,y,z,rx,ry,rz,material,motion){
+ const rings=5,sides=9;
+ const ring=(j,i)=>{
+  const a=Math.PI*j/rings,b=Math.PI*2*i/sides;
+  return [x+rx*Math.sin(a)*Math.cos(b),y+ry*Math.cos(a),z+rz*Math.sin(a)*Math.sin(b)];
+ };
+ for(let j=0;j<rings;j++)for(let i=0;i<sides;i++){
+  const points=[ring(j,i),ring(j,i+1),ring(j+1,i+1),ring(j+1,i)];
+  const a=(j+.5)*Math.PI/rings,b=(i+.5)*2*Math.PI/sides;
+  heroParts.push({points,material,motion,light:.72+.28*Math.cos(a)+.13*Math.sin(a)*Math.cos(b)});
+ }
+}
+sphere(0,93,0,27,39,18,'suit');
+sphere(0,106,16,18,23,5,'cape');
+sphere(0,72,1,26,6,18,'trim');
+sphere(0,145,3,32,27,26,'fur');
+sphere(0,137,25,18,12,9,'muzzle');
+sphere(0,145,33,5,3,3,'inner');
+for(const side of [-1,1]){
+ sphere(side*12,151,24,6,8,4,'muzzle');
+ sphere(side*12,151,27,3,5,2,'suit');
+ sphere(side*35,113,0,13,10,14,'trim');
+ sphere(side*36,86,0,9,23,10,'suit',-side);
+ sphere(side*37,67,3,10,10,11,'trim',-side);
+ sphere(side*13,43,0,10,25,12,'suit',side);
+ sphere(side*13,13,5,11,14,17,'trim',side);
+ const a=[side*15,157,15],b=[side*32,151,12],c=[side*28,191,4],d=[side*25,153,-10];
+ for(const points of [[a,b,c],[b,d,c],[d,a,c]])heroParts.push({points,material:'fur',light:1,motion:0});
+ heroParts.push({points:[[side*19,159,15],[side*29,157,13],[side*27,182,8]],material:'inner',light:1,motion:0});
+}
+for(let i=0;i<5;i++)sphere(i*6,59+i*5,-15-i*8,8-i*.65,9-i*.65,10,'fur');
+heroParts.push({points:[[-26,120,-13],[26,120,-13],[35,54,-32],[-32,52,-32]],material:'cape',light:.91,motion:0});
+function addHero(drawList,view){
+ const palette=heroPalettes[Number(luna)],sn=Math.sin(facing),cs=Math.cos(facing);
+ const moving=roll||joy.x||joy.z||['w','a','s','d','arrowup','arrowdown'].some(k=>keys.has(k));
+ const stride=moving?Math.sin(last*.014)*11:0;
+ for(const {points,material,motion,light} of heroParts){
+  const a=points.map(([x,y,z])=>{
+   const step=(motion||0)*stride;
+   const forward=z+step;
+   return view(p.x+x*cs+forward*sn,p.y+y+Math.max(0,step*.35),p.z+forward*cs-x*sn);
+  });
+  if(a.some(v=>v[2]<30))continue;
+  const polygon=a.map(([x,y,z])=>[360+x*410/z,174-y*410/z]);
+  drawList.push({polygon,tone:palette[material].map(v=>Math.min(255,v*light)),depth:a.reduce((sum,v)=>sum+v[2],0)/a.length,hero:true});
+ }
 }
 function draw(){
- const sky=ctx.createLinearGradient(0,0,0,410);sky.addColorStop(0,'#5d9bb7');sky.addColorStop(1,'#d7daab');
+ const sky=ctx.createLinearGradient(0,0,0,410);sky.addColorStop(0,'#396b9d');sky.addColorStop(.52,'#a3c9cb');sky.addColorStop(1,'#f2dca5');
  ctx.fillStyle=sky;ctx.fillRect(0,0,720,410);
  const sn=Math.sin(camera.angle),cs=Math.cos(camera.angle);
  const follow=looking?0:435;
- const projected=vertices.map(([x,y,z])=>[(x-camera.x)*cs-(z-camera.z)*sn,y-camera.y-(looking?108:160),(x-camera.x)*sn+(z-camera.z)*cs+follow]);
- const dx=p.x-camera.x,dz=p.z-camera.z;
- const heroDepth=435+dx*sn+dz*cs;
- const heroX=360+(dx*cs-dz*sn)*410/heroDepth;
- const heroY=174-(p.y-camera.y-160)*410/heroDepth;
- function drawHero(){
-  if(looking)return;
-  ctx.save();ctx.translate(heroX-360,heroY-325);hero();ctx.restore();
- }
+ const view=(x,y,z)=>[(x-camera.x)*cs-(z-camera.z)*sn,y-camera.y-(looking?108:160),(x-camera.x)*sn+(z-camera.z)*cs+follow];
+ const projected=vertices.map(v=>view(...v));
  const drawList=[];
- for(const {f,tone} of surfaces){
+ if(!looking)addHero(drawList,view);
+ for(const {f,tone,style} of surfaces){
   const a=f.map(i=>projected[i]);
   if(a.every(v=>v[2]<30))continue;
   const polygon=clipNear(a).map(([x,y,z])=>[360+x*410/z,174-y*410/z]);
   if(polygon.every(v=>v[0]<0)||polygon.every(v=>v[0]>720)||polygon.every(v=>v[1]<0)||polygon.every(v=>v[1]>410))continue;
-  drawList.push({polygon,tone,depth:(a[0][2]+a[1][2]+a[2][2])/3});
+  drawList.push({polygon,tone,style,depth:(a[0][2]+a[1][2]+a[2][2])/3});
  }
  const goal=objective();
  if(goal){
@@ -267,18 +321,30 @@ function draw(){
   }
  }
  drawList.sort((a,b)=>b.depth-a.depth);
- let painted=false;
  for(const face of drawList){
-  if(!painted&&face.depth<heroDepth){drawHero();painted=true}
   if(face.goal){
    const {goal,sx,sy,depth}=face, size=Math.max(7,Math.min(36,10500/depth));
    const color=goal===queen?(windup>.3?'#ff9e56':'#b66286'):'#ffe28b';
    oval(sx,sy-size,size*.64,size,color);
    ctx.fillStyle='#fff5dc';ctx.textAlign='center';ctx.font='bold 14px system-ui';
    ctx.fillText(goal.label||'Lantern Spark',sx,sy-size*2-8);
-  }else poly(face.polygon,surfaceColor(face.tone,face.depth));
+  }else {
+   poly(face.polygon,surfaceColor(face.tone,face.depth));
+   if(!face.hero&&face.depth<1900&&patterns[face.style]){
+    ctx.save();ctx.clip();ctx.globalAlpha=.20*(1-face.depth/2200);
+    ctx.fillStyle=patterns[face.style];ctx.fillRect(0,0,720,410);ctx.restore();
+   }
+  }
  }
- if(!painted)drawHero();
+ if(!looking&&(shield||swing||effect)){
+  const [x,y,z]=view(p.x,p.y+76,p.z);
+  if(z>30){
+   const sx=360+x*410/z,sy=174-y*410/z;
+   if(shield)oval(sx-29,sy,12,19,'#a5daefaa');
+   if(swing){ctx.strokeStyle='#ffe3a6';ctx.lineWidth=4;ctx.beginPath();ctx.arc(sx,sy,41,-1,1.4);ctx.stroke()}
+   if(effect&&activeGear!=='Trail Compass')oval(sx+28,sy-30*effect,6,6,activeGear==='Lantern'?'#ffd777':'#b0f5ff');
+  }
+ }
  if(lock){ctx.strokeStyle='#ffe29b';ctx.lineWidth=2;ctx.strokeRect(350,164,20,20)}
  if(mapOn||(effect&&activeGear==='Trail Compass')){
   ctx.fillStyle='#142434dd';ctx.fillRect(572,12,135,103);
