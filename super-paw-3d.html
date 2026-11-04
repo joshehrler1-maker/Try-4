@@ -410,11 +410,11 @@ const miniBossBreeds=[
 ];
 function botDraw(b){const spec=b.main?mainBossSpec:encounterBook[chapter-1],dog=b.main?canineProfiles[0]:b.boss?miniBossBreeds[chapter-1]:canineProfiles[chapter-1],k=b.boss?1.5:b.type==='guard'?1.1:.8,c=Math.cos(b.angle),s=Math.sin(b.angle),color=spec.color,gait=b.gait||0,walk=b.walkBlend||0,wind=Math.min(1,Math.max(b.wind||0,(b.meleeWind||0)*2,(b.volleyWind||0)*2)),hit=(b.hitReact||0)/.24,attack=(b.attackPose||0)>0?Math.sin(Math.min(1,b.attackPose/.4)*Math.PI):0,bob=Math.cos(gait*2)*.012*walk+Math.sin(motion.time*2+b.x)*.005,lean=walk*.08+wind*.13-hit*.14;const shape=dog.shape,wide=shape==='slender'?.75:shape==='longbody'?1.17:shape==='mane'?1.14:1,short=shape==='shortlegs'?.72:shape==='longbody'?.76:shape==='slender'?1.15:1,depth=shape==='longbody'?1.28:shape==='slender'?.91:1;
 function part(mesh,x,y,z,sx,sy,sz,col){if(x>.35&&y>.55&&y<1.2&&['oct','cube'].includes(mesh)){y+=attack*.22;z-=attack*.48;}if(mesh==='sphere'&&(isLowDetail()||distance(b,hero)>5))mesh='sphere-low';const shape=dog.shape,wide=shape==='slender'?.75:shape==='longbody'?1.17:shape==='mane'?1.14:1,short=shape==='shortlegs'?.72:shape==='longbody'?.76:shape==='slender'?1.15:1,depth=shape==='longbody'?1.28:shape==='slender'?.91:1;z-=Math.max(0,y-.4)*lean;x+=Math.sin(gait)*.018*walk*Math.max(0,y-.4);x*=wide;y*=short;z*=depth;worldSurface=col===dog.fur||col===dog.muzzle?4:0;draw(mesh,b.x+(c*x+s*z)*k,y*k+bob*Math.max(0,Math.min(1,(y/short-.25)/.4)),b.z+(-s*x+c*z)*k,sx*k*wide,sy*k*short,sz*k*depth,col,b.angle);}
-const armor=[.16,.20,.28],fur=dog.fur,muzzle=dog.muzzle;
-part('sphere',0,.78,0,.35,.44,.27,armor);part('sphere',0,.88,-.23,.26,.28,.07,color);part('sphere',0,1.40,-.01,.39,.35,.33,fur);
+const armor=[.20,.18,.34],fur=dog.fur,muzzle=dog.muzzle;
+part('sphere',0,.78,0,.35,.44,.27,armor);part('sphere',0,.88,-.23,.26,.28,.07,color);part('sphere',0,1.40,-.01,.43,.37,.35,fur);
 // Broad protruding muzzle, canine nose, soft cheeks and readable eyes.
 part('sphere',0,1.28,-.34,dog.shape==='slender'?.17:.25,.16,dog.shape==='slender'||dog.shape==='longbody'?.30:.24,muzzle);part('sphere',0,1.35,-.555,.11,.075,.065,[.07,.07,.10]);
-for(const side of [-1,1]){part('sphere',side*.16,1.46,-.29,.10,.11,.055,[.98,.98,1]);part('sphere',side*.16,1.45,-.342,.044,.064,.019,[.20,.13,.09]);part('sphere',side*.14,1.48,-.362,.013,.018,.01,[1,1,1]);part('sphere',side*.17,1.59,-.26,.12,.034,.065,fur.map(v=>v*.65));
+for(const side of [-1,1]){part('sphere',side*.16,1.46,-.31,.115,.122,.059,[.98,.98,1]);part('sphere',side*.16,1.45,-.342,.044,.064,.019,[.20,.13,.09]);part('sphere',side*.14,1.48,-.362,.013,.018,.01,[1,1,1]);part('sphere',side*.17,1.59,-.26,.12,.034,.065,fur.map(v=>v*.65));
 if(dog.ears==='upright'||dog.ears==='scruffy'){part('oct',side*.29,1.76,.02,.14,.25,.13,fur);part('oct',side*.29,1.76,-.07,.075,.16,.06,muzzle);}else{part('sphere',side*.38,dog.ears==='long'?1.36:1.48,.015+Math.sin(gait+side)*.045*walk,.135,dog.ears==='long'?.35:dog.ears==='folded'?.16:.25,.17,fur.map(v=>v*.75));}
 if(dog.ears==='scruffy')for(let i=0;i<2;i++)part('oct',side*(.29+i*.055),1.28-i*.055,-.12,.10,.10,.11,fur);
 const foot=enemyFootContact(b,side,k,wide,short,depth),phase=gait+(side>0?0:Math.PI),stride=Math.sin(phase)*walk,footZ=foot.z,footY=foot.y,extend=(side>0?attack:attack*.25),shoulder=[side*.4,1.02,0],elbow=[side*.44,.83+extend*.12,-stride*.16-extend*.25],paw=[side*.40,.64+extend*.30,-.1-stride*.21-extend*.55],hip=[side*.19,.54,.01],knee=[side*.19+(foot.x-side*.19)*.5,.31+foot.lift*.4,footZ*.5-.08];function link(a,b,r,col){const samples=isLowDetail()?2:3;for(let j=0;j<samples;j++){const t=j/(samples-1);part('sphere',a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t,r,r*1.1,r,col);}}
@@ -1030,6 +1030,20 @@ for(let i=0;i<48;i++){const a=i*2.39996,r=WORLD+6+(i%4)*3.5,x=Math.cos(a)*r,z=Ma
 const end=dungeonRooms[5];const archZ=end.z-end.d/2-1.3;if(free(end.x,archZ,1.0)){sceneryLandmarks.push({x:end.x,z:archZ,kind:'district gate'});for(const side of [-1,1])add('cube',end.x+side*1.35,1.45,archZ,.24,1.45,.26,art.stone);add('cube',end.x,2.9,archZ,1.6,.22,.32,art.trim);add('oct',end.x,3.4,archZ,.32,.45,.20,art.gem);}
 let i=0;for(const group of groups.values()){const name='district-batch-'+i++;makeMesh(name,group.tri,group.smooth);sceneryBatches.push({name,color:group.color,x:group.cx,z:group.cz,detail:group.detail});}
 }
+function drawDistrictCrests(art,low){
+ for(const room of dungeonRooms){
+  if(!visibleAt(room.x,1,room.z,room.w/2+3))continue;
+  for(const side of [-1,1]){
+   const x=room.x+side*(room.w/2-.29),z=room.z-room.d/2+.36;
+   draw('cylinder',x,.26,z,.24,.26,.24,art.stone);
+   draw('cylinder',x,.54,z,.31,.05,.31,art.trim);
+   worldSurface=6;
+   draw('oct',x,.88,z,.16,.28,.16,art.gem,motion.time*.7);
+   if(!low)draw('oct',x+side*.19,.71,z+.11,.075,.13,.075,art.gem);
+   worldSurface=0;
+  }
+ }
+}
 function drawDungeon(){const art=districtArt[chapter-1],low=isLowDetail();worldSurface=chapter===4?2:1;
 draw('cube',0,-.75,0,WORLD+4,.3,WORLD+4,chapter===4?[.08,.22,.26]:chapter===5?[.16,.24,.18]:chapter===3?[.12,.14,.18]:[.19,.22,.26]);worldSurface=1;
 for(const r of dungeonRects)draw('cube',r.x,-.184,r.z,r.w/2,.18,r.d/2,chapter===1&&!inEcho?[.49,.44,.63]:art.stone.map((v,i)=>inEcho?v*.64+[.04,.11,.19][i]:v*.88));
@@ -1159,6 +1173,7 @@ renderEye=camera;gl.uniform3fv(eyeLoc,renderEye);const shadowData=new Float32Arr
 gl.uniform1f(retroSceneryLoc,chapter===1?2:1);gl.uniform3fv(skyTintLoc,inEcho?[.26,.35,.69]:skyColors[chapter-1]);gl.uniform1f(skyYawLoc,cameraYaw);gl.uniform1f(timeLoc,motion.time);drawSky();
 if(chapter===1&&!inEcho)drawPawtopiaSkyline();
 drawDungeon();
+drawDistrictCrests(districtArt[chapter-1],isLowDetail());
 if(chapter===1&&!inEcho)drawPawtopiaLanterns();
 drawMiniCats();drawPolish();
 const threatBars=[];for(const b of bots){if(threatBars.length===8)break;if(b.hp>=b.maxHp&&!b.wind&&!b.meleeWind&&!b.volleyWind&&!b.boss)continue;const y=b.boss?4.5:2.7,w=vp[3]*b.x+vp[7]*y+vp[11]*b.z+vp[15],px=vp[0]*b.x+vp[4]*y+vp[8]*b.z+vp[12],py=vp[1]*b.x+vp[5]*y+vp[9]*b.z+vp[13];if(w>.1&&Math.abs(px/w)<.95&&Math.abs(py/w)<.95)threatBars.push({x:(px/w*.5+.5)*100,y:(-py/w*.5+.5)*100,hp:b.hp/b.maxHp,boss:b.boss,name:b.name,warning:!!(b.wind>0||b.meleeWind>0||b.volleyWind>0)});}window.CrystalPro?.project(threatBars);
@@ -1285,7 +1300,7 @@ let dx=-Math.sin(cameraYaw),dz=-Math.cos(cameraYaw);const target=lockedTarget&&c
 
 function enemyVolley(b,count=1){b.attackPose=.38;const angle=Math.atan2(hero.x-b.x,hero.z-b.z);for(let i=0;i<count;i++){const a=angle+(i-(count-1)/2)*.24;shoot(b.x,b.z,Math.sin(a),Math.cos(a),true);}}
 function updateProjectiles(dt){for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];p.life-=dt;let remove=p.life<=0;const steps=Math.ceil(p.speed*dt/.18);for(let j=0;j<steps&&!remove;j++){p.x+=p.dx*p.speed*dt/steps;p.z+=p.dz*p.speed*dt/steps;if(!onDungeon(p.x,p.z)){remove=true;break}if(p.enemy){if(Math.hypot(hero.x-p.x,hero.z-p.z)<.44){damageHero(hero.x-p.dx,hero.z-p.dz);remove=true;}}else{const hit=bots.find(b=>b.hp>0&&Math.hypot(b.x-p.x,b.z-p.z)<(b.boss?.8:.5));if(hit){hitEnemy(hit,p.damage);remove=true;}}}if(remove)projectiles.splice(i,1);}bots=bots.filter(b=>b.hp>0);}
-function drawProjectiles(){for(const p of projectiles){draw('sphere',p.x,.95,p.z,p.enemy?.14:.11,.11,.18,p.color,Math.atan2(p.dx,p.dz));draw('oct',p.x-p.dx*.22,.95,p.z-p.dz*.22,.065,.065,.18,p.color,Math.atan2(p.dx,p.dz));}}
+function drawProjectiles(){worldSurface=6;for(const p of projectiles){draw('sphere',p.x,.95,p.z,p.enemy?.14:.11,.11,.18,p.color,Math.atan2(p.dx,p.dz));draw('oct',p.x-p.dx*.22,.95,p.z-p.dz*.22,.065,.065,.18,p.color,Math.atan2(p.dx,p.dz));}worldSurface=0;}
 function ensureMainBoss(){if(!pendingMainBoss||mainBossSpawned)return;pendingMainBoss=false;mainBossSpawned=true;const r=regionVault;bots.push(makeEnemy(r.x,r.z,'shooter',true,true));heroInvulnerable=1;notify('Baron Brasswhirl enters! The main boss battle begins.');updateHud();}
 function smoothAngle(current,target,dt,response=9){const delta=Math.atan2(Math.sin(target-current),Math.cos(target-current));return current+delta*(1-Math.exp(-dt*response));}
 function updateEnemies(dt){for(const b of bots){b.wishX=b.wishZ=0;b.hitReact=Math.max(0,(b.hitReact||0)-dt);b.attackPose=Math.max(0,(b.attackPose||0)-dt);}updateEnemiesLogic(dt);for(const b of bots){const travelled=driveBody(b,b,b.wishX,b.wishZ,dt,b.dash>0?20:b.stagger>0?28:b.boss?8:14);const profile=b.main?canineProfiles[0]:b.boss?miniBossBreeds[chapter-1]:canineProfiles[chapter-1],scale=b.boss?1.5:b.type==='guard'?1.1:.8,depth=profile.shape==='longbody'?1.28:profile.shape==='slender'?.91:1;b.gait=(b.gait||0)+travelled*(Math.PI*.62/(.28*scale*depth));b.walkBlend=(b.walkBlend||0)+(Math.min(1,travelled/Math.max(dt,.001)/2.3)-(b.walkBlend||0))*(1-Math.exp(-dt*10));}}
@@ -1749,4 +1764,10 @@ header .muted,.chapter-kicker{color:#9eeaff}
  #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .gamepad-utilities :is(button,summary){min-height:34px}
  #game-fullscreen-stage:is(:fullscreen,.fs-expanded) :is(#ability-progress,#ability-unlock,.stick-area small){display:none}
 }
+</style><style>
+#hud span,#funhud span,.fs-tools button,.gamepad-menu button{border-color:#a899e6;background:linear-gradient(#352a76,#171a4a);color:#faf2ff}
+#game-fullscreen-stage .actions button:not([hidden]){border-color:#c3b6ff;color:#fff6dc}
+#game-fullscreen-stage #attack{background:radial-gradient(circle at 30% 24%,#ed735d,#952e62 68%,#32184e)}
+#game-fullscreen-stage #special,#game-fullscreen-stage #ranged{background:radial-gradient(circle at 30% 24%,#7397f2,#493391 68%,#241748)}
+.panel h2{color:#ffe49a;text-shadow:0 2px #7b415e,0 4px #20164e}
 </style></body></html>
