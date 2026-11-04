@@ -329,7 +329,18 @@ function posterMaterial(materialName,nodeName,luna,base){
  if(/cape/i.test(nodeName)&&/red|cloth|cape/i.test(materialName))return {color:[.67,.032,.095],surface:0};
  return {color:base,surface:/fur|hair/i.test(materialName)?4:armor?5:0};
 }
-function drawPosterHero(){const api=window.SuperPawRig,name=hero.mode==='luna'?'Luna':'Whisker',low=isLowDetail(),gpu=posterHeroModels[name][low?'low':'high'],pose=combatPose(api,name,{time:motion.time,phase:motion.phase,speed:motion.pace,turn:motion.turn||0,punch:0,recoil:motion.recoil,dash:dashTime>0,neutral:true}),root=model(hero.x,groundedHeroHeight(api,name,pose),hero.z,.64,.64,.64,hero.dir),normalRoot=model(0,0,0,1,1,1,hero.dir);for(const foot of pose.filter(p=>p.node.name==='boot toe')){const m=api.mul(root,foot.world);draw('sphere',m[12],.001,m[14],.15,.001,.21,[.12,.13,.14]);}gl.disable(gl.CULL_FACE);for(const part of pose){if(low&&part.node.extras?.lod)continue;const mesh=gpu[part.node.mesh],luna=name==='Luna',scale=posterPartScale(part.node,luna);
+function drawPosterHero(){const api=window.SuperPawRig,name=hero.mode==='luna'?'Luna':'Whisker',low=isLowDetail(),gpu=posterHeroModels[name][low?'low':'high'],pose=combatPose(api,name,{time:motion.time,phase:motion.phase,speed:motion.pace,turn:motion.turn||0,punch:0,recoil:motion.recoil,dash:dashTime>0,neutral:true}),root=model(hero.x,groundedHeroHeight(api,name,pose),hero.z,.64,.64,.64,hero.dir),normalRoot=model(0,0,0,1,1,1,hero.dir);for(const foot of pose.filter(p=>p.node.name==='boot toe')){const m=api.mul(root,foot.world);draw('sphere',m[12],.001,m[14],.15,.001,.21,[.12,.13,.14]);}gl.disable(gl.CULL_FACE);
+const capeAnchor=pose.find(part=>part.node.extras?.region==='cape');
+if(name==='Whisker'&&capeAnchor){
+ const y=root[13]+1.49;
+ const back=.22,angle=hero.dir+Math.sin(motion.time*3)*.045*(.2+Math.min(1,motion.pace/6));
+ const x=hero.x+Math.sin(hero.dir)*back,z=hero.z+Math.cos(hero.dir)*back;
+ draw('whisker-cape',x,y,z,1,1,1,[.72,.027,.071],angle);
+ draw('whisker-cape-trim',x,y,z,1,1,1,[1,.66,.22],angle);
+}
+for(const part of pose){
+ if((low&&part.node.extras?.lod)||(name==='Whisker'&&capeAnchor&&part.node.extras?.region==='cape'))continue;
+ const mesh=gpu[part.node.mesh],luna=name==='Luna',scale=posterPartScale(part.node,luna);
 let world=api.mul(root,part.world),normal=api.mul(normalRoot,part.normal);
 if(scale){
  const [x,y,z]=scale;
@@ -1086,6 +1097,36 @@ function drawPawtopiaLanterns(){
   }
  }
 }
+// The rooftop portal is built from curved masonry, inset enamel and a gold reveal.
+function portalBand(inner,outer,depth){
+ const triangles=[];
+ const point=(i,r,z)=>[Math.cos(i*Math.PI/24)*2.18*r,Math.sin(i*Math.PI/24)*1.48*r,z];
+ const quad=(a,b,c,d)=>triangles.push([a,b,c],[a,c,d]);
+ for(let i=0;i<24;i++){
+  const a=point(i,inner,depth),b=point(i,outer,depth);
+  const c=point(i+1,outer,depth),d=point(i+1,inner,depth);
+  const A=point(i,inner,-depth),B=point(i,outer,-depth);
+  const C=point(i+1,outer,-depth),D=point(i+1,inner,-depth);
+  quad(a,b,c,d);quad(D,C,B,A);quad(d,D,A,a);quad(b,B,C,c);
+ }
+ return triangles;
+}
+function rooftopCape(trim){
+ const triangles=[];
+ const point=(u,v)=>{
+  const width=.35+.47*v;
+  return [u*width-.12*v*v,-1.26*v+.095*u*u*v,.11+.48*v+.12*Math.cos(u*8)*v];
+ };
+ const columns=trim?2:16;
+ for(let row=0;row<12;row++)for(let i=0;i<columns;i++){
+  const u=trim?(i===0?-1:.91):-1+i*.125;
+  const next=trim?(i===0?-.91:1):u+.125;
+  const a=point(u,row/12),b=point(next,row/12),c=point(next,(row+1)/12),d=point(u,(row+1)/12);
+  if(trim)for(const p of [a,b,c,d])p[2]+=.009;
+  triangles.push([a,b,c],[a,c,d]);
+ }
+ return triangles;
+}
 function drawCrystalArch(x,z){
  const stone=[.29,.31,.53],trim=[.50,.46,.72],crystal=[.20,.81,1];
  for(const side of [-1,1]){
@@ -1093,10 +1134,9 @@ function drawCrystalArch(x,z){
   draw('cube',x+side*2.22,.17,z,.46,.17,.55,trim);
   draw('cube',x+side*2.22,2.31,z,.45,.11,.49,trim);
  }
- for(let i=0;i<=8;i++){
-  const angle=i*Math.PI/8;
-  draw('sphere-low',x+Math.cos(angle)*2.22,2.32+Math.sin(angle)*1.35,z,.46,.35,.48,i%2?stone:trim);
- }
+ draw('portal-stone',x,2.32,z,1,1,1,stone);
+ draw('portal-trim',x,2.32,z+.035,1,1,1,[.68,.53,.37]);
+ draw('portal-inset',x,2.32,z-.05,1,1,1,[.15,.47,.74]);
  if(!isLowDetail()){
   for(const side of [-1,1]){
    draw('sphere-low',x+side*3.14,1.16,z-.36,.61,1.27,.64,stone);
@@ -1434,7 +1474,12 @@ function updateHeldActions(dt){if(!playing||paused)return;for(const entry of act
 function bindActionPointer(id,action,repeat=false){const button=$(id);button.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0||actionPointers.has(e.pointerId)||!playing||paused||button.disabled)return;e.preventDefault();actionPointers.set(e.pointerId,{button,action,repeat,elapsed:0});button.classList.add('held');button.setAttribute('aria-pressed','true');try{button.setPointerCapture(e.pointerId)}catch(_){}action();},{passive:false});for(const event of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(event,e=>releaseActionPointer(e.pointerId));button.addEventListener('click',e=>{if(e.detail===0)action();else e.preventDefault();});button.addEventListener('contextmenu',e=>e.preventDefault());}
 for(const event of ['pointerup','pointercancel'])document.addEventListener(event,e=>releaseActionPointer(e.pointerId));
 bindActionPointer('attack',attack,true);bindActionPointer('ranged',rangedAttack,true);bindActionPointer('dodge',dodge);bindActionPointer('special',superBurst);bindActionPointer('heal',heal);bindActionPointer('upgrade',upgrade);
-$('pause').addEventListener('click',togglePause);$('voice').addEventListener('click',()=>{voiceOn=!voiceOn;$('voice').textContent=voiceOn?'🔊 Voice: On':'🔇 Voice: Off';if(!voiceOn)characterSpeech.cancel()});$('quality').addEventListener('change',()=>{autoLow=false;slowFrames=0;const low=isLowDetail();canvas.width=low?640:960;canvas.height=low?400:600;if(gl)render()});$('hero').addEventListener('change',()=>{if(!playing||paused){hero.mode=$('hero').value;if(gl)render();}});canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();stop();playing=false;keys.clear();resetJoystick();overlay.classList.remove('hidden');desc.textContent='3D graphics connection lost. Reload this page to restart.';$('start').disabled=true;$('restart').disabled=true;});if(!gl){$('restart').disabled=true;$('resume').disabled=true;desc.textContent='This browser does not support WebGL. 3D is required; gameplay is stopped instead of switching to 2D. Try Chrome on an Android device.';$('start').disabled=true;return}try{program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vs));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fs));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));gl.useProgram(program);posLoc=gl.getAttribLocation(program,'position');normLoc=gl.getAttribLocation(program,'normal');mvpLoc=gl.getUniformLocation(program,'mvp');colorLoc=gl.getUniformLocation(program,'color');modelLoc=gl.getUniformLocation(program,'world');normalMatrixLoc=gl.getUniformLocation(program,'normalMatrix');eyeLoc=gl.getUniformLocation(program,'eye');lampsLoc=gl.getUniformLocation(program,'lamps[0]');shadowActorsLoc=gl.getUniformLocation(program,'shadowActors[0]');surfaceLoc=gl.getUniformLocation(program,'surface');retroSceneryLoc=gl.getUniformLocation(program,'retroScenery');skyPassLoc=gl.getUniformLocation(program,'skyPass');skyTintLoc=gl.getUniformLocation(program,'skyTint');skyYawLoc=gl.getUniformLocation(program,'skyYaw');timeLoc=gl.getUniformLocation(program,'sceneTime');gl.enableVertexAttribArray(posLoc);gl.enableVertexAttribArray(normLoc);gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);makeMesh('sphere',sphereMesh());makeMesh('sphere-low',sphereMesh(6,10));makeMesh('kitten-heart',kittenHeartMesh());makeMesh('cube',cube());makeMesh('cylinder',cylinderMesh(),true);makeMesh('oct',oct());makeMesh('ring',ringMesh());makeMesh('sky',skyMesh());if(window.SuperPawRig)posterHeroModels=window.SuperPawRig.createGpuModels(gl);buildDistrict(1);render()}catch(err){desc.textContent='WebGL could not initialize: '+err.message;$('start').disabled=true;console.error(err)}
+$('pause').addEventListener('click',togglePause);$('voice').addEventListener('click',()=>{voiceOn=!voiceOn;$('voice').textContent=voiceOn?'🔊 Voice: On':'🔇 Voice: Off';if(!voiceOn)characterSpeech.cancel()});$('quality').addEventListener('change',()=>{autoLow=false;slowFrames=0;const low=isLowDetail();canvas.width=low?640:960;canvas.height=low?400:600;if(gl)render()});$('hero').addEventListener('change',()=>{if(!playing||paused){hero.mode=$('hero').value;if(gl)render();}});canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();stop();playing=false;keys.clear();resetJoystick();overlay.classList.remove('hidden');desc.textContent='3D graphics connection lost. Reload this page to restart.';$('start').disabled=true;$('restart').disabled=true;});if(!gl){$('restart').disabled=true;$('resume').disabled=true;desc.textContent='This browser does not support WebGL. 3D is required; gameplay is stopped instead of switching to 2D. Try Chrome on an Android device.';$('start').disabled=true;return}try{program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vs));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fs));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));gl.useProgram(program);posLoc=gl.getAttribLocation(program,'position');normLoc=gl.getAttribLocation(program,'normal');mvpLoc=gl.getUniformLocation(program,'mvp');colorLoc=gl.getUniformLocation(program,'color');modelLoc=gl.getUniformLocation(program,'world');normalMatrixLoc=gl.getUniformLocation(program,'normalMatrix');eyeLoc=gl.getUniformLocation(program,'eye');lampsLoc=gl.getUniformLocation(program,'lamps[0]');shadowActorsLoc=gl.getUniformLocation(program,'shadowActors[0]');surfaceLoc=gl.getUniformLocation(program,'surface');retroSceneryLoc=gl.getUniformLocation(program,'retroScenery');skyPassLoc=gl.getUniformLocation(program,'skyPass');skyTintLoc=gl.getUniformLocation(program,'skyTint');skyYawLoc=gl.getUniformLocation(program,'skyYaw');timeLoc=gl.getUniformLocation(program,'sceneTime');gl.enableVertexAttribArray(posLoc);gl.enableVertexAttribArray(normLoc);gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);makeMesh('sphere',sphereMesh());makeMesh('sphere-low',sphereMesh(6,10));makeMesh('kitten-heart',kittenHeartMesh());makeMesh('cube',cube());makeMesh('cylinder',cylinderMesh(),true);makeMesh('oct',oct());makeMesh('ring',ringMesh());makeMesh('sky',skyMesh());
+makeMesh('portal-stone',portalBand(.91,1.17,.43));
+makeMesh('portal-trim',portalBand(1.08,1.11,.41));
+makeMesh('portal-inset',portalBand(.86,.91,.35));
+makeMesh('whisker-cape',rooftopCape(false),true);
+makeMesh('whisker-cape-trim',rooftopCape(true),true);if(window.SuperPawRig)posterHeroModels=window.SuperPawRig.createGpuModels(gl);buildDistrict(1);render()}catch(err){desc.textContent='WebGL could not initialize: '+err.message;$('start').disabled=true;console.error(err)}
 })();
 </script><script src="cross-platform.js" defer></script><script src="app.js"></script><script>(function installGameFullscreen(){
 'use strict';
