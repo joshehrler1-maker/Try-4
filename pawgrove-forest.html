@@ -6,7 +6,7 @@
 <main><header><div><a href="pawgrove.html">← Pawgrove adventure</a> · <a href="play-n64.html">Play original N64 game</a><h1>Pawgrove · Kokiri Forest</h1></div><div><button id="hero" aria-pressed="false">Whisker</button> <button id="reset">Restart</button></div></header>
 <details id="poster"><summary>Meet Whisker and Luna</summary><img src="assets/whisker-luna-master.webp" alt="Super Paw Heroes character poster" loading="lazy"></details><div class="hud"><strong id="area"></strong><span id="status"></span></div>
 <canvas width="720" height="410" aria-label="Third-person view of Pawgrove"></canvas>
-<p id="quest"></p><div id="kit" aria-label="Adventure gear"></div><div class="controls"><div id="stick" aria-label="Movement joystick"><i id="knob"></i></div><div class="n64" aria-label="N64-style controller">
+<p id="quest"></p><p id="next-chapter" hidden><a href="pawgrove.html?chapter=ember-hollow">Continue to Chapter 2 · Ember Hollow →</a></p><div id="kit" aria-label="Adventure gear"></div><div class="controls"><div id="stick" aria-label="Movement joystick"><i id="knob"></i></div><div class="n64" aria-label="N64-style controller">
 <button id="target" title="Center view or focus a landmark" aria-pressed="false">Z</button><button id="shield" title="Raise shield" aria-pressed="false">R</button><button id="map" title="Toggle minimap" aria-pressed="false">L</button><button id="start" aria-pressed="false">Start</button>
 <button id="action" title="Roll">A</button><button id="blade" title="Swing Pawblade">B</button><button class="c" id="cup" title="Look around" aria-pressed="false">C ↑</button><button class="c" id="cleft" title="Use C-left gear">C ←</button><button class="c" id="cdown" title="Use C-down gear">C ↓</button><button class="c" id="cright" title="Use C-right gear">C →</button>
 </div></div><section id="gear-menu" hidden><strong>Pause · Assign gear</strong><div id="gear-slots"></div></section>
@@ -95,7 +95,7 @@ function target(){
 function action(){
  if(paused||looking||roll||!health||phase===4)return;
  if(phase===0&&distance(poppy)<150){phase=1;hint('Poppy: Collect the three lantern sparks. Follow the gold marker.');return}
- if(phase===3&&distance(shrine)<150){phase=4;hint('Quest complete! You relit the shrine and saved Pawgrove.');return}
+ if(phase===3&&distance(shrine)<150){phase=4;hint('The shrine is lit! Its light revealed the entrance to Ember Hollow.');$('next-chapter').hidden=false;try{localStorage.setItem('pawgrove-forest-clear','1');localStorage.setItem('pawgrove-hero',luna?'luna':'whisker')}catch{}return}
  roll=.34;
 }
 function blade(){
@@ -148,6 +148,7 @@ function floor(x,z,y){
 }
 function reset(){phase=collected=windup=recovery=gearCooldown=0;bossHP=6;health=5;hud();hint('Walk to Poppy and press A to begin.');[p.x,p.y,p.z]=spawn;p.angle=facing=Math.PI;lock=null;looking=false;roll=swing=effect=0;guard(false);pressed('target',false);pressed('cup',false);const y=floor(p.x,p.z,p.y);if(Number.isFinite(y))p.y=y;Object.assign(camera,p)}
 reset();
+try{$('next-chapter').hidden=localStorage.getItem('pawgrove-forest-clear')!=='1'}catch{}
 $('reset').onclick=reset;
 $('hero').onclick=()=>{luna=!luna;$('hero').textContent=luna?'Luna':'Whisker';$('hero').setAttribute('aria-pressed',luna)};
 $('area').textContent='Kokiri Forest';
