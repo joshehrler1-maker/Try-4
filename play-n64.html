@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Classic Adventure | Super Paw Heroes</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101831;color:#fff3d0;font:16px system-ui}main{max-width:960px;margin:auto;padding:16px}a{color:#a9efff}h1{margin:.3em 0}p{line-height:1.5}form{display:flex;gap:12px;flex-wrap:wrap;align-items:center}input{max-width:100%;font:inherit}button{font:inherit;font-weight:bold;padding:10px 16px;border-radius:12px;border:1px solid #ffdf9f;background:#ffe49e;color:#241c13}button:disabled{opacity:.5}#game{width:100%;height:clamp(270px,68dvh,720px);background:#080c1a;margin-top:12px}#status{min-height:1.5em;color:#d1eaff}
+</style>
+<main>
+<a href="pawgrove-forest.html">← Super Paw forest quest</a>
+<h1>Classic Adventure</h1>
+<p>Play your original Nintendo 64 game in this browser. In Android Files, extract your ZIP first and select the <strong>.z64</strong> file inside. Your game file is read on this device.</p>
+<form id="launch"><label for="rom">Nintendo 64 game file</label><input id="rom" type="file" accept=".z64,.n64,.v64"><button>Load game</button></form>
+<p id="status" role="status"></p>
+<div id="game" hidden></div>
+</main>
+<script>
+'use strict';
+const form=document.getElementById('launch'),input=document.getElementById('rom'),status=document.getElementById('status'),game=document.getElementById('game'),button=form.querySelector('button');
+const cdn='https://cdn.emulatorjs.org/stable/data/';
+let busy=false;
+form.onsubmit=async event=>{
+ event.preventDefault();
+ if(busy)return;
+ const rom=input.files[0];
+ if(!rom){status.textContent='Choose the extracted game file first.';return}
+ busy=button.disabled=input.disabled=true;
+ let url,loader;
+ try{
+  const bytes=new Uint8Array(await rom.slice(0,4).arrayBuffer());
+  const signature=Array.from(bytes,v=>v.toString(16).padStart(2,'0')).join('');
+  if(rom.size<4096||!['80371240','37804012','40123780'].includes(signature)){
+   throw new Error('Choose the Nintendo 64 game file inside the ZIP.');
+  }
+  url=URL.createObjectURL(rom);
+  window.EJS_player='#game';
+  window.EJS_core='mupen64plus';
+  window.EJS_gameName=rom.name.replace(/\.[^.]+$/,'');
+  window.EJS_gameUrl=url;
+  window.EJS_pathtodata=cdn;
+  window.EJS_threads=false;
+  window.EJS_onGameStart=()=>{status.textContent='Game running. Use the on-screen controller or connect a gamepad.'};
+  game.hidden=false;
+  status.textContent='Downloading the browser player. Tap Start Game in the player when it appears.';
+  await new Promise((resolve,reject)=>{
+   loader=document.createElement('script');
+   loader.src=cdn+'loader.js';
+   loader.onload=resolve;
+   loader.onerror=()=>reject(new Error('The browser player could not load. Check your connection and try again.'));
+   document.head.append(loader);
+  });
+ }catch(error){
+  if(url)URL.revokeObjectURL(url);
+  loader?.remove();game.hidden=true;
+  busy=button.disabled=input.disabled=false;
+  status.textContent=error.message;
+ }
+};
+</script>
+</html>
