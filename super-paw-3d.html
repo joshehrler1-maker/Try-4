@@ -1039,6 +1039,26 @@ function drawPawtopiaSkyline(){
   worldSurface=0;
  }
 }
+function drawPawtopiaLanterns(){
+ const stone=[.42,.37,.57],gold=[.85,.53,.22],amber=[1,.76,.34];
+ const low=isLowDetail();
+ for(const room of dungeonRooms){
+  if(!visibleAt(room.x,1,room.z,room.w/2+4))continue;
+  for(const side of [-1,1]){
+   const x=room.x+side*(room.w/2-.27);
+   for(const offset of [0,room.d*.35]){
+    if(low&&offset)continue;
+    const z=room.z+offset;
+    draw('cube',x,.24,z,.28,.24,.3,stone);
+    draw('cube',x,.49,z,.24,.045,.24,gold);
+    worldSurface=6;
+    draw('cube',x,.71,z,.115,.18,.115,amber);
+    worldSurface=0;
+    draw('cube',x,.92,z,.17,.035,.17,gold);
+   }
+  }
+ }
+}
 function drawCrystalArch(x,z){
  const stone=[.29,.31,.53],trim=[.50,.46,.72],crystal=[.20,.81,1];
  for(const side of [-1,1]){
@@ -1049,6 +1069,12 @@ function drawCrystalArch(x,z){
  for(let i=0;i<=8;i++){
   const angle=i*Math.PI/8;
   draw('sphere-low',x+Math.cos(angle)*2.22,2.32+Math.sin(angle)*1.35,z,.46,.35,.48,i%2?stone:trim);
+ }
+ if(!isLowDetail()){
+  for(const side of [-1,1]){
+   draw('sphere-low',x+side*3.14,1.16,z-.36,.61,1.27,.64,stone);
+   draw('sphere-low',x+side*2.71,2.32,z-.48,.45,.88,.48,trim);
+  }
  }
  worldSurface=6;
  draw('oct',x,4.16,z,.27,.46,.31,crystal);
@@ -1061,11 +1087,13 @@ function drawCrystalArch(x,z){
 
 function render(){
 if(!gl)return;lastIdentity=false;lastMesh=null;gl.viewport(0,0,canvas.width,canvas.height);gl.clearColor(.11,.15,.25,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-const close=$('camera').value==='close',back=close?4:6.5,side=close?.65:.45,s=Math.sin(cameraYaw),c=Math.cos(cameraYaw),camera=[hero.x+s*back+c*side,cameraLift+(close?0:.8),hero.z+c*back-s*side];
-renderEye=camera;gl.uniform3fv(eyeLoc,renderEye);const shadowData=new Float32Array(12);shadowData.set([hero.x,hero.z,.75]);const shadowBots=bots.slice().sort((a,b)=>distance(a,hero)-distance(b,hero)).slice(0,isLowDetail()?1:3);shadowBots.forEach((b,i)=>shadowData.set([b.x,b.z,b.boss?1.2:.65],(i+1)*3));gl.uniform3fv(shadowActorsLoc,shadowData);const nearest=dungeonRooms.slice().sort((a,b)=>Math.hypot(a.x-hero.x,a.z-hero.z)-Math.hypot(b.x-hero.x,b.z-hero.z))[0];gl.uniform3fv(lampsLoc,new Float32Array([nearest.x-nearest.w/2+.5,1.8,nearest.z-2,nearest.x+nearest.w/2-.5,1.8,nearest.z-2]));vp=matMul(perspective(Math.PI/3.1,canvas.width/canvas.height,.1,170),lookAt(camera,[hero.x-s*4,1.25,hero.z-c*4]));
+const close=$('camera').value==='close',back=close?4:6.5,side=close?1.35:.45,s=Math.sin(cameraYaw),c=Math.cos(cameraYaw),camera=[hero.x+s*back+c*side,cameraLift+(close?0:.8),hero.z+c*back-s*side];
+renderEye=camera;gl.uniform3fv(eyeLoc,renderEye);const shadowData=new Float32Array(12);shadowData.set([hero.x,hero.z,.75]);const shadowBots=bots.slice().sort((a,b)=>distance(a,hero)-distance(b,hero)).slice(0,isLowDetail()?1:3);shadowBots.forEach((b,i)=>shadowData.set([b.x,b.z,b.boss?1.2:.65],(i+1)*3));gl.uniform3fv(shadowActorsLoc,shadowData);const nearest=dungeonRooms.slice().sort((a,b)=>Math.hypot(a.x-hero.x,a.z-hero.z)-Math.hypot(b.x-hero.x,b.z-hero.z))[0];gl.uniform3fv(lampsLoc,new Float32Array([nearest.x-nearest.w/2+.5,1.8,nearest.z-2,nearest.x+nearest.w/2-.5,1.8,nearest.z-2]));vp=matMul(perspective(Math.PI/3.1,canvas.width/canvas.height,.1,170),lookAt(camera,[hero.x-s*4+c*(close?.8:0),close?1.55:1.25,hero.z-c*4-s*(close?.8:0)]));
 gl.uniform1f(retroSceneryLoc,chapter===1?2:1);gl.uniform3fv(skyTintLoc,inEcho?[.26,.35,.69]:skyColors[chapter-1]);gl.uniform1f(skyYawLoc,cameraYaw);gl.uniform1f(timeLoc,motion.time);drawSky();
 if(chapter===1&&!inEcho)drawPawtopiaSkyline();
-drawDungeon();drawMiniCats();drawPolish();
+drawDungeon();
+if(chapter===1&&!inEcho)drawPawtopiaLanterns();
+drawMiniCats();drawPolish();
 const threatBars=[];for(const b of bots){if(threatBars.length===8)break;if(b.hp>=b.maxHp&&!b.wind&&!b.meleeWind&&!b.volleyWind&&!b.boss)continue;const y=b.boss?4.5:2.7,w=vp[3]*b.x+vp[7]*y+vp[11]*b.z+vp[15],px=vp[0]*b.x+vp[4]*y+vp[8]*b.z+vp[12],py=vp[1]*b.x+vp[5]*y+vp[9]*b.z+vp[13];if(w>.1&&Math.abs(px/w)<.95&&Math.abs(py/w)<.95)threatBars.push({x:(px/w*.5+.5)*100,y:(-py/w*.5+.5)*100,hp:b.hp/b.maxHp,boss:b.boss,name:b.name,warning:!!(b.wind>0||b.meleeWind>0||b.volleyWind>0)});}window.CrystalPro?.project(threatBars);
 
 if(!inEcho)for(const person of residents){
@@ -1621,4 +1649,32 @@ header .muted,.chapter-kicker{color:#9eeaff}
 #dodge{background:linear-gradient(#225eac,#20367a);border-color:#8ce8ff}
 #heal{background:linear-gradient(#20716d,#184258);border-color:#8beedd}
 #msg{color:#ffe18f}
+</style><style id="pawtopia-landscape">
+@media (orientation:landscape) and (pointer:coarse){
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded){grid-template-rows:minmax(0,1fr) 34px 24px!important}
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded)>.controls{
+  grid-row:1/3!important;z-index:5;display:block!important;border:0;background:none;box-shadow:none;overflow:visible!important;pointer-events:none!important
+ }
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .stick-area{
+  position:absolute!important;left:max(16px,env(safe-area-inset-left));bottom:44px;pointer-events:auto
+ }
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .actions{
+  position:absolute!important;right:max(16px,env(safe-area-inset-right));bottom:46px;width:auto;max-width:56vw;min-height:0;flex-wrap:wrap;justify-content:flex-end;pointer-events:none
+ }
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .actions button{
+  pointer-events:auto;width:52px;height:52px;flex-basis:52px;border:2px solid #e4edff;background:#1b285eaa!important;box-shadow:0 2px 10px #16112e99
+ }
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) #joystick{
+  background:#30255f91;border:2px solid #f0e6ffcc;box-shadow:0 2px 10px #16112e99
+ }
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .gamepad-menu,
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .gamepad-utilities{
+  position:absolute!important;bottom:0;display:flex;margin:0;pointer-events:auto;border:0
+ }
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .gamepad-menu{left:max(6px,env(safe-area-inset-left));right:auto;top:auto}
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .gamepad-utilities{right:max(6px,env(safe-area-inset-right));left:auto;top:auto}
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .gamepad-menu button,
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) .gamepad-utilities :is(button,summary){min-height:34px}
+ #game-fullscreen-stage:is(:fullscreen,.fs-expanded) :is(#ability-progress,#ability-unlock,.stick-area small){display:none}
+}
 </style></body></html>
