@@ -2,11 +2,11 @@
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pawgrove | Super Paw Heroes</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#101831;color:#fff3d0;font:16px system-ui}main{max-width:980px;margin:auto;padding:12px}header,.hud,.controls{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}h1{margin:.2em 0;font-size:clamp(22px,5vw,34px)}a{color:#a9efff}button{font:inherit;font-weight:bold;color:#fff3d0;background:#29365e;border:1px solid #8e9dcc;border-radius:12px;padding:10px;touch-action:manipulation}button[aria-pressed=true]{background:#644792}canvas{width:100%;height:auto;max-height:60dvh;display:block;background:#93b7ce;border-radius:10px}.hud{padding:8px 0}.controls{padding:10px 3px;user-select:none}#stick{width:106px;height:106px;border:2px solid #65769b;border-radius:50%;position:relative;background:#202b49;touch-action:none}#knob{position:absolute;left:33px;top:33px;width:36px;height:36px;background:#ffd57e;border-radius:50%;pointer-events:none}.actions{display:flex;gap:6px}.actions button{min-height:54px}#quest{min-height:2.8em;margin:6px 0;color:#cbeafa}small{color:#c8d0e2}
-#poster{margin:0 0 12px;padding:9px 12px;border:1px solid #64658c;border-radius:10px;background:#202747}#poster img{display:block;margin:8px auto 0;width:min(100%,310px);border-radius:8px}#kit{display:flex;gap:5px;flex-wrap:wrap;padding:5px 0;color:#a9efff;font-size:.83em}.actions{flex-wrap:wrap;max-width:calc(100% - 114px)}#guard[aria-pressed=true]{background:#256384}</style>
+#poster{margin:0 0 12px;padding:9px 12px;border:1px solid #64658c;border-radius:10px;background:#202747}#poster img{display:block;margin:8px auto 0;width:min(100%,310px);border-radius:8px}#kit{display:flex;gap:5px;flex-wrap:wrap;padding:5px 0;color:#a9efff;font-size:.83em}.actions{flex-wrap:wrap;max-width:calc(100% - 114px)}#guard[aria-pressed=true]{background:#256384}.controls{touch-action:none}.actions{display:grid;grid-template-columns:repeat(4,minmax(38px,1fr));flex:1;max-width:380px}.actions button{min-height:40px;padding:4px;touch-action:none}.actions button[aria-pressed=true]{background:#256384}</style>
 <main><header><div><a href="index.html#games">← Hero Game Zone</a> · <a href="pawgrove-forest.html">Explore Kokiri Forest</a><h1>Pawgrove · The Lantern Curse</h1></div><div><button id="hero" aria-pressed="false">Whisker</button> <button id="reset">Restart</button></div></header>
 <details id="poster"><summary>Meet Whisker and Luna</summary><img src="assets/whisker-luna-master.webp" alt="Super Paw Heroes character poster" loading="lazy"></details><div class="hud"><strong id="area"></strong><span id="status"></span></div>
 <canvas width="720" height="410" aria-label="Third-person view of Pawgrove"></canvas>
-<p id="quest"></p><div id="kit" aria-label="Adventure gear"></div><div class="controls"><div id="stick" aria-label="Movement joystick"><i id="knob"></i></div><div class="actions"><button id="talk">Talk</button><button id="attack">Strike</button><button id="pulse">Launch</button><button id="guard" aria-pressed="false">Guard</button></div></div><small>Joystick or WASD to move · E to talk · Space to strike · Q to launch · Hold Shift to guard</small></main>
+<p id="quest"></p><div id="kit" aria-label="Adventure gear"></div><div class="controls"><div id="stick" aria-label="Movement joystick"><i id="knob"></i></div><div class="actions"><button id="target" aria-pressed="false" title="Focus">Z</button><button id="guard" aria-pressed="false" title="Guard">R</button><button id="map" aria-pressed="false" title="Map">L</button><button id="pause" aria-pressed="false">Start</button><button id="talk" title="Talk or roll">A</button><button id="attack" title="Pawblade">B</button><button id="pulse" title="Comet Launcher">C ←</button><button id="look" aria-pressed="false" title="Look ahead">C ↑</button><button id="lantern" title="Lantern">C ↓</button><button id="compass" title="Trail Compass">C →</button></div></div><small>Joystick to move · A talk or roll · B strike · R hold shield · Z focus · C ← launch · C ↑ look · Start pause</small></main>
 <script>
 'use strict';
 const $=id=>document.getElementById(id), canvas=document.querySelector('canvas'), ctx=canvas.getContext('2d');
@@ -26,11 +26,12 @@ function guard(on){guarding=on;$('guard').setAttribute('aria-pressed',on)}
 const chapterTwo=new URLSearchParams(location.search).get('chapter')==='ember-hollow';
 let savedHero='';
 try{savedHero=localStorage.getItem('pawgrove-hero')||''}catch{}
+let paused=false,mapOn=false,look=false,targeted=false,roll=0,lanternTime=0;
 let foes,luna=chapterTwo&&savedHero==='luna',won,spoken,hit,shot,flash,note,noteTime,last=0;
 function reset(){
  Object.assign(p,{x:0,z:0,face:0,hp:5}); for(const g of gems)g.taken=false;
  foes=[{x:0,z:16,hp:2},{x:3,z:28,hp:2},{x:-3,z:39,hp:2},{x:0,z:54,hp:7,boss:true}];
- gear=new Set();gate=false;seeds=0;windup=0;guard(false);won=spoken=false;hit=shot=flash=noteTime=0;note='';
+ paused=mapOn=look=targeted=false;roll=lanternTime=0;for(const id of ['pause','map','look','target'])$(id).setAttribute('aria-pressed',false);gear=new Set();gate=false;seeds=0;windup=0;guard(false);won=spoken=false;hit=shot=flash=noteTime=0;note='';
 }
 function startChapter(){
  reset();
@@ -57,7 +58,7 @@ function talk(){
  else say('Move closer to Poppy or Milo to talk.');
 }
 function attack(ranged){
- if(won||!p.hp||(ranged?shot:hit)>0)return;
+ if(paused||won||!p.hp||(ranged?shot:hit)>0)return;
  if(!has(ranged?2:0)){say(ranged?'Find the Comet Launcher on Sunpaw Trail.':'Pick up the Pawblade by the village path.');return}
  if(ranged){
   if(!seeds){say('Out of star seeds. Walk back to the launcher chest for more.');return}
@@ -68,7 +69,21 @@ function attack(ranged){
  if(target){target.hp=Math.max(0,target.hp-(ranged?1:2));target.flash=.2;if(!target.hp&&has(2))seeds=Math.min(16,seeds+3)}
 }
 $('hero').onclick=()=>{luna=!luna;$('hero').textContent=luna?'Luna':'Whisker';$('hero').setAttribute('aria-pressed',luna)};
-$('reset').onclick=startChapter;$('talk').onclick=talk;$('attack').onclick=()=>attack(false);$('pulse').onclick=()=>attack(true);
+$('reset').onclick=startChapter;
+function toggle(id,value){$(id).setAttribute('aria-pressed',value);return value}
+$('pause').onclick=()=>{paused=toggle('pause',!paused);if(paused)guard(false)};
+$('map').onclick=()=>{mapOn=toggle('map',!mapOn)};
+$('look').onclick=()=>{look=toggle('look',!look)};
+$('target').onclick=()=>{targeted=toggle('target',!targeted)};
+$('lantern').onclick=()=>{lanternTime=4};
+$('compass').onclick=()=>{mapOn=toggle('map',true);say(gate?'Follow the trail to the shrine.':'Find the glowing gate switch.')};
+$('talk').onclick=()=>{if(paused||!p.hp||won)return;if(npcs.some(n=>dist(n)<4))talk();else if(!roll)roll=.24};
+$('attack').onclick=()=>attack(false);$('pulse').onclick=()=>attack(true);
+for(const id of ['pause','map','look','target','lantern','compass','talk','attack','pulse']){
+ const button=$(id),activate=button.onclick;
+ button.onpointerdown=event=>{if(event.button===0)activate()};
+ button.onclick=event=>{if(!event||event.detail===0)activate()};
+}
 const shield=$('guard');
 shield.onpointerdown=e=>{if(!has(1)){say('Find the Crescent Shield by the trail.');return}shield.setPointerCapture(e.pointerId);guard(true)};
 shield.onpointerup=shield.onpointercancel=shield.onlostpointercapture=()=>guard(false);
@@ -83,13 +98,16 @@ stick.onpointerup=stick.onpointercancel=stick.onlostpointercapture=release;
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)&&e.target.tagName!=='BUTTON')e.preventDefault();keys.add(k);if(e.repeat||e.target.tagName==='BUTTON')return;if(k==='e')talk();if(k===' ')attack(false);if(k==='q')attack(true)});
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));addEventListener('blur',()=>{keys.clear();guard(false)});
 function update(dt){
+ if(paused)return;
+ roll=Math.max(0,roll-dt);lanternTime=Math.max(0,lanternTime-dt);
  for(const f of foes)f.flash=Math.max(0,(f.flash||0)-dt);
  hit=Math.max(0,hit-dt);shot=Math.max(0,shot-dt);flash=Math.max(0,flash-dt);noteTime=Math.max(0,noteTime-dt);
  if(won||!p.hp)return;
  let x=joy.x+Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'));
  let z=joy.z+Number(keys.has('w')||keys.has('arrowup'))-Number(keys.has('s')||keys.has('arrowdown'));
  const blocking=has(1)&&(guarding||keys.has('shift'));
- const speed=(blocking?2.8:5)*dt/Math.max(1,Math.hypot(x,z));
+ if(roll){x=Math.sin(p.face);z=Math.cos(p.face)}
+ const speed=(roll?10:blocking?2.8:5)*dt/Math.max(1,Math.hypot(x,z));
  p.x=Math.max(-12,Math.min(12,p.x+x*speed));p.z=Math.max(-2,Math.min(gate?61:gateZ-.7,p.z+z*speed));
  if(Math.hypot(x,z)>.1)p.face=Math.atan2(x,z);
  for(const g of gems)if(!g.taken&&dist(g)<1.4){g.taken=true;say('Lantern spark found!')}
@@ -114,7 +132,7 @@ function project(x,y,z){
  const depth=z-p.z+8;
  if(depth<.7)return null;
  const s=350/depth;
- return [360+(x-p.x)*s,137+(4.8-y)*s,s];
+ return [360+(x-p.x)*s,(look?157:137)+(4.8-y)*s,s];
 }
 function poly(points,color){if(points.some(a=>!a))return;ctx.fillStyle=color;ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fill()}
 const romPatterns={};
@@ -193,11 +211,22 @@ function render(){
   if(o.type==='npc'){actor(o,o.name==='Poppy'?'#ffc079':'#bbb9d9','#31768a','#60a69b',.86);const a=project(o.x,1.65,o.z);if(a){ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillStyle='#fff';ctx.fillText(o.name,a[0],a[1])}}
   if(o.type==='hero'){actor(o,luna?'#e9eafa':'#ef994f',luna?'#51439a':'#213358',luna?'#9f65dc':'#c6354c',1,true);if(hit||shot){const a=project(o.x,1,o.z);ctx.strokeStyle=shot?'#a2f8ff':'#ffdf8a';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(a[0],a[1],shot?55:30,13,0,0,7);ctx.stroke()}}
  }
+ if(lanternTime){ctx.fillStyle='#ffd66b19';ctx.fillRect(0,0,720,410)}
+ if(targeted){
+  const focus=!gate?gateSwitch:foes.filter(f=>f.hp).sort((a,b)=>dist(a)-dist(b))[0];
+  const mark=focus&&project(focus.x,1,focus.z);
+  if(mark){ctx.strokeStyle='#ffe395';ctx.lineWidth=2;ctx.strokeRect(mark[0]-10,mark[1]-10,20,20)}
+ }
+ if(mapOn){
+  ctx.fillStyle='#18203ddd';ctx.fillRect(609,10,102,130);
+  ctx.fillStyle='#a6e8ff';ctx.fillRect(655+p.x*2,120-p.z*1.65,6,6);
+  ctx.fillStyle='#ffe28b';ctx.fillRect(655,120-(gate?60:43)*1.65,6,6);
+ }
  $('area').textContent=p.z>=43?'Ember Hollow':p.z>=22?'Sunpaw Trail':'Pawgrove Village';
  $('status').textContent='♥ '+p.hp+'/5   ·   Sparks '+count()+'/3';
  const gearText=loot.filter((_,i)=>has(i)).map(i=>i.name).join(' · ')+(has(2)?' · Star seeds '+seeds:'');
  if(kitText!==gearText){kitText=gearText;$('kit').textContent=gearText}
- $('quest').textContent=won?(chapterTwo?'Chapter complete! You defeated the Cinder Warden and restored the heart of Ember Hollow.':'You relit the shrine! Pawgrove is safe.'):!p.hp?'The curse knocked you out. Tap Restart to try again.':noteTime?note:!spoken&&p.z<10?'Find Poppy by the path and tap Talk.':!gate&&p.z>33?(has(3)?'Stand near the gate and tap Launch to hit its switch.':'Find the Ember Key in the gold chest beside the gate.'):count()<3?'Collect the three golden lantern sparks along the trail.':foes.at(-1).hp?(chapterTwo?'Defeat the Cinder Warden at the far end of Ember Hollow.':'Defeat Queen Ember at the far end of Ember Hollow.'):'Walk up to the shrine to restore its light.';
+ $('quest').textContent=paused?'Paused. Tap Start to resume.':won?(chapterTwo?'Chapter complete! You defeated the Cinder Warden and restored the heart of Ember Hollow.':'You relit the shrine! Pawgrove is safe.'):!p.hp?'The curse knocked you out. Tap Restart to try again.':noteTime?note:!spoken&&p.z<10?'Find Poppy by the path and tap Talk.':!gate&&p.z>33?(has(3)?'Stand near the gate and tap Launch to hit its switch.':'Find the Ember Key in the gold chest beside the gate.'):count()<3?'Collect the three golden lantern sparks along the trail.':foes.at(-1).hp?(chapterTwo?'Defeat the Cinder Warden at the far end of Ember Hollow.':'Defeat Queen Ember at the far end of Ember Hollow.'):'Walk up to the shrine to restore its light.';
 }
 function frame(now){update(Math.min(.05,(now-last)/1000));last=now;render();requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
