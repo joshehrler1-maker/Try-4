@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pawgrove | Super Paw Heroes</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101831;color:#fff3d0;font:16px system-ui}main{max-width:980px;margin:auto;padding:12px}header,.hud,.controls{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}h1{margin:.2em 0;font-size:clamp(22px,5vw,34px)}a{color:#a9efff}button{font:inherit;font-weight:bold;color:#fff3d0;background:#29365e;border:1px solid #8e9dcc;border-radius:12px;padding:10px;touch-action:manipulation}button[aria-pressed=true]{background:#644792}canvas{width:100%;height:auto;max-height:60dvh;display:block;background:#93b7ce;border-radius:10px}.hud{padding:8px 0}.controls{padding:10px 3px;user-select:none}#stick{width:106px;height:106px;border:2px solid #65769b;border-radius:50%;position:relative;background:#202b49;touch-action:none}#knob{position:absolute;left:33px;top:33px;width:36px;height:36px;background:#ffd57e;border-radius:50%;pointer-events:none}.actions{display:flex;gap:6px}.actions button{min-height:54px}#quest{min-height:2.8em;margin:6px 0;color:#cbeafa}small{color:#c8d0e2}
+</style>
+<main><header><div><a href="index.html#games">← Hero Game Zone</a><h1>Pawgrove · The Lantern Curse</h1></div><div><button id="hero" aria-pressed="false">Whisker</button> <button id="reset">Restart</button></div></header>
+<div class="hud"><strong id="area"></strong><span id="status"></span></div>
+<canvas width="720" height="410" aria-label="Third-person view of Pawgrove"></canvas>
+<p id="quest"></p><div class="controls"><div id="stick" aria-label="Movement joystick"><i id="knob"></i></div><div class="actions"><button id="talk">Talk</button><button id="attack">Strike</button><button id="pulse">Pulse</button></div></div><small>Joystick or WASD to move · E to talk · Space to strike · Q for ranged pulse</small></main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id), canvas=document.querySelector('canvas'), ctx=canvas.getContext('2d');
+const keys=new Set(), p={x:0,z:0,face:0,hp:5}, joy={x:0,z:0,id:null};
+const gems=[{x:-6,z:13},{x:7,z:24},{x:-7,z:36}], npcs=[{x:3,z:5,name:'Poppy'},{x:-4,z:30,name:'Milo'}];
+const lantern={x:0,z:60};
+let foes,luna=false,won,spoken,hit,shot,flash,note,noteTime,last=0;
+function reset(){
+ Object.assign(p,{x:0,z:0,face:0,hp:5}); for(const g of gems)g.taken=false;
+ foes=[{x:0,z:16,hp:2},{x:3,z:28,hp:2},{x:-3,z:39,hp:2},{x:0,z:54,hp:7,boss:true}];
+ won=spoken=false;hit=shot=flash=noteTime=0;note='';
+}
+reset();
+const count=()=>gems.filter(g=>g.taken).length, dist=o=>Math.hypot(o.x-p.x,o.z-p.z);
+function say(line){note=line;noteTime=5}
+function talk(){
+ const npc=npcs.find(n=>dist(n)<4);
+ if(npc){spoken=true;say(npc.name==='Poppy'?'Poppy: Brassfang stole our lantern light. Bring three sparks to the shrine!':'Milo: Queen Ember guards the shrine. Pulse can reach her from a safe distance.')}
+ else say('Move closer to Poppy or Milo to talk.');
+}
+function attack(ranged){
+ if(won||!p.hp||(ranged?shot:hit)>0)return;
+ if(ranged)shot=.55;else hit=.32;
+ const target=foes.filter(f=>f.hp&&dist(f)<(ranged?9:2.6)).sort((a,b)=>dist(a)-dist(b))[0];
+ if(target){target.hp=Math.max(0,target.hp-(ranged?1:2));target.flash=.2}
+}
+$('hero').onclick=()=>{luna=!luna;$('hero').textContent=luna?'Luna':'Whisker';$('hero').setAttribute('aria-pressed',luna)};
+$('reset').onclick=reset;$('talk').onclick=talk;$('attack').onclick=()=>attack(false);$('pulse').onclick=()=>attack(true);
+const stick=$('stick');
+function drag(e){const b=stick.getBoundingClientRect(),x=e.clientX-b.left-b.width/2,z=e.clientY-b.top-b.height/2,d=Math.max(34,Math.hypot(x,z));joy.x=x/d;joy.z=-z/d;$('knob').style.transform='translate('+joy.x*34+'px,'+(-joy.z*34)+'px)'}
+stick.onpointerdown=e=>{if(joy.id!==null)return;joy.id=e.pointerId;stick.setPointerCapture(e.pointerId);drag(e)};
+stick.onpointermove=e=>{if(e.pointerId===joy.id)drag(e)};
+function release(e){if(e.pointerId!==joy.id)return;joy.id=null;joy.x=joy.z=0;$('knob').style.transform=''}
+stick.onpointerup=stick.onpointercancel=stick.onlostpointercapture=release;
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)&&e.target.tagName!=='BUTTON')e.preventDefault();keys.add(k);if(e.repeat||e.target.tagName==='BUTTON')return;if(k==='e')talk();if(k===' ')attack(false);if(k==='q')attack(true)});
+addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));addEventListener('blur',()=>keys.clear());
+function update(dt){
+ for(const f of foes)f.flash=Math.max(0,(f.flash||0)-dt);
+ hit=Math.max(0,hit-dt);shot=Math.max(0,shot-dt);flash=Math.max(0,flash-dt);noteTime=Math.max(0,noteTime-dt);
+ if(won||!p.hp)return;
+ let x=joy.x+Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'));
+ let z=joy.z+Number(keys.has('w')||keys.has('arrowup'))-Number(keys.has('s')||keys.has('arrowdown'));
+ const speed=5*dt/Math.max(1,Math.hypot(x,z));
+ p.x=Math.max(-12,Math.min(12,p.x+x*speed));p.z=Math.max(-2,Math.min(61,p.z+z*speed));
+ if(Math.hypot(x,z)>.1)p.face=Math.atan2(x,z);
+ for(const g of gems)if(!g.taken&&dist(g)<1.4){g.taken=true;say('Lantern spark found!')}
+ for(const f of foes){
+  const d=dist(f);
+  if(!f.hp||d>7)continue;
+  if(d>1.25){f.x+=(p.x-f.x)*dt*1.7/d;f.z+=(p.z-f.z)*dt*1.7/d}
+  if(d<1.7&&!flash){p.hp--;flash=1.5}
+ }
+ if(dist(lantern)<2.3&&count()===3&&!foes.at(-1).hp)won=true;
+}
+function project(x,y,z){
+ const depth=z-p.z+8;
+ if(depth<.7)return null;
+ const s=350/depth;
+ return [360+(x-p.x)*s,137+(4.8-y)*s,s];
+}
+function poly(points,color){if(points.some(a=>!a))return;ctx.fillStyle=color;ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fill()}
+function mesh(x,y,z,s,colors){
+ const a=project(x-s,y,z-s),b=project(x+s,y,z-s),c=project(x+s,y,z+s),d=project(x-s,y,z+s),e=project(x,y+s*2,z);
+ poly([d,c,e],colors[0]);poly([a,d,e],colors[1]);poly([c,b,e],colors[2]);poly([b,a,e],colors[1]);
+}
+function ellipse(x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,7);ctx.fill()}
+function actor(o,fur,suit,cape,size=1,player=false){
+ const a=project(o.x,0,o.z);if(!a)return;
+ const [x,y,s]=a,u=s*size;
+ ellipse(x,y,u*.42,u*.12,'#0e172877');
+ poly([[x-u*.27,y-u*.88],[x+u*.25,y-u*.88],[x+u*.36,y-u*.16],[x-u*.42,y-u*.20]],cape);
+ ellipse(x-u*.15,y-u*.15,u*.13,u*.24,suit);ellipse(x+u*.15,y-u*.15,u*.13,u*.24,suit);
+ ellipse(x,y-u*.58,u*.31,u*.37,suit);
+ ellipse(x,y-u*.55,u*.10,u*.085,'#ffd26a');
+ const hx=x+(player?Math.sin(p.face)*u*.12:0),hy=y-u*1.03;
+ poly([[hx-u*.30,hy],[hx-u*.25,hy-u*.43],[hx-u*.04,hy-u*.18]],fur);
+ poly([[hx+u*.30,hy],[hx+u*.25,hy-u*.43],[hx+u*.04,hy-u*.18]],fur);
+ ellipse(hx,hy,u*.33,u*.26,fur);
+ ellipse(hx,hy+u*.075,u*.19,u*.11,'#ffecd0');
+ ellipse(hx-u*.11,hy-u*.02,u*.035,u*.049,'#181327');ellipse(hx+u*.11,hy-u*.02,u*.035,u*.049,'#181327');
+}
+const trees=Array.from({length:76},(_,i)=>({x:(i%2?-1:1)*(8+(i*13%14)),z:Math.floor(i/2)*2.1-4,s:.65+(i*7%8)*.12}));
+function render(){
+ const cavern=p.z>=43;
+ const sky=ctx.createLinearGradient(0,0,0,260);sky.addColorStop(0,cavern?'#181126':'#466e9d');sky.addColorStop(1,cavern?'#614566':'#f9c88e');ctx.fillStyle=sky;ctx.fillRect(0,0,720,410);
+ poly([[0,150],[75,105],[141,132],[226,74],[340,142],[434,89],[548,143],[658,80],[720,126],[720,410],[0,410]],cavern?'#372947':'#49647c');
+ for(let z=Math.ceil((p.z+68)/3)*3;z>p.z-8;z-=3){
+  const cave=z>=43;
+  poly([project(-100,0,z),project(100,0,z),project(100,0,z-3),project(-100,0,z-3)],cave?(z%2?'#473953':'#514059'):(z%2?'#487353':'#527b57'));
+  poly([project(-3,0,z),project(3,0,z),project(3,0,z-3),project(-3,0,z-3)],cave?'#645271':'#8e825d');
+ }
+ const objects=[...trees.map(t=>({...t,type:'tree'})),...gems.filter(g=>!g.taken).map(g=>({...g,type:'gem'})),...foes.filter(f=>f.hp).map(f=>({...f,type:'foe'})),...npcs.map(n=>({...n,type:'npc'})),{...lantern,type:'lantern'},{...p,type:'hero'}];
+ objects.sort((a,b)=>b.z-a.z);
+ for(const o of objects){
+  if(o.z<p.z-5||o.z>p.z+64)continue;
+  if(o.type==='tree'){
+   mesh(o.x,0,o.z,.38,['#735047','#563a3b','#8c5944']);
+   if(o.z<43){mesh(o.x,.55,o.z,o.s,['#426c53','#365847','#51826a']);mesh(o.x,1.35,o.z,o.s*.77,['#638e59','#486f4c','#72a471'])}
+   else mesh(o.x,0,o.z,o.s,['#8559a4','#533d74','#a16cba']);
+  }
+  if(o.type==='gem')mesh(o.x,.22,o.z,.37,['#fff392','#ffac44','#fffbd2']);
+  if(o.type==='lantern'){mesh(o.x,0,o.z,1.25,['#6b5378','#423653','#876c90']);mesh(o.x,1.4,o.z,.58,won?['#fff3a1','#ffb640','#fffbd2']:['#8fa2b7','#59677d','#b5cada'])}
+  if(o.type==='foe')actor(o,o.flash?'#fff0bc':'#b56a7b','#39294c','#692e57',o.boss?1.9:.9);
+  if(o.type==='npc'){actor(o,o.name==='Poppy'?'#ffc079':'#bbb9d9','#31768a','#60a69b',.86);const a=project(o.x,1.65,o.z);if(a){ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillStyle='#fff';ctx.fillText(o.name,a[0],a[1])}}
+  if(o.type==='hero'){actor(o,luna?'#e9eafa':'#ef994f',luna?'#51439a':'#213358',luna?'#9f65dc':'#c6354c',1,true);if(hit||shot){const a=project(o.x,1,o.z);ctx.strokeStyle=shot?'#a2f8ff':'#ffdf8a';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(a[0],a[1],shot?55:30,13,0,0,7);ctx.stroke()}}
+ }
+ $('area').textContent=p.z>=43?'Ember Hollow':p.z>=22?'Sunpaw Trail':'Pawgrove Village';
+ $('status').textContent='♥ '+p.hp+'/5   ·   Sparks '+count()+'/3';
+ $('quest').textContent=won?'You relit the shrine! Pawgrove is safe.':!p.hp?'The curse knocked you out. Tap Restart to try again.':noteTime?note:!spoken&&p.z<10?'Find Poppy by the path and tap Talk.':count()<3?'Collect the three golden lantern sparks along the trail.':foes.at(-1).hp?'Defeat Queen Ember at the far end of Ember Hollow.':'Walk up to the shrine to restore its light.';
+}
+function frame(now){update(Math.min(.05,(now-last)/1000));last=now;render();requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></html>
