@@ -10,7 +10,7 @@
 <button id="target" title="Center view or focus a landmark" aria-pressed="false">Z</button><button id="shield" title="Raise shield" aria-pressed="false">R</button><button id="map" title="Toggle minimap" aria-pressed="false">L</button><button id="start" aria-pressed="false">Start</button>
 <button id="action" title="Roll">A</button><button id="blade" title="Swing Pawblade">B</button><button class="c" id="cup" title="Look around" aria-pressed="false">C ↑</button><button class="c" id="cleft" title="Use C-left gear">C ←</button><button class="c" id="cdown" title="Use C-down gear">C ↓</button><button class="c" id="cright" title="Use C-right gear">C →</button>
 </div></div><section id="gear-menu" hidden><strong>Pause · Assign gear</strong><div id="gear-slots"></div></section>
-<small>Move with the stick. Drag the view to turn. A rolls, B swings, Z focuses, and R raises your shield. Start opens gear assignments.</small></main>
+<small>Move with the stick. Drag the view to turn. A talks, interacts or rolls. B swings, Z focuses, and R raises your shield. Start opens gear assignments.</small></main>
 <script>
 'use strict';
 const $=id=>document.getElementById(id),canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d');
@@ -40,7 +40,32 @@ let roll=0,swing=0,effect=0,activeGear='',facing=Math.PI;
 const slots=['cleft','cdown','cright'];
 const gearNames=['Comet Launcher','Lantern','Trail Compass'];
 const assigned=[...gearNames];
-const landmarks=[[-68,941],[760,250],[-800,-600],[1200,-1100]];
+const poppy={x:-68,y:-76,z:810,label:'Poppy'};
+const sparks=[{x:-68,y:-45,z:645},{x:-68,y:0,z:365},{x:-68,y:1,z:180}];
+const queen={x:-68,y:0,z:-215,label:'Queen Ember'};
+const shrine={x:-68,y:0,z:-455,label:'Lantern Shrine'};
+const landmarks=[poppy,...sparks,queen,shrine].map(o=>[o.x,o.z]);
+let phase=0,collected=0,bossHP=6,health=5,windup=0,recovery=0,gearCooldown=0;
+const distance=o=>Math.hypot(o.x-p.x,o.z-p.z);
+function objective(){
+ return phase===0?poppy:phase===1?sparks[collected]:phase===2?queen:phase===3?shrine:null;
+}
+function hud(){
+ $('status').textContent='♥ '+health+'/5 · Sparks '+collected+'/3'+(phase===2?' · Queen Ember '+bossHP+'/6':'');
+}
+function hurtBoss(amount){
+ if(phase!==2)return;
+ bossHP=Math.max(0,bossHP-amount);
+ if(!bossHP){phase=3;lock=null;pressed('target',false);hint('Queen Ember is defeated. Go to the shrine and press A.')}
+ else hint('Queen Ember: '+bossHP+'/6. Hold R when she glows.');
+ hud();
+}
+function useGear(name){
+ if(paused||!health||gearCooldown)return;
+ activeGear=name;effect=.65;gearCooldown=.42;
+ if(name==='Comet Launcher'&&phase===2&&distance(queen)<530){hurtBoss(1);return}
+ hint(name==='Trail Compass'?'Follow the gold dot on the map.':name+' used.');
+}
 function pressed(id,on){$(id).setAttribute('aria-pressed',on)}
 function hint(line){$('quest').textContent=line}
 function pause(){
@@ -53,7 +78,7 @@ for(const [i,id] of slots.entries()){
  for(const name of gearNames){const option=document.createElement('option');option.value=option.textContent=name;select.append(option)}
  select.value=assigned[i];select.onchange=()=>{assigned[i]=select.value;$(id).title=select.value};
  label.append(select);$('gear-slots').append(label);$(id).title=assigned[i];
- $(id).onclick=()=>{if(!paused){activeGear=assigned[i];effect=.65;hint(activeGear+' used.')}};
+ $(id).onclick=()=>useGear(assigned[i]);
 }
 function toggleMap(){mapOn=!mapOn;pressed('map',mapOn)}
 function look(){if(paused)return;looking=!looking;lock=null;pressed('cup',looking);pressed('target',false)}
@@ -62,13 +87,22 @@ function target(){
  looking=false;pressed('cup',false);
  if(lock){lock=null;p.angle=facing}
  else {
-  lock=landmarks.filter(([x,z])=>Math.hypot(x-p.x,z-p.z)>100).sort((a,b)=>Math.hypot(a[0]-p.x,a[1]-p.z)-Math.hypot(b[0]-p.x,b[1]-p.z))[0]||null;
+  lock=phase===2?[queen.x,queen.z]:landmarks.filter(([x,z])=>Math.hypot(x-p.x,z-p.z)>100).sort((a,b)=>Math.hypot(a[0]-p.x,a[1]-p.z)-Math.hypot(b[0]-p.x,b[1]-p.z))[0]||null;
   if(!lock)p.angle=facing;
  }
  pressed('target',!!lock);
 }
-function action(){if(!paused&&!looking&&!roll){roll=.34;hint('Roll')}}
-function blade(){if(!paused&&!looking&&!swing){swing=.3;hint('Pawblade swing')}}
+function action(){
+ if(paused||looking||roll||!health||phase===4)return;
+ if(phase===0&&distance(poppy)<150){phase=1;hint('Poppy: Collect the three lantern sparks. Follow the gold marker.');return}
+ if(phase===3&&distance(shrine)<150){phase=4;hint('Quest complete! You relit the shrine and saved Pawgrove.');return}
+ roll=.34;
+}
+function blade(){
+ if(paused||looking||swing||!health)return;
+ swing=.3;
+ if(phase===2&&distance(queen)<170)hurtBoss(2);
+}
 function guard(on){shield=on&&!paused&&!looking;pressed('shield',shield)}
 $('start').onclick=pause;$('map').onclick=toggleMap;$('cup').onclick=look;
 $('target').onclick=target;$('action').onclick=action;$('blade').onclick=blade;
@@ -94,13 +128,12 @@ function floor(x,z,y){
  }
  return result;
 }
-function reset(){[p.x,p.y,p.z]=spawn;p.angle=facing=Math.PI;lock=null;looking=false;roll=swing=effect=0;guard(false);pressed('target',false);pressed('cup',false);const y=floor(p.x,p.z,p.y);if(Number.isFinite(y))p.y=y;Object.assign(camera,p)}
+function reset(){phase=collected=windup=recovery=gearCooldown=0;bossHP=6;health=5;hud();hint('Walk to Poppy and press A to begin.');[p.x,p.y,p.z]=spawn;p.angle=facing=Math.PI;lock=null;looking=false;roll=swing=effect=0;guard(false);pressed('target',false);pressed('cup',false);const y=floor(p.x,p.z,p.y);if(Number.isFinite(y))p.y=y;Object.assign(camera,p)}
 reset();
 $('reset').onclick=reset;
 $('hero').onclick=()=>{luna=!luna;$('hero').textContent=luna?'Luna':'Whisker';$('hero').setAttribute('aria-pressed',luna)};
 $('area').textContent='Kokiri Forest';
-$('status').textContent='ROM geometry test';
-$('quest').textContent='Explore the original forest layout as Whisker or Luna.';
+hud();
 const stick=$('stick'),joy={x:0,z:0,id:null},keys=new Set();
 function drag(e){const b=stick.getBoundingClientRect(),x=e.clientX-b.left-b.width/2,z=e.clientY-b.top-b.height/2,d=Math.max(34,Math.hypot(x,z));joy.x=x/d;joy.z=-z/d;$('knob').style.transform='translate('+joy.x*34+'px,'+(-joy.z*34)+'px)'}
 stick.onpointerdown=e=>{if(joy.id!==null)return;joy.id=e.pointerId;stick.setPointerCapture(e.pointerId);drag(e)};
@@ -118,7 +151,23 @@ addEventListener('keydown',e=>{
 addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k==='shift')guard(false)});
 addEventListener('blur',()=>{keys.clear();guard(false);joy.x=joy.z=0});
 function update(dt){
- if(paused)return;
+ if(paused||!health)return;
+ gearCooldown=Math.max(0,gearCooldown-dt);
+ recovery=Math.max(0,recovery-dt);
+ if(phase===1&&distance(sparks[collected])<100){
+  collected++;
+  if(collected===3){phase=2;hint('Queen Ember guards the shrine. Use B nearby or the Comet Launcher from a distance.')}
+  else hint('Lantern spark collected. Follow the gold marker to the next one.');
+  hud();
+ }
+ if(phase===2&&distance(queen)<190&&recovery===0){
+  windup+=dt;
+  if(windup>=.85){
+   windup=0;recovery=.9;
+   if(shield)hint('Shield blocked Queen Ember!');
+   else {health--;hud();hint(health?'Queen Ember hit you. Hold R when she glows.':'You ran out of hearts. Tap Restart to try again.')}
+  }
+ }else if(distance(queen)>=190)windup=0;
  const rolling=roll>0;
  roll=Math.max(0,roll-dt);swing=Math.max(0,swing-dt);effect=Math.max(0,effect-dt);
  p.angle+=(Number(keys.has('arrowright'))-Number(keys.has('arrowleft')))*1.65*dt;
@@ -209,11 +258,25 @@ function draw(){
   if(polygon.every(v=>v[0]<0)||polygon.every(v=>v[0]>720)||polygon.every(v=>v[1]<0)||polygon.every(v=>v[1]>410))continue;
   drawList.push({polygon,tone,depth:(a[0][2]+a[1][2]+a[2][2])/3});
  }
+ const goal=objective();
+ if(goal){
+  const x=goal.x-camera.x,z=goal.z-camera.z,d=x*sn+z*cs+follow;
+  if(d>30){
+   const y=goal.y-camera.y-(looking?108:160),sx=360+(x*cs-z*sn)*410/d,sy=174-y*410/d;
+   drawList.push({goal,sx,sy,depth:d});
+  }
+ }
  drawList.sort((a,b)=>b.depth-a.depth);
  let painted=false;
  for(const face of drawList){
   if(!painted&&face.depth<heroDepth){drawHero();painted=true}
-  poly(face.polygon,surfaceColor(face.tone,face.depth));
+  if(face.goal){
+   const {goal,sx,sy,depth}=face, size=Math.max(7,Math.min(36,10500/depth));
+   const color=goal===queen?(windup>.3?'#ff9e56':'#b66286'):'#ffe28b';
+   oval(sx,sy-size,size*.64,size,color);
+   ctx.fillStyle='#fff5dc';ctx.textAlign='center';ctx.font='bold 14px system-ui';
+   ctx.fillText(goal.label||'Lantern Spark',sx,sy-size*2-8);
+  }else poly(face.polygon,surfaceColor(face.tone,face.depth));
  }
  if(!painted)drawHero();
  if(lock){ctx.strokeStyle='#ffe29b';ctx.lineWidth=2;ctx.strokeRect(350,164,20,20)}
@@ -221,7 +284,8 @@ function draw(){
   ctx.fillStyle='#142434dd';ctx.fillRect(572,12,135,103);
   const mx=x=>576+(x+2600)/8900*125,mz=z=>17+(z+3600)/6200*91;
   for(const [x,z] of landmarks)oval(mx(x),mz(z),3,3,'#8bd4ab');
-  oval(mx(p.x),mz(p.z),4,4,'#ffe387');
+  if(goal)oval(mx(goal.x),mz(goal.z),5,5,'#ffe387');
+  oval(mx(p.x),mz(p.z),4,4,'#a9f1ff');
  }
 }
 function frame(now){
