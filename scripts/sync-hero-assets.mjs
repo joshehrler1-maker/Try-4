@@ -8,6 +8,7 @@ game=game.replace(/<script src="crystal-professional\.js[^" ]*"><\/script>/,'<sc
 game=game.replace('<link rel="stylesheet" href="crystal-professional.css">','<style>'+read('crystal-professional.css')+'</style>');
 game=game.replace(/<script src="face-review\.js[^" ]*"><\/script>/,'');
 const rig=read('assets/super-paw-rig.js');
+game=game.replace(/<script src="assets\/hero-turnaround\.js[^"]*"><\/script>/,'<script>'+read('assets/hero-turnaround.js')+'</script>');
 const poster='data:image/webp;base64,'+fs.readFileSync(path.join(root,'assets/whisker-luna-master.webp')).toString('base64');
 game=game.replace(/<script src="assets\/super-paw-rig\.js(?:\?[^"]*)?"><\/script>/,'<script>'+rig+'</script>');
 game=game.replace('src="assets/whisker-luna-master.webp"','data-master-poster="true"');
