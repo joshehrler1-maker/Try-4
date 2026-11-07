@@ -332,11 +332,16 @@ const root=model(actor.x,groundedHeroHeight(api,name,pose),actor.z,.64,.64,.64,a
 for(const foot of pose.filter(p=>p.node.name==='boot toe')){const m=api.mul(root,foot.world);draw('sphere',m[12],.001,m[14],.15,.001,.21,[.12,.13,.14]);}gl.disable(gl.CULL_FACE);
 const capeAnchor=pose.find(part=>part.node.extras?.region==='cape');
 if(name==='Whisker'&&capeAnchor){
- const y=root[13]+1.49;
- const back=.22,angle=actor.dir+Math.sin(motion.time*3)*.045*(.2+(player?Math.min(1,motion.pace/6):0));
+ // Follow the rig root instead of placing the cape in unscaled world space.
+ // Root scale is .64; the previous full-size mesh was oversized and offset.
+ const scale=.64;
+ const y=root[13]+1.43*scale;
+ const pace=player?Math.min(1,motion.pace/6):0;
+ const angle=actor.dir+Math.sin(motion.time*2.5)*(.012+.025*pace);
+ const back=.10*scale;
  const x=actor.x+Math.sin(actor.dir)*back,z=actor.z+Math.cos(actor.dir)*back;
- draw('whisker-cape',x,y,z,1,1,1,[.72,.027,.071],angle);
- draw('whisker-cape-trim',x,y,z,1,1,1,[1,.66,.22],angle);
+ draw('whisker-cape',x,y,z,scale,scale,scale,[.72,.027,.071],angle);
+ draw('whisker-cape-trim',x,y,z,scale,scale,scale,[1,.66,.22],angle);
 }
 for(const part of pose){
  if((low&&part.node.extras?.lod)||(name==='Whisker'&&capeAnchor&&part.node.extras?.region==='cape'))continue;
@@ -1142,8 +1147,11 @@ function portalBand(inner,outer,depth){
 function rooftopCape(trim){
  const triangles=[];
  const point=(u,v)=>{
-  const width=.35+.47*v;
-  return [u*width-.12*v*v,-1.26*v+.095*u*u*v,.11+.48*v+.12*Math.cos(u*8)*v];
+  // Keep the shoulder seam centered, taper the fabric naturally, and avoid
+  // the previous sideways displacement that made the cape stick out.
+  const width=.30+.33*v;
+  const shoulderFold=.025*Math.sin(u*Math.PI);
+  return [u*width+shoulderFold*(1-v),-1.14*v+.055*u*u*v,.055+.25*v+.035*Math.cos(u*5)*v];
  };
  const columns=trim?2:16;
  for(let row=0;row<12;row++)for(let i=0;i<columns;i++){
