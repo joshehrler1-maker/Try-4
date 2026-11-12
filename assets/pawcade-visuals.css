@@ -1,0 +1,21 @@
+/* Shared presentation for Pawcade games. */
+body{color-scheme:dark;font-family:system-ui,sans-serif}
+body.arcade-visuals{background-color:#090d20;background-image:radial-gradient(ellipse at 18% 0,#3b2559 0,transparent 42rem),radial-gradient(ellipse at 100% 42%,#102b49 0,transparent 42rem)}
+.arcade-visuals h1{font-family:Georgia,serif;letter-spacing:-.035em;text-wrap:balance;color:#fff1d8;text-shadow:0 3px 18px #201036}
+.arcade-visuals h2{letter-spacing:-.018em;text-wrap:balance}
+.arcade-visuals .arena,.arcade-visuals .hero,.arcade-visuals .cover,.arcade-visuals .play,.arcade-visuals .game-directory,.arcade-visuals .pawtopia-arcade-scene{border-radius:clamp(12px,2vw,22px);border-color:#a18bd3;box-shadow:0 14px 42px #03061266,0 0 22px #8064d129}
+.arcade-visuals .arena,.arcade-visuals .play{isolation:isolate}
+.arcade-visuals .panel,.arcade-visuals .overlay{background-image:radial-gradient(ellipse at 50% 54%,#221745f2 0%,#131630bb 55%,#0c132970 100%)}
+.arcade-visuals .screen h2,.arcade-visuals .panel h2,.arcade-visuals .overlay h2{text-shadow:0 4px 16px #000}
+.arcade-visuals .hud,.arcade-visuals #hud{font-variant-numeric:tabular-nums}
+.arcade-visuals .hud>span,.arcade-visuals p#hud{background:#151d3b;border:1px solid #6d639e;border-radius:9px;padding:.4rem .7rem}
+.arcade-visuals .controls button,.arcade-visuals #start,.arcade-visuals #action,.arcade-visuals menu button{min-height:44px}
+.arcade-visuals button:focus-visible,.arcade-visuals a:focus-visible{outline:3px solid #97efff;outline-offset:3px}
+.arcade-visuals #start:not(:disabled),.arcade-visuals #action:not(:disabled),.arcade-visuals .controls>button:first-child:not(:disabled){color:#241727;background:linear-gradient(#fff1bf,#efb967);border:1px solid #ffdfa0;box-shadow:0 3px 0 #7d5439,0 6px 15px #0a0b2080;font-weight:800}
+.arcade-visuals #start:active,.arcade-visuals #action:active,.arcade-visuals .controls>button:first-child:active{box-shadow:0 1px 0 #7d5439;transform:translateY(2px)}
+.arcade-visuals .arcade-card-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:.85rem;margin:1rem 0}
+.arcade-visuals .arcade-card{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;justify-content:end;min-height:13rem;padding:1rem;border:1px solid #8773ac;border-radius:16px;background:linear-gradient(0deg,#0c112bf9 3%,#131a35e8 38%,#16193330 100%),var(--card-art) center/cover}
+.arcade-visuals .arcade-card h2{font:700 1.45rem/1.1 Georgia,serif;color:#fff1d8}
+.arcade-visuals .arcade-card a{align-self:start;font-weight:800;text-underline-offset:.25em}
+.arcade-visuals .arcade-card p{font-size:.9rem}
+@media(max-width:480px){.arcade-visuals .controls{flex-wrap:wrap}.arcade-visuals .hud{gap:.35rem}.arcade-visuals .arcade-card{min-height:11rem}}
