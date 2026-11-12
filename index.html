@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#071b51">
 <meta name="description" content="Super Paw Heroes is a cat superhero series featuring Whisker and Luna. Its Crystal Catacombs printable coloring book includes 100 coloring and activity pages for kids and families.">
+<link rel="stylesheet" href="assets/pawtopia-atlas.css">
 <title>Super Paw Heroes | Crystal Catacombs Coloring Book &amp; Games</title>
 <style>
 .skip-link{position:absolute;left:12px;top:-90px;z-index:2147483647;background:#ffe36c;color:#081640;padding:12px 18px;border-radius:10px;font-weight:900}.skip-link:focus{top:12px}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #ffe36c;outline-offset:3px}img{max-width:100%}body{overflow-wrap:break-word}
@@ -13,6 +14,9 @@
 </style>
 <link rel="manifest" href="manifest.webmanifest"><style>.main-boss-reference{display:flex;gap:22px;align-items:center;padding:22px;margin:22px auto;background:linear-gradient(135deg,#25182e,#101e35);border:1px solid #b38c4f;border-radius:18px;max-width:1100px;color:#edf2fc}.main-boss-reference img{width:180px;max-width:40%;height:auto;border-radius:10px;box-shadow:0 12px 35px #0006}.main-boss-reference h2{font-size:clamp(22px,4vw,32px);margin:6px 0;color:#f1d49a}.main-boss-reference small{color:#e0b36e;letter-spacing:.12em;font-size:10px}.main-boss-reference p{line-height:1.6;font-size:14px}.main-boss-reference a{color:#ffe0a0;text-decoration:underline}@media(max-width:500px){.main-boss-reference{padding:14px;gap:14px;align-items:flex-start}.main-boss-reference img{width:110px}.main-boss-reference p{font-size:12px}}</style><link rel="sitemap" type="application/xml" href="sitemap.xml"><style>
 .world-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:clamp(12px,3vw,28px);border:2px solid #8fdfff;border-radius:24px;background:linear-gradient(130deg,#17494b,#173865 55%,#452d6d)}.world-map a{display:grid;align-content:center;min-height:130px;padding:14px;border:1px solid #a2b9ef;border-radius:15px;background:#111d42;color:#fff}.world-map a:hover{border-color:#ffe36c;background:#233866}.world-map > div{padding:12px;background:#111d42;border-radius:15px}.world-map > div p{margin:5px 0}.world-map > div a{display:flex;min-height:44px;padding:5px 8px}.world-map span{font-size:1.8rem}.world-map small{color:#dae7ff}.world-profile{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:14px 0;padding:14px 18px;border-radius:15px;background:#10275b}.world-profile p{margin:4px 0}.world-profile button{min-height:44px;padding:7px 12px;margin:3px 0;border-radius:10px;border:1px solid #67dcff;background:#15366e;color:white}.world-profile button[aria-pressed=true]{background:#ffe36c;color:#211500}.world-profile button:disabled{opacity:.65;cursor:default}.house-ad{margin:4rem auto 2rem;max-width:740px;padding:20px;text-align:center;border:1px solid #5d96d4;border-radius:14px}.house-ad small{display:block;color:#d5e5ff}.house-ad a{text-decoration:underline;color:#ffe36c}@media(max-width:620px){.world-map{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<style>
+.pawtopia-atlas{position:relative;isolation:isolate;aspect-ratio:3/2;border:3px solid #f7d485;border-radius:22px;overflow:hidden;background:#164e49;box-shadow:0 12px 30px #0008}.atlas-sign{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:grid;place-items:center;text-align:center;width:max-content;max-width:32%;min-height:44px;padding:5px clamp(5px,1.5vw,15px);line-height:1.1;font-weight:900;font-size:clamp(11px,2vw,20px);color:#33200c;background:linear-gradient(#fff1b2,#efbf65);border:2px solid #75491f;border-radius:9px;box-shadow:0 3px 0 #542f1b,0 5px 9px #0007}.atlas-sign:hover,.atlas-sign:focus-visible{background:#fff8d1;z-index:1;outline:3px solid white;outline-offset:2px}.atlas-sign:active{transform:translate(-50%,-46%)}.atlas-note{margin:.6rem 0;text-align:center;color:#d8eaff}#coloring-book,#challenge,#pawtopia{scroll-margin-top:110px}
 </style>
 </head>
 <body><a class="skip-link" href="#main-content">Skip to main content</a><button type="button" id="fullscreen-top" style="display:block;width:calc(100% - 24px);max-width:700px;margin:12px auto;padding:16px;background:#ffe17b;color:#17213a;border:2px solid #fff2b0;border-radius:12px;font:800 20px system-ui">⛶ Full Screen</button>
@@ -23,13 +27,14 @@
 <section class="content" id="pawtopia" aria-labelledby="pawtopia-heading">
 <h2 id="pawtopia-heading">Explore Pawtopia</h2>
 <div class="world-profile"><div><strong>Hero headquarters</strong><p id="world-save" role="status">Choose your hero.</p></div><div><button type="button" data-world-hero="Whisker">Whisker</button> <button type="button" data-world-hero="Luna">Luna</button> <button type="button" id="world-daily">Claim daily coins</button></div></div>
-<div class="world-map" aria-label="Pawtopia destinations">
-<a href="universe-center.html"><span>🏰</span><strong>Town Square</strong><small>Meet Pawtopia’s heroes and friends</small></a>
-<a href="pawtopia-arcade.html"><span>🎪</span><strong>Festival Arcade</strong><small>Play six arcade games</small></a>
-<a href="pawgrove.html"><span>🏮</span><strong>Pawgrove</strong><small>Investigate the Lantern Curse</small></a>
-<a href="super-paw-3d.html"><span>💎</span><strong>Crystal Catacombs</strong><small>Explore the 3D adventure</small></a>
-<a href="#coloring-book"><span>📚</span><strong>Coloring Book Shop</strong><small>Browse books and try free pages</small></a>
-<a href="#challenge"><span>⭐</span><strong>Hero Training</strong><small>Take the Hero Choice Challenge</small></a>
+<p class="atlas-note">Tap a sign to visit a place in Pawtopia.</p>
+<div class="pawtopia-atlas" aria-label="Illustrated map of Pawtopia">
+<a class="atlas-sign" style="--x:17%;--y:45%" href="universe-center.html" aria-label="Town Square. Meet Pawtopia’s heroes and friends">Town Square</a>
+<a class="atlas-sign" style="--x:50%;--y:45%" href="pawtopia-arcade.html" aria-label="Festival Arcade. Play six arcade games">Festival Arcade</a>
+<a class="atlas-sign" style="--x:83%;--y:45%" href="pawgrove.html" aria-label="Pawgrove. Investigate the Lantern Curse">Pawgrove</a>
+<a class="atlas-sign" style="--x:17%;--y:88%" href="super-paw-3d.html" aria-label="Crystal Catacombs. Explore the 3D adventure">Crystal Catacombs</a>
+<a class="atlas-sign" style="--x:50%;--y:88%" href="#coloring-book" aria-label="Coloring Book Shop. Browse books and try free pages">Coloring Book Shop</a>
+<a class="atlas-sign" style="--x:83%;--y:88%" href="#challenge" aria-label="Hero Training. Take the Hero Choice Challenge">Hero Training</a>
 </div>
 <h3>Games by location</h3>
 <div class="world-map" aria-label="Games by location">
