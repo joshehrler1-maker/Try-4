@@ -32,8 +32,8 @@ footer{padding:0 0 20px}
 #breed-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(6.5rem,1fr));gap:.5rem}
 #breed-options label{display:grid;justify-items:center;gap:.25rem;text-align:center;cursor:pointer}
 #breed-options img,#cat-portrait{max-width:100%;height:auto;border-radius:.55rem}
-#companion-stats{display:grid;grid-template-columns:auto 1fr;gap:.3rem .6rem}
-#companion-stats dd{margin:0}
+#companion-stats,#breed-battle-preview{display:grid;grid-template-columns:auto 1fr;gap:.3rem .6rem}
+#companion-stats dd,#breed-battle-preview dd{margin:0}
 
 #breed-options label[hidden],#cat-portrait[hidden]{display:none}
 .breed-portrait,#cat-portrait{display:block;width:100%;aspect-ratio:1;border-radius:.6rem}

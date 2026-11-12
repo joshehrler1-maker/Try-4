@@ -10,7 +10,7 @@
   const originalBreeds = ['Maine Coon', 'Siamese', 'Bengal', 'British Shorthair', 'Ragdoll', 'Sphynx'];
   const catalogBreeds = ["Abyssinian", "American Bobtail", "American Curl", "American Shorthair", "American Wirehair", "Balinese", "Birman", "Bombay", "Burmese", "Burmilla", "Chartreux", "Cornish Rex", "Devon Rex", "Egyptian Mau", "European Shorthair", "Exotic Shorthair", "Havana Brown", "Japanese Bobtail", "Khao Manee", "Korat", "LaPerm", "Lykoi", "Manx", "Nebelung", "Norwegian Forest Cat", "Ocicat", "Oriental Shorthair", "Persian", "Peterbald", "Pixiebob", "Ragamuffin", "Russian Blue", "Savannah", "Scottish Fold", "Selkirk Rex", "Siberian", "Singapura", "Snowshoe", "Somali", "Tonkinese", "Toyger", "Turkish Angora", "Turkish Van", "York Chocolate", "Australian Mist", "Cymric", "Donskoy", "German Rex", "Kurilian Bobtail", "Sokoke"];
   const breeds = [...originalBreeds, ...catalogBreeds];
-  const stats = { level: 1, strength: 1, defence: 1, movement: 1, endurance: 2 };
+  const stats = save.battleStats();
   const trainingPrice = 5;
   const maxCats = 4;
   const active = byId('active-cat');
@@ -29,6 +29,20 @@
     const y = Math.floor(cell / 5) * 25;
     element.style.background = x + '% ' + y + '% / 500% 500% no-repeat url(assets/scenes/adopt-catalog-' + sheet + '.webp)';
   }
+  function showStats(target, values) {
+    const health = save.maxHealth(values);
+    target.replaceChildren(...Object.entries({ health: health + ' / ' + health, ...values }).flatMap(([key, value]) => {
+      const term = document.createElement('dt');
+      const detail = document.createElement('dd');
+      term.textContent = key[0].toUpperCase() + key.slice(1);
+      detail.textContent = value;
+      return [term, detail];
+    }));
+  }
+  function previewBreed(breed) {
+    byId('breed-selected').textContent = 'Selected: ' + breed;
+    showStats(byId('breed-battle-preview'), save.battleStats({ breed }));
+  }
   const breedSearch = byId('breed-search');
   const breedChoices = breeds.map((breed, index) => {
     const label = document.createElement('label');
@@ -44,10 +58,11 @@
     label.append(option, portrait, breed);
     byId('breed-options').append(label);
     option.addEventListener('change', () => {
-      byId('breed-selected').textContent = 'Selected: ' + breed;
+      previewBreed(breed);
     });
     return { breed, label };
   });
+  previewBreed(originalBreeds[0]);
   breedSearch.addEventListener('input', () => {
     const query = breedSearch.value.trim().toLowerCase();
     let count = 0;
@@ -63,7 +78,7 @@
     const baseCap = values.level * 2;
     return values[stat] < values.level * (stat === 'endurance' ? 3 : 2) &&
       (stat === 'endurance' || values.endurance <= baseCap) &&
-      ['strength', 'defence', 'movement'].every(key => values[key] <= baseCap);
+      ['strength', 'defence', 'movement', 'intelligence'].every(key => values[key] <= baseCap);
   }
   const snackPrice = 2;
   const toyPrice = 5;
@@ -108,14 +123,8 @@
         paintPortrait(image, companion.breed);
         image.setAttribute('aria-label', companion.breed + ' companion portrait');
       }
-      const values = { ...stats, ...companion.stats };
-      byId('companion-stats').replaceChildren(...Object.entries(values).flatMap(([key, value]) => {
-        const term = document.createElement('dt');
-        const detail = document.createElement('dd');
-        term.textContent = key[0].toUpperCase() + key.slice(1);
-        detail.textContent = value;
-        return [term, detail];
-      }));
+      const values = save.battleStats(companion);
+      showStats(byId('companion-stats'), values);
       train.disabled = coins < trainingPrice || !canTrain(values, training.value);
       byId('fullness').value = fullness;
       byId('fullness-label').textContent = fullness + '%';
@@ -165,7 +174,7 @@
     const stat = training.value;
     act(progress => {
       if (!progress.companion || progress.coins < trainingPrice) return 'You need 5 Paw Coins and an active companion.';
-      const values = { ...stats, ...progress.companion.stats };
+      const values = save.battleStats(progress.companion);
       if (!canTrain(values, stat)) return 'Raise your companion’s level to train that stat further.';
       values[stat]++;
       progress.coins -= trainingPrice;

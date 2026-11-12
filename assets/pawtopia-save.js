@@ -27,5 +27,23 @@
       return 'Progress could not be saved in this browser.';
     }
   }
-  window.PawtopiaSave = { read, update, today: () => new Date().toDateString() };
+  const baseStats = { level: 1, strength: 1, defence: 1, movement: 1, endurance: 2, intelligence: 1 };
+  const aptitudes = {
+    strength: ['Maine Coon', 'American Bobtail', 'Norwegian Forest Cat', 'Pixiebob', 'Siberian', 'Toyger'],
+    defence: ['British Shorthair', 'Chartreux', 'Manx', 'Persian', 'Scottish Fold', 'Cymric'],
+    movement: ['Bengal', 'Abyssinian', 'Egyptian Mau', 'Ocicat', 'Savannah', 'Sokoke'],
+    endurance: ['Ragdoll', 'Birman', 'Ragamuffin', 'Turkish Van', 'Kurilian Bobtail'],
+    intelligence: ['Siamese', 'Sphynx', 'Oriental Shorthair', 'Cornish Rex', 'Balinese', 'Devon Rex']
+  };
+  function battleStats(cat) {
+    const values = { ...baseStats };
+    for (const [stat, breeds] of Object.entries(aptitudes)) {
+      if (breeds.includes(cat?.breed)) values[stat]++;
+    }
+    return { ...values, ...cat?.stats };
+  }
+  function maxHealth(stats) {
+    return 8 + stats.endurance * 2;
+  }
+  window.PawtopiaSave = { read, update, battleStats, maxHealth, today: () => new Date().toDateString() };
 })();

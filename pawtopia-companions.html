@@ -36,6 +36,7 @@
         <input type="search" id="breed-search" autocomplete="off">
         <p id="breed-count" role="status">56 breeds</p>
         <p id="breed-selected">Selected: Maine Coon</p>
+        <dl id="breed-battle-preview" aria-label="Starting battle stats"></dl>
         <div id="breed-options"></div></fieldset>
         <label for="cat-name">Name your cat</label>
         <input id="cat-name" maxlength="24" required autocomplete="off">
@@ -46,10 +47,10 @@
         <h3 id="cat-label"></h3>
         <section aria-labelledby="training-title">
           <h4 id="training-title">Companion Training School</h4>
-          <p>Strength, defence, and movement can reach twice your level. Endurance can reach three times your level. Each lesson costs 5 Paw Coins.</p>
+          <p>Strength, defence, movement, and intelligence can reach twice your level. Endurance can reach three times your level. Each lesson costs 5 Paw Coins.</p>
           <dl id="companion-stats"></dl>
           <label for="training-stat">Train</label>
-          <select id="training-stat"><option value="level">Level</option><option value="strength">Strength</option><option value="defence">Defence</option><option value="movement">Movement</option><option value="endurance">Endurance</option></select>
+          <select id="training-stat"><option value="level">Level</option><option value="strength">Strength</option><option value="defence">Defence</option><option value="movement">Movement</option><option value="endurance">Endurance</option><option value="intelligence">Intelligence</option></select>
           <button type="button" id="train-cat">Train · 5 Paw Coins</button>
         </section>
         <p><label for="fullness">Fullness</label> <output id="fullness-label"></output><meter id="fullness" min="0" max="100"></meter></p>

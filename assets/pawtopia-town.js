@@ -31,7 +31,8 @@
     return Object.hasOwn(labels, quest.item) ? progress[quest.item] : (progress.townCollection[quest.item] || 0);
   }
   const moves = { Strike: 'Charge', Guard: 'Strike', Charge: 'Guard' };
-  const newMatch = () => ({ player: 0, bot: 0, rounds: 0, shieldUsed: false, message: 'Choose your first move.' });
+  const botHealth = 12;
+  const newMatch = () => ({ bot: botHealth, rounds: 0, shieldUsed: false, message: 'Choose your first move.' });
   let match = newMatch();
 
   function render() {
@@ -81,9 +82,16 @@
     byId('shield-status').textContent = match.shieldUsed ? 'Shield used this match.' :
       p.shieldEquipped ? 'Crystal Shield ready to block one lost round.' :
       'A Crystal Shield from Defense Gear can block one lost round per match.';
-    byId('round').textContent = match.message + ' You ' + match.player + ' · Bot ' + match.bot;
+    const fighter = match.fighter || p.companion;
+    const stats = match.stats || save.battleStats(fighter);
+    const max = save.maxHealth(stats);
+    byId('arena-fighter').textContent = (fighter?.name || 'Practice recruit') +
+      ' · Level ' + stats.level + ' · STR ' + stats.strength + ' · DEF ' + stats.defence +
+      ' · MOV ' + stats.movement + ' · INT ' + stats.intelligence;
+    byId('round').textContent = match.message + ' Your HP ' + (match.player ?? max) + '/' + max +
+      ' · Bot HP ' + match.bot + '/' + botHealth;
     byId('moves').querySelectorAll('button').forEach(button => {
-      button.disabled = match.player >= 2 || match.bot >= 2;
+      button.disabled = match.player === 0 || match.bot === 0;
     });
     const query = byId('search').value.trim().toLowerCase();
     const offers = shops.filter(({ store, item, label }) => (store + ' ' + (label || labels[item])).toLowerCase().includes(query));
@@ -220,21 +228,36 @@
   }));
   byId('moves').addEventListener('click', event => {
     const move = event.target.closest('button')?.dataset.move;
-    if (!move || match.player >= 2 || match.bot >= 2) return;
+    if (!move || match.player === 0 || match.bot === 0) return;
     const choices = Object.keys(moves);
     const bot = choices[Math.floor(Math.random() * choices.length)];
-    if (moves[move] === bot) match.player++;
-    if (match.rounds === 0) match.shieldReady = Boolean(save.read().shieldEquipped);
+    if (!match.rounds) {
+      const p = save.read();
+      match.fighter = p.companion || { name: 'Practice recruit' };
+      match.stats = save.battleStats(match.fighter);
+      match.player = save.maxHealth(match.stats);
+      match.shieldReady = Boolean(p.shieldEquipped);
+    }
     match.rounds++;
+    const { strength, defence, movement, intelligence } = match.stats;
     match.message = 'You chose ' + move + '. Bolt’s bot chose ' + bot + '.';
-    if (moves[bot] === move) {
+    if (moves[move] === bot) {
+      const bonus = move === 'Charge' ? intelligence : 0;
+      const damage = 3 + strength + bonus + Math.floor(movement / 2);
+      match.bot = Math.max(0, match.bot - damage);
+      match.message += ' You dealt ' + damage + ' damage.';
+    } else if (moves[bot] === move) {
       if (match.shieldReady && !match.shieldUsed) {
         match.shieldUsed = true;
         match.message += ' Your shield blocked the hit.';
-      } else match.bot++;
+      } else {
+        const damage = Math.max(1, 5 - defence);
+        match.player = Math.max(0, match.player - damage);
+        match.message += ' You took ' + damage + ' damage.';
+      }
     }
-    if (match.bot === 2) match.message += ' The bot won.';
-    if (match.player === 2) {
+    if (match.player === 0) match.message += ' The bot won.';
+    if (match.bot === 0) {
       match.message += ' You won!';
       act(p => {
         const day = save.today();
