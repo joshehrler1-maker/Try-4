@@ -6,8 +6,9 @@
 <script src="assets/game-fullscreen.js" defer></script>
 <link rel="stylesheet" href="assets/pawcade-visuals.css">
 <body class="arcade-visuals"><main data-fullscreen-game><nav><a href="index.html">Super Paw Heroes</a><a href="pawcade-classics.html">Back to Pawcade</a></nav><h1>Bolt’s Toy Workshop</h1>
-<p id="hud"></p><div class="arena"><canvas width="600" height="390" aria-label="Bolt’s Toy Workshop playfield"></canvas><div class="panel" id="panel"><h2 id="heading">Bolt’s Toy Workshop</h2><p id="info">Drop colored gems into matching vats and help Bolt build hero toys before the shift ends.</p><button id="start">Start game</button></div></div>
-<div class="controls"><button id="act" disabled>Drop gem</button><button id="pause" disabled>Pause</button></div><p class="hint">Tap Drop gem or the playfield when the highlighted gem is above its matching vat. Collect one of each gem to build a toy. Five spills end the shift. Space also works.</p></main><script>
+<p id="hud"></p><div class="arena"><canvas width="600" height="390" data-hd="390" aria-label="Bolt’s Toy Workshop playfield"></canvas><div class="panel" id="panel"><h2 id="heading">Bolt’s Toy Workshop</h2><p id="info">Drop colored gems into matching vats and help Bolt build hero toys before the shift ends.</p><button id="start">Start game</button></div></div>
+<div class="controls"><button id="act" disabled>Drop gem</button><button id="pause" disabled>Pause</button></div><p class="hint">Tap Drop gem or the playfield when the highlighted gem is above its matching vat. Collect one of each gem to build a toy. Five spills end the shift. Space also works.</p></main><script src="assets/game-hd.js"></script>
+<script>
 const el=id=>document.getElementById(id), field=document.querySelector('canvas'), ctx=field.getContext('2d');
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const record='pawcade-bolt-workshop';
