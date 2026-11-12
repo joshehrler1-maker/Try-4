@@ -1,0 +1,101 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bolt’s Toy Workshop | Super Paw Heroes</title><style>
+*{box-sizing:border-box}body{margin:0;background:#0a1027;color:#fff3e1;font:600 1rem/1.45 system-ui}main{width:min(100% - 24px,720px);margin:16px auto}nav{display:flex;justify-content:space-between;gap:8px}a{color:#ffdb8c}h1{font:700 clamp(34px,7vw,58px)/1 Georgia;margin:.35em 0}.arena{position:relative;overflow:hidden;border:1px solid #9c82bf;border-radius:16px;background:#1b2140 url(assets/scenes/blue-tech-mines.webp) center/cover}canvas{display:block;width:100%;height:auto;touch-action:none}.panel{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:14px;background:#0c1234b8}.panel[hidden]{display:none}.panel h2{margin:0;font:700 clamp(24px,6vw,46px)/1 Georgia}.panel p{margin:.55em auto;max-width:29rem}.controls{display:flex;gap:.55rem;margin:.65rem 0;align-items:center}.controls button:first-child{flex:1}button{font:inherit;min-height:44px;background:#ffdc93;color:#241a37;border:1px solid #fff4cd;border-radius:10px;padding:.45rem .85rem;cursor:pointer}button:disabled{opacity:.55}.hint{color:#d5d9f2;font-size:.88rem}#hud{margin:.5rem 0;color:#ffe5b5}
+</style><main><nav><a href="index.html">Super Paw Heroes</a><a href="pawcade-classics.html">Back to Pawcade</a></nav><h1>Bolt’s Toy Workshop</h1>
+<p id="hud"></p><div class="arena"><canvas width="600" height="390" aria-label="Bolt’s Toy Workshop playfield"></canvas><div class="panel" id="panel"><h2 id="heading">Bolt’s Toy Workshop</h2><p id="info">Drop colored gems into matching vats and help Bolt build hero toys before the shift ends.</p><button id="start">Start game</button></div></div>
+<div class="controls"><button id="act" disabled>Drop gem</button><button id="pause" disabled>Pause</button></div><p class="hint">Tap Drop gem or the playfield when the highlighted gem is above its matching vat. Collect one of each gem to build a toy. Five spills end the shift. Space also works.</p></main><script>
+const el=id=>document.getElementById(id), field=document.querySelector('canvas'), ctx=field.getContext('2d');
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+const record='pawcade-bolt-workshop';
+let best=0,score=0,mode='ready',previous;
+try{best=Number(localStorage.getItem(record))||0;}catch{}
+function hud(message){el('hud').textContent=message+' · Best '+best;}
+function overlay(title,info,label,action){
+  el('heading').textContent=title;el('info').textContent=info;el('start').textContent=label;el('start').onclick=action;
+  el('panel').hidden=false;el('act').disabled=el('pause').disabled=true;
+}
+function play(){mode='playing';el('panel').hidden=true;el('act').disabled=el('pause').disabled=false;}
+function finish(title,message){
+  mode='done';best=Math.max(best,score);
+  try{localStorage.setItem(record,best);}catch{}
+  hud('Score '+score);overlay(title,message+' · Best '+best,'Play again',start);
+}
+function pause(){if(mode==='playing'){mode='paused';overlay('Paused','Your run will resume from here.','Resume',play);}}
+function circle(x,y,r,color){
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+}
+function shade(){ctx.fillStyle='#09132c85';ctx.fillRect(0,0,600,390);}
+function label(value,x,y,color='#fff7dc',size=20){
+  ctx.fillStyle=color;ctx.font='bold '+size+'px system-ui';ctx.textAlign='center';ctx.fillText(value,x,y);
+}
+el('start').onclick=start;el('act').onclick=()=>{if(mode==='playing')action();};el('pause').onclick=pause;
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});
+addEventListener('keydown',e=>{
+  if(mode!=='playing'||e.repeat)return;
+  if(e.code==='Escape'){pause();return;}
+  if(e.code==='Space'&&e.target?.tagName!=='BUTTON'){e.preventDefault();action();}
+});
+field.onpointerdown=()=>{if(mode==='playing')action();};
+function frame(now){
+  const dt=previous===undefined?0:Math.min(.04,(now-previous)/1000);
+  previous=now;if(mode==='playing')update(dt);
+  ctx.clearRect(0,0,600,390);shade();paint();requestAnimationFrame(frame);
+}
+const gems=[['#ff7f9b','◆'],['#74d9ff','▲'],['#f8cf6f','●']];
+const vats=[108,300,492];
+let items=[], countdown=60, spawn=0, spills=0, batch=[0,0,0], orders=0, note='';
+function start(){
+  items=[];countdown=60;spawn=0;spills=0;batch=[0,0,0];orders=0;score=0;note='Match the gem to its vat';
+  hud('60 s · Score 0');play();
+}
+function action(){
+  const gem=items.find(item=>!item.falling);
+  if(gem)gem.falling=true;
+}
+function update(dt){
+  countdown-=dt;spawn-=dt;
+  if(countdown<=0){finish('Shift complete','Toys built '+orders+' · Score '+score);return;}
+  if(spawn<=0){
+    items.push({x:-22,y:106,kind:Math.floor(Math.random()*3),falling:false});
+    spawn=Math.max(.85,2.2-orders*.12);
+  }
+  const remaining=[];
+  for(const gem of items){
+    if(gem.falling)gem.y+=395*dt;
+    else gem.x+=(145+Math.min(orders,12)*12)*dt;
+    if(gem.y>=290){
+      if(Math.abs(gem.x-vats[gem.kind])<=53){
+        score+=10;batch[gem.kind]++;note='Gem delivered!';
+        if(batch.every(Boolean)){
+          batch=batch.map(count=>count-1);orders++;score+=30;note='Hero toy built! +30';
+        }
+      }else{
+        spills++;note='Spill! Match the color and symbol';
+        if(spills===5){finish('Workshop cleanup','Toys built '+orders+' · Score '+score);return;}
+      }
+    }else if(gem.x<628)remaining.push(gem);
+  }
+  items=remaining;
+  hud(Math.ceil(countdown)+' s · Score '+score+' · Spills '+spills+'/5 · Toys '+orders);
+}
+function paint(){
+  ctx.fillStyle='#172d50';ctx.fillRect(0,123,600,21);
+  ctx.fillStyle='#85d5ec';ctx.fillRect(0,123,600,3);
+  for(let i=0;i<3;i++){
+    const x=vats[i], [color,symbol]=gems[i];
+    ctx.fillStyle='#152347';ctx.strokeStyle=color;ctx.lineWidth=3;
+    ctx.beginPath();ctx.roundRect(x-55,290,110,70,13);ctx.fill();ctx.stroke();
+    label(symbol+'  '+batch[i],x,334,color,25);
+  }
+  for(const item of items){
+    const [color,symbol]=gems[item.kind];
+    if(!item.falling&&item===items.find(gem=>!gem.falling)){
+      ctx.fillStyle='#e9f5ff55';ctx.fillRect(item.x-1,item.y+21,2,155);
+    }
+    ctx.save();ctx.shadowColor=color;ctx.shadowBlur=17;circle(item.x,item.y,19,color);ctx.restore();
+    label(symbol,item.x,item.y+6,'#16213f',17);
+  }
+  label(note,300,53);
+}
+hud('Ready');requestAnimationFrame(frame);
+</script></html>
