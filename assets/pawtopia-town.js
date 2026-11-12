@@ -31,7 +31,7 @@
     return Object.hasOwn(labels, quest.item) ? progress[quest.item] : (progress.townCollection[quest.item] || 0);
   }
   const moves = { Strike: 'Charge', Guard: 'Strike', Charge: 'Guard' };
-  const newMatch = () => ({ player: 0, bot: 0, message: 'Choose your first move.' });
+  const newMatch = () => ({ player: 0, bot: 0, rounds: 0, shieldUsed: false, message: 'Choose your first move.' });
   let match = newMatch();
 
   function render() {
@@ -76,6 +76,11 @@
     byId('interest').disabled = p.lastInterest === day || p.bankCoins < 100;
     byId('interest').textContent = p.lastInterest === day ? 'Interest collected today' : 'Collect daily interest';
     byId('trade').disabled = p.shards < 2;
+    byId('arena-shield').disabled = !p.townCollection['Crystal Shield'] || match.rounds > 0;
+    byId('arena-shield').textContent = p.shieldEquipped ? 'Unequip Crystal Shield' : 'Equip Crystal Shield';
+    byId('shield-status').textContent = match.shieldUsed ? 'Shield used this match.' :
+      p.shieldEquipped ? 'Crystal Shield ready to block one lost round.' :
+      'A Crystal Shield from Defense Gear can block one lost round per match.';
     byId('round').textContent = match.message + ' You ' + match.player + ' · Bot ' + match.bot;
     byId('moves').querySelectorAll('button').forEach(button => {
       button.disabled = match.player >= 2 || match.bot >= 2;
@@ -208,14 +213,26 @@
     p.lastSoup = day;
     return cat.name + ' enjoyed a warm meal.';
   }));
+  byId('arena-shield').addEventListener('click', () => act(p => {
+    if (match.rounds || !p.townCollection['Crystal Shield']) return 'Equip a purchased shield before the match starts.';
+    p.shieldEquipped = !p.shieldEquipped;
+    return p.shieldEquipped ? 'Crystal Shield equipped.' : 'Crystal Shield unequipped.';
+  }));
   byId('moves').addEventListener('click', event => {
     const move = event.target.closest('button')?.dataset.move;
     if (!move || match.player >= 2 || match.bot >= 2) return;
     const choices = Object.keys(moves);
     const bot = choices[Math.floor(Math.random() * choices.length)];
     if (moves[move] === bot) match.player++;
-    if (moves[bot] === move) match.bot++;
+    if (match.rounds === 0) match.shieldReady = Boolean(save.read().shieldEquipped);
+    match.rounds++;
     match.message = 'You chose ' + move + '. Bolt’s bot chose ' + bot + '.';
+    if (moves[bot] === move) {
+      if (match.shieldReady && !match.shieldUsed) {
+        match.shieldUsed = true;
+        match.message += ' Your shield blocked the hit.';
+      } else match.bot++;
+    }
     if (match.bot === 2) match.message += ' The bot won.';
     if (match.player === 2) {
       match.message += ' You won!';

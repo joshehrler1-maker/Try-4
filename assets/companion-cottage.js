@@ -4,6 +4,9 @@
   const controls = {
     feed: byId('feed'), play: byId('play'), food: byId('buy-food'), toy: byId('buy-toy')
   };
+  const cape = byId('cottage-cape');
+  const bed = byId('cottage-bed');
+  const rest = byId('cottage-rest');
   const snackPrice = 2;
   const toyPrice = 5;
   const dayMs = 86400000;
@@ -15,9 +18,17 @@
     };
   }
   function render(message) {
-    const { companion, coins, food, toy } = save.read();
+    const { companion, coins, food, toy, townCollection, capeEquipped, bedPlaced, lastBedRest } = save.read();
     byId('coins').textContent = coins;
     byId('inventory').textContent = 'Inventory · ' + food + (food === 1 ? ' snack' : ' snacks') + (toy ? ' · Crystal toy' : '');
+    cape.disabled = !companion || !townCollection['Festival Cape'];
+    cape.textContent = capeEquipped ? 'Remove Festival Cape' : 'Equip Festival Cape';
+    bed.disabled = !townCollection['Velvet Cat Bed'];
+    bed.textContent = bedPlaced ? 'Put Velvet Cat Bed away' : 'Place Velvet Cat Bed';
+    rest.disabled = !companion || !bedPlaced || lastBedRest === save.today() ||
+      (companion && careLevels(companion).happiness >= 100);
+    byId('cottage-outfit').textContent = capeEquipped ? 'Outfit: Festival Cape' : 'Outfit: Everyday';
+    byId('cottage-furnishing').textContent = bedPlaced ? 'Furniture: Velvet Cat Bed placed' : 'Furniture: No bed placed';
     byId('adopt').hidden = Boolean(companion);
     byId('care').hidden = !companion;
     controls.food.disabled = !companion || coins < snackPrice;
@@ -78,6 +89,26 @@
     if (levels.happiness === 100) return '';
     Object.assign(cat, levels, { happiness: Math.min(100, levels.happiness + (progress.toy ? 25 : 10)), updatedAt: Date.now() });
     return 'You played with ' + cat.name + '.';
+  }));
+  cape.addEventListener('click', () => act(progress => {
+    if (!progress.companion || !progress.townCollection['Festival Cape']) return 'Adopt a companion and buy a Festival Cape first.';
+    progress.capeEquipped = !progress.capeEquipped;
+    return progress.capeEquipped ? 'Festival Cape equipped.' : 'Festival Cape removed.';
+  }));
+  bed.addEventListener('click', () => act(progress => {
+    if (!progress.townCollection['Velvet Cat Bed']) return 'Buy a Velvet Cat Bed first.';
+    progress.bedPlaced = !progress.bedPlaced;
+    return progress.bedPlaced ? 'Velvet Cat Bed placed.' : 'Velvet Cat Bed put away.';
+  }));
+  rest.addEventListener('click', () => act(progress => {
+    const cat = progress.companion;
+    const day = save.today();
+    if (!cat || !progress.bedPlaced || progress.lastBedRest === day) return 'Rest is unavailable.';
+    const levels = careLevels(cat);
+    if (levels.happiness >= 100) return 'Your companion is already happy.';
+    Object.assign(cat, levels, { happiness: Math.min(100, levels.happiness + 30), updatedAt: Date.now() });
+    progress.lastBedRest = day;
+    return cat.name + ' woke up happier.';
   }));
   addEventListener('storage', render);
   addEventListener('pageshow', render);
