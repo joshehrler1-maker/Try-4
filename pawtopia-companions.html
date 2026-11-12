@@ -31,13 +31,18 @@
       <label id="active-cat-label" for="active-cat" hidden>Active companion</label>
       <select id="active-cat" hidden></select>
       <form id="adopt">
-        <fieldset><legend>Choose a breed</legend><div id="breed-options"></div></fieldset>
+        <fieldset><legend>Choose a breed</legend>
+        <label for="breed-search">Find a breed</label>
+        <input type="search" id="breed-search" autocomplete="off">
+        <p id="breed-count" role="status">56 breeds</p>
+        <p id="breed-selected">Selected: Maine Coon</p>
+        <div id="breed-options"></div></fieldset>
         <label for="cat-name">Name your cat</label>
         <input id="cat-name" maxlength="24" required autocomplete="off">
         <button type="submit">Adopt a cat</button>
       </form>
       <div id="care" hidden>
-        <img id="cat-portrait" width="180" height="180" alt="">
+        <div id="cat-portrait" role="img" hidden></div>
         <h3 id="cat-label"></h3>
         <section aria-labelledby="training-title">
           <h4 id="training-title">Companion Training School</h4>

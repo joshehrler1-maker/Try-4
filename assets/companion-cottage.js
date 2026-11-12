@@ -7,30 +7,55 @@
   const cape = byId('cottage-cape');
   const bed = byId('cottage-bed');
   const rest = byId('cottage-rest');
-  const breeds = ['Maine Coon', 'Siamese', 'Bengal', 'British Shorthair', 'Ragdoll', 'Sphynx'];
+  const originalBreeds = ['Maine Coon', 'Siamese', 'Bengal', 'British Shorthair', 'Ragdoll', 'Sphynx'];
+  const catalogBreeds = ["Abyssinian", "American Bobtail", "American Curl", "American Shorthair", "American Wirehair", "Balinese", "Birman", "Bombay", "Burmese", "Burmilla", "Chartreux", "Cornish Rex", "Devon Rex", "Egyptian Mau", "European Shorthair", "Exotic Shorthair", "Havana Brown", "Japanese Bobtail", "Khao Manee", "Korat", "LaPerm", "Lykoi", "Manx", "Nebelung", "Norwegian Forest Cat", "Ocicat", "Oriental Shorthair", "Persian", "Peterbald", "Pixiebob", "Ragamuffin", "Russian Blue", "Savannah", "Scottish Fold", "Selkirk Rex", "Siberian", "Singapura", "Snowshoe", "Somali", "Tonkinese", "Toyger", "Turkish Angora", "Turkish Van", "York Chocolate", "Australian Mist", "Cymric", "Donskoy", "German Rex", "Kurilian Bobtail", "Sokoke"];
+  const breeds = [...originalBreeds, ...catalogBreeds];
   const stats = { level: 1, strength: 1, defence: 1, movement: 1, endurance: 2 };
   const trainingPrice = 5;
   const maxCats = 4;
   const active = byId('active-cat');
   const training = byId('training-stat');
   const train = byId('train-cat');
-  function portrait(breed) {
-    return 'assets/scenes/adopt-' + breed.toLowerCase().replaceAll(' ', '-') + '.webp';
+  function paintPortrait(element, breed) {
+    const index = catalogBreeds.indexOf(breed);
+    if (index < 0) {
+      const file = breed.toLowerCase().replaceAll(' ', '-');
+      element.style.background = 'center / cover no-repeat url(assets/scenes/adopt-' + file + '.webp)';
+      return;
+    }
+    const sheet = Math.floor(index / 25) + 1;
+    const cell = index % 25;
+    const x = cell % 5 * 25;
+    const y = Math.floor(cell / 5) * 25;
+    element.style.background = x + '% ' + y + '% / 500% 500% no-repeat url(assets/scenes/adopt-catalog-' + sheet + '.webp)';
   }
-  breeds.forEach((breed, index) => {
+  const breedSearch = byId('breed-search');
+  const breedChoices = breeds.map((breed, index) => {
     const label = document.createElement('label');
     const option = document.createElement('input');
     option.type = 'radio';
     option.name = 'breed';
     option.value = breed;
     option.checked = index === 0;
-    const img = document.createElement('img');
-    img.src = portrait(breed);
-    img.alt = '';
-    img.width = 96;
-    img.height = 96;
-    label.append(option, img, breed);
+    const portrait = document.createElement('span');
+    portrait.className = 'breed-portrait';
+    portrait.setAttribute('aria-hidden', 'true');
+    paintPortrait(portrait, breed);
+    label.append(option, portrait, breed);
     byId('breed-options').append(label);
+    option.addEventListener('change', () => {
+      byId('breed-selected').textContent = 'Selected: ' + breed;
+    });
+    return { breed, label };
+  });
+  breedSearch.addEventListener('input', () => {
+    const query = breedSearch.value.trim().toLowerCase();
+    let count = 0;
+    for (const { breed, label } of breedChoices) {
+      label.hidden = !breed.toLowerCase().includes(query);
+      if (!label.hidden) count++;
+    }
+    byId('breed-count').textContent = count + ' of ' + breeds.length + ' breeds';
   });
   function canTrain(values, stat) {
     if (stat === 'level') return true;
@@ -80,8 +105,8 @@
       const image = byId('cat-portrait');
       image.hidden = !companion.breed;
       if (companion.breed) {
-        image.src = portrait(companion.breed);
-        image.alt = companion.breed + ' companion portrait';
+        paintPortrait(image, companion.breed);
+        image.setAttribute('aria-label', companion.breed + ' companion portrait');
       }
       const values = { ...stats, ...companion.stats };
       byId('companion-stats').replaceChildren(...Object.entries(values).flatMap(([key, value]) => {
