@@ -1,0 +1,22 @@
+:root{font-family:system-ui,sans-serif;color:#36244d;background:#f9f2df;scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0}
+header{background:#442863;color:white;padding:.9rem clamp(1rem,4vw,3rem);display:flex;justify-content:space-between;gap:1rem;align-items:center}
+header a{color:#ffde92;font-weight:800}
+.layout{display:grid;grid-template-columns:minmax(9rem,12rem) minmax(0,1fr);max-width:74rem;margin:auto;padding:1rem;gap:1rem}
+nav{align-self:start;background:#f7db94;border:1px solid #a47536;border-radius:.65rem;overflow:hidden}
+nav a{display:flex;align-items:center;min-height:44px;padding:.55rem .85rem;color:#442863;font-weight:700;border-bottom:1px solid #c39851}
+nav a:last-child{border-bottom:0}
+.banner{min-height:12rem;display:flex;align-items:end;border-radius:.65rem;background:linear-gradient(transparent,#251736dd),url(scenes/pawtopia.webp) center 48%/cover;color:white;padding:1rem}
+h1,h2{margin:0;line-height:1.15}
+h2{font-size:1.2rem;margin-bottom:.8rem}
+section{background:#fffdf7;border:1px solid #d6b875;border-radius:.55rem;padding:1rem;margin-bottom:.85rem}
+button,input,select{font:inherit;min-height:44px;margin:.15rem;max-width:100%}
+button{padding:.45rem .75rem;background:#583779;color:white;border:1px solid #3f255a;border-radius:.4rem;cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+input[type=number]{width:7rem}
+ul{padding-left:1.25rem}
+#feedback{position:sticky;top:0;background:#f9f2df;padding:.5rem .2rem;min-height:2.4rem;margin:0;z-index:1}
+section{scroll-margin-top:5rem}
+.foot{color:#554564;font-size:.9rem}
+@media(max-width:650px){.layout{grid-template-columns:1fr}nav{display:flex;flex-wrap:wrap}nav a{border:0}.banner{min-height:9rem}}
