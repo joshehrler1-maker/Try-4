@@ -16,7 +16,7 @@
 <a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html">Companions</a>
 <a href="pawtopia-arcade.html">Games Room</a><a href="#shops">Shops</a><a href="#inventory">Inventory</a>
 <a href="#bank">Bank</a><a href="#trading">Trading Post</a><a href="#dailies">Dailies</a>
-<a href="#arena">Training Arena</a><a href="#gazette">Gazette</a>
+<a href="#quests">Hero Quests</a><a href="#arena">Training Arena</a><a href="#gazette">Gazette</a>
 </nav>
 <main>
 <nav class="paw-world-nav" aria-label="Explore Pawtopia"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html">Companions</a><a href="pawtopia-arcade.html">Games Room</a><a href="pawtopia-town.html" aria-current="page">Shops</a><a href="pawtopia-town.html#dailies">Dailies</a><a href="pawtopia-town.html#card-album">Card Album</a><a href="index.html#crystal-regions">Crystal Regions</a></nav>
@@ -69,6 +69,13 @@
 <img class="shop-scene" src="assets/scenes/town-well.webp" width="500" height="500" loading="lazy" alt=""><p>The Wishing Well grants a daily gift. The Soup Kitchen feeds a hungry companion if you have fewer than 10 Paw Coins across your wallet and bank.</p>
 <p id="daily-progress"></p>
 <button id="wish">Visit the Wishing Well</button> <button id="soup">Visit the Soup Kitchen</button></section>
+<section id="quests"><h2>Hero Quests</h2>
+<img class="shop-scene" src="assets/scenes/town-gazette.webp" width="500" height="500" loading="lazy" alt="">
+<p id="quest-brief"></p>
+<button id="quest-accept" type="button">Accept quest</button>
+<button id="quest-turn-in" type="button">Deliver items</button>
+<a href="#shops" id="quest-supplies" data-shop="">Find supplies</a>
+</section>
 <section id="arena"><h2>Training Arena</h2>
 <img class="shop-scene" src="assets/scenes/town-arena.webp" width="500" height="500" loading="lazy" alt=""><p>Choose a move against Bolt’s practice bot. Strike beats Charge, Guard beats Strike, and Charge beats Guard. Win two rounds first to earn today’s 8-Paw-Coin prize.</p>
 <p id="round"></p><div id="moves"><button data-move="Strike">Strike</button> <button data-move="Guard">Guard</button> <button data-move="Charge">Charge</button></div>

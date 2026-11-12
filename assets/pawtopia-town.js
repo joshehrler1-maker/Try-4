@@ -17,6 +17,19 @@
       ['Collector Cards', 'Luna Collector Card', 7], ['Collector Cards', 'Bolt Collector Card', 7]
     ].map(([store, label, price]) => ({ store, label, price }))
   ];
+  const quests = [
+    { hero: 'Ivy', item: 'food', quantity: 2, label: 'Cottage Snacks', shop: 'Cottage Pantry', reward: 7 },
+    { hero: 'Bolt', item: 'shards', quantity: 1, label: 'Crystal Shard', shop: 'Crystal Exchange', reward: 9 },
+    { hero: 'Melody', item: 'Glowbell Bouquet', quantity: 1, label: 'Glowbell Bouquet', shop: 'Flower Shop', reward: 8 }
+  ];
+  function dailyQuest() {
+    const date = new Date();
+    const dayNumber = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+    return quests[dayNumber % quests.length];
+  }
+  function questItems(progress, quest) {
+    return Object.hasOwn(labels, quest.item) ? progress[quest.item] : (progress.townCollection[quest.item] || 0);
+  }
   const moves = { Strike: 'Charge', Guard: 'Strike', Charge: 'Guard' };
   const newMatch = () => ({ player: 0, bot: 0, message: 'Choose your first move.' });
   let match = newMatch();
@@ -47,6 +60,17 @@
     byId('album').replaceChildren(...cards);
     const completed = [p.lastWish, p.lastSoup, p.lastArena, p.lastInterest].filter(date => date === day).length;
     byId('daily-progress').textContent = completed + ' of 4 daily activities completed today.';
+    const quest = dailyQuest();
+    const accepted = p.questAccepted === day;
+    const delivered = p.questDelivered === day;
+    byId('quest-brief').textContent = delivered ? 'Today’s quest is complete. A new request arrives tomorrow.' :
+      quest.hero + ' needs ' + quest.quantity + ' ' + quest.label + '. Reward: ' + quest.reward + ' Paw Coins.' +
+      (accepted ? ' On hand: ' + questItems(p, quest) + '.' : '');
+    byId('quest-accept').hidden = accepted || delivered;
+    byId('quest-turn-in').hidden = !accepted || delivered;
+    byId('quest-turn-in').disabled = questItems(p, quest) < quest.quantity;
+    byId('quest-supplies').hidden = delivered;
+    byId('quest-supplies').dataset.shop = quest.shop;
     byId('wish').disabled = p.lastWish === day;
     byId('wish').textContent = p.lastWish === day ? 'Gift collected today' : 'Visit the Wishing Well';
     byId('interest').disabled = p.lastInterest === day || p.bankCoins < 100;
@@ -100,6 +124,24 @@
       render();
     });
   });
+  byId('quest-accept').addEventListener('click', () => act(p => {
+    const day = save.today();
+    if (p.questAccepted === day || p.questDelivered === day) return 'Today’s quest is already recorded.';
+    p.questAccepted = day;
+    return 'Quest accepted.';
+  }));
+  byId('quest-turn-in').addEventListener('click', () => act(p => {
+    const day = save.today();
+    const quest = dailyQuest();
+    if (p.questAccepted !== day || p.questDelivered === day) return 'There is no active quest to deliver.';
+    if (questItems(p, quest) < quest.quantity) return 'You still need supplies.';
+    const inventory = Object.hasOwn(labels, quest.item) ? p : p.townCollection;
+    inventory[quest.item] -= quest.quantity;
+    if (inventory === p.townCollection && !inventory[quest.item]) delete inventory[quest.item];
+    p.questDelivered = day;
+    p.coins += quest.reward;
+    return quest.hero + ' thanked you and paid ' + quest.reward + ' Paw Coins.';
+  }));
   byId('search').addEventListener('input', render);
   byId('bank-form').addEventListener('submit', event => {
     event.preventDefault();
