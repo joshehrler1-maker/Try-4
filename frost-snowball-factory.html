@@ -11,11 +11,12 @@
 <main data-fullscreen-game><nav><a href="index.html">Super Paw Heroes</a><a href="pawcade-classics.html">Back to Pawcade</a></nav>
 <h1>Frost’s Snowball Factory</h1>
 <div class="hud"><span id="level">Level 1</span><span id="lives">Lives 3</span><span id="score">Score 0</span><span id="best">Best 0</span></div>
-<div class="arena"><canvas width="560" height="420" aria-label="Snowball Factory playfield"></canvas>
+<div class="arena"><canvas width="560" height="420" data-hd="420" aria-label="Snowball Factory playfield"></canvas>
 <div class="screen" id="screen"><h2 id="title">Snowball Factory</h2><p id="summary">Help Frost dodge runaway snowballs, then push through the warehouse to the exit.</p><button id="action">Start game</button></div></div>
 <div class="controls"><button id="pause" disabled>Pause</button><button id="escape" hidden>Escape (−1 life)</button><div class="controls" id="move" aria-label="Warehouse movement" hidden><button data-dir="up" aria-label="Move up">↑</button><button data-dir="left" aria-label="Move left">←</button><button data-dir="down" aria-label="Move down">↓</button><button data-dir="right" aria-label="Move right">→</button></div></div>
 <p class="hint" id="hint">Move with your mouse, drag on touchscreens, or use the arrow keys. Watch for launchers that flash before they fire.</p></main>
 <script src="assets/pawtopia-save.js"></script>
+<script src="assets/game-hd.js"></script>
 <script>
 (() => {
 const el=id=>document.getElementById(id);
