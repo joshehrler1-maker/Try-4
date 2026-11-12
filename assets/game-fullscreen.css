@@ -1,0 +1,13 @@
+.game-fullscreen-tools{display:flex;justify-content:flex-end;margin:0 0 .55rem}
+.game-fullscreen-toggle{min-height:44px;padding:.45rem .9rem;font:700 .95rem system-ui,sans-serif;color:#f6efff;background:#28234d;border:1px solid #ae99db;border-radius:.65rem;cursor:pointer}
+.game-fullscreen-toggle:focus-visible{outline:3px solid #a1efff;outline-offset:3px}
+[data-fullscreen-game]:fullscreen,[data-fullscreen-game].game-fullscreen-expanded{box-sizing:border-box;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));overflow:auto;overscroll-behavior:contain;background-color:#10132d;color:#fff}
+[data-fullscreen-game].game-fullscreen-expanded{position:fixed;inset:0;height:100dvh;z-index:2147483647}
+body.game-fullscreen-lock{overflow:hidden}
+[data-fullscreen-game] .game-fullscreen-tools{position:sticky;top:0;z-index:10;pointer-events:none}
+.game-fullscreen-tools>button{pointer-events:auto}
+[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .arena{width:min(100%,900px);margin-inline:auto}
+[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) canvas:not([hidden]){display:block;margin-inline:auto;max-width:100%}
+[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .arena:has(canvas[height="480"]){width:min(100%,900px,calc(64dvh * 4 / 3))}
+[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .arena:has(canvas[height="420"]){width:min(100%,900px,calc(64dvh * 4 / 3))}
+[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .arena:has(canvas[height="390"]){width:min(100%,900px,calc(64dvh * 20 / 13))}
