@@ -1,0 +1,11 @@
+.pawcade-directory{margin:2rem auto;padding:clamp(.75rem,3vw,1.5rem);background:#211633;border:1px solid #a084bc;border-radius:1rem;color:#f9edff}
+.pawcade-directory h2{margin-top:0;color:#fff1cb}
+.collection-filters{display:flex;flex-wrap:wrap;gap:.65rem 1rem}
+.collection-filters input,.collection-filters select{min-height:44px;max-width:100%;font:inherit;border:1px solid #a084bc;border-radius:.4rem;background:#302046;color:#fff;padding:.35rem}
+#collection-catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,12rem),1fr));gap:.75rem}
+#collection-catalog .game-card{display:flex;flex-direction:column;overflow:hidden;background:#322149;border:1px solid #8c71ac;border-radius:.65rem;text-decoration:none;color:#fff2d3;min-height:44px}
+#collection-catalog .game-card:hover,#collection-catalog .game-card:focus-visible{border-color:#ffdb94;background:#493064;outline:2px solid #ffdb94}
+#collection-catalog img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+#collection-catalog strong,#collection-catalog small{padding:.25rem .55rem}
+#collection-catalog small{color:#e9d6f6}
+@media(max-width:450px){#collection-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}}

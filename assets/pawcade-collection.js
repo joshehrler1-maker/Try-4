@@ -22,6 +22,40 @@
   const games = types.flatMap((type, kind) => type.titles.map((title, variant) => ({
     title, kind, variant, type, art: art[title.split('’')[0]], id: kind + '-' + variant
   })));
+  const directory = Boolean(byId('collection-catalog'));
+  function catalog() {
+    const query=byId(directory ? 'collection-search' : 'search').value.trim().toLowerCase();
+    const filter=byId(directory ? 'collection-filter' : 'filter').value;
+    const found=games.filter(item => (!filter || item.type.name===filter) && item.title.toLowerCase().includes(query));
+    byId(directory ? 'collection-results' : 'results').textContent=found.length + ' of 30 games';
+    byId(directory ? 'collection-catalog' : 'catalog').replaceChildren(...found.map(item=>{
+      const button=document.createElement(directory ? 'a' : 'button');
+      if (directory) button.href='pawcade-collection.html?game=' + item.id;
+      else button.type='button';
+      button.className='game-card';
+      const img=document.createElement('img');
+      img.src='assets/scenes/' + item.art + '.webp';
+      img.alt='';
+      img.loading='lazy';
+      const title=document.createElement('strong');
+      title.textContent=item.title;
+      const category=document.createElement('small');
+      category.textContent=item.type.name;
+      button.append(img,title,category);
+      if (!directory) button.addEventListener('click',()=>select(item,button));
+      return button;
+    }));
+  }
+  function mountCatalog() {
+    types.forEach(type=>byId(directory ? 'collection-filter' : 'filter').add(new Option(type.name,type.name)));
+    byId(directory ? 'collection-search' : 'search').addEventListener('input',catalog);
+    byId(directory ? 'collection-filter' : 'filter').addEventListener('change',catalog);
+    catalog();
+  }
+  if (directory) {
+    mountCatalog();
+    return;
+  }
   const marks = [['◆','✦','●','▲','■','✚','♥','☾'],['☀','☁','❄','☂','⚡','✿','♬','★'],['1','2','3','4','5','6','7','8']];
   const board = byId('board');
   const cabinet = byId('cabinet');
@@ -266,36 +300,13 @@
     update();
     byId('cabinet-name').focus();
   }
-  function catalog() {
-    const query=byId('search').value.trim().toLowerCase();
-    const filter=byId('filter').value;
-    const found=games.filter(item => (!filter || item.type.name===filter) && item.title.toLowerCase().includes(query));
-    byId('results').textContent=found.length + ' of 30 games';
-    byId('catalog').replaceChildren(...found.map(item=>{
-      const button=document.createElement('button');
-      button.type='button';
-      button.className='game-card';
-      const img=document.createElement('img');
-      img.src='assets/scenes/' + item.art + '.webp';
-      img.alt='';
-      img.loading='lazy';
-      const title=document.createElement('strong');
-      title.textContent=item.title;
-      const category=document.createElement('small');
-      category.textContent=item.type.name;
-      button.append(img,title,category);
-      button.addEventListener('click',()=>select(item,button));
-      return button;
-    }));
-  }
-  types.forEach(type=>byId('filter').add(new Option(type.name,type.name)));
-  byId('search').addEventListener('input',catalog);
-  byId('filter').addEventListener('change',catalog);
   byId('back').addEventListener('click',()=>{stop();cabinet.hidden=true;lastCard?.focus();});
   byId('start').addEventListener('click',start);
   board.addEventListener('click', event => {
     const button=event.target.closest('[data-tile]');
     if (button) play(Number(button.dataset.tile));
   });
-  catalog();
+  mountCatalog();
+  const requested = games.find(item => item.id === new URLSearchParams(location.search).get('game'));
+  if (requested) select(requested, byId('catalog').children[games.indexOf(requested)]);
 })();
