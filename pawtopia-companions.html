@@ -28,13 +28,25 @@
   <div class="panels">
     <section class="panel" id="companion-care" aria-labelledby="companion-title">
       <h2 id="companion-title">Your companion</h2>
+      <label id="active-cat-label" for="active-cat" hidden>Active companion</label>
+      <select id="active-cat" hidden></select>
       <form id="adopt">
+        <fieldset><legend>Choose a breed</legend><div id="breed-options"></div></fieldset>
         <label for="cat-name">Name your cat</label>
         <input id="cat-name" maxlength="24" required autocomplete="off">
         <button type="submit">Adopt a cat</button>
       </form>
       <div id="care" hidden>
+        <img id="cat-portrait" width="180" height="180" alt="">
         <h3 id="cat-label"></h3>
+        <section aria-labelledby="training-title">
+          <h4 id="training-title">Companion Training School</h4>
+          <p>Strength, defence, and movement can reach twice your level. Endurance can reach three times your level. Each lesson costs 5 Paw Coins.</p>
+          <dl id="companion-stats"></dl>
+          <label for="training-stat">Train</label>
+          <select id="training-stat"><option value="level">Level</option><option value="strength">Strength</option><option value="defence">Defence</option><option value="movement">Movement</option><option value="endurance">Endurance</option></select>
+          <button type="button" id="train-cat">Train · 5 Paw Coins</button>
+        </section>
         <p><label for="fullness">Fullness</label> <output id="fullness-label"></output><meter id="fullness" min="0" max="100"></meter></p>
         <p><label for="happiness">Happiness</label> <output id="happiness-label"></output><meter id="happiness" min="0" max="100"></meter></p>
         <div class="controls"><button id="feed" type="button">Feed a snack</button><button id="play" type="button">Play with your cat</button></div>

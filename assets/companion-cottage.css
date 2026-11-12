@@ -28,3 +28,9 @@ output{margin-left:8px}
 #feedback{min-height:1.55em;color:var(--gold)}
 footer{padding:0 0 20px}
 @media(max-width:640px){.hero,.panels{grid-template-columns:1fr}.hero img{max-height:240px;object-position:center 32%}}
+
+#breed-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(6.5rem,1fr));gap:.5rem}
+#breed-options label{display:grid;justify-items:center;gap:.25rem;text-align:center;cursor:pointer}
+#breed-options img,#cat-portrait{max-width:100%;height:auto;border-radius:.55rem}
+#companion-stats{display:grid;grid-template-columns:auto 1fr;gap:.3rem .6rem}
+#companion-stats dd{margin:0}

@@ -7,6 +7,39 @@
   const cape = byId('cottage-cape');
   const bed = byId('cottage-bed');
   const rest = byId('cottage-rest');
+  const breeds = ['Maine Coon', 'Siamese', 'Bengal', 'British Shorthair', 'Ragdoll', 'Sphynx'];
+  const stats = { level: 1, strength: 1, defence: 1, movement: 1, endurance: 2 };
+  const trainingPrice = 5;
+  const maxCats = 4;
+  const active = byId('active-cat');
+  const training = byId('training-stat');
+  const train = byId('train-cat');
+  function portrait(breed) {
+    return 'assets/scenes/adopt-' + breed.toLowerCase().replaceAll(' ', '-') + '.webp';
+  }
+  breeds.forEach((breed, index) => {
+    const label = document.createElement('label');
+    const option = document.createElement('input');
+    option.type = 'radio';
+    option.name = 'breed';
+    option.value = breed;
+    option.checked = index === 0;
+    const img = document.createElement('img');
+    img.src = portrait(breed);
+    img.alt = '';
+    img.width = 96;
+    img.height = 96;
+    label.append(option, img, breed);
+    byId('breed-options').append(label);
+  });
+  function canTrain(values, stat) {
+    if (stat === 'level') return true;
+    if (!Object.hasOwn(stats, stat)) return false;
+    const baseCap = values.level * 2;
+    return values[stat] < values.level * (stat === 'endurance' ? 3 : 2) &&
+      (stat === 'endurance' || values.endurance <= baseCap) &&
+      ['strength', 'defence', 'movement'].every(key => values[key] <= baseCap);
+  }
   const snackPrice = 2;
   const toyPrice = 5;
   const dayMs = 86400000;
@@ -18,7 +51,7 @@
     };
   }
   function render(message) {
-    const { companion, coins, food, toy, townCollection, capeEquipped, bedPlaced, lastBedRest } = save.read();
+    const { companion, coins, food, toy, townCollection, capeEquipped, bedPlaced, lastBedRest, otherCompanions } = save.read();
     byId('coins').textContent = coins;
     byId('inventory').textContent = 'Inventory · ' + food + (food === 1 ? ' snack' : ' snacks') + (toy ? ' · Crystal toy' : '');
     cape.disabled = !companion || !townCollection['Festival Cape'];
@@ -29,13 +62,36 @@
       (companion && careLevels(companion).happiness >= 100);
     byId('cottage-outfit').textContent = capeEquipped ? 'Outfit: Festival Cape' : 'Outfit: Everyday';
     byId('cottage-furnishing').textContent = bedPlaced ? 'Furniture: Velvet Cat Bed placed' : 'Furniture: No bed placed';
-    byId('adopt').hidden = Boolean(companion);
+    byId('adopt').hidden = Boolean(companion && otherCompanions.length >= maxCats - 1);
+    active.hidden = !companion;
+    byId('active-cat-label').hidden = !companion;
+    active.replaceChildren(...[companion, ...otherCompanions].filter(Boolean).map((cat, index) => {
+      const option = document.createElement('option');
+      option.value = String(index);
+      option.textContent = cat.name + ' · ' + (cat.breed || 'Domestic Shorthair');
+      return option;
+    }));
     byId('care').hidden = !companion;
     controls.food.disabled = !companion || coins < snackPrice;
     controls.toy.disabled = !companion || toy || coins < toyPrice;
     if (companion) {
       const { fullness, happiness } = careLevels(companion);
-      byId('cat-label').textContent = companion.name;
+      byId('cat-label').textContent = companion.name + ' · ' + (companion.breed || 'Domestic Shorthair');
+      const image = byId('cat-portrait');
+      image.hidden = !companion.breed;
+      if (companion.breed) {
+        image.src = portrait(companion.breed);
+        image.alt = companion.breed + ' companion portrait';
+      }
+      const values = { ...stats, ...companion.stats };
+      byId('companion-stats').replaceChildren(...Object.entries(values).flatMap(([key, value]) => {
+        const term = document.createElement('dt');
+        const detail = document.createElement('dd');
+        term.textContent = key[0].toUpperCase() + key.slice(1);
+        detail.textContent = value;
+        return [term, detail];
+      }));
+      train.disabled = coins < trainingPrice || !canTrain(values, training.value);
       byId('fullness').value = fullness;
       byId('fullness-label').textContent = fullness + '%';
       byId('happiness').value = happiness;
@@ -55,10 +111,41 @@
       field.focus();
       return;
     }
+    const breed = new FormData(event.currentTarget).get('breed');
+    if (!breeds.includes(breed)) return;
     act(progress => {
-      if (progress.companion) return '';
-      progress.companion = { name, fullness: 65, happiness: 65, updatedAt: Date.now() };
+      if (progress.companion && progress.otherCompanions.length >= maxCats - 1) return 'The cottage is full.';
+      const cat = { name, breed, fullness: 65, happiness: 65, updatedAt: Date.now() };
+      if (progress.companion) progress.otherCompanions.push(cat);
+      else progress.companion = cat;
       return name + ' has moved into the cottage!';
+    });
+  });
+  active.addEventListener('change', () => {
+    const index = Number(active.value) - 1;
+    act(progress => {
+      const next = progress.otherCompanions[index];
+      if (!next || !progress.companion) return '';
+      progress.otherCompanions[index] = {
+        ...progress.companion, capeEquipped: progress.capeEquipped, lastBedRest: progress.lastBedRest
+      };
+      progress.companion = next;
+      progress.capeEquipped = Boolean(next.capeEquipped);
+      progress.lastBedRest = next.lastBedRest || '';
+      return next.name + ' is now your active companion.';
+    });
+  });
+  training.addEventListener('change', render);
+  train.addEventListener('click', () => {
+    const stat = training.value;
+    act(progress => {
+      if (!progress.companion || progress.coins < trainingPrice) return 'You need 5 Paw Coins and an active companion.';
+      const values = { ...stats, ...progress.companion.stats };
+      if (!canTrain(values, stat)) return 'Raise your companion’s level to train that stat further.';
+      values[stat]++;
+      progress.coins -= trainingPrice;
+      progress.companion.stats = values;
+      return progress.companion.name + ' gained 1 ' + stat + '.';
     });
   });
   controls.food.addEventListener('click', () => act(progress => {
