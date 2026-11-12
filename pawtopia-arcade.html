@@ -74,7 +74,7 @@
 </nav>
 </section>
 <section class="play" id="game-panel" data-fullscreen-game aria-labelledby="game-title">
-<img class="echo-art" id="echo-art" src="assets/scenes/pawcade-mystic.webp" width="900" height="300" alt="Luna among the crystals of the Purple Mystic Halls" hidden>
+<img class="echo-art" id="echo-art" src="assets/scenes/pawcade-mystic.webp" width="900" height="300" alt="" hidden>
 <h2 id="game-title" tabindex="-1"></h2><p id="rules"></p>
 <div class="hud"><span id="score"></span><span id="best"></span></div>
 <div class="grid" id="grid" role="group" aria-label="Game tiles"></div>
@@ -296,7 +296,12 @@ function stop() {
 function select(modeName) {
   mode = modeName;
   byId('game-panel').dataset.game = mode;
-  byId('echo-art').hidden = sound.hidden = mode !== 'crystal';
+  const scenes = { lantern: 'arcade', crystal: 'pawcade-mystic', defense: 'pawcade-flame',
+    courier: 'pawtopia', forge: 'green-life-groves', beacons: 'catacombs' };
+  const scene = byId('echo-art');
+  scene.src = 'assets/scenes/' + scenes[mode] + '.webp';
+  scene.hidden = false;
+  sound.hidden = mode !== 'crystal';
   stop();
   score = best = 0;
   try { best = Math.max(Number(localStorage.getItem('pawtopia-arcade-' + mode)) || 0, wallet.read().arcadeBests[mode] || 0); } catch {}

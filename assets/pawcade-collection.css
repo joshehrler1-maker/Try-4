@@ -36,3 +36,6 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 #board.single-pad{width:min(100%,15rem)}
 #board.single-pad button{aspect-ratio:2}
 @media(prefers-reduced-motion:no-preference){.game-card{transition:background-color .16s,border-color .16s,transform .16s}.game-card:hover{transform:translateY(-2px)}#board button{transition:background-color .12s,box-shadow .12s}#board button:active{transform:scale(.94)}}
+#cabinet-scene{display:block;width:100%;height:auto;aspect-ratio:3/1;object-fit:cover;border-radius:.7rem;border:1px solid #a987c1;margin:.4rem 0 .85rem}
+#board{padding:.6rem;border-radius:.8rem;background:linear-gradient(#22153296,#221532bd),var(--cabinet-art) center/cover;border:1px solid #aa84c7}
+@media(prefers-reduced-motion:no-preference){#board button[data-state="highlight"]{animation:pawcade-glow .8s ease-in-out infinite alternate}@keyframes pawcade-glow{to{box-shadow:0 0 .95rem #ffce68,inset 0 0 .4rem #fff5cf}}}

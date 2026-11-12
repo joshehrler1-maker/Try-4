@@ -3,25 +3,20 @@
   const byId = id => document.getElementById(id);
   const save = window.PawtopiaSave;
   const types = [
-    { name: 'Target hunt', rules: 'Find the glowing target before it moves. Avoid the red decoy.', titles: ['Whisker’s Ember Rescue','Spark’s Firefly Watch','Frost’s Snowflake Catch'] },
-    { name: 'Sequence memory', rules: 'Watch the tiles light up, then repeat their order.', titles: ['Luna’s Moon Runes','Melody’s Crystal Chorus','Bolt’s Control Panel'] },
-    { name: 'Matching pairs', rules: 'Reveal two tiles at a time and find every matching pair.', titles: ['Ivy’s Seed Vault','Stone’s Fossil Pairs','Luna’s Starlight Cards'] },
-    { name: 'Maze', rules: 'Move to adjacent tiles and find the goal. The dark tiles are walls.', titles: ['Shadow’s Lantern Maze','Whisker’s Rooftop Route','Blaze’s Lava Labyrinth'] },
-    { name: 'Lights puzzle', rules: 'Tap a tile to flip it and its neighbors. Turn every light off.', titles: ['Bolt’s Power Grid','Melody’s Stage Lights','Spark’s Beacon Switches'] },
-    { name: 'Sorting', rules: 'Send each symbol to its matching crate. Correct sorts score points.', titles: ['Ivy’s Garden Market','Stone’s Quarry Sort','Frost’s Ice Parcel Post'] },
-    { name: 'Reaction', rules: 'Wait for GO, then tap the launch pad. An early tap costs a point.', titles: ['Blaze’s Launch Drill','Luna’s Moon Dash','Whisker’s Cape Sprint'] },
-    { name: 'Number trail', rules: 'Tap the tiles in ascending order. Clear as many boards as you can.', titles: ['Spark’s Trail Markers','Bolt’s Circuit Count','Stone’s Quarry Orders'] },
-    { name: 'Safe crossing', rules: 'Move one tile at a time. The red patrols shift after each move. Reach the goal without touching them.', titles: ['Shadow’s Patrol Crossing','Frost’s Thin Ice','Blaze’s Ember Crossing'] },
-    { name: 'Odd tile', rules: 'Find the one symbol that differs from all the others.', titles: ['Melody’s Missing Note','Ivy’s Leaf Detective','Shadow’s Decoy Hunt'] }
+    [3, 'Maze', 'Move to adjacent tiles and find the goal. The dark tiles are walls.', 'Shadow’s Lantern Maze'],
+    [5, 'Sorting', 'Send each symbol to its matching crate. Correct sorts score points.', 'Ivy’s Garden Market'],
+    [6, 'Reaction', 'Wait for GO, then tap the launch pad. An early tap costs a point.', 'Blaze’s Launch Drill'],
+    [8, 'Safe crossing', 'Move one tile at a time. Red patrols shift after each move. Reach the goal without touching them.', 'Shadow’s Patrol Crossing'],
+    [9, 'Odd tile', 'Find the one symbol that differs from all the others.', 'Melody’s Missing Note']
   ];
+  const legacyArcade = { 0: 'defense', 1: 'crystal', 2: 'forge', 4: 'beacons', 7: 'courier' };
   const art = {
-    Whisker:'red-flame-caves', Luna:'purple-mystic-halls', Bolt:'blue-tech-mines', Ivy:'green-life-groves',
-    Blaze:'orange-volcanic-depths', Frost:'cyan-frost-caverns', Shadow:'indigo-shadow-tunnels',
-    Spark:'yellow-light-ruins', Melody:'pink-harmony-grotto', Stone:'brown-earth-quarries'
+    Ivy: 'green-life-groves', Blaze: 'orange-volcanic-depths',
+    Shadow: 'indigo-shadow-tunnels', Melody: 'pink-harmony-grotto'
   };
-  const games = types.flatMap((type, kind) => type.titles.map((title, variant) => ({
-    title, kind, variant, type, art: art[title.split('’')[0]], id: kind + '-' + variant
-  })));
+  const games = types.map(([kind, name, rules, title]) => ({
+    title, kind, type: { name, rules }, art: kind === 8 ? 'town-arena' : art[title.split('’')[0]], id: kind + '-0'
+  }));
   const directory = Boolean(byId('collection-catalog'));
   const roomGames = [
     ['Lantern Festival','Action','arcade','?game=lantern#game-panel','lantern'],
@@ -159,7 +154,7 @@
     addEventListener('pawtopia-arcade-score',roomPanels);
     return;
   }
-  const marks = [['◆','✦','●','▲','■','✚','♥','☾'],['☀','☁','❄','☂','⚡','✿','♬','★'],['1','2','3','4','5','6','7','8']];
+  const marks = ['◆','✦','●','▲','■','✚','♥','☾'];
   const board = byId('board');
   const cabinet = byId('cabinet');
   const pick = n => Math.floor(Math.random() * n);
@@ -233,59 +228,31 @@
     }
   }
   function prepareMaze(crossing) {
-    const width = 5 + game.variant;
+    const width = 5;
     const count = width * width;
     const safe = new Set([...range(width), ...range(width).map(row => row*width+width-1)]);
     Object.assign(state,{ width,count,player:0,walls:new Set(),patrols:null, step:0 });
     if (crossing) {
       state.patrols = range(width-2).map(i => (i+1)*width + pick(width));
     } else {
-      state.walls = new Set(shuffle(range(count).filter(i => !safe.has(i))).slice(0, width + game.variant*2));
+      state.walls = new Set(shuffle(range(count).filter(i => !safe.has(i))).slice(0, width));
     }
     cells(count,width);
     drawMaze();
   }
-  function target() {
-    const previous = state.target;
-    state.target = pick(state.count-1);
-    if (state.target >= previous) state.target++;
-    state.decoy = (state.target + 1 + pick(state.count-1)) % state.count;
-    range(state.count).forEach(i => tile(i, i===state.target ? '✦' : i===state.decoy ? '×' : '', i===state.target ? 'highlight' : i===state.decoy ? 'danger' : ''));
-  }
-  function sequence() {
-    state.locked = true;
-    state.cursor = 0;
-    const speed = 530 - game.variant*75;
-    state.sequence.forEach((index,i) => {
-      later(() => tile(index,'✦','highlight'), i*speed + 120);
-      later(() => tile(index,''), i*speed + speed - 30);
-    });
-    later(() => { state.locked = false; byId('message').textContent = 'Repeat the sequence.'; }, state.sequence.length*speed);
-  }
-  function flip(i) {
-    for (const j of [i,...adjacent(i,state.width,state.count)]) {
-      state.lights[j] = !state.lights[j];
-      tile(j,state.lights[j] ? '✦' : '',state.lights[j] ? 'highlight' : '');
-    }
-  }
   function sortPrompt() {
     state.target = pick(state.count);
-    byId('message').textContent = 'Sort ' + marks[game.variant][state.target] + ' into its crate.';
+    byId('message').textContent = 'Sort ' + marks[state.target] + ' into its crate.';
   }
   function reaction() {
     state.go = false;
     const attempt = ++state.attempt;
     tile(0,'WAIT','danger');
-    later(() => { if (attempt === state.attempt) {state.go = true; tile(0,'GO','highlight');} }, 600 + pick(1500 + game.variant*450));
-  }
-  function numbers() {
-    state.order = shuffle(range(state.count));
-    state.cursor = 0;
-    state.order.forEach((value,index) => tile(index,String(value+1)));
+    later(() => { if (attempt === state.attempt) {state.go = true; tile(0,'GO','highlight');} }, 600 + pick(1500));
   }
   function odd() {
     state.target = pick(state.count);
-    const symbols = marks[game.variant];
+    const symbols = marks;
     const value = pick(symbols.length);
     const different = (value+1+pick(symbols.length-1))%symbols.length;
     range(state.count).forEach(i => tile(i,symbols[i===state.target ? different : value]));
@@ -293,75 +260,29 @@
   function start() {
     stop();
     state = { score:0,left:30,running:true };
-    const v = game.variant;
     byId('message').textContent = '';
     switch (game.kind) {
-      case 0:
-        state.count = (4+v)**2; state.target = 0; cells(state.count,4+v); target(); break;
-      case 1:
-        cells(9,3); state.sequence = range(2+v).map(() => pick(9)); sequence(); break;
-      case 2: {
-        const pairs = 4+v*2;
-        state.deck = shuffle([...range(pairs),...range(pairs)]);
-        state.matched = new Set(); state.first = null;
-        cells(pairs*2,4); break;
-      }
       case 3: prepareMaze(false); break;
-      case 4:
-        state.width=3+v; state.count=state.width**2; state.lights=range(state.count).map(() => false);
-        cells(state.count,state.width);
-        shuffle(range(state.count)).slice(0,3+v*2).forEach(flip);
-        if (!state.lights.some(Boolean)) flip(0);
-        break;
       case 5:
-        state.count=3+v; cells(state.count,state.count);
-        range(state.count).forEach(i=>tile(i,marks[v][i])); sortPrompt(); break;
-      case 6: state.attempt=0; cells(1,1); reaction(); break;
-      case 7: state.count=9+v*3; cells(state.count,3+v); numbers(); break;
+        state.count = 3;
+        cells(state.count, state.count);
+        range(state.count).forEach(i => tile(i, marks[i]));
+        sortPrompt();
+        break;
+      case 6: state.attempt = 0; cells(1, 1); reaction(); break;
       case 8: prepareMaze(true); break;
-      case 9: state.count=(4+v)**2; cells(state.count,4+v); odd(); break;
+      case 9: state.count = 16; cells(state.count, 4); odd(); break;
     }
     update();
     clock=setInterval(() => {
       state.left--;
       update();
       if (!state.left) finish('Time’s up.');
-      else if (game.kind===0 && state.left % (3-v)===0) target();
     },1000);
   }
   function play(i) {
-    if (!state?.running || state.locked) return;
-    const v = game.variant;
+    if (!state?.running) return;
     switch (game.kind) {
-      case 0:
-        if (i===state.target) { point(); target(); }
-        else if (i===state.decoy) point(-1);
-        break;
-      case 1:
-        if (i!==state.sequence[state.cursor]) {
-          point(-1); byId('message').textContent='Watch the sequence again.'; sequence(); break;
-        }
-        state.cursor++;
-        if (state.cursor===state.sequence.length) {
-          point(state.sequence.length); state.sequence.push(pick(9)); sequence();
-        }
-        break;
-      case 2: {
-        if (i===state.first || state.matched.has(i)) break;
-        const first=state.first;
-        tile(i,marks[v][state.deck[i]],'highlight');
-        if (first===null) {state.first=i;break;}
-        state.first=null;
-        if (state.deck[i]===state.deck[first]) {
-          for (const index of [first,i]) {state.matched.add(index);tile(index,marks[v][state.deck[index]],'success');}
-          point(2);
-          if (state.matched.size===state.deck.length) finish('All pairs found!');
-        } else {
-          state.locked=true;
-          later(()=>{tile(first,'');tile(i,'');state.locked=false;},650);
-        }
-        break;
-      }
       case 3:
       case 8:
         if (!adjacent(state.player,state.width,state.count).includes(i) || state.walls.has(i)) break;
@@ -369,22 +290,13 @@
         state.player=i;
         if (i===state.count-1) {point(state.width*2);finish('Goal reached!');break;}
         if (state.patrols) {
-          state.patrols=state.patrols.map(j=>Math.floor(j/state.width)*state.width+(j%state.width+1+v)%state.width);
+          state.patrols=state.patrols.map(j=>Math.floor(j/state.width)*state.width+(j%state.width+1)%state.width);
           if (state.patrols.includes(i)) {point(-1);state.player=0;}
         }
         drawMaze();
         break;
-      case 4:
-        flip(i);
-        if (!state.lights.some(Boolean)) {point(state.count);finish('All lights cleared!');}
-        break;
-      case 5: point(i===state.target ? 1 : -1);sortPrompt();break;
-      case 6: point(state.go ? 1 : -1);reaction();break;
-      case 7:
-        if (state.order[i]!==state.cursor) {point(-1);break;}
-        tile(i,'✓','success');state.cursor++;point();
-        if (state.cursor===state.count) numbers();
-        break;
+      case 5: point(i===state.target ? 1 : -1); sortPrompt(); break;
+      case 6: point(state.go ? 1 : -1); reaction(); break;
       case 9: point(i===state.target ? 1 : -1);odd();break;
     }
   }
@@ -396,6 +308,8 @@
     lastCard=card;
     board.replaceChildren();
     cabinet.style.setProperty('--cabinet-art','url(assets/scenes/' + game.art + '.webp)');
+    const scene = byId('cabinet-scene');
+    scene.src = 'assets/scenes/' + game.art + '.webp';
     byId('cabinet-name').textContent=game.title;
     byId('rules').textContent=game.type.rules;
     byId('message').textContent='';
@@ -410,6 +324,13 @@
     if (button) play(Number(button.dataset.tile));
   });
   mountCatalog();
-  const requested = games.find(item => item.id === new URLSearchParams(location.search).get('game'));
-  if (requested) select(requested, byId('catalog').children[games.indexOf(requested)]);
+  const requestedId = new URLSearchParams(location.search).get('game');
+  const legacy = /^(\d)-[012]$/.exec(requestedId || '');
+  const kind = legacy?.[1];
+  if (kind !== undefined && Object.hasOwn(legacyArcade, kind)) {
+    location.replace('pawtopia-arcade.html?game=' + legacyArcade[kind] + '#game-panel');
+  } else {
+    const requested = games.find(item => item.id === requestedId || String(item.kind) === kind);
+    if (requested) select(requested, byId('catalog').children[games.indexOf(requested)]);
+  }
 })();
