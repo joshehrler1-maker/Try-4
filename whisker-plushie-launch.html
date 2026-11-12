@@ -1,0 +1,100 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Whisker’s Plushie Launch | Super Paw Heroes</title><style>
+*{box-sizing:border-box}body{margin:0;background:#0a1027;color:#fff3e1;font:600 1rem/1.45 system-ui}main{width:min(100% - 24px,720px);margin:16px auto}nav{display:flex;justify-content:space-between;gap:8px}a{color:#ffdb8c}h1{font:700 clamp(34px,7vw,58px)/1 Georgia;margin:.35em 0}.arena{position:relative;overflow:hidden;border:1px solid #9c82bf;border-radius:16px;background:#1b2140 url(assets/scenes/pawcade-flame.webp) center/cover}canvas{display:block;width:100%;height:auto;touch-action:none}.panel{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:14px;background:#0c1234b8}.panel[hidden]{display:none}.panel h2{margin:0;font:700 clamp(24px,6vw,46px)/1 Georgia}.panel p{margin:.55em auto;max-width:29rem}.controls{display:flex;gap:.55rem;margin:.65rem 0;align-items:center}.controls button:first-child{flex:1}button{font:inherit;min-height:44px;background:#ffdc93;color:#241a37;border:1px solid #fff4cd;border-radius:10px;padding:.45rem .85rem;cursor:pointer}button:disabled{opacity:.55}.hint{color:#d5d9f2;font-size:.88rem}#hud{margin:.5rem 0;color:#ffe5b5}
+</style><main><nav><a href="index.html">Super Paw Heroes</a><a href="pawcade-classics.html">Back to Pawcade</a></nav><h1>Whisker’s Plushie Launch</h1>
+<p id="hud"></p><div class="arena"><canvas width="600" height="390" aria-label="Whisker’s Plushie Launch playfield"></canvas><div class="panel" id="panel"><h2 id="heading">Whisker’s Plushie Launch</h2><p id="info">Help Whisker send a Baron Brasswhirl plushie flying across the Red Flame Caves.</p><button id="start">Start game</button></div></div>
+<div class="controls"><button id="act" disabled>Drop plush</button><button id="pause" disabled>Pause</button></div><p class="hint">Wait for a tailwind. Tap Drop plush, then Swing as the plush reaches the gold line. Tap Bounce just before it touches the ground. Space also works.</p></main><script>
+const el=id=>document.getElementById(id), field=document.querySelector('canvas'), ctx=field.getContext('2d');
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+const record='pawcade-plush-launch';
+let best=0,score=0,mode='ready',previous;
+try{best=Number(localStorage.getItem(record))||0;}catch{}
+function hud(message){el('hud').textContent=message+' · Best '+best;}
+function overlay(title,info,label,action){
+  el('heading').textContent=title;el('info').textContent=info;el('start').textContent=label;el('start').onclick=action;
+  el('panel').hidden=false;el('act').disabled=el('pause').disabled=true;
+}
+function play(){mode='playing';el('panel').hidden=true;el('act').disabled=el('pause').disabled=false;}
+function finish(title,message){
+  mode='done';best=Math.max(best,score);
+  try{localStorage.setItem(record,best);}catch{}
+  hud('Score '+score);overlay(title,message+' · Best '+best,'Play again',start);
+}
+function pause(){if(mode==='playing'){mode='paused';overlay('Paused','Your run will resume from here.','Resume',play);}}
+function circle(x,y,r,color){
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+}
+function shade(){ctx.fillStyle='#09132c85';ctx.fillRect(0,0,600,390);}
+function label(value,x,y,color='#fff7dc',size=20){
+  ctx.fillStyle=color;ctx.font='bold '+size+'px system-ui';ctx.textAlign='center';ctx.fillText(value,x,y);
+}
+el('start').onclick=start;el('act').onclick=()=>{if(mode==='playing')action();};el('pause').onclick=pause;
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});
+addEventListener('keydown',e=>{
+  if(mode!=='playing'||e.repeat)return;
+  if(e.code==='Escape'){pause();return;}
+  if(e.code==='Space'&&e.target?.tagName!=='BUTTON'){e.preventDefault();action();}
+});
+field.onpointerdown=()=>{if(mode==='playing')action();};
+function frame(now){
+  const dt=previous===undefined?0:Math.min(.04,(now-previous)/1000);
+  previous=now;if(mode==='playing')update(dt);
+  ctx.clearRect(0,0,600,390);shade();paint();requestAnimationFrame(frame);
+}
+let phase='aim',clock=0,wind=0,drop=0,x=115,y=0,vx=0,vy=0,bounces=0,boost=0,feedback='';
+function start(){
+  score=0;phase='aim';clock=0;wind=0;drop=0;x=115;y=0;vx=vy=0;bounces=0;boost=0;feedback='';
+  el('act').textContent='Drop plush';hud('Watch the wind');play();
+}
+function action(){
+  if(phase==='aim'){phase='drop';el('act').textContent='Swing';return;}
+  if(phase==='drop'){
+    const timing=clamp(1-Math.abs(drop-173)/96,0,1);
+    if(!timing){finish('Missed swing','Swing when the plush reaches the gold line');return;}
+    phase='fly';x=115;y=55;vx=155+timing*145+wind*9;vy=110+timing*155;
+    feedback=timing>.85?'Perfect swing!':'Keep it bouncing!';
+    el('act').textContent='Bounce';return;
+  }
+  if(phase==='fly'&&vy<0&&y<34)boost=.19;
+}
+function update(dt){
+  clock+=dt;
+  if(phase==='aim'){
+    wind=Math.round(9*Math.sin(clock*1.45));
+    hud('Wind '+(wind>0?'+':'')+wind);return;
+  }
+  if(phase==='drop'){
+    drop+=dt*(82+drop*1.8);
+    if(drop>270)finish('Missed swing','Swing when the plush reaches the gold line');
+    return;
+  }
+  boost=Math.max(0,boost-dt);
+  x+=vx*dt;y+=vy*dt;vy-=460*dt;score=Math.floor((x-115)/2.2);
+  if(y<=0){
+    bounces++;const powered=boost>0;
+    if(bounces>=7||vx<36){finish('Flight complete','Distance '+score+' m');return;}
+    y=0;vy=Math.max(45,Math.abs(vy)*(powered?.87:.49));vx*=powered?.91:.64;
+    boost=0;feedback=powered?'Great bounce!':'Tap just before landing';
+  }
+  hud('Distance '+score+' m');
+}
+function plush(px,py){
+  ctx.save();ctx.shadowColor='#efbf7b';ctx.shadowBlur=13;
+  circle(px,py,17,'#b37858');circle(px-12,py-13,7,'#a55d55');circle(px+12,py-13,7,'#a55d55');
+  ctx.shadowBlur=0;circle(px-6,py-2,2.5,'#302139');circle(px+6,py-2,2.5,'#302139');circle(px,py+4,3,'#ffe1ad');ctx.restore();
+}
+function paint(){
+  const camera=phase==='fly'?Math.max(0,x-267):0;
+  ctx.fillStyle='#25142bce';ctx.fillRect(0,314,600,76);
+  ctx.fillStyle='#ffb96e';ctx.fillRect(0,313,600,3);
+  for(let marker=Math.floor(camera/110)*110;marker<camera+600;marker+=110){
+    ctx.fillStyle='#ffbd76';ctx.fillRect(marker-camera,314,2,13);
+    if(marker>=115)label(Math.floor((marker-115)/2.2)+' m',marker-camera,352,'#ffe1ad',14);
+  }
+  if(phase==='fly'){plush(x-camera,296-y);label(feedback,300,45);return;}
+  ctx.fillStyle='#ffd78a';ctx.fillRect(72,247,86,3);
+  label('SWING LINE',110,281,'#ffdc91',13);plush(115,75+drop);
+  label('Wind '+(wind>0?'+':'')+wind,428,64,'#ffe9b1',30);
+}
+hud('Ready');requestAnimationFrame(frame);
+</script></html>
