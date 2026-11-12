@@ -1,12 +1,13 @@
 (() => {
   const key = 'pawtopia-home-progress-v1';
   function read() {
-    const defaults = { hero: '', coins: 0, lastClaim: '', badge: false, companion: null, food: 0, toy: false, arcadeBests: {}, bankCoins: 0, shards: 0, storageBox: { food: 0, shards: 0 }, lastWish: "", lastSoup: "", lastInterest: "", lastArena: "" };
+    const defaults = { hero: '', coins: 0, lastClaim: '', badge: false, companion: null, food: 0, toy: false, arcadeBests: {}, townCollection: {}, bankCoins: 0, shards: 0, storageBox: { food: 0, shards: 0 }, lastWish: "", lastSoup: "", lastInterest: "", lastArena: "" };
     try {
       const saved = JSON.parse(localStorage.getItem(key));
       if (!saved || typeof saved !== 'object') return defaults;
       const progress = { ...defaults, ...saved };
       progress.arcadeBests = { ...saved.arcadeBests };
+      progress.townCollection = { ...saved.townCollection };
       progress.storageBox = { ...defaults.storageBox, ...saved.storageBox };
       return progress;
     } catch {

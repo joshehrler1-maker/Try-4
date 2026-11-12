@@ -5,7 +5,16 @@
   const shops = [
     { store: 'Cottage Pantry', item: 'food', price: 2 },
     { store: 'Festival Cart', item: 'food', price: 3 },
-    { store: 'Crystal Exchange', item: 'shards', price: 6 }
+    { store: 'Crystal Exchange', item: 'shards', price: 6 },
+    ...[
+      ['Home Goods', 'Pawprint Rug', 7], ['Health Food', 'Garden Crunch', 3],
+      ['Toy Shop', 'Clockwork Mouse', 6], ['Hero Shirts', 'Paw Emblem Tee', 8],
+      ['Chocolate Factory', 'Chocolate Paw', 4], ['Fresh Smoothies', 'Moonberry Smoothie', 4],
+      ['Defense Gear', 'Crystal Shield', 12], ['Flower Shop', 'Glowbell Bouquet', 5],
+      ['Hero Clothing', 'Festival Cape', 10], ['Gifts Galore', 'Ribbon Gift Box', 5],
+      ['Garden Supplies', 'Glowbell Seeds', 4], ['Fine Furniture', 'Velvet Cat Bed', 12],
+      ['The Bakery', 'Honey Paw Roll', 3], ['Collector Cards', 'Whisker Collector Card', 7]
+    ].map(([store, label, price]) => ({ store, label, price }))
   ];
   const moves = { Strike: 'Charge', Guard: 'Strike', Charge: 'Guard' };
   const newMatch = () => ({ player: 0, bot: 0, message: 'Choose your first move.' });
@@ -18,6 +27,8 @@
     byId('balance').textContent = 'Balance: ' + p.bankCoins + ' Paw Coins';
     byId('items').textContent = 'On hand: ' + p.food + ' snacks, ' + p.shards + ' shards' +
       (p.toy ? ', Crystal Toy' : '') + (p.badge ? ', Crystal Badge' : '');
+    const collection = Object.entries(p.townCollection).map(([name, count]) => name + ' × ' + count);
+    if (collection.length) byId('items').textContent += '. Collection: ' + collection.join(', ');
     byId('box').textContent = 'Stored: ' + p.storageBox.food + ' snacks, ' + p.storageBox.shards + ' shards';
     byId('wish').disabled = p.lastWish === day;
     byId('wish').textContent = p.lastWish === day ? 'Gift collected today' : 'Visit the Wishing Well';
@@ -29,10 +40,11 @@
       button.disabled = match.player >= 2 || match.bot >= 2;
     });
     const query = byId('search').value.trim().toLowerCase();
-    const offers = shops.filter(({ store, item }) => (store + ' ' + labels[item]).toLowerCase().includes(query));
+    const offers = shops.filter(({ store, item, label }) => (store + ' ' + (label || labels[item])).toLowerCase().includes(query));
     const list = byId('offers');
     list.replaceChildren();
     for (const offer of offers) {
+      const label = offer.label || labels[offer.item];
       const line = document.createElement('li');
       const button = document.createElement('button');
       button.textContent = 'Buy · ' + offer.price + ' coins';
@@ -40,10 +52,11 @@
       button.addEventListener('click', () => act(progress => {
         if (progress.coins < offer.price) return 'You need more Paw Coins.';
         progress.coins -= offer.price;
-        progress[offer.item]++;
-        return labels[offer.item] + ' added to inventory.';
+        if (offer.item) progress[offer.item]++;
+        else progress.townCollection[label] = (progress.townCollection[label] || 0) + 1;
+        return label + ' added to inventory.';
       }, button));
-      line.append(offer.store + ' · ' + labels[offer.item] + ' ', button);
+      line.append(offer.store + ' · ' + label + ' ', button);
       list.append(line);
     }
     if (!offers.length) {
@@ -64,6 +77,12 @@
     }
   }
 
+  document.querySelectorAll('[data-shop]').forEach(link => {
+    link.addEventListener('click', () => {
+      byId('search').value = link.dataset.shop;
+      render();
+    });
+  });
   byId('search').addEventListener('input', render);
   byId('bank-form').addEventListener('submit', event => {
     event.preventDefault();
