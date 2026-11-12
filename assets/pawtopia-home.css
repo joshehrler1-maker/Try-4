@@ -1,0 +1,33 @@
+:root{--home-ink:#111127;--home-gold:#ffd99b;--home-width:76rem}
+.home-skip{position:fixed;top:.5rem;left:.5rem;z-index:20;padding:.65rem;background:#fff;color:#141126;transform:translateY(-200%)}
+.home-skip:focus{transform:none}
+.home-header{background:#16142af5;border-bottom:1px solid #a07cbc;padding:.55rem max(1rem,calc((100% - var(--home-width))/2));gap:.6rem 1rem}
+.home-header .logo{color:#fff2d3;font-size:clamp(1.05rem,3vw,1.45rem);white-space:nowrap}
+.home-header .logo b{color:var(--home-gold)}
+.home-header nav{display:flex;flex-wrap:wrap;align-items:center;gap:.15rem .55rem}
+.home-header nav a,.home-more summary{display:flex;align-items:center;min-height:44px;padding:.3rem .45rem;color:#faf0ff;font-weight:650;font-size:.9rem}
+.home-header nav a:hover,.home-more summary:hover{color:var(--home-gold)}
+.home-more{position:relative}
+.home-more summary{display:list-item;align-content:center;cursor:pointer;white-space:nowrap}
+.home-more>div{position:absolute;right:0;top:100%;min-width:12rem;max-height:65vh;overflow:auto;background:#221832;border:1px solid #9e79bc;border-radius:.6rem;padding:.35rem;box-shadow:0 .6rem 1.5rem #080717bf}
+.home-more>div a{white-space:nowrap}
+.home-welcome{position:relative;isolation:isolate;display:grid;grid-template-columns:1.2fr 1fr;align-items:center;gap:clamp(1rem,4vw,4rem);max-width:var(--home-width);margin:clamp(.75rem,3vw,2rem) auto 0;padding:clamp(1.25rem,5vw,4rem);background:linear-gradient(90deg,#17132bf5,#17132bdc 54%,#17132b58),url(scenes/pawtopia.webp) center/cover;border:1px solid #a987bf;border-radius:1.2rem}
+.home-welcome h1{font-family:Georgia,serif;font-size:clamp(2.7rem,7vw,6rem);letter-spacing:-.055em;line-height:.98;margin:0;color:#fff2d5}
+.home-welcome p{max-width:31rem;font-size:clamp(1rem,2vw,1.25rem);line-height:1.55;color:#f5e9ff}
+.home-welcome img{display:block;width:100%;height:auto;max-height:31rem;object-fit:contain;filter:drop-shadow(0 .6rem 1.2rem #120f24a8);border-radius:.75rem}
+.home-actions{display:flex;flex-wrap:wrap;gap:.65rem}
+.home-actions .btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.home-actions .btn:not(.alt){background:var(--home-gold);color:#251732}
+.home-destinations{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;max-width:var(--home-width);margin:1rem auto 0}
+.home-destinations a{overflow:hidden;border-radius:.75rem;background:#2a1e46;border:1px solid #a181c1;color:#fff0d2;font-weight:750;box-shadow:0 .35rem 1rem #07091a55}
+.home-destinations a:hover{border-color:var(--home-gold)}
+.home-destinations img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.home-destinations span{display:flex;align-items:center;min-height:44px;padding:.45rem .65rem}
+@media(max-width:79rem){.home-welcome,.home-destinations{margin-inline:1rem}}
+@media(max-width:660px){.home-header{position:relative}.home-header nav{gap:0 .25rem}.home-header nav a,.home-more summary{font-size:.82rem}.home-welcome{grid-template-columns:1fr 1fr;gap:.85rem;padding:1rem}.home-welcome h1{font-size:clamp(1.7rem,7.6vw,3rem)}.home-welcome p{font-size:.9rem}.home-actions .btn{font-size:.83rem;padding:.45rem .6rem}.home-destinations{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:350px){.home-welcome{grid-template-columns:1fr}.home-welcome img{max-height:15rem}}
+.home-header nav{overflow:visible}
+.home-destinations a{padding:0;white-space:normal}
+.home-destinations a:hover{background:#392759}
+.home-more summary:focus-visible{outline:3px solid var(--home-gold);outline-offset:2px}
+@media(max-width:660px){.home-header{display:grid;justify-items:center}.home-header nav{justify-content:center}.home-more>div{right:0}}
