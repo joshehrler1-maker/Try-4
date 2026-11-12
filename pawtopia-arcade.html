@@ -8,6 +8,14 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:#080f25;color:#f8f7ff;font:1rem/1.5 system-ui,sans-serif}header,main,footer{width:min(100% - 2rem,64rem);margin:auto}header{padding:1rem 0}a{color:#ffde87}h1{font-size:clamp(2.7rem,8vw,5rem);line-height:1;margin:.4rem 0}h2{margin:.3rem 0}.hero{min-height:24rem;display:grid;align-content:end;padding:clamp(1.25rem,5vw,3rem);border-radius:1.25rem;background:linear-gradient(0deg,#090f29 2%,#090f2960 75%),url(assets/whisker-luna-master.webp) center 30%/cover}.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.8rem;margin:1rem 0}.games button{text-align:left}button{font:inherit;min-height:48px;color:inherit;background:#222e59;border:1px solid #7789c4;border-radius:.75rem;padding:.55rem .8rem;cursor:pointer}button[aria-pressed=true],.start{background:#ffde87;color:#211b32;font-weight:750}button:focus-visible,a:focus-visible{outline:3px solid #8bf9ff;outline-offset:3px}.play{padding:1rem;border-radius:1rem;background:radial-gradient(ellipse at 50% 0,#33347a,#131b38 70%);border:1px solid #646eb0}.hud{display:flex;gap:1rem;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;max-width:25rem;margin:1rem auto}.grid button{aspect-ratio:1;font-size:clamp(1.15rem,6vw,2rem);padding:.15rem;touch-action:manipulation;background:linear-gradient(150deg,#344780,#1a2448)}.grid button:disabled{opacity:.78;cursor:default}.grid button[data-lit=true]{background:#554277;border-color:#d2a4ff}.sponsor{margin:5rem auto 2rem;max-width:46rem;padding:1.5rem;text-align:center;border:1px solid #536081;border-radius:.75rem;color:#d5dcf4}.sponsor small{display:block;text-transform:uppercase;letter-spacing:.12em}footer{padding:1rem 0 2rem}
 .game-directory{margin:1rem 0;padding:1rem;border-radius:1rem;background:#152044;border:1px solid #7789c4}.game-directory h2{color:#ffde87}.game-filters{display:flex;gap:.75rem;flex-wrap:wrap}.game-filters label{display:grid;flex:1 1 10rem}.game-filters input,.game-filters select{min-height:44px;padding:.5rem;border-radius:.5rem;font:inherit}.games [hidden]{display:none}.games button small{display:block;font-weight:500}.game-directory p{margin:.5rem 0 0}
+.echo-art[hidden],.echo-sound[hidden]{display:none}.echo-art{display:block;width:100%;height:auto;aspect-ratio:3/1;object-fit:cover;object-position:center;border-radius:.8rem;border:1px solid #b188ed;margin:.35rem 0 1rem}
+.play[data-game=crystal]{background:radial-gradient(ellipse at 50% 45%,#57328588,#16112be8 74%),url(assets/scenes/purple-mystic-halls.webp) center/cover;border-color:#9566c9}
+.play[data-game=crystal] h2{font:700 clamp(2.2rem,7vw,3.5rem)/1 Georgia;color:#fff0de}.play[data-game=crystal] .hud{color:#f1d6ff}
+.play[data-game=crystal] .grid{gap:clamp(.35rem,1.5vw,.65rem);max-width:24rem}.play[data-game=crystal] .grid button{position:relative;display:grid;place-items:center;min-width:0;background:linear-gradient(145deg,#3e2568,#19132e);border-color:#9c77c3;opacity:1}
+.play[data-game=crystal] .grid button::before{content:"";width:48%;aspect-ratio:1;clip-path:polygon(50% 0,85% 23%,100% 57%,50% 100%,0 57%,15% 23%);background:conic-gradient(from 15deg at 50% 56%,#fff8,var(--gem),#170d38,var(--gem),#fff8);filter:brightness(.78);transition:transform .12s,filter .12s}
+.play[data-game=crystal] .grid button[data-lit=true]{background:#613b91;border-color:#fff2d9;box-shadow:0 0 1.15rem var(--gem),inset 0 0 .75rem var(--gem);z-index:1}
+.play[data-game=crystal] .grid button[data-lit=true]::before{filter:brightness(1.7);transform:scale(1.2)}.play[data-game=crystal] #status{min-height:3em}.echo-sound{margin-left:.5rem}
+@media(prefers-reduced-motion:reduce){.play[data-game=crystal] .grid button::before{transition:none;transform:none!important}}
 </style>
 <script src="assets/pawtopia-save.js"></script>
 <link rel="stylesheet" href="assets/pawtopia-scenes.css">
@@ -32,11 +40,12 @@
 <button type="button" data-mode="beacons" data-category="Puzzles" aria-pressed="false">Catacombs Beacons<small>Puzzles · Crystal Catacombs</small></button>
 </nav>
 </section>
-<section class="play" aria-labelledby="game-title">
+<section class="play" id="game-panel" aria-labelledby="game-title">
+<img class="echo-art" id="echo-art" src="assets/scenes/pawcade-mystic.webp" width="900" height="300" alt="Luna among the crystals of the Purple Mystic Halls" hidden>
 <h2 id="game-title"></h2><p id="rules"></p>
 <div class="hud"><span id="score"></span><span id="best"></span></div>
 <div class="grid" id="grid" role="group" aria-label="Game tiles"></div>
-<p id="status" role="status"></p><button class="start" id="start" type="button">Start game</button>
+<p id="status" role="status"></p><button class="start" id="start" type="button">Start game</button><button class="echo-sound" id="echo-sound" type="button" aria-pressed="false" hidden>Sound off</button>
 </section>
 <aside class="sponsor" aria-label="House advertisement"><small>From Super Paw Heroes</small><a href="coloring-book.html">Try the free Crystal Catacombs coloring pages</a></aside>
 </main>
@@ -47,14 +56,44 @@ const games = {
   forge: { title: 'Pawgrove Forge', rules: 'Flip two tiles at a time and find matching crafting materials. Match all eight pairs.' },
   beacons: { title: 'Catacombs Beacons', rules: 'Light every beacon in the cave. Tapping a beacon toggles it and its neighbors above, below, left, and right. Each solved board earns a point.' },
   lantern: { title: 'Lantern Festival', rules: 'Help Whisker catch glowing lanterns. Each lantern moves when you catch it or after one second. You have 20 seconds.' },
-  crystal: { title: 'Crystal Echo', rules: 'Help Luna repeat the order of the flashing crystals. Each round adds one crystal.' },
+  crystal: { title: 'Crystal Echo', rules: 'Watch Luna’s crystals light up, then tap them in the same order. Each round adds one crystal and the flashes gradually speed up.' },
   defense: { title: 'Iron Fang Defense', rules: 'Tap the Iron Fang robots and leave the shielded townsfolk alone. One new pair appears after each choice or timeout. You have 20 seconds.' }
 };
 const byId = id => document.getElementById(id);
+const echoColors = ['#ff82cc','#9f9aff','#73eaff','#ffc277'];
+let echoFlash;
+let echoAudio;
+const sound = byId('echo-sound');
+sound.addEventListener('click', () => {
+  const enabled = sound.getAttribute('aria-pressed') === 'true';
+  if (!enabled) {
+    try {
+      echoAudio ??= new AudioContext();
+      echoAudio.resume().catch(() => {});
+    } catch { return; }
+  }
+  sound.setAttribute('aria-pressed', String(!enabled));
+  sound.textContent = enabled ? 'Sound off' : 'Sound on';
+});
+function crystalChime(index) {
+  if (echoAudio?.state !== 'running' || sound.getAttribute('aria-pressed') !== 'true') return;
+  const now = echoAudio.currentTime;
+  const note = echoAudio.createOscillator();
+  const volume = echoAudio.createGain();
+  note.type = 'sine';
+  note.frequency.value = 392 * 2 ** ([0,2,4,7,9,12,14,16][index % 8] / 12);
+  volume.gain.setValueAtTime(.001, now);
+  volume.gain.exponentialRampToValueAtTime(.11, now + .025);
+  volume.gain.exponentialRampToValueAtTime(.001, now + .3);
+  note.connect(volume).connect(echoAudio.destination);
+  note.start(now);
+  note.stop(now + .31);
+}
 const selectors = [...document.querySelectorAll('[data-mode]')];
 const tiles = Array.from({length: 16}, (_, index) => {
   const tile = document.createElement('button');
   tile.type = 'button';
+  tile.style.setProperty('--gem', echoColors[(index + Math.floor(index / 4)) % 4]);
   tile.addEventListener('click', () => choose(index));
   byId('grid').append(tile);
   return tile;
@@ -181,7 +220,7 @@ function draw(highlight = -1) {
   tiles.forEach((tile, index) => {
     const lit = index === highlight;
     let symbol = mode === 'crystal' ? '◇' : '·';
-    let label = 'Tile ' + (index + 1);
+    let label = (mode === 'crystal' ? 'Crystal ' : 'Tile ') + (index + 1);
     if (lit) { symbol = '💎'; label += ', glowing crystal'; }
     if (index === target) {
       symbol = mode === 'lantern' ? '🏮' : '🤖';
@@ -191,7 +230,7 @@ function draw(highlight = -1) {
     if (running && mode === 'courier') { symbol = board[index] || '·'; label += board[index] ? ', parcel ' + board[index] : ', empty'; }
     if (running && mode === 'forge' && (revealed.includes(index) || matched.has(index))) { symbol = board[index]; label += ', ' + symbol; }
     if (running && mode === 'beacons') { symbol = board[index] ? '✦' : '◇'; label += board[index] ? ', lit' : ', unlit'; }
-    tile.textContent = symbol;
+    tile.textContent = mode === 'crystal' ? '' : symbol;
     tile.setAttribute('aria-label', label);
     tile.dataset.lit = String(lit || (mode === 'beacons' && running && !!board[index]));
     tile.disabled = !running || !accepting;
@@ -200,6 +239,7 @@ function draw(highlight = -1) {
 function stop() {
   clearTimeout(timer);
   clearTimeout(next);
+  clearTimeout(echoFlash);
   running = accepting = false;
   target = decoy = -1;
   draw();
@@ -207,6 +247,8 @@ function stop() {
 }
 function select(modeName) {
   mode = modeName;
+  byId('game-panel').dataset.game = mode;
+  byId('echo-art').hidden = sound.hidden = mode !== 'crystal';
   stop();
   score = best = 0;
   try { best = Math.max(Number(localStorage.getItem('pawtopia-arcade-' + mode)) || 0, wallet.read().arcadeBests[mode] || 0); } catch {}
@@ -227,21 +269,24 @@ function crystalRound() {
   sequence.push(randomTile());
   accepting = false;
   step = 0;
-  status('Watch the crystals.');
+  status('Round ' + sequence.length + ' · Watch the crystals.');
+  const flashTime = Math.max(250, 540 - (sequence.length - 1) * 22);
   draw();
   let preview = 0;
   function flash() {
     if (preview === sequence.length) {
       accepting = true;
-      status('Your turn.');
+      status('Your turn · 0 of ' + sequence.length + ' crystals');
       draw();
       return;
     }
-    draw(sequence[preview++]);
+    const index = sequence[preview++];
+    draw(index);
+    crystalChime(index);
     next = setTimeout(() => {
       draw();
       next = setTimeout(flash, 230);
-    }, 440);
+    }, flashTime);
   }
   next = setTimeout(flash, 400);
 }
@@ -254,11 +299,20 @@ function choose(index) {
       status('Sequence missed. Final score: ' + score);
       return;
     }
-    if (++step === sequence.length) {
+    clearTimeout(echoFlash);
+    draw(index);
+    crystalChime(index);
+    step++;
+    if (step === sequence.length) {
+      accepting = false;
       score++;
       scoreboard();
-      crystalRound();
+      status('Round ' + score + ' cleared!');
+      next = setTimeout(crystalRound, 680);
+    } else {
+      status('Your turn · ' + step + ' of ' + sequence.length + ' crystals');
     }
+    echoFlash = setTimeout(draw, 210);
     return;
   }
   if (index !== target && index !== decoy) return;
