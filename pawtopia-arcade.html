@@ -7,20 +7,29 @@
 <meta name="description" content="Play six free Super Paw Heroes arcade games with Whisker and Luna.">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#080f25;color:#f8f7ff;font:1rem/1.5 system-ui,sans-serif}header,main,footer{width:min(100% - 2rem,64rem);margin:auto}header{padding:1rem 0}a{color:#ffde87}h1{font-size:clamp(2.7rem,8vw,5rem);line-height:1;margin:.4rem 0}h2{margin:.3rem 0}.hero{min-height:24rem;display:grid;align-content:end;padding:clamp(1.25rem,5vw,3rem);border-radius:1.25rem;background:linear-gradient(0deg,#090f29 2%,#090f2960 75%),url(assets/whisker-luna-master.webp) center 30%/cover}.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.8rem;margin:1rem 0}.games button{text-align:left}button{font:inherit;min-height:48px;color:inherit;background:#222e59;border:1px solid #7789c4;border-radius:.75rem;padding:.55rem .8rem;cursor:pointer}button[aria-pressed=true],.start{background:#ffde87;color:#211b32;font-weight:750}button:focus-visible,a:focus-visible{outline:3px solid #8bf9ff;outline-offset:3px}.play{padding:1rem;border-radius:1rem;background:radial-gradient(ellipse at 50% 0,#33347a,#131b38 70%);border:1px solid #646eb0}.hud{display:flex;gap:1rem;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;max-width:25rem;margin:1rem auto}.grid button{aspect-ratio:1;font-size:clamp(1.15rem,6vw,2rem);padding:.15rem;touch-action:manipulation;background:linear-gradient(150deg,#344780,#1a2448)}.grid button:disabled{opacity:.78;cursor:default}.grid button[data-lit=true]{background:#554277;border-color:#d2a4ff}.sponsor{margin:5rem auto 2rem;max-width:46rem;padding:1.5rem;text-align:center;border:1px solid #536081;border-radius:.75rem;color:#d5dcf4}.sponsor small{display:block;text-transform:uppercase;letter-spacing:.12em}footer{padding:1rem 0 2rem}
+.game-directory{margin:1rem 0;padding:1rem;border-radius:1rem;background:#152044;border:1px solid #7789c4}.game-directory h2{color:#ffde87}.game-filters{display:flex;gap:.75rem;flex-wrap:wrap}.game-filters label{display:grid;flex:1 1 10rem}.game-filters input,.game-filters select{min-height:44px;padding:.5rem;border-radius:.5rem;font:inherit}.games [hidden]{display:none}.games button small{display:block;font-weight:500}.game-directory p{margin:.5rem 0 0}
 </style>
 </head>
 <body>
 <header><a href="./">Super Paw Heroes</a></header>
 <main>
 <section class="hero"><h1>Pawtopia Arcade</h1><p>Play with Whisker and Luna.</p></section>
+<section class="game-directory" aria-labelledby="directory-title">
+<h2 id="directory-title">Games Room</h2>
+<div class="game-filters">
+<label>Find a game<input id="game-search" type="search" placeholder="Try Crystal or Pawgrove"></label>
+<label>Category<select id="game-category"><option value="">All games</option><option value="Action">Action</option><option value="Puzzles">Puzzles</option></select></label>
+</div>
+<p id="game-results" role="status">6 games</p>
 <nav class="games" aria-label="Arcade games">
-<button type="button" data-mode="lantern" aria-pressed="true">Lantern Festival</button>
-<button type="button" data-mode="crystal" aria-pressed="false">Crystal Echo</button>
-<button type="button" data-mode="defense" aria-pressed="false">Iron Fang Defense</button>
-<button type="button" data-mode="courier" aria-pressed="false">Town Square Courier</button>
-<button type="button" data-mode="forge" aria-pressed="false">Pawgrove Forge</button>
-<button type="button" data-mode="beacons" aria-pressed="false">Catacombs Beacons</button>
+<button type="button" data-mode="lantern" data-category="Action" aria-pressed="true">Lantern Festival<small>Action · Festival Grounds</small></button>
+<button type="button" data-mode="crystal" data-category="Puzzles" aria-pressed="false">Crystal Echo<small>Puzzles · Crystal Catacombs</small></button>
+<button type="button" data-mode="defense" data-category="Action" aria-pressed="false">Iron Fang Defense<small>Action · Festival Grounds</small></button>
+<button type="button" data-mode="courier" data-category="Action" aria-pressed="false">Town Square Courier<small>Action · Town Square</small></button>
+<button type="button" data-mode="forge" data-category="Puzzles" aria-pressed="false">Pawgrove Forge<small>Puzzles · Pawgrove</small></button>
+<button type="button" data-mode="beacons" data-category="Puzzles" aria-pressed="false">Catacombs Beacons<small>Puzzles · Crystal Catacombs</small></button>
 </nav>
+</section>
 <section class="play" aria-labelledby="game-title">
 <h2 id="game-title"></h2><p id="rules"></p>
 <div class="hud"><span id="score"></span><span id="best"></span></div>
@@ -269,6 +278,22 @@ function start() {
 }
 selectors.forEach(button => button.addEventListener('click', () => select(button.dataset.mode)));
 byId('start').addEventListener('click', start);
+const gameSearch = byId('game-search');
+const gameCategory = byId('game-category');
+function filterGames() {
+  const query = gameSearch.value.trim().toLowerCase();
+  let visible = 0;
+  selectors.forEach(button => {
+    const entry = button.textContent + ' ' + games[button.dataset.mode].rules;
+    const matchesCategory = !gameCategory.value || button.dataset.category === gameCategory.value;
+    button.hidden = !matchesCategory || !entry.toLowerCase().includes(query);
+    if (!button.hidden) visible++;
+  });
+  byId('game-results').textContent = visible ? visible + (visible === 1 ? ' game' : ' games') : 'No games match. Try another search or category.';
+}
+gameSearch.addEventListener('input', filterGames);
+gameCategory.addEventListener('change', filterGames);
+filterGames();
 const requestedGame = new URLSearchParams(location.search).get('game');
 select(Object.hasOwn(games, requestedGame) ? requestedGame : 'lantern');
 </script>
