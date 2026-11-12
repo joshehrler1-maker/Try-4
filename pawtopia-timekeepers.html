@@ -100,7 +100,7 @@ body{background:radial-gradient(ellipse at 85% 3%,#383992,transparent 36%),radia
 <form method="dialog"><button type="submit">Return to adventure</button></form>
 </dialog>
 <dialog id="hero-stats" aria-labelledby="stats-title">
-<h2 id="stats-title">Hero Stats</h2><p id="stats-summary"></p><p id="stats-attributes"></p>
+<h2 id="stats-title">Hero Stats</h2><p id="stats-summary"></p><p id="stats-attributes"></p><h3>Inventory</h3><ul id="campaign-inventory"></ul>
 <p>Spend upgrade stars to unlock each branch in order. Upgrades carry over with your chapter save.</p>
 <div id="stats-tree"></div><form method="dialog"><button>Close Stats</button></form>
 </dialog><script>
@@ -1546,7 +1546,7 @@ function addCombatLabel(x,z,amount,defeated){if(polish.labels.length>=10){polish
 function resetPolish(n){for(const p of polish.labels)p.node.remove();polish.labels=[];polish.hit=polish.hurt=0;polish.banner=3.4;$('pause-sheet').hidden=true;$('district-kicker').textContent='DISTRICT '+n+' / '+CHAPTERS;$('district-name').textContent=districtArt[n-1].name;document.querySelector('.chapter-kicker').textContent='PAWTOPIA • DISTRICT '+n;}
 function stepPolish(dt){polish.hit=Math.max(0,polish.hit-dt);polish.hurt=Math.max(0,polish.hurt-dt);polish.banner=Math.max(0,polish.banner-dt);for(let i=polish.labels.length-1;i>=0;i--){const p=polish.labels[i];p.life-=dt;if(p.life<=0){p.node.remove();polish.labels.splice(i,1);}}}
 function updateQuestCard(){
- const collected=Math.min(3,Math.max(unlockedDistrict-1,chapter<=3&&relicFound?chapter:0));
+ const collected=Math.min(3,collectedRelicCount());
  $('time-keys').textContent=timeGateOpened?'Pawtopia · Seven years later':'Time Gate keys · '+collected+' / 3';
  const remaining=crystals.length,done=8-remaining;$('quest-task').textContent=catCelebration?'District safe · thank-you hugs!':nextVillageStop()&&!inEcho?'Village gear · '+nextVillageStop().name:districtRescued?'Pawtopia Field · Choose an open region road':!clueFound?(inEcho?'Echo Age · Find the violet memory':'Present · Play the melody at the teal shrine'):!gateOpen?'Echo Age · Release the '+regionAdventures[chapter-1].dungeon+' latch':inEcho?'Echo Age · Return to the shrine':!dungeonAwake()?trialInstruction():relicReady()?'Recover the '+relicNames[chapter-1]:remaining?'Recover crystals · '+done+' / 8':bots.length?'Defeat remaining villains · '+bots.length+(bots.some(b=>b.boss)?' · Gold core: double damage':''):'Reach the gold rescue beacon';$('quest-fill').style.width=(remaining?done/8*.7:bots.length?.8:1)*100+'%';$('quest-card').hidden=!playing||over;}
 function drawPolish(){const f=$('combat-feedback');f.classList.toggle('hit',polish.hit>0);f.classList.toggle('hurt',polish.hurt>0);$('district-banner').classList.toggle('visible',playing&&polish.banner>0&&!paused);for(const p of polish.labels){const y=1.9+(.85-p.life)*.7,w=vp[3]*p.x+vp[7]*y+vp[11]*p.z+vp[15],x=vp[0]*p.x+vp[4]*y+vp[8]*p.z+vp[12],v=vp[1]*p.x+vp[5]*y+vp[9]*p.z+vp[13];p.node.hidden=w<=.1||Math.abs(x/w)>1.1||Math.abs(v/w)>1.1;if(!p.node.hidden){p.node.style.left=(x/w*.5+.5)*100+'%';p.node.style.top=(-v/w*.5+.5)*100+'%';p.node.style.opacity=Math.min(1,p.life*4);}}}
@@ -1624,12 +1624,33 @@ const strike=strikeProfile();strikeCooldown=strike.duration;motion.punch=strike.
 
 function superBurst(){if(catCelebration)return;if(!abilityUnlocked('special'))return;if(!playing||paused||energy<40)return;energy-=40;burstEffect=15;emitSparks(hero.x,hero.z,[.42,.96,1],24);let removed=0;bots=bots.filter(b=>{if(distance(hero,b)<7.5&&clearPath(hero,b)){hitEnemy(b,2+damageBoost);if(b.hp<=0){removed++;return false}}return true});notify('🌪️ Super Burst! '+removed+' dog villains defeated!');speak(hero.mode==='luna'?'Moon storm!':'Super paw blast!');updateHud()}function heal(){if(catCelebration)return;if(!playing||paused||potions<1||hero.hp>=5)return;potions--;const restored=statRanks.defense>=2?3:2;hero.hp=Math.min(5,hero.hp+restored);window.CrystalPro?.event("heal");notify('🧪 Restored up to '+restored+' hearts.');updateHud()}const statsDialog=$('hero-stats');
 let statsOwnPause=false;
+function collectedRelicCount(){
+ return Math.min(CHAPTERS,Math.max(unlockedDistrict-1,relicFound?chapter:0));
+}
+function updateInventory(){
+ const inventory=$('campaign-inventory');
+ const items=[
+  'Healing potions: '+potions,
+  'Equipped gear: '+(gear?gearBook[gear].name:'None'),
+  'Time Gate keys: '+Math.min(3,collectedRelicCount())+' / 3'
+ ];
+ if(villageKit.has('training')||unlockedDistrict>1)items.push('Training gauntlets');
+ if(villageKit.has('shop')||unlockedDistrict>1)items.push('Practice shield');
+ if(tetherUnlocked)items.push('Paw Tether');
+ for(const relic of relicNames.slice(0,collectedRelicCount()))items.push(relic);
+ inventory.replaceChildren(...items.map(text=>{
+  const item=document.createElement('li');
+  item.textContent=text;
+  return item;
+ }));
+}
 function updateStatsPanel(){
+ updateInventory();
  const name=hero.mode==='luna'?'Luna':'Whisker';
  $('stats-summary').textContent=name+' · Level '+level+' · '+stars+' stars · '+hero.hp+'/5 hearts · '+Math.floor(energy)+'/100 energy';
  const melee=damageBoost+Number(gear==='gauntlet')+Number(statRanks.power>=1)+Number(statRanks.power>=3);
  const ranged=damageBoost*.5+Number(gear==='lens')+Number(statRanks.power>=2);
- $('stats-attributes').textContent='Melee bonus +'+melee+' · Ranged bonus +'+ranged+' · XP '+xp+'/'+(level*5)+' · Gear: '+(gear?gearBook[gear].name:'None')+' · Relics: '+Math.max(unlockedDistrict-1,chapter-1+Number(relicFound))+' / '+CHAPTERS;
+ $('stats-attributes').textContent='Melee bonus +'+melee+' · Ranged bonus +'+ranged+' · XP '+xp+'/'+(level*5)+' · Gear: '+(gear?gearBook[gear].name:'None')+' · Relics: '+collectedRelicCount()+' / '+CHAPTERS;
  const tree=$('stats-tree');
  tree.replaceChildren();
  for(const [key,branch] of Object.entries(statTree)){
