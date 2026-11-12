@@ -9,9 +9,10 @@
 *{box-sizing:border-box}body{margin:0;background:#080f25;color:#f8f7ff;font:1rem/1.5 system-ui,sans-serif}header,main,footer{width:min(100% - 2rem,64rem);margin:auto}header{padding:1rem 0}a{color:#ffde87}h1{font-size:clamp(2.7rem,8vw,5rem);line-height:1;margin:.4rem 0}h2{margin:.3rem 0}.hero{min-height:24rem;display:grid;align-content:end;padding:clamp(1.25rem,5vw,3rem);border-radius:1.25rem;background:linear-gradient(0deg,#090f29 2%,#090f2960 75%),url(assets/whisker-luna-master.webp) center 30%/cover}.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.8rem;margin:1rem 0}.games button{text-align:left}button{font:inherit;min-height:48px;color:inherit;background:#222e59;border:1px solid #7789c4;border-radius:.75rem;padding:.55rem .8rem;cursor:pointer}button[aria-pressed=true],.start{background:#ffde87;color:#211b32;font-weight:750}button:focus-visible,a:focus-visible{outline:3px solid #8bf9ff;outline-offset:3px}.play{padding:1rem;border-radius:1rem;background:radial-gradient(ellipse at 50% 0,#33347a,#131b38 70%);border:1px solid #646eb0}.hud{display:flex;gap:1rem;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;max-width:25rem;margin:1rem auto}.grid button{aspect-ratio:1;font-size:clamp(1.15rem,6vw,2rem);padding:.15rem;touch-action:manipulation;background:linear-gradient(150deg,#344780,#1a2448)}.grid button:disabled{opacity:.78;cursor:default}.grid button[data-lit=true]{background:#554277;border-color:#d2a4ff}.sponsor{margin:5rem auto 2rem;max-width:46rem;padding:1.5rem;text-align:center;border:1px solid #536081;border-radius:.75rem;color:#d5dcf4}.sponsor small{display:block;text-transform:uppercase;letter-spacing:.12em}footer{padding:1rem 0 2rem}
 .game-directory{margin:1rem 0;padding:1rem;border-radius:1rem;background:#152044;border:1px solid #7789c4}.game-directory h2{color:#ffde87}.game-filters{display:flex;gap:.75rem;flex-wrap:wrap}.game-filters label{display:grid;flex:1 1 10rem}.game-filters input,.game-filters select{min-height:44px;padding:.5rem;border-radius:.5rem;font:inherit}.games [hidden]{display:none}.games button small{display:block;font-weight:500}.game-directory p{margin:.5rem 0 0}
 </style>
+<script src="assets/pawtopia-save.js"></script>
 </head>
 <body>
-<header><a href="./">Super Paw Heroes</a></header>
+<header><a href="./">Super Paw Heroes</a> · <a href="pawtopia-companions.html">Companion Cottage</a><p id="arcade-wallet" aria-live="polite"></p><p>Beat your personal best to earn Paw Coins for your companion.</p></header>
 <main>
 <section class="hero"><h1>Pawtopia Arcade</h1><p>Play with Whisker and Luna.</p></section>
 <section class="game-directory" aria-labelledby="directory-title">
@@ -150,10 +151,27 @@ function choosePuzzle(index) {
 }
 const randomTile = () => Math.floor(Math.random() * tiles.length);
 const status = message => byId('status').textContent = message;
+const wallet = window.PawtopiaSave;
+function renderWallet(message = '') {
+  byId('arcade-wallet').textContent = wallet.read().coins + ' Paw Coins' + (message ? ' · ' + message : '');
+}
+addEventListener('storage', () => renderWallet());
+addEventListener('pageshow', () => renderWallet());
+
 function scoreboard() {
   if (score > best) {
-    best = score;
-    try { localStorage.setItem('pawtopia-arcade-' + mode, String(best)); } catch {}
+    const game = mode;
+    const previousBest = best;
+    const newBest = score;
+    best = newBest;
+    wallet.update(progress => {
+      const recorded = Math.max(previousBest, progress.arcadeBests[game] || 0);
+      if (newBest <= recorded) return '';
+      const reward = newBest - recorded;
+      progress.arcadeBests[game] = newBest;
+      progress.coins += reward;
+      return '+' + reward + ' Paw Coins';
+    }).then(renderWallet);
   }
   byId('score').textContent = 'Score: ' + score;
   byId('best').textContent = 'Best: ' + best;
@@ -190,7 +208,7 @@ function select(modeName) {
   mode = modeName;
   stop();
   score = best = 0;
-  try { best = Number(localStorage.getItem('pawtopia-arcade-' + mode)) || 0; } catch {}
+  try { best = Math.max(Number(localStorage.getItem('pawtopia-arcade-' + mode)) || 0, wallet.read().arcadeBests[mode] || 0); } catch {}
   selectors.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
   byId('game-title').textContent = games[mode].title;
   byId('rules').textContent = games[mode].rules;

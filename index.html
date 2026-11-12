@@ -19,9 +19,10 @@
 .pawtopia-atlas{position:relative;isolation:isolate;aspect-ratio:3/2;border:3px solid #f7d485;border-radius:22px;overflow:hidden;background:#164e49;box-shadow:0 12px 30px #0008}.atlas-sign{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:grid;place-items:center;text-align:center;width:max-content;max-width:32%;min-height:44px;padding:5px clamp(5px,1.5vw,15px);line-height:1.1;font-weight:900;font-size:clamp(11px,2vw,20px);color:#33200c;background:linear-gradient(#fff1b2,#efbf65);border:2px solid #75491f;border-radius:9px;box-shadow:0 3px 0 #542f1b,0 5px 9px #0007}.atlas-sign:hover,.atlas-sign:focus-visible{background:#fff8d1;z-index:1;outline:3px solid white;outline-offset:2px}.atlas-sign:active{transform:translate(-50%,-46%)}.atlas-note{margin:.6rem 0;text-align:center;color:#d8eaff}#coloring-book,#challenge,#pawtopia{scroll-margin-top:110px}
 </style>
 <link rel="stylesheet" href="assets/crystal-regions.css">
+<script src="assets/pawtopia-save.js"></script>
 </head>
 <body><a class="skip-link" href="#main-content">Skip to main content</a><button type="button" id="fullscreen-top" style="display:block;width:calc(100% - 24px);max-width:700px;margin:12px auto;padding:16px;background:#ffe17b;color:#17213a;border:2px solid #fff2b0;border-radius:12px;font:800 20px system-ui">⛶ Full Screen</button>
-<header><a class="logo" href="index.html">🐾 SUPER <b>PAW HEROES</b></a><nav aria-label="Main navigation"><a href="#pawtopia">World Map</a><a href="#crystal-regions">Crystal Regions</a><a href="#hero-headquarters">Hero Profile</a><a href="pawtopia-arcade.html">Games Room</a><a href="#coloring-book">Bookshop</a><a href="#games">Adventures</a><a href="studio.html">🛠️ Creator Studio</a><a href="#challenge">⚡ Challenge</a><a href="#explore">🌟 Explore</a><a href="#families">💛 Families</a><a href="readiness.html">📱 Setup & Status</a></nav></header>
+<header><a class="logo" href="index.html">🐾 SUPER <b>PAW HEROES</b></a><nav aria-label="Main navigation"><a href="#pawtopia">World Map</a><a href="#crystal-regions">Crystal Regions</a><a href="pawtopia-companions.html">Companions</a><a href="#hero-headquarters">Hero Profile</a><a href="pawtopia-arcade.html">Games Room</a><a href="#coloring-book">Bookshop</a><a href="#games">Adventures</a><a href="studio.html">🛠️ Creator Studio</a><a href="#challenge">⚡ Challenge</a><a href="#explore">🌟 Explore</a><a href="#families">💛 Families</a><a href="readiness.html">📱 Setup & Status</a></nav></header>
 <main id="main-content">
 <div class="hero"><div class="hero-content"><span class="tag">✨ Kindness is a superpower!</span><h1>Super Paw Heroes</h1><p>Super Paw Heroes follows Whisker and Luna, two cat superheroes. Their <a href="coloring-book.html" style="text-decoration:underline">Crystal Catacombs coloring book</a> includes 100 printable coloring and activity pages for kids and families. You can also play games set in their world.</p><div class="actions"><a class="btn" href="#pawtopia">Explore Pawtopia</a><a class="btn alt" href="https://payhip.com/b/rk4E5">🎨 Shop the Crystal Catacombs Coloring Book</a><a class="btn alt" href="#games">🎮 Play Now</a><a class="btn alt" href="studio.html">🛠️ Open Creator Studio</a><a class="btn alt" href="universe-center.html">🐱 Meet the Heroes</a></div></div></div>
 
@@ -44,46 +45,48 @@
 <div><strong>Pawgrove</strong><p><a href="pawtopia-arcade.html?game=forge">Pawgrove Forge</a></p><p><a href="pawgrove.html">The Lantern Curse</a></p></div>
 <div><strong>Crystal Catacombs</strong><p><a href="pawtopia-arcade.html?game=crystal">Crystal Echo</a></p><p><a href="pawtopia-arcade.html?game=beacons">Catacombs Beacons</a></p><p><a href="super-paw-3d.html">Crystal Catacombs 3D RPG</a></p></div>
 </div>
+<div class="world-profile"><div><strong>Companion Cottage</strong><p>Adopt a cat, earn Paw Coins in the arcade, and bring home a treat.</p></div><a class="btn" href="pawtopia-companions.html">Visit Companion Cottage</a></div>
 <div class="world-profile" id="pawtopia-shop"><div><strong>Town Shop</strong><p id="world-inventory">Collection: empty</p></div><button type="button" id="world-buy">Collect a Crystal Badge · 10 coins</button></div>
 </section>
 <script>
 (() => {
-  const key = 'pawtopia-home-progress-v1';
-  const progress = { hero: '', coins: 0, lastClaim: '', badge: false };
-  try { Object.assign(progress, JSON.parse(localStorage.getItem(key)) || {}); } catch {}
+  const save = window.PawtopiaSave;
   const heroes = [...document.querySelectorAll('[data-world-hero]')];
   const daily = document.getElementById('world-daily');
   const buy = document.getElementById('world-buy');
-  const today = () => new Date().toDateString();
   function render(message = '') {
+    const progress = save.read();
     heroes.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.worldHero === progress.hero)));
-    daily.disabled = !progress.hero || progress.lastClaim === today();
-    daily.textContent = progress.lastClaim === today() ? 'Daily coins claimed' : 'Claim daily coins';
+    daily.disabled = !progress.hero || progress.lastClaim === save.today();
+    daily.textContent = progress.lastClaim === save.today() ? 'Daily coins claimed' : 'Claim daily coins';
     buy.disabled = !progress.hero || progress.badge || progress.coins < 10;
-    document.getElementById('world-save').textContent = (progress.hero || 'Choose your hero') + ' · ' + progress.coins + ' coins' + (message ? ' · ' + message : '');
+    document.getElementById('world-save').textContent = (progress.hero || 'Choose your hero') + ' · ' + progress.coins + ' Paw Coins' + (message ? ' · ' + message : '');
     document.getElementById('world-inventory').textContent = 'Collection: ' + (progress.badge ? 'Crystal Badge' : 'empty');
   }
-  function save(message) {
-    try { localStorage.setItem(key, JSON.stringify(progress)); }
-    catch { message += ' Progress could not be saved on this device.'; }
-    render(message);
-  }
-  heroes.forEach(button => button.addEventListener('click', () => {
-    progress.hero = button.dataset.worldHero;
-    save('Hero selected');
+  heroes.forEach(button => button.addEventListener('click', async () => {
+    render(await save.update(progress => {
+      progress.hero = button.dataset.worldHero;
+      return 'Hero selected';
+    }));
   }));
-  daily.addEventListener('click', () => {
-    if (!progress.hero || progress.lastClaim === today()) return;
-    progress.lastClaim = today();
-    progress.coins += 10;
-    save('Received 10 coins');
+  daily.addEventListener('click', async () => {
+    render(await save.update(progress => {
+      if (!progress.hero || progress.lastClaim === save.today()) return '';
+      progress.lastClaim = save.today();
+      progress.coins += 10;
+      return 'Received 10 Paw Coins';
+    }));
   });
-  buy.addEventListener('click', () => {
-    if (!progress.hero || progress.badge || progress.coins < 10) return;
-    progress.coins -= 10;
-    progress.badge = true;
-    save('Crystal Badge collected');
+  buy.addEventListener('click', async () => {
+    render(await save.update(progress => {
+      if (!progress.hero || progress.badge || progress.coins < 10) return '';
+      progress.coins -= 10;
+      progress.badge = true;
+      return 'Crystal Badge collected';
+    }));
   });
+  addEventListener('storage', () => render());
+  addEventListener('pageshow', () => render());
   render();
 })();
 </script>
