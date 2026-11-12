@@ -4,12 +4,31 @@
   const save = window.PawtopiaSave;
   const games = {
     flame: ['Whisker’s Ember Trail', 'Steer with arrow keys or the direction buttons. Collect embers to grow your trail. Avoid the walls and your own trail.'],
-    mystic: ['Luna’s Crystal Cascade', 'Tap a group of at least two matching adjacent crystals. Larger groups score more. Crystals fall and empty columns slide left.'],
+    mystic: ['Luna’s Crystal Cascade', 'Tap touching crystals of the same color. Match a Burst crystal to clear its neighbors or a Prism to clear its color. Special crystals can set each other off.'],
     frost: ['Frost’s Icicle Run', 'Drag across the ice or use the arrow keys and direction buttons. Dodge falling icicles and collect blue shields.']
   };
   const dirs = {up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
   const colors = ['#ff9ba8','#d3a7ff','#81ccff','#9de79c','#ffe493'];
   const symbols = ['◆','●','▲','■','✦'];
+  const gemNames = ['Rose', 'Amethyst', 'Sapphire', 'Jade', 'Amber'];
+  const powers = {
+    burst: {name:'Burst', icon:'✷'},
+    prism: {name:'Prism', icon:'✧'}
+  };
+  const relax = document.createElement('button');
+  relax.type = 'button';
+  relax.textContent = 'Relaxed mode';
+  relax.setAttribute('aria-pressed','false');
+  byId('start').after(relax);
+  let relaxed = false;
+  relax.onclick = () => {
+    relaxed = !relaxed;
+    relax.setAttribute('aria-pressed',String(relaxed));
+    start();
+  };
+  const style = document.createElement('style');
+  style.textContent = '#board:not([hidden]){display:grid;gap:clamp(2px,1vw,6px);background:linear-gradient(#120e2ccb,#120e2ccb),url(assets/scenes/purple-mystic-halls.webp) center/cover;padding:clamp(4px,1.5vw,12px);border:1px solid #a17cda;border-radius:14px} #board button{display:grid;place-items:center;position:relative;isolation:isolate;padding:0;min-width:0;min-height:0;aspect-ratio:1;color:#201232;font-weight:900;background:#211740;border-color:#715995;touch-action:manipulation} #board button[data-filled=true]::before{content:"";position:absolute;inset:9%;z-index:-1;clip-path:polygon(49% 0,88% 19%,100% 61%,50% 100%,0 65%,12% 22%);background:conic-gradient(from 17deg at 48% 53%,#fff,var(--gem),#39235e,var(--gem),#fff)} #board button[data-power]:not([data-power=""]){border-color:#fff0b7;box-shadow:inset 0 0 10px #edc2ff} #board button:disabled{opacity:.55} @media(prefers-reduced-motion:no-preference){#board button[data-shift=true]{animation:crystal-settle .22s ease-out}@keyframes crystal-settle{from{transform:translateY(-6px);filter:brightness(1.65)}}}';
+  document.head.append(style);
   let mode, phase = 'ready', state, score = 0, previous = 0, elapsed = 0;
   const same = (a,b) => a[0] === b[0] && a[1] === b[1];
   function ember() {
@@ -18,12 +37,17 @@
   }
   function hud() {
     const progress = save.read();
+    if(mode==='mystic' && relaxed){
+      byId('hud').textContent = 'Relaxed mode · ' + score + ' points';
+      return;
+    }
     byId('hud').textContent = 'Score ' + score + ' · Best ' + (progress.arcadeBests['pawcade-'+mode] || 0) + ' · ' + progress.coins + ' Paw Coins';
   }
   function finish(message) {
     phase = 'ended';
     byId('pause').disabled = true;
     byId('status').textContent = message;
+    if(mode==='mystic' && relaxed)return;
     const key = 'pawcade-'+mode, finalScore = score;
     save.update(progress => {
       const record = progress.arcadeBests[key] || 0;
@@ -52,24 +76,50 @@
     if (phase !== 'playing') return;
     const cells = group(index);
     if (cells.length < 2) { byId('status').textContent = 'Choose two or more touching crystals.'; return; }
-    cells.forEach(i => state.cells[i] = -1);
-    const columns = Array.from({length:8},(_,x)=>state.cells.filter((v,i)=>i%8===x&&v>=0)).filter(c=>c.length);
-    state.cells = Array.from({length:64},(_,i)=> {
-      const column = columns[i%8] || [];
-      return column[Math.floor(i/8)+column.length-8] ?? -1;
-    });
-    score += Math.floor(cells.length*cells.length/4);
-    byId('status').textContent = cells.length + ' crystals cleared';
-    drawBoard(); hud();
-    if (!state.cells.some((v,i)=>v>=0&&group(i).length>1)) finish(state.cells.every(v=>v<0) ? 'Board cleared!' : 'No groups left.');
+    const cleared = new Set(cells);
+    let triggered = 0;
+    for(const i of cleared){
+      const power = state.specials[i];
+      if(!power)continue;
+      triggered++;
+      const x=i%8, y=Math.floor(i/8);
+      state.cells.forEach((value,j)=>{
+        const nearby=Math.abs(j%8-x)<=1 && Math.abs(Math.floor(j/8)-y)<=1;
+        if(value>=0 && (power==='prism'?value===state.cells[i]:nearby))cleared.add(j);
+      });
+    }
+    const before=state.cells.slice(), previousPowers=state.specials;
+    const columns=Array.from({length:8},(_,x)=>before
+      .map((value,i)=>({value,i}))
+      .filter(({value,i})=>i%8===x && value>=0 && !cleared.has(i)))
+      .filter(column=>column.length);
+    state.cells=Array(64).fill(-1);
+    state.specials=Array(64).fill('');
+    const shifted=new Set();
+    columns.forEach((column,x)=>column.forEach(({value,i},row)=>{
+      const dest=(8-column.length+row)*8+x;
+      state.cells[dest]=value;
+      state.specials[dest]=previousPowers[i];
+      if(dest!==i)shifted.add(dest);
+    }));
+    score += Math.floor(cleared.size*cleared.size/4);
+    byId('status').textContent = cleared.size+' crystals cleared'+(triggered?' · '+triggered+' power'+(triggered===1?'':'s')+' triggered':'');
+    drawBoard(shifted);hud();
+    if(!state.cells.some((v,i)=>v>=0&&group(i).length>1)){
+      const message=state.cells.every(v=>v<0)?'Board cleared!':'No groups left.';
+      finish(relaxed?message+' Choose New board to keep playing.':message);
+    }
   }
-  function drawBoard() {
+  function drawBoard(shifted=new Set()) {
     for (const [i,b] of [...board.children].entries()) {
-      const value = state.cells[i];
-      b.disabled = value<0;
-      b.textContent = symbols[value] || '';
+      const value=state.cells[i], power=powers[state.specials[i]];
+      b.disabled=value<0;
+      b.textContent=power?.icon || symbols[value] || '';
+      b.dataset.power=state.specials[i];
+      b.dataset.filled=String(value>=0);
+      b.dataset.shift=String(shifted.has(i));
       b.style.setProperty('--gem',colors[value] || '');
-      b.setAttribute('aria-label',(symbols[value] || 'Empty')+' row '+(Math.floor(i/8)+1)+' column '+(i%8+1));
+      b.setAttribute('aria-label',(gemNames[value] || 'Empty')+(power?' '+power.name:'')+' row '+(Math.floor(i/8)+1)+' column '+(i%8+1));
     }
   }
   function stepFlame() {
@@ -130,6 +180,9 @@
   }
   function select(game) {
     mode=game;phase='ready';score=0;
+    relax.hidden=mode!=='mystic';
+    byId('start').textContent='Start game';
+    byId('pause').textContent='Pause';
     const [title,rules]=games[mode];
     byId('title').textContent=title;byId('rules').textContent=rules;
     byId('cover').src='assets/scenes/pawcade-'+mode+'.webp';
@@ -149,7 +202,14 @@
     if(mode==='flame'){state={trail:[[6,8],[5,8],[4,8]],direction:dirs.right,next:dirs.right};state.ember=ember();}
     if(mode==='frost')state={x:200,y:330,drops:[],spawn:.3,seconds:0,protected:false};
     if(mode==='mystic'){
-      state={cells:Array.from({length:64},()=>Math.floor(Math.random()*5))};
+      byId('start').textContent='New board';
+      state={cells:Array.from({length:64},()=>Math.floor(Math.random()*5)),specials:Array(64).fill('')};
+      const positions=Array.from({length:62},(_,i)=>i+2);
+      for(const power of ['burst','prism','burst','prism']){
+        const [index]=positions.splice(Math.floor(Math.random()*positions.length),1);
+        state.specials[index]=power;
+      }
+      state.specials[0]='burst';
       state.cells[1]=state.cells[0];board.replaceChildren();
       for(let i=0;i<64;i++){const b=document.createElement('button');b.type='button';b.onclick=()=>clear(i);board.append(b);}
       drawBoard();
