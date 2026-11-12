@@ -637,7 +637,7 @@ function updateFieldTravel(){
 function travelRoad(destination){
  const road=availableRoad();
  if(!playing||paused||catCelebration||road?.destination!==destination)return;
- districtVisits.set(chapter,{districtRescued,clueFound,gateOpen,favor,chestOpened,crystals,bots,pendingMainBoss,mainBossSpawned,runeProgress,relicFound});
+ districtVisits.set(chapter,{districtRescued,clueFound,gateOpen,favor,chestOpened,crystals,bots,pendingMainBoss,mainBossSpawned,runeProgress,relicFound,launcherFound,clockSwitchHit});
  const hp=hero.hp,storedEnergy=energy;
  const crossingTime=firstTimeCrossing(chapter,destination,timeGateOpened);
  if(crossingTime)timeGateOpened=true;
@@ -646,7 +646,7 @@ function travelRoad(destination){
  energy=storedEnergy;
  const prior=districtVisits.get(destination);
  if(prior){
-  ({districtRescued,clueFound,gateOpen,favor,chestOpened,crystals,bots,pendingMainBoss,mainBossSpawned,runeProgress,relicFound}=prior);
+  ({districtRescued,clueFound,gateOpen,favor,chestOpened,crystals,bots,pendingMainBoss,mainBossSpawned,runeProgress,relicFound,launcherFound,clockSwitchHit}=prior);
  }else if(destination<unlockedDistrict){
   districtRescued=clueFound=gateOpen=chestOpened=relicFound=true;
   bots=[];
@@ -700,10 +700,24 @@ function activateTrialControl(hit){
 const runeColors=[[1,.62,.21],[.30,.91,.53],[.75,.49,1]];
 const relicNames=['Clockwork Heart','Lantern Crown','Echo Prism','Tidegate Pearl','Rootglass Seed','Brasswhirl Crest','Moonspire Core'];
 let dungeonRunes=[],relic=null,runeProgress=0,runeUnderfoot=-1,relicFound=false;
+let launcherChest=null,clockSwitch=null,launcherFound=false,clockSwitchHit=false;
+function clocktowerLauncherTrial(){
+ return chapter===1&&gateOpen&&!inEcho&&!districtRescued&&!clockSwitchHit;
+}
+function hitClockSwitch(projectile){
+ if(!clocktowerLauncherTrial()||!projectile.launcher||distance(projectile,clockSwitch)>.62)return false;
+ clockSwitchHit=true;
+ emitSparks(clockSwitch.x,clockSwitch.z,[1,.75,.25],18);
+ notify('The clockwork switch released the seal controls.');
+ return true;
+}
 function resetDungeonTrial(){
  const {x,z}=regionVault;
  dungeonRunes=dungeonTrials[chapter-1].points.map(([dx,dz])=>({x:x+dx,z:z+dz}));
  relic={x,z:z-2.7};
+ launcherChest={x:x-2.4,z:z+2.7};
+ clockSwitch={x:x+2.7,z:z-2.2};
+ launcherFound=clockSwitchHit=false;
  runeProgress=0;
  runeUnderfoot=-1;
  relicFound=false;
@@ -713,7 +727,7 @@ function relicReady(){return dungeonAwake()&&!relicFound&&!bots.some(b=>b.boss&&
 function stepDungeonTrial(){
  if(!gateOpen||inEcho||districtRescued)return;
  if(!dungeonAwake()){
-  if(chapter!==1)return;
+  if(chapter!==1||!clockSwitchHit)return;
   const hit=dungeonRunes.findIndex(rune=>distance(hero,rune)<.88);
   if(hit!==-1&&hit!==runeUnderfoot)activateTrialControl(hit);
   runeUnderfoot=hit;
@@ -759,6 +773,10 @@ function worldAction(){
   const stop=villageStops.find(stop=>!villageKit.has(stop.id)&&distance(hero,villageStopPoint(stop))<1.5);
   if(stop)return {villageStop:stop,label:stop.verb};
  }
+ if(clocktowerLauncherTrial()){
+  if(!launcherFound&&distance(hero,launcherChest)<1.45)return {launcher:'collect',label:'Open launcher chest'};
+  if(launcherFound&&distance(hero,clockSwitch)<8&&clearPath(hero,clockSwitch))return {launcher:'fire',label:'Fire Paw Launcher at switch'};
+ }
  const control=nearbyTrialControl();
  if(control>=0)return {control,label:dungeonTrials[chapter-1].verb+' '+runeNames[control]};
  if(tetherUnlocked&&distance(hero,tetherShore)<1.65)return {label:'Use Paw Tether',destination:tetherIsland};
@@ -775,7 +793,14 @@ function updateWorldInteract(){
 worldInteract.addEventListener('click',()=>{
  const action=worldAction();
  if(!action)return;
- if(action.villageStop){
+ if(action.launcher==='collect'){
+  launcherFound=true;
+  notify('Paw Launcher acquired. Get within range of the gold switch and use the Launcher action.');
+ }else if(action.launcher==='fire'){
+  if(projectiles.some(p=>p.launcher))return;
+  const dx=clockSwitch.x-hero.x,dz=clockSwitch.z-hero.z,length=Math.hypot(dx,dz)||1;
+  projectiles.push({x:hero.x,z:hero.z,dx:dx/length,dz:dz/length,launcher:true,enemy:false,life:1,speed:16,color:[1,.72,.24]});
+ }else if(action.villageStop){
   villageKit.add(action.villageStop.id);
   const next=nextVillageStop();
   notify(next?'Gear collected. Head to '+next.name+'.':'Training gear ready. Return to the Echo Shrine.');
@@ -1465,7 +1490,12 @@ if(hero.z>-9){
  if(!overlookFound&&visibleAt(overlook.x,1,overlook.z,2))draw('oct',overlook.x,1,overlook.z,.16,.29,.16,[.99,.79,.41],motion.time);
 }
 if(gateOpen&&!districtRescued&&!inEcho){
- if(!dungeonAwake())for(const [i,rune] of dungeonRunes.entries()){
+ if(clocktowerLauncherTrial()){
+  const point=launcherFound?clockSwitch:launcherChest;
+  ring(point.x,.05,point.z,.58,[1,.74,.25]);
+  draw(launcherFound?'oct':'cube',point.x,.48,point.z,.28,.32,.28,[1,.67,.21],motion.time);
+ }
+ if(!clocktowerLauncherTrial()&&!dungeonAwake())for(const [i,rune] of dungeonRunes.entries()){
   ring(rune.x,.08,rune.z,.75,runeColors[i]);
   const {x,z}=rune,color=runeColors[i];
   if(chapter===2){
@@ -1548,7 +1578,7 @@ function stepPolish(dt){polish.hit=Math.max(0,polish.hit-dt);polish.hurt=Math.ma
 function updateQuestCard(){
  const collected=Math.min(3,collectedRelicCount());
  $('time-keys').textContent=timeGateOpened?'Pawtopia · Seven years later':'Time Gate keys · '+collected+' / 3';
- const remaining=crystals.length,done=8-remaining;$('quest-task').textContent=catCelebration?'District safe · thank-you hugs!':nextVillageStop()&&!inEcho?'Village gear · '+nextVillageStop().name:districtRescued?'Pawtopia Field · Choose an open region road':!clueFound?(inEcho?'Echo Age · Find the violet memory':'Present · Play the melody at the teal shrine'):!gateOpen?'Echo Age · Release the '+regionAdventures[chapter-1].dungeon+' latch':inEcho?'Echo Age · Return to the shrine':!dungeonAwake()?trialInstruction():relicReady()?'Recover the '+relicNames[chapter-1]:remaining?'Recover crystals · '+done+' / 8':bots.length?'Defeat remaining villains · '+bots.length+(bots.some(b=>b.boss)?' · Gold core: double damage':''):'Reach the gold rescue beacon';$('quest-fill').style.width=(remaining?done/8*.7:bots.length?.8:1)*100+'%';$('quest-card').hidden=!playing||over;}
+ const remaining=crystals.length,done=8-remaining;$('quest-task').textContent=catCelebration?'District safe · thank-you hugs!':nextVillageStop()&&!inEcho?'Village gear · '+nextVillageStop().name:districtRescued?'Pawtopia Field · Choose an open region road':!clueFound?(inEcho?'Echo Age · Find the violet memory':'Present · Play the melody at the teal shrine'):!gateOpen?'Echo Age · Release the '+regionAdventures[chapter-1].dungeon+' latch':inEcho?'Echo Age · Return to the shrine':clocktowerLauncherTrial()?(launcherFound?'Use the Paw Launcher on the gold switch':'Find the Paw Launcher chest') :!dungeonAwake()?trialInstruction():relicReady()?'Recover the '+relicNames[chapter-1]:remaining?'Recover crystals · '+done+' / 8':bots.length?'Defeat remaining villains · '+bots.length+(bots.some(b=>b.boss)?' · Gold core: double damage':''):'Reach the gold rescue beacon';$('quest-fill').style.width=(remaining?done/8*.7:bots.length?.8:1)*100+'%';$('quest-card').hidden=!playing||over;}
 function drawPolish(){const f=$('combat-feedback');f.classList.toggle('hit',polish.hit>0);f.classList.toggle('hurt',polish.hurt>0);$('district-banner').classList.toggle('visible',playing&&polish.banner>0&&!paused);for(const p of polish.labels){const y=1.9+(.85-p.life)*.7,w=vp[3]*p.x+vp[7]*y+vp[11]*p.z+vp[15],x=vp[0]*p.x+vp[4]*y+vp[8]*p.z+vp[12],v=vp[1]*p.x+vp[5]*y+vp[9]*p.z+vp[13];p.node.hidden=w<=.1||Math.abs(x/w)>1.1||Math.abs(v/w)>1.1;if(!p.node.hidden){p.node.style.left=(x/w*.5+.5)*100+'%';p.node.style.top=(-v/w*.5+.5)*100+'%';p.node.style.opacity=Math.min(1,p.life*4);}}}
 $('pause-continue').addEventListener('click',()=>{if(paused)togglePause();});
 function damageHero(x,z){if(heroInvulnerable>0||dashTime>0)return;
@@ -1570,7 +1600,7 @@ function rangedAttack(){if(guarding||catCelebration||!abilityUnlocked('ranged')|
 let dx=-Math.sin(cameraYaw),dz=-Math.cos(cameraYaw);const target=lockedTarget&&canLockTarget(lockedTarget,17)?lockedTarget:bots.filter(b=>{const d=distance(hero,b);return d<17&&d>0&&((b.x-hero.x)*dx+(b.z-hero.z)*dz)/d>.30&&clearPath(hero,b)}).sort((a,b)=>distance(hero,a)-distance(hero,b))[0];if(target){dx=target.x-hero.x;dz=target.z-hero.z;}const length=Math.hypot(dx,dz)||1;combat.aimX=dx/length;combat.aimZ=dz/length;hero.dir=Math.atan2(-dx,-dz);rangedCooldown=hero.mode==='luna'?.40:.54;startCombat('ranged',.36,.13);notify(hero.mode==='luna'?'Aiming Moonbeam…':'Aiming Sun-Paw Bolt…');updateHud();}
 
 function enemyVolley(b,count=1){b.attackPose=.38;const angle=Math.atan2(hero.x-b.x,hero.z-b.z);for(let i=0;i<count;i++){const a=angle+(i-(count-1)/2)*.24;shoot(b.x,b.z,Math.sin(a),Math.cos(a),true);}}
-function updateProjectiles(dt){for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];p.life-=dt;let remove=p.life<=0;const steps=Math.ceil(p.speed*dt/.18);for(let j=0;j<steps&&!remove;j++){p.x+=p.dx*p.speed*dt/steps;p.z+=p.dz*p.speed*dt/steps;if(!onDungeon(p.x,p.z)){remove=true;break}if(p.enemy){if(Math.hypot(hero.x-p.x,hero.z-p.z)<.44){damageHero(hero.x-p.dx,hero.z-p.dz);remove=true;}}else{const hit=bots.find(b=>b.hp>0&&Math.hypot(b.x-p.x,b.z-p.z)<(b.boss?.8:.5));if(hit){hitEnemy(hit,p.damage);remove=true;}}}if(remove)projectiles.splice(i,1);}bots=bots.filter(b=>b.hp>0);}
+function updateProjectiles(dt){for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];p.life-=dt;let remove=p.life<=0;const steps=Math.ceil(p.speed*dt/.18);for(let j=0;j<steps&&!remove;j++){p.x+=p.dx*p.speed*dt/steps;p.z+=p.dz*p.speed*dt/steps;if(!onDungeon(p.x,p.z)){remove=true;break}if(p.enemy){if(Math.hypot(hero.x-p.x,hero.z-p.z)<.44){damageHero(hero.x-p.dx,hero.z-p.dz);remove=true;}}else if(p.launcher){remove=hitClockSwitch(p);}else{const hit=bots.find(b=>b.hp>0&&Math.hypot(b.x-p.x,b.z-p.z)<(b.boss?.8:.5));if(hit){hitEnemy(hit,p.damage);remove=true;}}}if(remove)projectiles.splice(i,1);}bots=bots.filter(b=>b.hp>0);}
 function drawProjectiles(){worldSurface=6;for(const p of projectiles){draw('sphere',p.x,.95,p.z,p.enemy?.14:.11,.11,.18,p.color,Math.atan2(p.dx,p.dz));draw('oct',p.x-p.dx*.22,.95,p.z-p.dz*.22,.065,.065,.18,p.color,Math.atan2(p.dx,p.dz));}worldSurface=0;}
 function ensureMainBoss(){if(!pendingMainBoss||mainBossSpawned)return;pendingMainBoss=false;mainBossSpawned=true;const r=regionVault;bots.push(makeEnemy(r.x,r.z,'shooter',true,true));heroInvulnerable=1;notify('Baron Brasswhirl enters! The main boss battle begins.');updateHud();}
 function smoothAngle(current,target,dt,response=9){const delta=Math.atan2(Math.sin(target-current),Math.cos(target-current));return current+delta*(1-Math.exp(-dt*response));}
@@ -1590,7 +1620,7 @@ ctx.fillStyle='#30435d';for(const r of dungeonRects)ctx.fillRect(p(r.x-r.w/2),p(
 function proSnapshot(){
 const road=nextRoad();
 const villageStop=!inEcho&&nextVillageStop();
-const options=villageStop?[{...villageStopPoint(villageStop),label:villageStop.name}]:road?[{...road,label:'Road to '+districtArt[road.destination-1].name}]:echoShrine&&(!inEcho&&!clueFound||inEcho&&clueFound&&gateOpen)?[{...echoShrine,label:'Echo Shrine'}]:inEcho&&!clueFound&&storyClue?[{...storyClue,label:'Echo memory'}]:inEcho&&clueFound&&!gateOpen?[{x:regionGate.x,z:regionGate.z+1,label:'Dungeon latch'}]:gateOpen&&!inEcho&&!dungeonAwake()?[{...dungeonRunes[runePatterns[chapter-1][runeProgress]],label:dungeonTrials[chapter-1].verb+' '+runeNames[runePatterns[chapter-1][runeProgress]]}]:relicReady()?[{...relic,label:relicNames[chapter-1]}]:crystals.length?crystals.map(c=>({...c,label:'Crystal'})):bots.length?bots.filter(b=>b.hp>0).map(b=>({...b,label:b.boss?'District leader':'Rival'})):[{...rescueBeacon,label:'Rescue beacon'}];
+const options=villageStop?[{...villageStopPoint(villageStop),label:villageStop.name}]:road?[{...road,label:'Road to '+districtArt[road.destination-1].name}]:echoShrine&&(!inEcho&&!clueFound||inEcho&&clueFound&&gateOpen)?[{...echoShrine,label:'Echo Shrine'}]:inEcho&&!clueFound&&storyClue?[{...storyClue,label:'Echo memory'}]:inEcho&&clueFound&&!gateOpen?[{x:regionGate.x,z:regionGate.z+1,label:'Dungeon latch'}]:clocktowerLauncherTrial()?[{...(launcherFound?clockSwitch:launcherChest),label:launcherFound?'Clockwork switch':'Paw Launcher chest'}]:gateOpen&&!inEcho&&!dungeonAwake()?[{...dungeonRunes[runePatterns[chapter-1][runeProgress]],label:dungeonTrials[chapter-1].verb+' '+runeNames[runePatterns[chapter-1][runeProgress]]}]:relicReady()?[{...relic,label:relicNames[chapter-1]}]:crystals.length?crystals.map(c=>({...c,label:'Crystal'})):bots.length?bots.filter(b=>b.hp>0).map(b=>({...b,label:b.boss?'District leader':'Rival'})):[{...rescueBeacon,label:'Rescue beacon'}];
 const target=options.sort((a,b)=>distance(hero,a)-distance(hero,b))[0];
 window.CrystalPro?.snapshot({playing,paused,over,chapter,level,xp,hp:hero.hp,energy,potions,combo,crystals:crystals.length,enemies:bots.length,chest:chestOpened,
  goal:target?{label:target.label,distance:distance(hero,target),angle:Math.atan2(target.x-hero.x,-(target.z-hero.z))+cameraYaw}:null,
@@ -1636,6 +1666,7 @@ function updateInventory(){
  ];
  if(villageKit.has('training')||unlockedDistrict>1)items.push('Training gauntlets');
  if(villageKit.has('shop')||unlockedDistrict>1)items.push('Practice shield');
+ if(launcherFound||unlockedDistrict>1)items.push('Paw Launcher');
  if(tetherUnlocked)items.push('Paw Tether');
  for(const relic of relicNames.slice(0,collectedRelicCount()))items.push(relic);
  inventory.replaceChildren(...items.map(text=>{
