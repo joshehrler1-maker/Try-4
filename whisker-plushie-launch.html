@@ -1,7 +1,9 @@
 <!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Whisker’s Plushie Launch | Super Paw Heroes</title><style>
 *{box-sizing:border-box}body{margin:0;background:#0a1027;color:#fff3e1;font:600 1rem/1.45 system-ui}main{width:min(100% - 24px,720px);margin:16px auto}nav{display:flex;justify-content:space-between;gap:8px}a{color:#ffdb8c}h1{font:700 clamp(34px,7vw,58px)/1 Georgia;margin:.35em 0}.arena{position:relative;overflow:hidden;border:1px solid #9c82bf;border-radius:16px;background:#1b2140 url(assets/scenes/pawcade-flame.webp) center/cover}canvas{display:block;width:100%;height:auto;touch-action:none}.panel{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:14px;background:#0c1234b8}.panel[hidden]{display:none}.panel h2{margin:0;font:700 clamp(24px,6vw,46px)/1 Georgia}.panel p{margin:.55em auto;max-width:29rem}.controls{display:flex;gap:.55rem;margin:.65rem 0;align-items:center}.controls button:first-child{flex:1}button{font:inherit;min-height:44px;background:#ffdc93;color:#241a37;border:1px solid #fff4cd;border-radius:10px;padding:.45rem .85rem;cursor:pointer}button:disabled{opacity:.55}.hint{color:#d5d9f2;font-size:.88rem}#hud{margin:.5rem 0;color:#ffe5b5}
-</style><main><nav><a href="index.html">Super Paw Heroes</a><a href="pawcade-classics.html">Back to Pawcade</a></nav><h1>Whisker’s Plushie Launch</h1>
+</style>
+<link rel="stylesheet" href="assets/pawcade-visuals.css">
+<body class="arcade-visuals"><main><nav><a href="index.html">Super Paw Heroes</a><a href="pawcade-classics.html">Back to Pawcade</a></nav><h1>Whisker’s Plushie Launch</h1>
 <p id="hud"></p><div class="arena"><canvas width="600" height="390" aria-label="Whisker’s Plushie Launch playfield"></canvas><div class="panel" id="panel"><h2 id="heading">Whisker’s Plushie Launch</h2><p id="info">Help Whisker send a Baron Brasswhirl plushie flying across the Red Flame Caves.</p><button id="start">Start game</button></div></div>
 <div class="controls"><button id="act" disabled>Drop plush</button><button id="pause" disabled>Pause</button></div><p class="hint">Wait for a tailwind. Tap Drop plush, then Swing as the plush reaches the gold line. Tap Bounce just before it touches the ground. Space also works.</p></main><script>
 const el=id=>document.getElementById(id), field=document.querySelector('canvas'), ctx=field.getContext('2d');
@@ -85,7 +87,9 @@ function plush(px,py){
 }
 function paint(){
   const camera=phase==='fly'?Math.max(0,x-267):0;
-  ctx.fillStyle='#25142bce';ctx.fillRect(0,314,600,76);
+  const ground=ctx.createLinearGradient(0,313,0,390);
+  ground.addColorStop(0,'#6b3d51');ground.addColorStop(.22,'#3a213b');ground.addColorStop(1,'#190f24');
+  ctx.fillStyle=ground;ctx.fillRect(0,314,600,76);
   ctx.fillStyle='#ffb96e';ctx.fillRect(0,313,600,3);
   for(let marker=Math.floor(camera/110)*110;marker<camera+600;marker+=110){
     ctx.fillStyle='#ffbd76';ctx.fillRect(marker-camera,314,2,13);
@@ -97,4 +101,4 @@ function paint(){
   label('Wind '+(wind>0?'+':'')+wind,428,64,'#ffe9b1',30);
 }
 hud('Ready');requestAnimationFrame(frame);
-</script></html>
+</script></body></html>
