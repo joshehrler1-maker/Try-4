@@ -10,9 +10,10 @@
 <body class="arcade-visuals">
 <main data-fullscreen-game><header><div><a href="index.html#games">← Hero Game Zone</a> · <a href="pawgrove-forest.html">Explore Kokiri Forest</a> · <a href="pawtopia-arcade.html?game=forge">Play Pawgrove Forge</a><h1>Pawgrove · The Lantern Curse</h1></div><div><button id="hero" aria-pressed="false">Whisker</button> <button id="reset">Restart</button></div></header>
 <details id="poster"><summary>Meet Whisker and Luna</summary><img src="assets/whisker-luna-master.webp" alt="Super Paw Heroes character poster" loading="lazy"></details><div class="hud"><strong id="area"></strong><span id="status"></span></div>
-<canvas class="grove-playfield" width="720" height="410" aria-label="Third-person view of Pawgrove"></canvas>
+<canvas class="grove-playfield" width="720" height="410" data-hd="410" aria-label="Third-person view of Pawgrove"></canvas>
 <p id="quest"></p><div id="kit" aria-label="Adventure gear"></div><div class="controls"><div id="stick" aria-label="Movement joystick"><i id="knob"></i></div><div class="actions"><button id="target" aria-pressed="false" title="Focus">Z</button><button id="guard" aria-pressed="false" title="Guard">R</button><button id="map" aria-pressed="false" title="Map">L</button><button id="pause" aria-pressed="false">Start</button><button id="talk" title="Talk or roll">A</button><button id="attack" title="Pawblade">B</button><button id="pulse" title="Comet Launcher">C ←</button><button id="look" aria-pressed="false" title="Look ahead">C ↑</button><button id="lantern" title="Lantern">C ↓</button><button id="compass" title="Trail Compass">C →</button></div></div><small>Joystick to move · A talk or roll · B strike · R hold shield · Z focus · C ← launch · C ↑ look · Start pause</small></main>
-<style>canvas{outline:1px solid #9482d7;box-shadow:0 0 26px #6754d455}button{border-color:#9c86da}h1{color:#ffe1a0;text-shadow:0 2px #4a2858}</style><script src="assets/animated-game-art.js?v=1"></script><script>
+<style>canvas{outline:1px solid #9482d7;box-shadow:0 0 26px #6754d455}button{border-color:#9c86da}h1{color:#ffe1a0;text-shadow:0 2px #4a2858}</style><script src="assets/animated-game-art.js?v=1"></script><script src="assets/game-hd.js"></script>
+<script>
 'use strict';
 const $=id=>document.getElementById(id), canvas=document.querySelector('canvas'), ctx=canvas.getContext('2d');
 const keys=new Set(), p={x:0,z:0,face:0,hp:5}, joy={x:0,z:0,id:null};
