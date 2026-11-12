@@ -1,0 +1,23 @@
+body.pawtopia-scene{background:#0b1330 linear-gradient(#0b13304f,#0b1330e8 850px);background-image:linear-gradient(#0b133059,#0b1330ed 850px),var(--pawtopia-scene);background-size:auto,100% auto;background-position:center top;background-repeat:no-repeat}
+body.pawtopia-scene.crystal-page{background-size:auto,max(100%,850px) auto}
+.pawtopia-scene .crystal-panel{background:linear-gradient(110deg,#101d45e8,#101d45b8);margin-top:clamp(120px,32vw,420px)}
+.pawtopia-scene .crystal-region-nav{background:#101d45e8;border-radius:12px;padding:0 12px}
+.pawtopia-scene .pawtopia-home-hero{background-size:cover}
+.pawtopia-master-poster{display:block;width:clamp(150px,25vw,330px);height:auto;max-height:47vh;object-fit:contain;margin:0 auto 18px;border-radius:12px;filter:drop-shadow(0 8px 14px #0009)}
+.pawtopia-arcade-scene{width:min(100% - 2rem,64rem);height:clamp(140px,27vw,320px);margin:0 auto 1rem;border-radius:16px;background:var(--pawtopia-scene) center/cover}
+.pawtopia-game-intro{background:linear-gradient(#111a38b5,#111a38f2),var(--pawtopia-scene) center/cover}
+.pawtopia-game-intro #chapter-poster{object-fit:contain!important;background:#0b1330b5}
+.pawtopia-art{--pawtopia-scene:url("scenes/pawtopia.webp")}
+.cottage-art{--pawtopia-scene:url("scenes/cottage.webp")}
+.arcade-art{--pawtopia-scene:url("scenes/arcade.webp")}
+.catacombs-art{--pawtopia-scene:url("scenes/catacombs.webp")}
+.blue-tech-mines-art{--pawtopia-scene:url("scenes/blue-tech-mines.webp")}
+.brown-earth-quarries-art{--pawtopia-scene:url("scenes/brown-earth-quarries.webp")}
+.cyan-frost-caverns-art{--pawtopia-scene:url("scenes/cyan-frost-caverns.webp")}
+.green-life-groves-art{--pawtopia-scene:url("scenes/green-life-groves.webp")}
+.indigo-shadow-tunnels-art{--pawtopia-scene:url("scenes/indigo-shadow-tunnels.webp")}
+.orange-volcanic-depths-art{--pawtopia-scene:url("scenes/orange-volcanic-depths.webp")}
+.pink-harmony-grotto-art{--pawtopia-scene:url("scenes/pink-harmony-grotto.webp")}
+.purple-mystic-halls-art{--pawtopia-scene:url("scenes/purple-mystic-halls.webp")}
+.red-flame-caves-art{--pawtopia-scene:url("scenes/red-flame-caves.webp")}
+.yellow-light-ruins-art{--pawtopia-scene:url("scenes/yellow-light-ruins.webp")}
