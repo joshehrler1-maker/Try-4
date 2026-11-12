@@ -480,13 +480,48 @@ const layouts=[
 ];
 layouts.push({rooms:[[0,0],[-11,2],[-10,-9],[10,-9],[10,7],[0,-13]],links:[[0,1],[1,2],[2,5],[5,3],[3,4],[4,0],[2,3]]});
 const story=[
- {title:'The Night the Lights Went Out',lead:'Narrator: Pawtopia has gone dark. Visit the Training Yard and Pondside Shop for your gear. Then use the shrine at Arrival Plaza to uncover what happened at the training grounds.',clue:'Whisker: The crystals were pulled out of the beacon. This delivery tag leads to Moonlight Market.',next:'The kittens are safe. Follow the delivery tag to Moonlight Market.'},
- {title:'A Midnight Delivery',lead:'Luna: The Clockwork Heart stamped a delivery route onto the beacon. It ends at Moonlight Market. Find Inkveil’s ledger in Merchant Lane, then light the Lantern Vault’s lamps to recover the Lantern Crown.',clue:'Luna: The ledger lists a machine under Crystal Caverns. The Baron is testing it tonight.',next:'Inkveil’s ledger points to Crystal Caverns, where the first machine test is underway.'},
- {title:'The Echo Engine',lead:'Whisker: The Lantern Crown lit up the route in Inkveil’s ledger. Follow it into Crystal Caverns. Find the test record and tune the Echo Engine resonators to recover the Echo Prism.',clue:'Whisker: The Echo Engine drains power from the rescue beacons. Its regulator was sent to Tideworks Docks.',next:'Follow the regulator shipment to Tideworks Docks before it reaches the Baron.'},
- {title:'The Shipment at Tideworks',lead:'Whisker: The Echo Prism showed us where the regulator was shipped. Check the manifest at Tidal Walk, then turn the Tidegate valves to recover the Pearl.',clue:'Luna: The regulator has already gone. The manifest names a caretaker in Skyline Gardens who knows how to shut it down.',next:'Find the caretaker’s message in Skyline Gardens.'},
- {title:'The Caretaker’s Signal',lead:'Luna: The Tidegate Pearl cleared the fog over Skyline Gardens. Find the caretaker’s message, then wake the seed beds to recover the Rootglass Seed.',clue:'Luna: The caretaker split the shutdown command in two. One half is in Shadow Fortress. The other is hidden in Nightglass Market.',next:'Enter Shadow Fortress and recover the Baron’s half of the shutdown command.'},
- {title:'Into Shadow Fortress',lead:'Whisker: The Rootglass Seed revealed Brasswhirl’s service road. Find the command fragment in Clockwork Hall and release the Keep’s interlocks to reach the Baron.',clue:'Whisker: First half recovered! Vesper has the other, and the engine is still running on its own.',next:'Brasswhirl is defeated. Reach Nightglass Market before the runaway engine burns out the last beacon.'},
- {title:'The Last Light of Pawtopia',lead:'Luna: The Brasswhirl Crest points to a second command fragment in Neon Arcade. Align the Moonspire relays, get past Vesper, and take the Core to the final beacon.',clue:'Luna: Both halves fit! Clear Moonspire Plaza, then send the shutdown command through the gold beacon.',next:''}
+  {
+    "title": "The Clocktower’s Call",
+    "lead": "The Old Clocktower guardian calls for help. Collect your training gauntlets and practice shield, then use the Echo Shrine in Arrival Plaza to learn how to open the dungeon.",
+    "clue": "Whisker: The Baron cursed the guardian to steal the key it protects. Let’s recover the Clockwork Heart and find out why he wants it.",
+    "next": "The Clockwork Heart is the first of three keys to the Time Gate. Meet Luna’s contact at Moonlight Market."
+  },
+  {
+    "title": "The Royal Warning",
+    "lead": "Luna: Pawtopia’s royal scout saw Baron Brasswhirl plotting to enter the Time Gate. We need the three keys before he gets them. Inkveil’s ledger in Merchant Lane points to the Lantern Crown.",
+    "clue": "Luna: Inkveil has hidden the second key in the Lantern Vault. Light the lamps to reach it.",
+    "next": "Two keys are safe. Follow the trail to Crystal Caverns for the third."
+  },
+  {
+    "title": "The Third Key",
+    "lead": "Whisker: The Echo Prism is inside the cavern guardian’s chamber. Find the test record in Mineral Passage and tune the resonators.",
+    "clue": "Whisker: The resonators open the way. After we recover the Prism, meet me at the Time Gate in Pawtopia Field.",
+    "next": "All three keys are assembled. Open the Time Gate at the southern arch. The Baron is close behind."
+  },
+  {
+    "title": "Seven Years Later",
+    "lead": "Luna: The Time Gate sealed us away for seven years. Brasswhirl slipped through behind us and took the crown’s power. A masked guide led us to Tideworks. Find the manifest and turn the sluice valves to awaken the first guardian.",
+    "clue": "Luna: The Tidegate guardian can help break the Baron’s hold. Turn the valves, defeat the keeper, and recover the Pearl.",
+    "next": "The Tidegate guardian is awake. Follow the light from the Pearl to Skyline Gardens."
+  },
+  {
+    "title": "The Guardians Awaken",
+    "lead": "Luna: The Tidegate Pearl opened the way to the gardens. Find the caretaker in Glasshouse Terrace and wake the seed beds.",
+    "clue": "Luna: The Rootglass guardian will answer when the seed beds are awake. Its relic points to the last road into Shadow Fortress.",
+    "next": "The guardians are gathering. The masked guide is waiting at Shadow Fortress."
+  },
+  {
+    "title": "The Masked Guide",
+    "lead": "Whisker: The guide has been Pawtopia’s royal scout all along. Brasswhirl’s guard has taken the scout to Moonspire. Search Clockwork Hall and release the Keep’s interlocks to free the last guardian.",
+    "clue": "Whisker: Vesper is holding Moonspire’s entrance. The Brasswhirl Crest can reveal the path to the citadel.",
+    "next": "The guardians opened the road to Moonspire. Rescue the scout and stop Brasswhirl."
+  },
+  {
+    "title": "The Fall of Moonspire",
+    "lead": "Luna: The guardians opened the road into Brasswhirl’s citadel. Align the relays in the Undercroft, defeat Vesper, and prepare for the Baron’s last attack.",
+    "clue": "Luna: The relays can seal the Baron’s stolen power. Recover the Moonspire Core after he falls and bring it to the final beacon.",
+    "next": ""
+  }
 ];
 const regionAdventures=[
  {friend:'Pip',dungeon:'Old Clocktower',secret:'Clockmaker’s spring',request:'Could you find my spring in the Gadget Treasury? The old Clocktower stopped when the beacon went dark.'},
@@ -559,13 +594,14 @@ function availableRoad(){
 function updateFieldTravel(){
  const road=playing&&!paused&&!catCelebration&&availableRoad();
  fieldTravel.hidden=!road;
- if(road)fieldTravel.textContent='Enter '+districtArt[road.destination-1].name;
+ if(road)fieldTravel.textContent=chapter===3&&road.destination===4?'Open the Time Gate':'Enter '+districtArt[road.destination-1].name;
 }
 function travelRoad(destination){
  const road=availableRoad();
  if(!playing||paused||catCelebration||road?.destination!==destination)return;
  districtVisits.set(chapter,{districtRescued,clueFound,gateOpen,favor,chestOpened,crystals,bots,pendingMainBoss,mainBossSpawned,runeProgress,relicFound});
  const hp=hero.hp,storedEnergy=energy;
+ const crossingTime=chapter===3&&destination===4&&unlockedDistrict===4&&!districtVisits.has(4);
  setChapter(destination);
  hero.hp=hp;
  energy=storedEnergy;
@@ -581,7 +617,7 @@ function travelRoad(destination){
  if(unlockedDistrict>=2)saveCheckpoint(unlockedDistrict);
  if(districtRescued)$('story-note').textContent='District rescued. Explore the region or take another road through Pawtopia Field.';
  updateHud();
- notify('Arrived at '+districtArt[destination-1].name+'.');
+ notify(crossingTime?'Seven years have passed. The Baron has seized Pawtopia’s crown.':'Arrived at '+districtArt[destination-1].name+'.');
 }
 fieldTravel.addEventListener('click',()=>{
  const road=availableRoad();
@@ -1470,7 +1506,7 @@ function bossCoreExposed(b){
  return b.boss&&b.coreTime>0&&b.wind<=0&&b.dash<=0;
 }
 function hitEnemy(b,damage){if(b.boss&&(!dungeonAwake()||inEcho||hero.z>=regionGate.z-.48))return;
-if(bossCoreExposed(b)){damage*=2;notify(b.name+'’s exposed core took double damage!');}window.CrystalPro?.event("hit");polish.hit=.14;addCombatLabel(b.x,b.z,damage,b.hp<=damage);b.hitReact=.24;b.stagger=b.boss?.08:.18;b.vx=b.vz=0;impactBody(b,b,hero.x,hero.z,(b.boss?1.55:4.4)*(combat.kind==='melee'&&combat.chain===0?1.3:1));b.hp-=damage;emitSparks(b.x,b.z,encounterBook[chapter-1].color,5);if(b.hp<=0){window.CrystalPro?.event("kill",{boss:b.boss});if(b.boss){stars+=4;notify(b.name+' defeated! +4 upgrade stars.');if(chapter===6&&!b.main&&!mainBossSpawned)pendingMainBoss=true;}defeatedBot();}}
+if(bossCoreExposed(b)){damage*=2;notify(b.name+'’s exposed core took double damage!');}window.CrystalPro?.event("hit");polish.hit=.14;addCombatLabel(b.x,b.z,damage,b.hp<=damage);b.hitReact=.24;b.stagger=b.boss?.08:.18;b.vx=b.vz=0;impactBody(b,b,hero.x,hero.z,(b.boss?1.55:4.4)*(combat.kind==='melee'&&combat.chain===0?1.3:1));b.hp-=damage;emitSparks(b.x,b.z,encounterBook[chapter-1].color,5);if(b.hp<=0){window.CrystalPro?.event("kill",{boss:b.boss});if(b.boss){stars+=4;notify(b.name+' defeated! +4 upgrade stars.');if(chapter===CHAPTERS&&!b.main&&!mainBossSpawned)pendingMainBoss=true;}defeatedBot();}}
 function shoot(x,z,dx,dz,enemy=false,damage=1){if(projectiles.length>=70)return;const length=Math.hypot(dx,dz)||1;projectiles.push({x,z,dx:dx/length,dz:dz/length,enemy,damage,life:enemy?3:1.5,speed:enemy?5.5:16,color:enemy?encounterBook[chapter-1].color:hero.mode==='luna'?[.66,.65,1]:[1,.74,.26]});}
 function rangedAttack(){if(guarding||catCelebration||!abilityUnlocked('ranged')||!playing||paused||rangedCooldown>0||combat.kind||dashTime>0)return;
 let dx=-Math.sin(cameraYaw),dz=-Math.cos(cameraYaw);const target=lockedTarget&&canLockTarget(lockedTarget,17)?lockedTarget:bots.filter(b=>{const d=distance(hero,b);return d<17&&d>0&&((b.x-hero.x)*dx+(b.z-hero.z)*dz)/d>.30&&clearPath(hero,b)}).sort((a,b)=>distance(hero,a)-distance(hero,b))[0];if(target){dx=target.x-hero.x;dz=target.z-hero.z;}const length=Math.hypot(dx,dz)||1;combat.aimX=dx/length;combat.aimZ=dz/length;hero.dir=Math.atan2(-dx,-dz);rangedCooldown=hero.mode==='luna'?.40:.54;startCombat('ranged',.36,.13);notify(hero.mode==='luna'?'Aiming Moonbeam…':'Aiming Sun-Paw Bolt…');updateHud();}
@@ -1512,8 +1548,8 @@ const spec=encounterBook[n-1];bots=[];for(let i=0;i<3+n;i++){const r=dungeonRoom
 
 const approvedHeroPortrait=$('chapter-poster').src,approvedBaronPortrait=$('main-boss-portrait').src;
 function startGame(){villageKit.clear();$('pause-sheet').hidden=true;previousAbilityLevel=1;$('ability-unlock').hidden=true;$('chapter-poster').src=approvedHeroPortrait;$('chapter-poster').alt='Whisker and Luna';campaignSeed=Math.floor(Math.random()*2147483646)+1;unlockedDistrict=1;overlookFound=false;tetherUnlocked=false;tetherCache=false;districtVisits.clear();characterSpeech.cancel();clearCheckpoint();stop();hero={x:0,z:0,hp:5,dir:0,mode:$('hero').value};chapter=1;totalCollected=0;defeated=0;level=1;xp=0;stars=0;combo=0;comboTime=0;energy=100;potions=2;damageBoost=0;gear="";statRanks={power:0,agility:0,defense:0};burstEffect=0;setChapter(1);playing=true;paused=false;over=false;frame=0;hitEffect=0;last=0;keys.clear();resetJoystick();overlay.classList.add('hidden');$('pause').textContent='⏸ Pause';updateHud();raf=requestAnimationFrame(loop)}
-function finish(win){echoInteract.hidden=true;if(win)window.CrystalPro?.event("victory");$('pause-sheet').hidden=true;if(win)clearCheckpoint();playing=false;over=true;stop();proSnapshot();overlay.classList.remove('hidden');title.textContent=win?'🏆 Seven Districts Rescued!':'💔 Mission Failed';desc.textContent=win?'Luna sent the shutdown command through the beacon while Whisker held the line. The Echo Engine fell silent. One by one, all seven beacons lit up, and the kittens came out to watch Pawtopia shine again.':'You reached district '+chapter+' of '+CHAPTERS+'. Restart to try the campaign again!';$('start').textContent='↻ Play Again';notify(win?'Victory! Full campaign completed.':'Game over.');characterSpeech.say(win?'Together, Whisker and Luna saved the city. Their courage brought hope to every district.':'Every hero needs another chance. Rest, regroup, and try again.','narrator')}
-function nextChapter(){echoInteract.hidden=true;window.CrystalPro?.event("district");const finalBoss=chapter+1===6;$('chapter-poster').src=finalBoss?approvedBaronPortrait:approvedHeroPortrait;$('chapter-poster').alt=finalBoss?'Baron Brasswhirl, Shadow Fortress boss':'Whisker and Luna';checkpoint=true;saveCheckpoint();playing=false;stop();proSnapshot();overlay.classList.remove('hidden');title.textContent='✅ District '+chapter+' Complete';desc.textContent=story[chapter-1].next+' '+totalCollected+' of '+CHAPTERS*8+' crystals recovered.';$('start').textContent='▶ Next District';notify('Checkpoint reached. Continue when ready.');characterSpeech.say('District cleared. The city is safer, and a new adventure awaits.','narrator')}
+function finish(win){echoInteract.hidden=true;if(win)window.CrystalPro?.event("victory");$('pause-sheet').hidden=true;if(win)clearCheckpoint();playing=false;over=true;stop();proSnapshot();overlay.classList.remove('hidden');title.textContent=win?'🏆 Seven Districts Rescued!':'💔 Mission Failed';desc.textContent=win?'The guardians sealed Brasswhirl’s stolen power as Luna restored the last beacon. The royal scout played the return melody and sent Whisker and Luna back to the day the Clocktower called. This time, they knew how to warn Pawtopia before the Baron struck.':'You reached district '+chapter+' of '+CHAPTERS+'. Restart to try the campaign again!';$('start').textContent='↻ Play Again';notify(win?'Victory! Full campaign completed.':'Game over.');characterSpeech.say(win?'Together, Whisker and Luna saved the city. Their courage brought hope to every district.':'Every hero needs another chance. Rest, regroup, and try again.','narrator')}
+function nextChapter(){echoInteract.hidden=true;window.CrystalPro?.event("district");const finalBoss=chapter+1===CHAPTERS;$('chapter-poster').src=finalBoss?approvedBaronPortrait:approvedHeroPortrait;$('chapter-poster').alt=finalBoss?'Baron Brasswhirl, Moonspire boss':'Whisker and Luna';checkpoint=true;saveCheckpoint();playing=false;stop();proSnapshot();overlay.classList.remove('hidden');title.textContent='✅ District '+chapter+' Complete';desc.textContent=story[chapter-1].next+' '+totalCollected+' of '+CHAPTERS*8+' crystals recovered.';$('start').textContent='▶ Next District';notify('Checkpoint reached. Continue when ready.');characterSpeech.say('District cleared. The city is safer, and a new adventure awaits.','narrator')}
 function continueCampaign(){setChapter(chapter+1);playing=true;paused=false;last=0;keys.clear();resetJoystick();overlay.classList.add('hidden');$('pause').textContent='⏸ Pause';raf=requestAnimationFrame(loop)}
 const strikes={
  whisker:[['Meteor Fist',.86,.58,3.9,3],['Cross Counter',.61,.41,3.3,2],['Solar Uppercut',.75,.52,4.1,4]],
