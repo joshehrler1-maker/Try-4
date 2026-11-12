@@ -577,12 +577,41 @@ fieldTravel.addEventListener('click',()=>{
 });
 const runePatterns=[[0,1,2],[2,0,1],[1,0,2],[0,2,1],[1,2,0],[2,1,0],[0,2,1,0]];
 const runeNames=['Amber','Jade','Violet'];
+const dungeonTrials=[
+ {verb:'Step on',title:'Clocktower seals',points:[[-3,1.7],[3,1.7],[0,-.6]]},
+ {verb:'Light',title:'Lantern Vault lanterns',points:[[-3,-1],[0,2.5],[3,-1]]},
+ {verb:'Tune',title:'Echo Engine resonators',points:[[-3,2.1],[3,-1.8],[0,.5]]},
+ {verb:'Turn',title:'Tidegate sluice valves',points:[[-3,-1.8],[3,-1.8],[0,2.3]]},
+ {verb:'Awaken',title:'Rootglass seed beds',points:[[-3,2.2],[0,-1.2],[3,2.2]]},
+ {verb:'Release',title:'Fortress interlocks',points:[[0,2.4],[-3,-1.5],[3,-1.5]]},
+ {verb:'Align',title:'Moonspire shutdown relays',points:[[-3,1.8],[3,1.8],[0,-1.8]]}
+];
+function trialInstruction(){
+ const {verb,title}=dungeonTrials[chapter-1];
+ const order=runePatterns[chapter-1].map((rune,i)=>i<runeProgress?'✓':runeNames[rune]).join(' → ');
+ return title+' · '+verb+': '+order;
+}
+function nearbyTrialControl(){
+ if(chapter===1||!gateOpen||inEcho||districtRescued||dungeonAwake())return -1;
+ return dungeonRunes.findIndex(rune=>distance(hero,rune)<1.2);
+}
+function activateTrialControl(hit){
+ const pattern=runePatterns[chapter-1];
+ if(hit===pattern[runeProgress]){
+  runeProgress++;
+  emitSparks(hero.x,hero.z,runeColors[hit],12);
+  notify(dungeonAwake()?'The dungeon guardian awakens!':runeNames[hit]+' · '+runeProgress+' / '+pattern.length);
+ }else{
+  runeProgress=hit===pattern[0]?1:0;
+  notify('Sequence reset. '+trialInstruction());
+ }
+}
 const runeColors=[[1,.62,.21],[.30,.91,.53],[.75,.49,1]];
 const relicNames=['Clockwork Heart','Lantern Crown','Echo Prism','Tidegate Pearl','Rootglass Seed','Brasswhirl Crest','Moonspire Core'];
 let dungeonRunes=[],relic=null,runeProgress=0,runeUnderfoot=-1,relicFound=false;
 function resetDungeonTrial(){
  const {x,z}=regionVault;
- dungeonRunes=[{x:x-3,z:z+1.7},{x:x+3,z:z+1.7},{x,z:z-.6}];
+ dungeonRunes=dungeonTrials[chapter-1].points.map(([dx,dz])=>({x:x+dx,z:z+dz}));
  relic={x,z:z-2.7};
  runeProgress=0;
  runeUnderfoot=-1;
@@ -593,17 +622,9 @@ function relicReady(){return dungeonAwake()&&!relicFound&&!bots.some(b=>b.boss&&
 function stepDungeonTrial(){
  if(!gateOpen||inEcho||districtRescued)return;
  if(!dungeonAwake()){
+  if(chapter!==1)return;
   const hit=dungeonRunes.findIndex(rune=>distance(hero,rune)<.88);
-  if(hit!==-1&&hit!==runeUnderfoot){
-   if(hit===runePatterns[chapter-1][runeProgress]){
-    runeProgress++;
-    emitSparks(hero.x,hero.z,runeColors[hit],12);
-    notify(dungeonAwake()?'The seals are open. The dungeon guardian awakens!':runeNames[hit]+' seal activated.');
-   }else{
-    runeProgress=hit===runePatterns[chapter-1][0]?1:0;
-    notify('The seals reset. Follow the order on the District Objective tab.');
-   }
-  }
+  if(hit!==-1&&hit!==runeUnderfoot)activateTrialControl(hit);
   runeUnderfoot=hit;
  }else if(relicReady()&&distance(hero,relic)<1.2){
   relicFound=true;
@@ -633,6 +654,8 @@ function updateResidents(){
 }
 function worldAction(){
  if(!playing||paused||catCelebration||inEcho)return null;
+ const control=nearbyTrialControl();
+ if(control>=0)return {control,label:dungeonTrials[chapter-1].verb+' '+runeNames[control]};
  if(tetherUnlocked&&distance(hero,tetherShore)<1.65)return {label:'Use Paw Tether',destination:tetherIsland};
  if(tetherUnlocked&&distance(hero,tetherIsland)<1.8)return {label:'Tether back',destination:tetherShore};
  const resident=residents.find(person=>distance(hero,person)<1.45);
@@ -647,7 +670,9 @@ function updateWorldInteract(){
 worldInteract.addEventListener('click',()=>{
  const action=worldAction();
  if(!action)return;
- if(action.destination){
+ if(Number.isInteger(action.control)){
+  activateTrialControl(action.control);
+ }else if(action.destination){
   emitSparks(hero.x,hero.z,[.56,.70,1],10);
   resetMotion();
   dashTime=0;
@@ -1304,7 +1329,26 @@ if(hero.z>-9){
 if(gateOpen&&!districtRescued&&!inEcho){
  if(!dungeonAwake())for(const [i,rune] of dungeonRunes.entries()){
   ring(rune.x,.08,rune.z,.75,runeColors[i]);
-  draw('oct',rune.x,.63,rune.z,.14,.23,.14,runeColors[i],motion.time);
+  const {x,z}=rune,color=runeColors[i];
+  if(chapter===2){
+   draw('cube',x,.28,z,.15,.28,.15,[.38,.25,.21]);
+   draw('oct',x,.84,z,.21,.29,.21,color,motion.time*.45);
+   draw('cube',x,1.14,z,.26,.06,.26,[.73,.51,.26]);
+  }else if(chapter===3){
+   draw('cylinder',x,.28,z,.29,.28,.29,[.26,.35,.53]);
+   draw('oct',x,.92,z,.25,.43,.25,color,motion.time);
+  }else if(chapter===4){
+   draw('cylinder',x,.3,z,.13,.3,.13,[.29,.40,.46]);
+   draw('cube',x,.65,z,.36,.08,.08,color);
+   draw('cube',x,.65,z,.08,.08,.36,color);
+  }else if(chapter===5){
+   draw('cylinder',x,.12,z,.4,.12,.4,[.29,.20,.13]);
+   draw('oct',x,.4,z,.19,.24,.19,color,motion.time*.4);
+   for(const side of [-1,1])draw('oct',x+side*.19,.29,z,.11,.17,.10,[.33,.75,.35],side*.45);
+  }else if(chapter>=6){
+   draw('cube',x,.35,z,.27,.35,.23,[.27,.29,.41]);
+   draw('oct',x,.83,z,.15,.22,.15,color,motion.time);
+  }else draw('oct',x,.63,z,.14,.23,.14,color,motion.time);
  }
  if(relicReady()){
   ring(relic.x,.08,relic.z,.9,[1,.82,.37]);
@@ -1353,7 +1397,7 @@ const polish={hit:0,hurt:0,banner:0,labels:[]};
 function addCombatLabel(x,z,amount,defeated){if(polish.labels.length>=10){polish.labels.shift().node.remove();}const node=document.createElement('span');node.className='damage-number'+(defeated?' defeated':'');node.textContent=defeated?'✓ Defeated':'−'+amount;$('combat-feedback').append(node);polish.labels.push({x,z,life:.85,node});}
 function resetPolish(n){for(const p of polish.labels)p.node.remove();polish.labels=[];polish.hit=polish.hurt=0;polish.banner=3.4;$('pause-sheet').hidden=true;$('district-kicker').textContent='DISTRICT '+n+' / '+CHAPTERS;$('district-name').textContent=districtArt[n-1].name;document.querySelector('.chapter-kicker').textContent='PAWTOPIA • DISTRICT '+n;}
 function stepPolish(dt){polish.hit=Math.max(0,polish.hit-dt);polish.hurt=Math.max(0,polish.hurt-dt);polish.banner=Math.max(0,polish.banner-dt);for(let i=polish.labels.length-1;i>=0;i--){const p=polish.labels[i];p.life-=dt;if(p.life<=0){p.node.remove();polish.labels.splice(i,1);}}}
-function updateQuestCard(){const remaining=crystals.length,done=8-remaining;$('quest-task').textContent=catCelebration?'District safe · thank-you hugs!':districtRescued?'Pawtopia Field · Choose an open region road':!clueFound?(inEcho?'Echo Age · Find the violet memory':'Present · Play the melody at the teal shrine'):!gateOpen?'Echo Age · Release the '+regionAdventures[chapter-1].dungeon+' latch':inEcho?'Echo Age · Return to the shrine':!dungeonAwake()?'Dungeon seals: '+runePatterns[chapter-1].map((rune,i)=>i<runeProgress?'✓':runeNames[rune]).join(' → '):relicReady()?'Recover the '+relicNames[chapter-1]:remaining?'Recover crystals · '+done+' / 8':bots.length?'Defeat remaining villains · '+bots.length+(bots.some(b=>b.boss)?' · Gold core: double damage':''):'Reach the gold rescue beacon';$('quest-fill').style.width=(remaining?done/8*.7:bots.length?.8:1)*100+'%';$('quest-card').hidden=!playing||over;}
+function updateQuestCard(){const remaining=crystals.length,done=8-remaining;$('quest-task').textContent=catCelebration?'District safe · thank-you hugs!':districtRescued?'Pawtopia Field · Choose an open region road':!clueFound?(inEcho?'Echo Age · Find the violet memory':'Present · Play the melody at the teal shrine'):!gateOpen?'Echo Age · Release the '+regionAdventures[chapter-1].dungeon+' latch':inEcho?'Echo Age · Return to the shrine':!dungeonAwake()?trialInstruction():relicReady()?'Recover the '+relicNames[chapter-1]:remaining?'Recover crystals · '+done+' / 8':bots.length?'Defeat remaining villains · '+bots.length+(bots.some(b=>b.boss)?' · Gold core: double damage':''):'Reach the gold rescue beacon';$('quest-fill').style.width=(remaining?done/8*.7:bots.length?.8:1)*100+'%';$('quest-card').hidden=!playing||over;}
 function drawPolish(){const f=$('combat-feedback');f.classList.toggle('hit',polish.hit>0);f.classList.toggle('hurt',polish.hurt>0);$('district-banner').classList.toggle('visible',playing&&polish.banner>0&&!paused);for(const p of polish.labels){const y=1.9+(.85-p.life)*.7,w=vp[3]*p.x+vp[7]*y+vp[11]*p.z+vp[15],x=vp[0]*p.x+vp[4]*y+vp[8]*p.z+vp[12],v=vp[1]*p.x+vp[5]*y+vp[9]*p.z+vp[13];p.node.hidden=w<=.1||Math.abs(x/w)>1.1||Math.abs(v/w)>1.1;if(!p.node.hidden){p.node.style.left=(x/w*.5+.5)*100+'%';p.node.style.top=(-v/w*.5+.5)*100+'%';p.node.style.opacity=Math.min(1,p.life*4);}}}
 $('pause-continue').addEventListener('click',()=>{if(paused)togglePause();});
 function damageHero(x,z){if(heroInvulnerable>0||dashTime>0)return;
@@ -1394,7 +1438,7 @@ function drawStoryPin(){
 ctx.fillStyle='#30435d';for(const r of dungeonRects)ctx.fillRect(p(r.x-r.w/2),p(r.z-r.d/2),r.w*mapScale,r.d*mapScale);const dot=(x,z,r,col)=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(p(x),p(z),r,0,Math.PI*2);ctx.fill()};crystals.forEach(c=>dot(c.x,c.z,2,'#78e7f5'));bots.forEach(b=>dot(b.x,b.z,b.boss?4:2,b.boss?'#ffb565':'#ec8da4'));dot(rescueBeacon.x,rescueBeacon.z,3,'#f3cf83');ctx.save();ctx.translate(p(hero.x),p(hero.z));ctx.rotate(-hero.dir);ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(0,-5);ctx.lineTo(3,3);ctx.lineTo(-3,3);ctx.closePath();ctx.fill();ctx.restore();drawStoryPin();}
 function proSnapshot(){
 const road=nextRoad();
-const options=road?[{...road,label:'Road to '+districtArt[road.destination-1].name}]:echoShrine&&(!inEcho&&!clueFound||inEcho&&clueFound&&gateOpen)?[{...echoShrine,label:'Echo Shrine'}]:inEcho&&!clueFound&&storyClue?[{...storyClue,label:'Echo memory'}]:inEcho&&clueFound&&!gateOpen?[{x:regionGate.x,z:regionGate.z+1,label:'Dungeon latch'}]:gateOpen&&!inEcho&&!dungeonAwake()?[{...dungeonRunes[runePatterns[chapter-1][runeProgress]],label:runeNames[runePatterns[chapter-1][runeProgress]]+' seal'}]:relicReady()?[{...relic,label:relicNames[chapter-1]}]:crystals.length?crystals.map(c=>({...c,label:'Crystal'})):bots.length?bots.filter(b=>b.hp>0).map(b=>({...b,label:b.boss?'District leader':'Rival'})):[{...rescueBeacon,label:'Rescue beacon'}];
+const options=road?[{...road,label:'Road to '+districtArt[road.destination-1].name}]:echoShrine&&(!inEcho&&!clueFound||inEcho&&clueFound&&gateOpen)?[{...echoShrine,label:'Echo Shrine'}]:inEcho&&!clueFound&&storyClue?[{...storyClue,label:'Echo memory'}]:inEcho&&clueFound&&!gateOpen?[{x:regionGate.x,z:regionGate.z+1,label:'Dungeon latch'}]:gateOpen&&!inEcho&&!dungeonAwake()?[{...dungeonRunes[runePatterns[chapter-1][runeProgress]],label:dungeonTrials[chapter-1].verb+' '+runeNames[runePatterns[chapter-1][runeProgress]]}]:relicReady()?[{...relic,label:relicNames[chapter-1]}]:crystals.length?crystals.map(c=>({...c,label:'Crystal'})):bots.length?bots.filter(b=>b.hp>0).map(b=>({...b,label:b.boss?'District leader':'Rival'})):[{...rescueBeacon,label:'Rescue beacon'}];
 const target=options.sort((a,b)=>distance(hero,a)-distance(hero,b))[0];
 window.CrystalPro?.snapshot({playing,paused,over,chapter,level,xp,hp:hero.hp,energy,potions,combo,crystals:crystals.length,enemies:bots.length,chest:chestOpened,
  goal:target?{label:target.label,distance:distance(hero,target),angle:Math.atan2(target.x-hero.x,-(target.z-hero.z))+cameraYaw}:null,
