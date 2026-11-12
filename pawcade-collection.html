@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pawcade Collection | Super Paw Heroes</title>
+<link rel="stylesheet" href="assets/pawcade-collection.css">
+<script defer src="assets/pawtopia-save.js"></script>
+<script defer src="assets/pawcade-collection.js"></script>
+</head>
+<body>
+<header><a href="index.html">Super Paw Heroes</a><nav aria-label="Pawtopia"><a href="pawtopia-arcade.html">Games Room</a><a href="pawtopia-companions.html">Companions</a></nav></header>
+<main>
+<section class="banner"><h1>Pawcade Collection</h1><p>30 games across Pawtopia</p></section>
+<section aria-labelledby="cabinet-name" class="cabinet" id="cabinet" hidden>
+<a href="#collection" id="back">Back to collection</a>
+<h2 id="cabinet-name" tabindex="-1"></h2><p id="rules"></p>
+<div class="controls"><button id="start" type="button">Start game</button><span id="score"></span><span id="best"></span></div>
+<div id="board" role="group" aria-label="Game board"></div>
+<p id="message" role="status"></p>
+</section>
+<section id="collection" aria-labelledby="collection-title">
+<h2 id="collection-title">Choose a game</h2>
+<div class="filters"><label>Find a game <input id="search" type="search"></label><label>Game type <select id="filter"><option value="">All types</option></select></label></div>
+<p id="results" role="status"></p><div id="catalog"></div>
+</section>
+<noscript>Enable JavaScript to play the Pawcade Collection.</noscript>
+</main>
+</body></html>
