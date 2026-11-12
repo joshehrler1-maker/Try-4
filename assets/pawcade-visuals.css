@@ -19,3 +19,5 @@ body.arcade-visuals{background-color:#090d20;background-image:radial-gradient(el
 .arcade-visuals .arcade-card a{align-self:start;font-weight:800;text-underline-offset:.25em}
 .arcade-visuals .arcade-card p{font-size:.9rem}
 @media(max-width:480px){.arcade-visuals .controls{flex-wrap:wrap}.arcade-visuals .hud{gap:.35rem}.arcade-visuals .arcade-card{min-height:11rem}}
+
+.game-directory .games button img{display:block;width:100%;height:auto;aspect-ratio:2.15;object-fit:cover;border-radius:.45rem;margin-bottom:.45rem}

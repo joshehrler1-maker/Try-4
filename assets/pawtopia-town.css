@@ -20,3 +20,11 @@ ul{padding-left:1.25rem}
 section{scroll-margin-top:5rem}
 .foot{color:#554564;font-size:.9rem}
 @media(max-width:650px){.layout{grid-template-columns:1fr}nav{display:flex;flex-wrap:wrap}nav a{border:0}.banner{min-height:9rem}}
+.town-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;margin-top:.8rem;background:transparent;border:0;overflow:visible}
+.town-map a{display:block;padding:0;border:1px solid #a47536;border-radius:.55rem;overflow:hidden;background:#f7db94;text-align:center;text-decoration:none}
+.town-map a:last-child{border-bottom:1px solid #a47536}
+.town-map a:hover,.town-map a:focus-visible{background:#ffebbd;text-decoration:underline;outline:2px solid #583779}
+.town-map img{display:block;width:100%;height:auto;aspect-ratio:1.45;object-fit:cover}
+.town-map span{display:grid;min-height:44px;place-items:center;padding:.35rem;font-size:.95rem}
+.shop-scene{display:block;width:min(100%,26rem);height:auto;aspect-ratio:1.45;object-fit:cover;border-radius:.4rem;margin:.6rem 0 1rem}
+@media(max-width:520px){.town-map{grid-template-columns:repeat(2,minmax(0,1fr))}}

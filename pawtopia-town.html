@@ -19,8 +19,17 @@
 </nav>
 <main>
 <div class="banner"><h1>Pawtopia Town Square</h1></div>
+<nav class="town-map" aria-label="Illustrated town destinations">
+<a href="#shops"><img src="assets/scenes/town-market.webp" width="500" height="500" alt=""><span>Town Shops</span></a>
+<a href="#bank"><img src="assets/scenes/town-bank.webp" width="500" height="500" alt=""><span>Golden Paw Bank</span></a>
+<a href="#dailies"><img src="assets/scenes/town-well.webp" width="500" height="500" alt=""><span>Daily Visits</span></a>
+<a href="#trading"><img src="assets/scenes/town-trading.webp" width="500" height="500" alt=""><span>Trading Post</span></a>
+<a href="#arena"><img src="assets/scenes/town-arena.webp" width="500" height="500" alt=""><span>Training Arena</span></a>
+<a href="#gazette"><img src="assets/scenes/town-gazette.webp" width="500" height="500" alt=""><span>Pawtopia Gazette</span></a>
+</nav>
 <p id="feedback" role="status" aria-live="polite"></p>
 <section id="shops"><h2>Town Shops</h2>
+<img class="shop-scene" src="assets/scenes/town-market.webp" width="500" height="500" loading="lazy" alt="">
 <label for="search">Shop Finder</label> <input id="search" type="search" placeholder="Find an item">
 <ul id="offers"></ul></section>
 <section id="inventory"><h2>Inventory &amp; Safety Deposit Box</h2>
@@ -29,17 +38,22 @@
 <button name="action" value="store">Store</button> <button name="action" value="retrieve">Retrieve</button></form>
 <p id="items"></p><p id="box"></p></section>
 <section id="bank"><h2>Golden Paw Bank</h2>
+<img class="shop-scene" src="assets/scenes/town-bank.webp" width="500" height="500" loading="lazy" alt="">
 <p id="balance"></p><form id="bank-form"><label for="amount">Paw Coins</label> <input id="amount" type="number" required min="1" max="999999999" value="1">
 <button name="action" value="deposit">Deposit</button> <button name="action" value="withdraw">Withdraw</button></form>
 <p><button id="interest">Collect daily interest</button></p><p>Earn 1% daily on balances of 100 Paw Coins or more.</p></section>
-<section id="trading"><h2>Trading Post</h2><p>Trade with Pawtopia shopkeepers. Bring two Crystal Shards for three Cottage Snacks.</p>
+<section id="trading"><h2>Trading Post</h2>
+<img class="shop-scene" src="assets/scenes/town-trading.webp" width="500" height="500" loading="lazy" alt=""><p>Trade with Pawtopia shopkeepers. Bring two Crystal Shards for three Cottage Snacks.</p>
 <button id="trade">Accept the shopkeeper’s offer</button></section>
-<section id="dailies"><h2>Daily Visits</h2><p>The Wishing Well grants a daily gift. The Soup Kitchen feeds a hungry companion if you have fewer than 10 Paw Coins across your wallet and bank.</p>
+<section id="dailies"><h2>Daily Visits</h2>
+<img class="shop-scene" src="assets/scenes/town-well.webp" width="500" height="500" loading="lazy" alt=""><p>The Wishing Well grants a daily gift. The Soup Kitchen feeds a hungry companion if you have fewer than 10 Paw Coins across your wallet and bank.</p>
 <button id="wish">Visit the Wishing Well</button> <button id="soup">Visit the Soup Kitchen</button></section>
-<section id="arena"><h2>Training Arena</h2><p>Choose a move against Bolt’s practice bot. Strike beats Charge, Guard beats Strike, and Charge beats Guard. Win two rounds first to earn today’s 8-Paw-Coin prize.</p>
+<section id="arena"><h2>Training Arena</h2>
+<img class="shop-scene" src="assets/scenes/town-arena.webp" width="500" height="500" loading="lazy" alt=""><p>Choose a move against Bolt’s practice bot. Strike beats Charge, Guard beats Strike, and Charge beats Guard. Win two rounds first to earn today’s 8-Paw-Coin prize.</p>
 <p id="round"></p><div id="moves"><button data-move="Strike">Strike</button> <button data-move="Guard">Guard</button> <button data-move="Charge">Charge</button></div>
 <p><button id="reset-match">Start a new match</button></p></section>
-<section id="gazette"><h2>The Pawtopia Gazette</h2><p>Bolt’s workshop is open for practice matches. The shopkeepers are collecting Crystal Shards from the Wishing Well.</p>
+<section id="gazette"><h2>The Pawtopia Gazette</h2>
+<img class="shop-scene" src="assets/scenes/town-gazette.webp" width="500" height="500" loading="lazy" alt=""><p>Bolt’s workshop is open for practice matches. The shopkeepers are collecting Crystal Shards from the Wishing Well.</p>
 <a href="index.html#crystal-regions">Explore the ten Crystal Catacombs regions</a></section>
 <p class="foot">Progress is saved in this browser. Paw Coins are in-game currency.</p>
 <noscript>Enable JavaScript to use Pawtopia’s town activities.</noscript>
