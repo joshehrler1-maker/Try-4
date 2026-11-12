@@ -152,7 +152,10 @@
     if (next !== score) { score = next; hud(); }
   }
   function orb(x,y,r,color) {
-    ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    const surface=ctx.createRadialGradient(x-r*.35,y-r*.4,1,x,y,r);
+    surface.addColorStop(0,'#fff7dd');surface.addColorStop(.48,color);surface.addColorStop(1,'#311b50');
+    ctx.save();ctx.shadowColor=color;ctx.shadowBlur=r*.7;
+    ctx.fillStyle=surface;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.restore();
   }
   function draw() {
     ctx.clearRect(0,0,400,400);
@@ -162,7 +165,10 @@
     } else if (mode === 'frost') {
       for (const d of state.drops) {
         if (d.shield) { orb(d.x,d.y,10,'#79fbff'); continue; }
-        ctx.fillStyle='#b1dbff';ctx.beginPath();ctx.moveTo(d.x-8,d.y-12);ctx.lineTo(d.x+8,d.y-12);ctx.lineTo(d.x,d.y+16);ctx.fill();
+        const ice=ctx.createLinearGradient(d.x-9,d.y-11,d.x+10,d.y+12);
+        ice.addColorStop(0,'#e4fdff');ice.addColorStop(.45,'#80c9ff');ice.addColorStop(1,'#4252a5');
+        ctx.fillStyle=ice;ctx.beginPath();ctx.moveTo(d.x-8,d.y-12);ctx.lineTo(d.x+8,d.y-12);ctx.lineTo(d.x,d.y+16);ctx.fill();
+        ctx.fillStyle='#ddfaff99';ctx.beginPath();ctx.moveTo(d.x-3,d.y-12);ctx.lineTo(d.x+2,d.y-12);ctx.lineTo(d.x,d.y+14);ctx.fill();
       }
       orb(state.x,state.y,13,state.protected?'#8afce9':'#ffdf83');
     }
