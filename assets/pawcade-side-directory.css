@@ -1,0 +1,7 @@
+#side-scroll-games{margin:1rem 0;scroll-margin-top:1rem}
+#side-catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,10rem),1fr));gap:.65rem}
+.side-card{display:flex;flex-direction:column;border:1px solid #a586c2;border-radius:.55rem;overflow:hidden;background:#302047;color:#fff2d3;text-decoration:none;font-weight:700}
+.side-card:hover,.side-card:focus-visible{outline:2px solid #ffdb99}
+.side-card-art{width:100%;aspect-ratio:1;background-size:500% 500%;background-repeat:no-repeat}
+.side-card span{display:flex;align-items:center;min-height:44px;padding:.4rem .55rem}
+@media(max-width:470px){#side-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}}

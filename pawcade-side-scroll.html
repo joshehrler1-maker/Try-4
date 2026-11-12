@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pawtopia Side-Scroll Adventures | Super Paw Heroes</title>
+<link rel="stylesheet" href="assets/pawcade-side-scroll.css"><link rel="stylesheet" href="assets/pawcade-side-directory.css">
+<script defer src="assets/pawcade-side-scroll.js"></script></head>
+<body><header><a href="index.html">Super Paw Heroes</a><a href="pawtopia-arcade.html#side-scroll-games">Games Room</a></header>
+<main>
+<section id="side-player" hidden aria-labelledby="side-title">
+<h1 id="side-title" tabindex="-1"></h1><p id="side-rules"></p>
+<div class="side-hud"><button type="button" id="side-start">Start</button><span id="side-progress"></span></div>
+<canvas id="side-canvas" width="800" height="380" aria-label="Side-scrolling playfield" tabindex="0"></canvas>
+<div class="side-controls" aria-label="Touch controls"><button data-control="up" type="button">↑ Jump / Rise</button><button data-control="down" type="button">↓ Crouch / Dive</button><button data-control="action" type="button">Action</button></div>
+<p id="side-status" role="status">Keyboard: ↑, ↓, and Space.</p>
+</section>
+<h2>Side-Scroll Adventures</h2><p>Choose a challenge.</p><div id="side-catalog"></div>
+</main></body></html>

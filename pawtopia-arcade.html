@@ -25,6 +25,8 @@
 <link rel="stylesheet" href="assets/pawtopia-explore.css">
 <link rel="stylesheet" href="assets/pawcade-directory.css">
 <script defer src="assets/pawcade-collection.js"></script>
+<link rel="stylesheet" href="assets/pawcade-side-directory.css">
+<script defer src="assets/pawcade-side-scroll.js"></script>
 </head>
 <body class="pawtopia-scene arcade-art arcade-visuals">
 <header class="arcade-header"><a href="./">Super Paw Heroes</a>
@@ -38,7 +40,7 @@
 <section class="room-frame" aria-labelledby="featured-title">
 <h2 id="featured-title">Featured Game</h2>
 <a class="room-feature" href="?game=crystal#game-panel"><img src="assets/scenes/pawcade-mystic.webp" alt="" width="900" height="300"><span>Crystal Echo</span></a>
-<nav class="room-tabs" aria-label="Games Room shortcuts"><a href="#pawcade-games">All Games</a><a href="#high-scores">High Scores</a><a href="#favourites">Favourites</a></nav>
+<nav class="room-tabs" aria-label="Games Room shortcuts"><a href="#pawcade-games">All Games</a><a href="#side-scroll-games">Side-Scroll Adventures</a><a href="#high-scores">High Scores</a><a href="#favourites">Favourites</a></nav>
 </section>
 <section class="room-frame" aria-labelledby="showcase-title">
 <h2 id="showcase-title">Showcase Games</h2>
@@ -55,6 +57,9 @@
 <label>Game type <select id="collection-filter"><option value="">All types</option></select></label></div>
 <p id="collection-results" role="status"></p><div id="collection-catalog"></div>
 <noscript><a href="pawcade-collection.html">Open the Pawcade Collection</a></noscript>
+</section>
+<section id="side-scroll-games" class="room-frame" aria-labelledby="side-scroll-title">
+<h2 id="side-scroll-title">Side-Scroll Adventures</h2><div id="side-catalog"></div>
 </section>
 <section class="game-directory" id="featured-games" aria-labelledby="directory-title">
 <h2 id="directory-title">Festival Arcade</h2>
