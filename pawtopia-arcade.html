@@ -20,6 +20,8 @@
 <script src="assets/pawtopia-save.js"></script>
 <link rel="stylesheet" href="assets/pawtopia-scenes.css">
 <link rel="stylesheet" href="assets/pawcade-visuals.css">
+<link rel="stylesheet" href="assets/game-fullscreen.css">
+<script src="assets/game-fullscreen.js" defer></script>
 </head>
 <body class="pawtopia-scene arcade-art arcade-visuals">
 <header><a href="./">Super Paw Heroes</a> · <a href="pawtopia-companions.html">Companion Cottage</a><p id="arcade-wallet" aria-live="polite"></p><p>Beat your personal best to earn Paw Coins for your companion.</p><p><a href="pawcade-classics.html">Play the Crystal Regions collection at Pawcade</a></p></header><div class="pawtopia-arcade-scene" aria-hidden="true"></div>
@@ -41,7 +43,7 @@
 <button type="button" data-mode="beacons" data-category="Puzzles" aria-pressed="false">Catacombs Beacons<small>Puzzles · Crystal Catacombs</small></button>
 </nav>
 </section>
-<section class="play" id="game-panel" aria-labelledby="game-title">
+<section class="play" id="game-panel" data-fullscreen-game aria-labelledby="game-title">
 <img class="echo-art" id="echo-art" src="assets/scenes/pawcade-mystic.webp" width="900" height="300" alt="Luna among the crystals of the Purple Mystic Halls" hidden>
 <h2 id="game-title"></h2><p id="rules"></p>
 <div class="hud"><span id="score"></span><span id="best"></span></div>
