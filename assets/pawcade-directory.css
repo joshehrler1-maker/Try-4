@@ -9,3 +9,18 @@
 #collection-catalog strong,#collection-catalog small{padding:.25rem .55rem}
 #collection-catalog small{color:#e9d6f6}
 @media(max-width:450px){#collection-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.arcade-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.45rem 1rem;padding:.55rem max(1rem,calc((100% - 65rem)/2));background:#18142c;border-bottom:1px solid #9873b0}
+.arcade-header a{display:inline-flex;align-items:center;min-height:44px;color:#fff1cf;text-decoration:none;font-weight:750}
+.arcade-header nav{display:flex;flex-wrap:wrap;gap:0 1rem}
+#arcade-wallet{margin:0;font-size:.9rem;color:#ffe2a7}
+.arcade-welcome{display:grid;align-content:end;min-height:clamp(13rem,29vw,19rem);padding:clamp(1rem,4vw,2rem);border:1px solid #a084bc;border-radius:1rem;background:linear-gradient(0deg,#17132cf5,#17132c38),url(scenes/arcade.webp) center/cover}
+.arcade-welcome h1{font-family:Georgia,serif;font-size:clamp(2.35rem,7vw,4.5rem);line-height:1;margin:0;color:#fff2d3}
+.arcade-welcome p{margin:.65rem 0}
+.arcade-welcome nav{display:flex;flex-wrap:wrap;gap:.45rem}
+.arcade-welcome a{display:inline-flex;align-items:center;min-height:44px;padding:.35rem .65rem;border-radius:.45rem;border:1px solid #bf9bd7;background:#35244f;color:#fff4db;text-decoration:none;font-weight:700}
+.arcade-welcome a:hover,.arcade-welcome a:focus-visible{background:#533674}
+.arcade-welcome a[href="#pawcade-games"]{background:#ffe1a7;color:#281a37}
+.arcade-visuals .game-directory .games.paw-map{max-width:32rem}
+.arcade-visuals .game-directory,.arcade-visuals #game-panel,.arcade-visuals #pawcade-games{scroll-margin-top:1rem}
+.arcade-visuals .sponsor{margin-top:1rem}
+@media(max-width:480px){.arcade-header{justify-content:flex-start}.arcade-welcome a{font-size:.85rem}}

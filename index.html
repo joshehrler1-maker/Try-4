@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="assets/pawtopia-explore.css">
 <link rel="stylesheet" href="assets/pawtopia-home.css">
 </head>
-<body class="pawtopia-scene pawtopia-art"><a class="skip-link" href="#main-content">Skip to main content</a><button type="button" id="fullscreen-top" style="display:block;width:calc(100% - 24px);max-width:700px;margin:12px auto;padding:16px;background:#ffe17b;color:#17213a;border:2px solid #fff2b0;border-radius:12px;font:800 20px system-ui">⛶ Full Screen</button>
+<body class="pawtopia-scene pawtopia-art">
 <a class="home-skip" href="#main-content">Skip to content</a>
 <header class="home-header">
 <a class="logo" href="index.html">Super Paw <b>Heroes</b></a>
@@ -48,16 +48,19 @@
 <div class="home-welcome-copy">
 <h1 id="home-title">Super Paw<br>Heroes</h1>
 <p>Explore Pawtopia with Whisker and Luna, adopt a cat companion, and play your way through the Games Room.</p>
-<div class="home-actions"><a class="btn" href="#pawtopia">Explore Pawtopia</a><a class="btn alt" href="universe-center.html">Meet the Heroes</a></div>
+<div class="home-actions"><a class="btn" href="#pawtopia">Explore Pawtopia</a><a class="btn alt" href="pawtopia-arcade.html">Play Games</a></div>
 </div>
 <img src="assets/whisker-luna-master.webp" alt="Whisker and Luna, the Super Paw Heroes" width="1229" height="1536" fetchpriority="high">
 </section>
+<section class="home-directory" aria-labelledby="home-directory-title">
+<h2 id="home-directory-title">Visit Pawtopia</h2>
 <nav class="home-destinations" aria-label="Popular Pawtopia destinations">
 <a href="pawtopia-companions.html"><img src="assets/scenes/cottage.webp" alt="" width="384" height="216"><span>Companion Cottage</span></a>
 <a href="pawtopia-town.html"><img src="assets/scenes/town-market.webp" alt="" width="384" height="216"><span>Town Square</span></a>
 <a href="pawtopia-arcade.html"><img src="assets/scenes/arcade.webp" alt="" width="384" height="216"><span>Games Room</span></a>
 <a href="#crystal-regions"><img src="assets/scenes/catacombs.webp" alt="" width="384" height="216"><span>Crystal Regions</span></a>
 </nav>
+</section>
 
 <section class="content" id="pawtopia" aria-labelledby="pawtopia-heading">
 <h2 id="pawtopia-heading">Explore Pawtopia</h2>
@@ -167,7 +170,7 @@ const style=document.createElement('style');style.textContent=`
 #game-fullscreen-stage:fullscreen #funhud,#game-fullscreen-stage.fs-expanded #funhud{grid-column:1;font-size:12px}
 }`;
 document.head.append(style);
-const tools=document.createElement('div');tools.className='fs-tools';const button=document.createElement('button');button.type='button';button.textContent='⛶ Full Screen';button.setAttribute('aria-pressed','false');const status=document.createElement('span');status.className='fs-status';status.setAttribute('role','status');tools.append(button,status);stage.prepend(tools);const topButton=document.getElementById('fullscreen-top');if(topButton)topButton.addEventListener('click',()=>button.click());
+const tools=document.createElement('div');tools.className='fs-tools';const button=document.createElement('button');button.type='button';button.textContent='⛶ Full Screen';button.setAttribute('aria-pressed','false');const status=document.createElement('span');status.className='fs-status';status.setAttribute('role','status');tools.append(button,status);stage.prepend(tools);
 let oldOverflow='',fallback=false,busy=false;
 function sync(){const on=document.fullscreenElement===stage||fallback;button.textContent=on?'✕ Exit Full Screen':'⛶ Full Screen';button.setAttribute('aria-pressed',String(on));}
 function expand(){oldOverflow=document.body.style.overflow;document.body.style.overflow='hidden';fallback=true;stage.classList.add('fs-expanded');status.textContent='Expanded view. Browser bars may remain.';sync();}
