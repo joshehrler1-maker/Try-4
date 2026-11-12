@@ -33,9 +33,28 @@
 <main>
 <nav class="paw-world-nav" aria-label="Explore Pawtopia"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html">Companions</a><a href="pawtopia-arcade.html" aria-current="page">Games Room</a><a href="pawtopia-town.html">Shops</a><a href="pawtopia-town.html#dailies">Dailies</a><a href="pawtopia-town.html#card-album">Card Album</a><a href="index.html#crystal-regions">Crystal Regions</a></nav>
 
-<section class="arcade-welcome" aria-labelledby="arcade-title">
-<h1 id="arcade-title">Games Room</h1><p>Play with Whisker, Luna, and their friends.</p>
-<nav aria-label="Game collections"><a href="#featured-games">Festival Arcade</a><a href="#pawcade-games">Pawcade Collection · 30 games</a><a href="pawcade-classics.html">Crystal Regions games</a></nav>
+<h1 class="room-title">Games Room</h1>
+<div class="room-spotlight">
+<section class="room-frame" aria-labelledby="featured-title">
+<h2 id="featured-title">Featured Game</h2>
+<a class="room-feature" href="?game=crystal#game-panel"><img src="assets/scenes/pawcade-mystic.webp" alt="" width="900" height="300"><span>Crystal Echo</span></a>
+<nav class="room-tabs" aria-label="Games Room shortcuts"><a href="#pawcade-games">All Games</a><a href="#high-scores">High Scores</a><a href="#favourites">Favourites</a></nav>
+</section>
+<section class="room-frame" aria-labelledby="showcase-title">
+<h2 id="showcase-title">Showcase Games</h2>
+<ul class="room-showcase">
+<li><a href="?game=lantern#game-panel"><img src="assets/scenes/arcade.webp" alt="">Lantern Festival</a></li>
+<li><a href="frost-snowball-factory.html"><img src="assets/scenes/pawcade-frost.webp" alt="">Frost’s Snowball Factory</a></li>
+<li><a href="pawcade-collection.html?game=3-0"><img src="assets/scenes/indigo-shadow-tunnels.webp" alt="">Shadow’s Lantern Maze</a></li>
+</ul>
+</section>
+</div>
+<section id="pawcade-games" class="pawcade-directory" aria-labelledby="pawcade-games-title">
+<h2 id="pawcade-games-title">All Games</h2>
+<div class="collection-filters"><label>Find a game <input id="collection-search" type="search"></label>
+<label>Game type <select id="collection-filter"><option value="">All types</option></select></label></div>
+<p id="collection-results" role="status"></p><div id="collection-catalog"></div>
+<noscript><a href="pawcade-collection.html">Open the Pawcade Collection</a></noscript>
 </section>
 <section class="game-directory" id="featured-games" aria-labelledby="directory-title">
 <h2 id="directory-title">Festival Arcade</h2>
@@ -62,13 +81,17 @@
 <p id="status" role="status"></p><button class="start" id="start" type="button">Start game</button><button class="echo-sound" id="echo-sound" type="button" aria-pressed="false" hidden>Sound off</button>
 </section>
 
-<section id="pawcade-games" class="pawcade-directory" aria-labelledby="pawcade-games-title">
-<h2 id="pawcade-games-title">Pawcade Collection</h2>
-<div class="collection-filters"><label>Find a Pawcade game <input id="collection-search" type="search"></label>
-<label>Game type <select id="collection-filter"><option value="">All types</option></select></label></div>
-<p id="collection-results" role="status"></p><div id="collection-catalog"></div>
-<noscript><a href="pawcade-collection.html">Open the Pawcade Collection</a></noscript>
+
+<div class="room-score-layout">
+<section class="room-frame" id="high-scores" aria-labelledby="high-scores-title">
+<h2 id="high-scores-title">High Scores</h2>
+<p>Personal bests saved in this browser.</p>
+<table class="room-scores"><thead><tr><th scope="col">Rank</th><th scope="col">Game</th><th scope="col">Score</th></tr></thead><tbody id="room-score-rows"></tbody></table>
 </section>
+<section class="room-frame" id="favourites" aria-labelledby="favourites-title">
+<h2 id="favourites-title">Favourites</h2><ul id="room-favourites"></ul>
+</section>
+</div>
 <aside class="sponsor" aria-label="House advertisement"><small>From Super Paw Heroes</small><a href="coloring-book.html">Try the free Crystal Catacombs coloring pages</a></aside>
 </main>
 <footer><a href="super-paw-3d.html">Play the Crystal Catacombs 3D RPG</a></footer>
@@ -233,7 +256,10 @@ function scoreboard() {
       progress.arcadeBests[game] = newBest;
       progress.coins += reward;
       return '+' + reward + ' Paw Coins';
-    }).then(renderWallet);
+    }).then(() => {
+      renderWallet();
+      dispatchEvent(new Event('pawtopia-arcade-score'));
+    });
   }
   byId('score').textContent = 'Score: ' + score;
   byId('best').textContent = 'Best: ' + best;

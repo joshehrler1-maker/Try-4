@@ -24,3 +24,24 @@
 .arcade-visuals .game-directory,.arcade-visuals #game-panel,.arcade-visuals #pawcade-games{scroll-margin-top:1rem}
 .arcade-visuals .sponsor{margin-top:1rem}
 @media(max-width:480px){.arcade-header{justify-content:flex-start}.arcade-welcome a{font-size:.85rem}}
+.room-title{font:700 clamp(2.1rem,7vw,4.2rem) Georgia,serif;color:#fff1cf;margin:1rem 0}
+.room-spotlight,.room-score-layout{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(0,1fr);gap:.85rem;margin:1rem 0}
+.room-frame{min-width:0;padding:.85rem;border:1px solid #ab89c7;border-radius:.8rem;background:linear-gradient(#392550,#211632);color:#fcf0dd}
+.room-frame h2{font:700 1.35rem Georgia,serif;color:#ffe1a6;margin:0 0 .65rem}
+.room-feature{position:relative;display:block;border-radius:.55rem;overflow:hidden;border:1px solid #a98bc4}
+.room-feature img{width:100%;height:auto;display:block;aspect-ratio:2.4;object-fit:cover}
+.room-feature span{position:absolute;inset:auto 0 0;background:linear-gradient(transparent,#1c1036);padding:.85rem;color:#fff4ce;font:700 clamp(1.1rem,4vw,1.8rem) Georgia,serif}
+.room-tabs{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.65rem}
+.room-tabs a{display:inline-flex;align-items:center;min-height:44px;padding:.35rem .65rem;border-radius:.45rem;background:#f9dc9c;color:#30203d;font-weight:750}
+.room-showcase,#room-favourites{padding:0;list-style:none;margin:0}
+.room-showcase a{display:flex;gap:.55rem;align-items:center;padding:.35rem;color:#fff0ce;font-weight:700}
+.room-showcase img{width:3.5rem;aspect-ratio:1;object-fit:cover;border-radius:.35rem}
+.room-game{position:relative;min-width:0}
+.room-game .game-card{height:100%}
+.room-star{position:absolute;top:.25rem;right:.25rem;min-width:44px;min-height:44px;border:1px solid #dfbd84;border-radius:.4rem;background:#211432ef;color:#ffe3a0;font-size:1.3rem;cursor:pointer}
+.room-scores{width:100%;border-collapse:collapse;text-align:left}
+.room-scores th,.room-scores td{padding:.4rem;border-bottom:1px solid #775b8b}
+.room-scores th:last-child,.room-scores td:last-child{text-align:right}
+#room-favourites li{padding:.4rem 0}
+#high-scores,#favourites{scroll-margin-top:1rem}
+@media(max-width:660px){.room-spotlight,.room-score-layout{grid-template-columns:1fr}.room-showcase img{width:2.8rem}}

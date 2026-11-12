@@ -23,14 +23,85 @@
     title, kind, variant, type, art: art[title.split('’')[0]], id: kind + '-' + variant
   })));
   const directory = Boolean(byId('collection-catalog'));
+  const roomGames = [
+    ['Lantern Festival','Action','arcade','?game=lantern#game-panel','lantern'],
+    ['Crystal Echo','Puzzles','pawcade-mystic','?game=crystal#game-panel','crystal'],
+    ['Iron Fang Defense','Action','pawcade-flame','?game=defense#game-panel','defense'],
+    ['Town Square Courier','Action','pawtopia','?game=courier#game-panel','courier'],
+    ['Pawgrove Forge','Puzzles','green-life-groves','?game=forge#game-panel','forge'],
+    ['Catacombs Beacons','Puzzles','catacombs','?game=beacons#game-panel','beacons'],
+    ['Crystal Spring','Action','pawcade-mystic','crystal-spring.html','paw-crystal-best'],
+    ['Frost’s Snowball Factory','Action','pawcade-frost','frost-snowball-factory.html','pawcade-snowball-factory'],
+    ['Whisker’s Plushie Launch','Action','pawcade-flame','whisker-plushie-launch.html','pawcade-plush-launch'],
+    ['Bolt’s Toy Workshop','Puzzles','blue-tech-mines','bolt-toy-workshop.html','pawcade-bolt-workshop'],
+    ['Crystal Catacombs 3D','Adventure','catacombs','super-paw-3d.html'],
+    ['Timekeepers of Pawtopia','Adventure','pawtopia','pawtopia-timekeepers.html'],
+    ['Pawgrove: The Lantern Curse','Adventure','green-life-groves','pawgrove.html'],
+    ['Hero Choice Challenge','Quiz','pawtopia','index.html#challenge']
+  ].map(([title,type,art,href,key]) => ({title,type:{name:type},art,href,key,id:href}));
+  const entries = directory ? [...roomGames, ...games] : games;
+  const hrefFor = item => item.href || 'pawcade-collection.html?game=' + item.id;
+  function scoreFor(item, bests) {
+    if (item.href && !item.key) return 0;
+    const key = item.key || 'collection-' + item.id;
+    try {
+      return Math.max(bests[key] || 0, Number(localStorage.getItem(key)) || 0,
+        Number(localStorage.getItem('pawtopia-arcade-' + key)) || 0);
+    } catch {
+      return bests[key] || 0;
+    }
+  }
+  function roomPanels() {
+    const progress = save.read();
+    const scores = entries.map(item => ({item, score:scoreFor(item, progress.arcadeBests)}))
+      .filter(entry => entry.score > 0).sort((a,b) => b.score-a.score || a.item.title.localeCompare(b.item.title));
+    const rows = scores.map(({item,score},index) => {
+      const row = document.createElement('tr');
+      const rank = document.createElement('td');
+      const name = document.createElement('td');
+      const value = document.createElement('td');
+      const link = document.createElement('a');
+      link.href = hrefFor(item);
+      link.textContent = item.title;
+      rank.textContent = index+1;
+      value.textContent = score.toLocaleString();
+      name.append(link);
+      row.append(rank,name,value);
+      return row;
+    });
+    if (!rows.length) {
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 3;
+      cell.textContent = 'Play a scored game to set your first record.';
+      row.append(cell);
+      rows.push(row);
+    }
+    byId('room-score-rows').replaceChildren(...rows);
+    const favourites = entries.filter(item => (progress.arcadeFavourites || []).includes(item.id));
+    const links = favourites.map(item => {
+      const line = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = hrefFor(item);
+      link.textContent = item.title;
+      line.append(link);
+      return line;
+    });
+    if (!links.length) {
+      const line = document.createElement('li');
+      line.textContent = 'Use the star on a game card to save it here.';
+      links.push(line);
+    }
+    byId('room-favourites').replaceChildren(...links);
+  }
   function catalog() {
     const query=byId(directory ? 'collection-search' : 'search').value.trim().toLowerCase();
     const filter=byId(directory ? 'collection-filter' : 'filter').value;
-    const found=games.filter(item => (!filter || item.type.name===filter) && item.title.toLowerCase().includes(query));
-    byId(directory ? 'collection-results' : 'results').textContent=found.length + ' of 30 games';
+    const found=entries.filter(item => (!filter || item.type.name===filter) && item.title.toLowerCase().includes(query));
+    byId(directory ? 'collection-results' : 'results').textContent=found.length + ' of ' + entries.length + ' games';
     byId(directory ? 'collection-catalog' : 'catalog').replaceChildren(...found.map(item=>{
       const button=document.createElement(directory ? 'a' : 'button');
-      if (directory) button.href='pawcade-collection.html?game=' + item.id;
+      if (directory) button.href=hrefFor(item);
       else button.type='button';
       button.className='game-card';
       const img=document.createElement('img');
@@ -42,18 +113,50 @@
       const category=document.createElement('small');
       category.textContent=item.type.name;
       button.append(img,title,category);
-      if (!directory) button.addEventListener('click',()=>select(item,button));
-      return button;
+      if (!directory) {
+        button.addEventListener('click',()=>select(item,button));
+        return button;
+      }
+      const card = document.createElement('article');
+      card.className = 'room-game';
+      const star = document.createElement('button');
+      star.type = 'button';
+      star.className = 'room-star';
+      const active = (save.read().arcadeFavourites || []).includes(item.id);
+      star.textContent = active ? '★' : '☆';
+      star.setAttribute('aria-label', 'Favourite ' + item.title);
+      star.setAttribute('aria-pressed', String(active));
+      star.addEventListener('click', async () => {
+        await save.update(progress => {
+          const favourites = new Set(progress.arcadeFavourites || []);
+          if (favourites.has(item.id)) favourites.delete(item.id);
+          else favourites.add(item.id);
+          progress.arcadeFavourites = [...favourites];
+          return 'Favourites updated.';
+        });
+        const selected = (save.read().arcadeFavourites || []).includes(item.id);
+        star.textContent = selected ? '★' : '☆';
+        star.setAttribute('aria-pressed', String(selected));
+        roomPanels();
+      });
+      card.append(button,star);
+      return card;
     }));
   }
   function mountCatalog() {
-    types.forEach(type=>byId(directory ? 'collection-filter' : 'filter').add(new Option(type.name,type.name)));
+    for (const name of new Set(entries.map(item => item.type.name))) {
+      byId(directory ? 'collection-filter' : 'filter').add(new Option(name,name));
+    }
     byId(directory ? 'collection-search' : 'search').addEventListener('input',catalog);
     byId(directory ? 'collection-filter' : 'filter').addEventListener('change',catalog);
     catalog();
   }
   if (directory) {
     mountCatalog();
+    roomPanels();
+    addEventListener('pageshow',roomPanels);
+    addEventListener('storage',roomPanels);
+    addEventListener('pawtopia-arcade-score',roomPanels);
     return;
   }
   const marks = [['◆','✦','●','▲','■','✚','♥','☾'],['☀','☁','❄','☂','⚡','✿','♬','★'],['1','2','3','4','5','6','7','8']];
