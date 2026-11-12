@@ -6,8 +6,9 @@
 <script src="assets/game-fullscreen.js" defer></script>
 <link rel="stylesheet" href="assets/pawcade-visuals.css">
 <body class="arcade-visuals"><main data-fullscreen-game><nav><a href="index.html">Super Paw Heroes</a><a href="pawcade-classics.html">Back to Pawcade</a></nav><h1>Whisker’s Plushie Launch</h1>
-<p id="hud"></p><div class="arena"><canvas width="600" height="390" aria-label="Whisker’s Plushie Launch playfield"></canvas><div class="panel" id="panel"><h2 id="heading">Whisker’s Plushie Launch</h2><p id="info">Help Whisker send a Baron Brasswhirl plushie flying across the Red Flame Caves.</p><button id="start">Start game</button></div></div>
-<div class="controls"><button id="act" disabled>Drop plush</button><button id="pause" disabled>Pause</button></div><p class="hint">Wait for a tailwind. Tap Drop plush, then Swing as the plush reaches the gold line. Tap Bounce just before it touches the ground. Space also works.</p></main><script>
+<p id="hud"></p><div class="arena"><canvas width="600" height="390" data-hd="390" aria-label="Whisker’s Plushie Launch playfield"></canvas><div class="panel" id="panel"><h2 id="heading">Whisker’s Plushie Launch</h2><p id="info">Help Whisker send a Baron Brasswhirl plushie flying across the Red Flame Caves.</p><button id="start">Start game</button></div></div>
+<div class="controls"><button id="act" disabled>Drop plush</button><button id="pause" disabled>Pause</button></div><p class="hint">Wait for a tailwind. Tap Drop plush, then Swing as the plush reaches the gold line. Tap Bounce just before it touches the ground. Space also works.</p></main><script src="assets/game-hd.js"></script>
+<script>
 const el=id=>document.getElementById(id), field=document.querySelector('canvas'), ctx=field.getContext('2d');
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const record='pawcade-plush-launch';
