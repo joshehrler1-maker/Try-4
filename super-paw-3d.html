@@ -471,7 +471,7 @@ miniBossBreeds.push({breed:'Husky',fur:[.31,.37,.56],muzzle:[.92,.94,1],ears:'up
 encounterBook.push({faction:'Nightglass Crew',troop:'Nightglass Scout',type:'orbit',boss:'Vesper Frost',style:'crystal',skill:'eclipse',hint:'Watch the marked ground. Vesper cycles between pulses, volleys and charges.',color:[.55,.67,1]});
 const mainBossSpec={...encounterBook[5],boss:'Baron Brasswhirl',style:'brass',hint:'Brasswhirl alternates volleys, marked pulses and wind-up charges; speeds up below half health.'};
 const layouts=[
-{rooms:[[0,0],[-10,-9],[10,-9],[-10,9],[10,9],[0,-13]],links:[[0,1],[0,2],[0,3],[0,4],[1,5],[2,5]]},
+{rooms:[[0,0],[-10,-9],[10,-9],[-10,9],[10,9],[0,-13]],links:[[0,1],[0,2],[0,3],[0,4],[1,5],[2,5]],fixed:true,roomSizes:[[9,9],[10,9],[9,8],[10,10],[9,8],[10,9]],horizontalLinks:[false,true,true,false,true,false]},
 {rooms:[[0,0],[-9,2],[-9,-9],[9,-9],[9,9],[0,-13]],links:[[0,1],[1,2],[2,3],[3,4],[4,0],[3,5]]},
 {rooms:[[0,0],[-9,-8],[8,-7],[-9,10],[8,10],[0,-13]],links:[[0,1],[1,2],[2,4],[4,3],[3,0],[1,5]]},
 {rooms:[[0,0],[-11,-8],[10,-10],[-10,10],[10,8],[0,-13]],links:[[0,3],[3,1],[0,4],[4,2],[1,5],[2,5]]},
@@ -774,7 +774,7 @@ function resetStory(n){
  $('story-heading').textContent=story[n-1].title;
  $('story-note').textContent=story[n-1].lead;
 }
-const districtPlaces=[['Arrival Plaza','Sunclock Court','Lantern Terrace','Founders Walk','Gadget Treasury','Cogpaw Courtyard'],['Market Gate','Silk Arcade','Moonlit Bazaar','Merchant Lane','Gadget Treasury','Inkveil Pavilion'],['Cavern Entrance','Amethyst Gallery','Echo Chamber','Mineral Passage','Gadget Treasury','Glint Grotto'],['Dockside Gate','Cargo Wharf','Crane Yard','Tidal Walk','Gadget Treasury','Admiral Pier'],['Garden Gate','Cypress Court','Orchard Walk','Glasshouse Terrace','Gadget Treasury','Bramblecoil Conservatory'],['Fortress Approach','West Bastion','East Rampart','Clockwork Hall','Gadget Treasury','Throne Courtyard']];
+const districtPlaces=[['Arrival Plaza','Sunclock Court','Lantern Terrace','Founders Walk','Gadget Treasury','Clocktower Courtyard'],['Market Gate','Silk Arcade','Moonlit Bazaar','Merchant Lane','Gadget Treasury','Inkveil Pavilion'],['Cavern Entrance','Amethyst Gallery','Echo Chamber','Mineral Passage','Gadget Treasury','Glint Grotto'],['Dockside Gate','Cargo Wharf','Crane Yard','Tidal Walk','Gadget Treasury','Admiral Pier'],['Garden Gate','Cypress Court','Orchard Walk','Glasshouse Terrace','Gadget Treasury','Bramblecoil Conservatory'],['Fortress Approach','West Bastion','East Rampart','Clockwork Hall','Gadget Treasury','Throne Courtyard']];
 
 districtPlaces.push(['Lantern Gate','Silk Alley','Rooftop Walk','Neon Arcade','Hidden Supply Court','Moonspire Plaza']);
 let miniCats=[],kittenCover=[],catCelebration=null;
@@ -798,9 +798,12 @@ function stepCatCelebration(dt){const party=catCelebration;party.elapsed+=dt;mot
   updateHud();
  }}}
 
-function buildDistrict(n){let state=(campaignSeed+n*7919)>>>0;const rand=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296};const layout=layouts[n-1],mirror=rand()<.5?-1:1;
-dungeonRooms=layout.rooms.map(([x,z],i)=>({x:Math.round(x*1.5)*mirror,z:Math.round(z*1.5),w:i===0?9:8+Math.floor(rand()*2),d:i===0?9:8+Math.floor(rand()*2),name:districtPlaces[n-1][i]}));
-dungeonRects=dungeonRooms.slice();for(const [a,b]of layout.links){const A=dungeonRooms[a],B=dungeonRooms[b],horizontal=rand()<.5;const corner=horizontal?{x:B.x,z:A.z}:{x:A.x,z:B.z};for(const [P,Q]of [[A,corner],[corner,B]])dungeonRects.push({x:(P.x+Q.x)/2,z:(P.z+Q.z)/2,w:Math.abs(P.x-Q.x)+3.8,d:Math.abs(P.z-Q.z)+3.8});}
+function buildDistrict(n){let state=(campaignSeed+n*7919)>>>0;const rand=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296};const layout=layouts[n-1],mirror=layout.fixed?1:(rand()<.5?-1:1);
+dungeonRooms=layout.rooms.map(([x,z],i)=>{
+ const [w,d]=layout.roomSizes?.[i]||(i===0?[9,9]:[8+Math.floor(rand()*2),8+Math.floor(rand()*2)]);
+ return {x:Math.round(x*1.5)*mirror,z:Math.round(z*1.5),w,d,name:districtPlaces[n-1][i]};
+});
+dungeonRects=dungeonRooms.slice();for(const [i,[a,b]]of layout.links.entries()){const A=dungeonRooms[a],B=dungeonRooms[b],horizontal=layout.horizontalLinks?.[i]??(rand()<.5);const corner=horizontal?{x:B.x,z:A.z}:{x:A.x,z:B.z};for(const [P,Q]of [[A,corner],[corner,B]])dungeonRects.push({x:(P.x+Q.x)/2,z:(P.z+Q.z)/2,w:Math.abs(P.x-Q.x)+3.8,d:Math.abs(P.z-Q.z)+3.8});}
 const end=dungeonRooms[5];
  gateOpen=false;
  regionGate={x:end.x,z:end.z-end.d/2-1.35};
