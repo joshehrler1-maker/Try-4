@@ -27,20 +27,9 @@
       return 'Progress could not be saved in this browser.';
     }
   }
-  const baseStats = { level: 1, strength: 1, defence: 1, movement: 1, endurance: 2, intelligence: 1 };
-  const aptitudes = {
-    strength: ['Maine Coon', 'American Bobtail', 'Norwegian Forest Cat', 'Pixiebob', 'Siberian', 'Toyger'],
-    defence: ['British Shorthair', 'Chartreux', 'Manx', 'Persian', 'Scottish Fold', 'Cymric'],
-    movement: ['Bengal', 'Abyssinian', 'Egyptian Mau', 'Ocicat', 'Savannah', 'Sokoke'],
-    endurance: ['Ragdoll', 'Birman', 'Ragamuffin', 'Turkish Van', 'Kurilian Bobtail'],
-    intelligence: ['Siamese', 'Sphynx', 'Oriental Shorthair', 'Cornish Rex', 'Balinese', 'Devon Rex']
-  };
+  const baseStats = { level: 1, strength: 2, defence: 2, movement: 2, endurance: 2, intelligence: 2 };
   function battleStats(cat) {
-    const values = { ...baseStats };
-    for (const [stat, breeds] of Object.entries(aptitudes)) {
-      if (breeds.includes(cat?.breed)) values[stat]++;
-    }
-    return { ...values, ...cat?.stats };
+    return { ...baseStats, ...cat?.stats };
   }
   function maxHealth(stats) {
     return 8 + stats.endurance * 2;
