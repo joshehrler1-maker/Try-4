@@ -6,17 +6,17 @@
 <link rel="stylesheet" href="assets/pawcade-collection.css">
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/pawcade-collection.js"></script>
-</head>
+<link rel="stylesheet" href="assets/game-fullscreen.css"><script defer src="assets/game-fullscreen.js"></script><link rel="stylesheet" href="assets/touch-joystick.css"><script src="assets/touch-joystick.js"></script></head>
 <body>
 <header><a href="index.html">Super Paw Heroes</a><nav aria-label="Pawtopia"><a href="pawtopia-arcade.html">Games Room</a><a href="pawtopia-companions.html">Companions</a></nav></header>
 <main>
 <section class="banner"><h1>Pawcade Collection</h1><p>Arcade challenges across Pawtopia</p></section>
-<section aria-labelledby="cabinet-name" class="cabinet" id="cabinet" hidden>
+<section aria-labelledby="cabinet-name" class="cabinet" id="cabinet" data-fullscreen-game hidden>
 <a href="#collection" id="back">Back to collection</a>
 <img id="cabinet-scene" alt="" width="900" height="300">
 <h2 id="cabinet-name" tabindex="-1"></h2><p id="rules"></p>
 <div class="controls"><button id="start" type="button">Start game</button><span id="score"></span><span id="best"></span></div>
-<div id="board" role="group" aria-label="Game board"></div>
+<div id="board" role="group" aria-label="Game board"></div><div class="cabinet-controls"><div class="touch-joystick" id="touch-stick" role="img" aria-label="Drag to select a tile"><span></span></div><button id="select-tile" type="button">Select tile</button></div>
 <p id="message" role="status"></p>
 </section>
 <section id="collection" aria-labelledby="collection-title">

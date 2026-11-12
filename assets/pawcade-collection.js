@@ -157,6 +157,7 @@
   const marks = ['◆','✦','●','▲','■','✚','♥','☾'];
   const board = byId('board');
   const cabinet = byId('cabinet');
+  bindTileJoystick(byId('touch-stick'),board,()=>Number(board.style.getPropertyValue('--columns')) || 1,byId('select-tile'));
   const pick = n => Math.floor(Math.random() * n);
   let game, state, clock, serial = 0;
   function shuffle(items) {

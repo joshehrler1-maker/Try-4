@@ -26,8 +26,8 @@
 <link rel="stylesheet" href="assets/pawcade-directory.css">
 <script defer src="assets/pawcade-collection.js"></script>
 <link rel="stylesheet" href="assets/pawcade-side-directory.css">
-<script defer src="assets/pawcade-side-scroll.js"></script>
-</head>
+<script defer src="assets/platform-worlds.js"></script><script defer src="assets/pawcade-side-scroll.js"></script>
+<link rel="stylesheet" href="assets/touch-joystick.css"><script src="assets/touch-joystick.js"></script></head>
 <body class="pawtopia-scene arcade-art arcade-visuals">
 <header class="arcade-header"><a href="./">Super Paw Heroes</a>
 <nav aria-label="Pawtopia destinations"><a href="pawtopia-town.html">Town Square</a><a href="pawtopia-companions.html">Companion Cottage</a></nav>
@@ -82,7 +82,7 @@
 <img class="echo-art" id="echo-art" src="assets/scenes/pawcade-mystic.webp" width="900" height="300" alt="" hidden>
 <h2 id="game-title" tabindex="-1"></h2><p id="rules"></p>
 <div class="hud"><span id="score"></span><span id="best"></span></div>
-<div class="grid" id="grid" role="group" aria-label="Game tiles"></div>
+<div class="grid" id="grid" role="group" aria-label="Game tiles"></div><div class="cabinet-controls"><div class="touch-joystick" id="arcade-stick" role="img" aria-label="Drag to select a tile"><span></span></div><button id="arcade-select" type="button">Select tile</button></div>
 <p id="status" role="status"></p><button class="start" id="start" type="button">Start game</button><button class="echo-sound" id="echo-sound" type="button" aria-pressed="false" hidden>Sound off</button>
 </section>
 
@@ -269,6 +269,7 @@ function scoreboard() {
   byId('score').textContent = 'Score: ' + score;
   byId('best').textContent = 'Best: ' + best;
 }
+bindTileJoystick(byId('arcade-stick'),byId('grid'),()=>4,byId('arcade-select'));
 function draw(highlight = -1) {
   tiles.forEach((tile, index) => {
     const lit = index === highlight;

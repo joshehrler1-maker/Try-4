@@ -1,215 +1,318 @@
 (() => {
   'use strict';
   const byId = id => document.getElementById(id);
-  const games = [
-    ['Whisker’s Forge Leap','Jump over molten vents. Clear six vents.','▲','#ff9066', (s,t) => s.y > 58],
-    ['Luna’s Library Slide','Hold ↓ under the moving shelves. Slide under six.','▰','#bca8ff', s => s.down && s.y < 16],
-    ['Coral Courier','Hold ↑ to swim upward and ↓ to dive. Match six delivery depths.','✉','#66f5dc', (s,t) => Math.abs(s.y-t.height)<38, 'swim'],
-    ['Bolt’s Clocktower Relay','Press Action as each clock hand passes the gold line. Hit six timing windows.','◷','#ffcb70', (s,t) => t.hit, 'timing'],
-    ['Ivy’s Seed Garden','Press Action to plant seeds in the passing soil beds while grounded. Plant six.','❀','#97eb81', (s,t) => t.hit, 'ground'],
-    ['Frost’s Waterfall Climb','Hold ↑ to glide beside the upper ledges, then release for the lower ones. Reach six ledges.','❄','#a8ecff', (s,t) => Math.abs(s.y-t.height)<48, 'glide'],
-    ['Lantern Festival Juggle','Press Action to toss your lantern. It must still be in the air at each arch.','◇','#ffb38e', s => s.lantern>30,'juggle'],
-    ['Crystal Mine Polarity','Action switches crystal polarity. Match the colour of six passing crystals.','◆','#d9a6ff', (s,t) => s.polarity===t.index%2,'polarity'],
-    ['Melody’s Stage Beat','Each marker is a beat: ↑, ↓, or Action. Press the displayed input inside the timing ring.','♫','#ff9ed3', (s,t) => t.hit,'beat'],
-    ['Stone’s Quarry Crane','Hold Action to lift the crate; release to lower it. Deliver six crates at the marked heights.','■','#e7bc83', (s,t) => Math.abs(s.y-t.height)<37,'crane'],
-    ['Sunset Wind Sail','Press Action to switch sail direction. Hold ↑ or ↓ to change altitude. Match wind and lane.','➤','#ffd27b', (s,t) => s.polarity===t.index%2 && Math.abs(s.y-t.height)<52,'sail'],
-    ['Cloud City Double Jump','Tap ↑ twice before landing. Reach six high cloud gates.','☁','#b2ffe1', s => s.y>114,'double'],
-    ['Thunder Harbor Shield','Press Action to raise a brief shield against lightning. Block six strikes.','ϟ','#a9c8ff', s => s.shield>0,'shield'],
-    ['Autumn Trail Photographer','Frame the birds at their height with ↑ or ↓, then press Action near each bird to take its photo.','✧','#ffb479', (s,t) => t.hit,'photo'],
-    ['Observatory Gravity Flip','Action flips gravity. Alternate ceiling and floor to reach the marked star gates.','★','#c6b0ff', (s,t) => Math.abs(s.y-t.height)<50,'gravity'],
-    ['Bamboo Village Lantern Count','Count the small lanterns on each sign. Press Action when the count is odd.','▦','#a4eda8', (s,t) => t.hit === Boolean(t.count%2),'count'],
-    ['Steamworks Valve Rush','Tap Action repeatedly before a valve reaches you. Each valve needs the displayed number of turns.','⚙','#ff9e9d', (s,t) => t.taps>=t.count,'valve'],
-    ['Snow Village Warmth Run','Collect warm mugs on the ground. Jump over ice patches. Finish with warmth remaining.','☕','#d9cbff', (s,t) => t.index%2 ? s.y>50 : s.y<22,'warmth'],
-    ['Canyon Bridge Balance','Hold ↑ or ↓ to move the balance marker toward the wind arrow. Stay inside the safe band at each checkpoint.','↔','#ffbb84', (s,t) => Math.abs(s.y-t.height)<35,'balance'],
-    ['Submarine Dock Sonar','Press Action once to reveal each gate’s depth, then steer through its opening.','◎','#7cf4df', (s,t) => t.revealed && Math.abs(s.y-t.height)<45,'sonar'],
-    ['Neon Arcade Dash','Action starts a brief dash. Time it to pass through six neon barriers.','»','#ff8bde', s => s.dash>0,'dash'],
-    ['Marble Temple Switches','Jump into the upper switch or crouch at the lower switch, then press Action to open the gate.','⊞','#fff1c5', (s,t) => t.hit,'switch'],
-    ['Swamp Bubble Ferry','Hold Action to inflate a bubble and float. Release it to sink beneath low branches. Alternate heights.','◉','#a5d482', (s,t) => Math.abs(s.y-t.height)<44,'bubble'],
-    ['Sunflower Field Pollinator','Collect pollen from a tall flower, then carry it to the next low bloom. Repeat three deliveries.','✿','#ffe577', (s,t) => t.index%2 ? s.pollen && s.y<30 : s.y>52,'pollen'],
-    ['Starship Cargo Orbit','Press Action to reverse the orbiting cargo. Align it with each dock as you pass.','✦','#8dcbff', (s,t) => Math.abs(90+Math.sin(s.orbit)*70-t.height)<40,'orbit']
-  ].map(([name,rules,icon,color,check,mode='jump'],id)=>({name,rules,icon,color,check,mode,id}));
-  const player=byId('side-player');
-  const canvas=byId('side-canvas');
-  const atlasUrl='assets/scenes/side-scroll-worlds.webp';
-  function artStyle(element,id) {
-    element.style.backgroundImage='url('+atlasUrl+')';
-    element.style.backgroundPosition=(id%5*25)+'% '+(Math.floor(id/5)*25)+'%';
-  }
-  const catalog=byId('side-catalog');
-  const inRoom=!player;
-  catalog.replaceChildren(...games.map(game=>{
-    const link=document.createElement('a');
-    link.className='side-card';
-    link.href='pawcade-side-scroll.html?game='+game.id;
-    const art=document.createElement('div');
-    art.className='side-card-art';
-    artStyle(art,game.id);
-    const title=document.createElement('span');
-    title.textContent=game.name;
-    link.append(art,title);
+  const scenery = 'assets/scenes/side-scroll-worlds.webp';
+  const courses = window.pawtopiaCourses;
+  const catalog = byId('side-catalog');
+  if (!catalog) return;
+  catalog.replaceChildren(...courses.map(([name], index) => {
+    const link = document.createElement('a');
+    link.className = 'side-card';
+    link.href = 'pawcade-side-scroll.html?game=' + index;
+    const art = document.createElement('div');
+    art.className = 'side-card-art';
+    art.style.backgroundImage = 'url(' + scenery + ')';
+    art.style.backgroundPosition = (index % 5 * 25) + '% ' + (Math.floor(index / 5) * 25) + '%';
+    const title = document.createElement('span');
+    title.textContent = name;
+    link.append(art, title);
     return link;
   }));
-  if(inRoom)return;
-  const key=new URLSearchParams(location.search).get('game');
-  if(key===null || !/^\d+$/.test(key) || !games[Number(key)])return;
-  const game=games[Number(key)];
-  const ctx=canvas.getContext('2d');
-  const art=new Image();
-  art.src=atlasUrl;
-  const active=new Set();
-  const floor=302;
-  const heroX=145;
-  const goal=6;
-  let state, raf, last;
-  const targets=Array.from({length:goal},(_,index)=>({
-    index,x:470+index*390,height:index%2 ? 35 : 136,count:2+index%3,hit:false,taps:0,revealed:false
-  }));
+
+  const canvas = byId('side-canvas');
+  if (!canvas) return;
+  const selection = new URLSearchParams(location.search).get('game');
+  if (selection === null || !/^\d+$/.test(selection) || !courses[Number(selection)]) return;
+  const index = Number(selection);
+  const [name, hero, opening, ending, power, terrain, enemy] = courses[index];
+  const descriptions = {
+    stomp:'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Hold Jump to swim upward',
+    dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
+    throw:'Press Action to throw a crystal', flip:'Press Action to reverse gravity',
+    pulse:'Press Action to release a shockwave', grapple:'Press Action to pull toward overhead rails',
+    double:'Jump again in midair', shield:'Hold Action to deflect hazards',
+    photo:'Press Action to stun enemies with a flash', bubble:'Hold Action to float'
+  };
+  const ctx = canvas.getContext('2d');
+  const backdrop = new Image();
+  backdrop.src = scenery;
+  const sprites = new Image();
+  sprites.src = 'assets/scenes/platform-sprites.webp';
+  const poster = new Image();
+  poster.src = 'assets/whisker-luna-master.webp';
+  const mobile = new Set();
+  const keys = new Set();
+  const held = key => mobile.has(key) || keys.has(key);
+  const width = 800;
+  const height = 380;
+  const sections = 6;
+  const sectionSize = 2200;
+  const finish = sections * sectionSize;
+  const finale = ['guardian','switch','sprint','guardian','summit'][index%5];
+  const exitX = finish+720;
+  const ground = 326;
+  const checkpoint = x => Math.floor(x / sectionSize) * sectionSize;
+  const status = message => { byId('side-status').textContent = message; };
+  const powerButton = document.querySelector('[data-control="action"]');
+  powerButton.hidden = power === 'stomp' || power === 'double' || power === 'swim' || power === 'glide';
+  byId('side-player').hidden = false;
+  byId('side-title').textContent = hero + ' · ' + name;
+  byId('side-rules').textContent = descriptions[power] + '. Reach the end of all six stages.';
+  const platforms = [];
+  const enemies = [];
+  const crystals = [];
+  let player, boss, phase, camera, frame, last, clock, chapter, taken, attacks;
+  for (let stage = 0; stage < sections; stage++) {
+    const start = stage * sectionSize;
+    platforms.push({x:start,y:ground,w:350,kind:'floor'});
+    for (let chunk = 0; chunk < 5; chunk++) {
+      const layout = (index * 7 + stage * 3 + chunk * (index + 1)) % 11;
+      const x = start + 350 + chunk * 350;
+      const gap = 46 + (layout * 7 + stage * 4) % 67;
+      platforms.push({x:x+gap,y:ground,w:350-gap,kind:'floor'});
+      platforms.push({x:x+gap+20,y:ground-55-layout%4*16,w:74+layout*5,kind:terrain});
+      crystals.push({x:x+gap+53,y:ground-92-layout%4*16});
+      enemies.push({x:x+gap+133,y:ground-23,type:enemy,offset:layout});
+    }
+    platforms.push({x:start+2100,y:ground,w:100,kind:'floor'});
+  }
+  platforms.push({x:finish,y:ground,w:850,kind:'floor'});
+  if (finale === 'summit') {
+    for (let i=0;i<4;i++) platforms.push({x:finish+310+i*110,y:ground-38-i*31,w:119,kind:'shelf'});
+  }
+  const resetPlayer = (x = 100) => ({
+    x,y:ground-22,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0
+  });
   function reset() {
-    state={distance:0,y:0,vy:0,jumps:0,shield:0,dash:0,lantern:0,orbit:0,orbitDirection:1,
-      polarity:0,gravity:-1,pollen:false,warmth:3,cleared:0,misses:0,running:false};
-    targets.forEach(target=>{target.hit=false;target.taps=0;target.revealed=false;});
-    active.clear();
+    player = resetPlayer();
+    boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0};
+    enemies.forEach(e => {e.dead = false;});
+    crystals.forEach(c => {c.taken = false;});
+    camera = chapter = taken = clock = 0;
+    attacks = [];
+    phase = 'ready';
+    status(opening + '.');
     hud();
+    draw();
   }
   function hud() {
-    byId('side-progress').textContent=state.cleared+' / '+goal+' cleared · '+state.misses+' missed';
+    byId('side-progress').textContent = 'Stage ' + Math.min(sections,chapter+1) + ' / ' + sections + ' · Hearts ' + player.health + ' · Crystals ' + taken;
   }
-  function nextTarget() {return targets[state.cleared+state.misses];}
-  function input(control) {
-    if(!state.running || active.has(control))return;
-    active.add(control);
-    const t=nextTarget();
-    const distance=t ? t.x-state.distance-heroX : Infinity;
-    const near=distance>=-8 && distance<85;
-    const mode=game.mode;
-    if(control==='up' && !['swim','glide','crane','sail','photo','gravity','balance','sonar','bubble'].includes(mode)) {
-      const limit=mode==='double'?2:1;
-      if(state.jumps<limit){state.vy=mode==='double'?420:370;state.jumps++;}
+  function jump() {
+    if (phase !== 'playing') return;
+    if (player.on || power === 'swim' || (power === 'double' && player.jumps < 2)) {
+      player.vy = -500 * player.gravity;
+      player.on = false;
+      player.jumps++;
     }
-    if(control==='action') {
-      if(mode==='juggle')state.lantern=115;
-      if(mode==='polarity'||mode==='sail')state.polarity^=1;
-      if(mode==='shield')state.shield=.72;
-      if(mode==='gravity')state.gravity*=-1;
-      if(mode==='sonar' && t)t.revealed=true;
-      if(mode==='dash')state.dash=.6;
-      if(mode==='orbit')state.orbitDirection*=-1;
-      if(mode==='valve' && near)t.taps++;
-      if(mode==='timing' && near && distance<45)t.hit=true;
-      if(mode==='ground' && near && state.y<16)t.hit=true;
-      if(mode==='photo' && near && Math.abs(state.y-t.height)<40)t.hit=true;
-      if(mode==='count' && near)t.hit=true;
-      if(mode==='switch' && near && (t.index%2 ? state.down : state.y>50))t.hit=true;
-    }
-    if(mode==='beat' && near && distance<55 && control===['up','down','action'][t.index%3])t.hit=true;
   }
-  function advance(dt) {
-    const s=state;
-    s.down=active.has('down');
-    const up=active.has('up'), action=active.has('action');
-    const mode=game.mode;
-    const clamp=value=>Math.min(170,Math.max(0,value));
-    if(['swim','sail','photo','balance','sonar'].includes(mode)) {
-      s.y=clamp(s.y+((up?1:0)-(s.down?1:0))*190*dt);
-    } else if(['crane','bubble','glide'].includes(mode)) {
-      const lift=mode==='glide'?up:action;
-      s.y=clamp(s.y+(lift?215:-140)*dt);
-    } else if(mode==='gravity') {
-      s.y=clamp(s.y+s.gravity*240*dt);
-    } else {
-      s.vy-=1050*dt;
-      s.y=Math.max(0,s.y+s.vy*dt);
-      if(!s.y){s.vy=0;s.jumps=0;}
+  function action() {
+    if (phase !== 'playing' || player.power > 0) return;
+    player.power = .48;
+    if (power === 'dash') player.vx = player.facing * 660;
+    if (power === 'flip') {player.gravity *= -1; player.on = false;}
+    if (power === 'vine' || power === 'grapple') player.vy = -590;
+    if (power === 'throw' || power === 'pulse' || power === 'photo') {
+      attacks.push({x:player.x,y:player.y,v:player.facing*(power==='throw'?700:400),life:power==='throw'?.8:.36});
     }
-    s.shield=Math.max(0,s.shield-dt);
-    s.dash=Math.max(0,s.dash-dt);
-    s.lantern=Math.max(0,s.lantern-120*dt);
-    s.orbit+=dt*3*s.orbitDirection;
-    s.distance+=(mode==='dash' && s.dash ? 265 : 155)*dt;
-    const t=nextTarget();
-    if(t && t.x-s.distance<=heroX) {
-      const success=game.check(s,t);
-      if(success)s.cleared++;
-      else s.misses++;
-      if(mode==='pollen')s.pollen=success && t.index%2===0;
-      if(mode==='warmth')s.warmth+=success?(t.index%2?0:1):-1;
-      byId('side-status').textContent=success?'Checkpoint cleared!':'Checkpoint missed.';
-      hud();
+  }
+  function hit() {
+    if (player.grace > 0 || (power === 'shield' && held('action'))) return;
+    player.health--;
+    player.grace = 1.25;
+    if (player.health <= 0) respawn();
+    hud();
+  }
+  function respawn() {
+    player = resetPlayer(chapter * sectionSize + 100);
+    player.grace = 1.1;
+    attacks = [];
+    status('Back at the stage checkpoint.');
+    hud();
+  }
+  const close = (a,b,x,y) => Math.abs(a.x-b.x)<x && Math.abs(a.y-b.y)<y;
+  function step(dt) {
+    clock += dt;
+    const p = player;
+    p.grace = Math.max(0,p.grace-dt);
+    p.power = Math.max(0,p.power-dt);
+    const steer = Number(held('right')) - Number(held('left'));
+    if (steer) p.facing = steer;
+    const topSpeed = power === 'dash' ? 390 : 245;
+    if (!(power === 'dash' && p.power > .22)) p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*10);
+    p.x = Math.max(30,Math.min(finish+770,p.x+p.vx*dt));
+    const oldY = p.y;
+    const body = power === 'slide' && held('action') ? 12 : 22;
+    if (power === 'swim' && held('jump')) p.vy = Math.max(-225,p.vy-dt*1850);
+    const floating = (power === 'glide' && held('jump')) || (power === 'bubble' && held('action'));
+    p.vy = floating ? Math.min(p.vy,65) + dt*90 : p.vy+dt*1050*p.gravity;
+    p.y += p.vy*dt;
+    p.on = false;
+    if (p.gravity < 0 && p.y < 48) {p.y=48;p.vy=0;p.on=true;p.jumps=0;}
+    for (const ledge of platforms) {
+      if (p.x < ledge.x-8 || p.x > ledge.x+ledge.w+8) continue;
+      if (ledge.kind === 'shelf' && p.y+body > ledge.y+20 && p.y-body < ledge.y+20 && p.vy < 0) {
+        p.y=ledge.y+20+body;p.vy=0;
+      }
+      if (p.vy >= 0 && oldY+body <= ledge.y && p.y+body >= ledge.y) {
+        p.y = ledge.y-body;p.vy = 0;p.on = true;p.jumps = 0;
+        if (ledge.kind === 'spring') p.vy = -565;
+        if (ledge.kind === 'belt') p.x += 75*dt;
+        if (ledge.kind === 'current') p.x -= 65*dt;
+        if (ledge.kind === 'lift' && held('jump')) p.vy = -560;
+      }
     }
-    if(!nextTarget()) {
-      s.running=false;
-      byId('side-status').textContent=(mode==='warmth' && s.warmth<=0?'You ran out of warmth.':s.cleared===goal?'Perfect run!':'Run complete.')+' '+s.cleared+' of '+goal+' cleared.';
-      if(mode==='warmth')byId('side-status').textContent+=' Warmth remaining: '+Math.max(0,s.warmth)+'.';
+    if (p.y > height+65) {respawn();return;}
+    const stage = Math.min(sections-1,Math.floor(checkpoint(p.x)/sectionSize));
+    if (oldY <= height && p.x>=finish && p.x-p.vx*dt<finish) {
+      status(({guardian:'Defeat the guardian, then reach the exit.',switch:'Reach the marker and press Jump or Action.',sprint:'Cross the finish at full speed.',summit:'Climb the ledges to reach the exit.'})[finale]);
     }
+    if (stage > chapter) {chapter=stage;status('Checkpoint reached.');hud();}
+    for (const c of crystals) {
+      if (!c.taken && close(p,c,24,29)) {c.taken=true;taken++;hud();}
+    }
+    for (const attack of attacks) {attack.x+=attack.v*dt;attack.life-=dt;}
+    attacks = attacks.filter(a => a.life>0);
+    for (const foe of enemies) {
+      if (foe.dead || Math.abs(foe.x-p.x)>180) continue;
+      const position = foePosition(foe);
+      if (attacks.some(a => close(a,position,28,28))) foe.dead=true;
+      if (!foe.dead && close(p,position,29,34)) {
+        if ((p.vy>65 && oldY<position.y-17) || (power==='dash' && p.power>.22)) {
+          foe.dead=true;p.vy=-320;
+        } else hit();
+      }
+    }
+    if (p.x > finish) {
+      boss.grace = Math.max(0,boss.grace-dt);
+      boss.x = finish+465+Math.sin(clock*(1.25+index%4*.25))*138;
+      boss.y = ground-41-Math.max(0,Math.sin(clock*2.3))* (24+index%5*11);
+      if (boss.health > 0 && !boss.grace && (attacks.some(a=>close(a,boss,49,42)) ||
+          (close(p,boss,47,52) && ((p.vy>70 && oldY<boss.y-18) || (power==='dash' && p.power>.22))))) {
+        boss.health--;boss.grace=.65;p.vy=-375;
+        status(boss.health ? 'Guardian · '+boss.health+' hits left.' : 'Guardian cleared. Reach the exit.');
+      } else if (boss.health>0 && close(p,boss,44,42)) hit();
+      const exitReady = !boss.health && (
+        finale === 'switch' ? held('action') || held('jump') :
+        finale === 'sprint' ? Math.abs(p.vx)>185 :
+        finale === 'summit' ? p.y<230 : true
+      );
+      if (p.x>exitX-20 && exitReady) {phase='won';status(ending+'!');}
+    }
+    camera = Math.max(0,Math.min(finish+70,p.x-238));
+  }
+  function foePosition(foe) {
+    const t = clock + foe.offset;
+    return {x:foe.x+Math.sin(t*1.6)*(foe.type==='vent'?0:34),y:foe.y-(foe.type==='drone'||foe.type==='eel'?24+Math.sin(t*3)*21:0)};
+  }
+  function sprite(cell,x,y,w,h,reverse=false) {
+    if (!sprites.naturalWidth) return false;
+    const size = sprites.naturalWidth/4;
+    ctx.save();
+    ctx.translate(x,y);
+    if (reverse) ctx.scale(-1,1);
+    ctx.drawImage(sprites,cell%4*size,Math.floor(cell/4)*size,size,size,-w/2,-h/2,w,h);
+    ctx.restore();
+    return true;
   }
   function draw() {
-    const s=state;
     ctx.fillStyle='#211332';
-    ctx.fillRect(0,0,800,380);
-    if(art.complete && art.naturalWidth) {
-      const size=art.naturalWidth/5;
-      const offset=(s.distance*.25)%800;
-      for(const x of [-offset,800-offset])ctx.drawImage(art,game.id%5*size,Math.floor(game.id/5)*size,size,size,x,0,800,380);
+    ctx.fillRect(0,0,width,height);
+    if (backdrop.naturalWidth) {
+      const tile=backdrop.naturalWidth/5;
+      const offset=(camera*.27)%width;
+      for(const x of [-offset,width-offset])ctx.drawImage(backdrop,index%5*tile,Math.floor(index/5)*tile,tile,tile,x,0,width,height);
     }
-    const shade=ctx.createLinearGradient(0,0,0,380);
-    shade.addColorStop(0,'#14102222');shade.addColorStop(1,'#130c25c9');
-    ctx.fillStyle=shade;ctx.fillRect(0,0,800,380);
-    ctx.strokeStyle=game.color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,floor+4);ctx.lineTo(800,floor+4);ctx.stroke();
-    for(const t of targets.slice(s.cleared+s.misses)) {
-      const x=t.x-s.distance;
-      if(x>825)break;
-      const altitude=['swim','glide','crane','sail','photo','gravity','balance','sonar','bubble','orbit'].includes(game.mode);
-      const y=floor-(altitude?t.height:game.mode==='jump' && game.id===1?40:29);
-      ctx.fillStyle=game.mode==='polarity'||game.mode==='sail'?(t.index%2?'#59e6ed':'#ffac74'):game.color;
-      ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=14;
-      ctx.font='bold 32px system-ui';ctx.textAlign='center';
-      const label=game.mode==='beat'?['↑','↓','A'][t.index%3]:game.mode==='valve'?String(t.count):game.mode==='count'?'•'.repeat(t.count):game.mode==='sonar'&&!t.revealed?'?':game.icon;
-      ctx.fillText(label,x,game.mode==='sonar'&&!t.revealed?floor-30:y);
-      ctx.shadowBlur=0;
-      if(game.mode==='warmth')ctx.fillText(t.index%2?'❄':'☕',x,y);
-      if(game.mode==='switch')ctx.fillText(t.index%2?'↓':'↑',x,y-34);
-      if(game.mode==='valve' && t.taps){ctx.font='bold 14px system-ui';ctx.fillText(t.taps+'/'+t.count,x,y+18);}
-      if(x-heroX<85 && x>=heroX){ctx.strokeStyle=game.color;ctx.strokeRect(x-24,y-31,48,39);}
+    ctx.save();
+    ctx.translate(-camera,0);
+    const ledgeColors={floor:'#25364a',shelf:'#71648d',spring:'#579578',belt:'#a56b4b',current:'#387d9b',lift:'#547d9c'};
+    for (const ledge of platforms) {
+      if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
+      const gradient=ctx.createLinearGradient(0,ledge.y,0,ledge.y+54);
+      gradient.addColorStop(0,ledgeColors[ledge.kind]);gradient.addColorStop(1,'#0c1220');
+      ctx.fillStyle=gradient;
+      ctx.fillRect(ledge.x,ledge.y,ledge.w,ledge.kind==='floor'?65:18);
+      ctx.fillStyle='#ffffff73';
+      ctx.fillRect(ledge.x,ledge.y,ledge.w,3);
     }
-    const y=floor-s.y-(s.down?10:24);
-    ctx.save();ctx.translate(heroX,y);
-    if(s.shield>0 || s.dash>0){ctx.strokeStyle=game.color;ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,30,0,Math.PI*2);ctx.stroke();}
-    ctx.fillStyle=s.polarity?'#59e6ed':game.color;
-    ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=12;
-    ctx.beginPath();ctx.moveTo(-18,-3);ctx.lineTo(-17,-23);ctx.lineTo(-5,-13);ctx.lineTo(5,-13);ctx.lineTo(17,-23);ctx.lineTo(18,-3);ctx.quadraticCurveTo(19,16,0,16);ctx.quadraticCurveTo(-19,16,-18,-3);ctx.fill();
-    ctx.shadowBlur=0;ctx.fillStyle='#241638';ctx.fillRect(-10,-4,6,5);ctx.fillRect(4,-4,6,5);ctx.fillRect(-2,4,4,3);ctx.restore();
-    if(game.mode==='juggle' && s.lantern>0){ctx.fillStyle='#ffdf7c';ctx.fillText('◇',heroX,floor-35-s.lantern);}
-    if(game.mode==='orbit'){ctx.fillStyle=game.color;ctx.fillText('✦',heroX+Math.cos(s.orbit)*25,floor-90-Math.sin(s.orbit)*70);}
+    for (const c of crystals) if (!c.taken && c.x>=camera && c.x<camera+width) {
+      if(!sprite(15,c.x,c.y,38,38)){ctx.fillStyle='#ffd967';ctx.fillRect(c.x-5,c.y-5,10,10);}
+    }
+    for (const foe of enemies) if(!foe.dead && foe.x>=camera-80 && foe.x<camera+width+80) {
+      const at=foePosition(foe);
+      const cell=({sentry:8,drone:9,beetle:10,vent:11,eel:9})[foe.type];
+      if(!sprite(cell,at.x,at.y,66,66,true)){ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);}
+    }
+    if (boss.health && camera+width>finish) {
+      if(!sprite(12,boss.x,boss.y,116,116,true)){ctx.fillStyle='#ad505c';ctx.fillRect(boss.x-34,boss.y-38,68,76);}
+      ctx.fillStyle='#f77c8b';ctx.fillRect(boss.x-36,boss.y-54,boss.health*14,5);
+    }
+    ctx.fillStyle=boss.health?'#78487c':'#e0bd64';
+    const markerY = finale==='summit' ? ground-225 : ground-104;
+    ctx.fillRect(exitX,markerY,11,104);
+    ctx.fillRect(exitX+11,markerY,45,25);
+    for (const a of attacks) {
+      ctx.fillStyle='#ffe9a9';ctx.beginPath();ctx.arc(a.x,a.y,9,0,Math.PI*2);ctx.fill();
+    }
+    const p=player;
+    const light=['Luna','Ivy','Frost','Melody','Spark'].includes(hero);
+    const pose=!p.on?3:Math.abs(p.vx)>15?1+Math.floor(clock*10)%2:0;
+    const cell = power==='slide' && held('action') ? 13 :
+      light && !p.on && (power==='double' || power==='vine') ? 14 : (light?4:0)+pose;
+    ctx.globalAlpha=p.grace && Math.floor(clock*12)%2?.55:1;
+    if(!sprite(cell,p.x,p.y-12,81,81,p.facing<0) && poster.naturalWidth) {
+      const sw=poster.naturalWidth/2;
+      ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
+    }
+    ctx.restore();
+    if (phase!=='playing') {
+      ctx.fillStyle='#100c27c9';ctx.fillRect(0,0,width,height);
+      ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 32px system-ui';
+      ctx.fillText(phase==='won'?ending:name,width/2,165);
+      ctx.font='18px system-ui';ctx.fillText(phase==='won'?'Adventure complete · '+taken+' crystals':opening,width/2,206);
+    }
   }
-  function frame(now) {
-    const dt=Math.min(.05,(now-last)/1000);
+  function loop(now) {
+    step(Math.min(.025,(now-last)/1000));
     last=now;
-    advance(dt);draw();
-    if(state.running)raf=requestAnimationFrame(frame);
+    draw();
+    if(phase==='playing') frame=requestAnimationFrame(loop);
   }
-  byId('side-title').textContent=game.name;
-  byId('side-rules').textContent=game.rules;
-  player.hidden=false;
-  reset();draw();
-  art.addEventListener('load',()=>{if(!state.running)draw();});
-  byId('side-start').addEventListener('click',()=>{
-    cancelAnimationFrame(raf);
-    reset();state.running=true;last=performance.now();
-    byId('side-status').textContent='Run started.';
+  byId('side-start').onclick=()=>{
+    cancelAnimationFrame(frame);
+    reset();
+    phase='playing';
     byId('side-start').textContent='Restart';
     canvas.focus({preventScroll:true});
-    raf=requestAnimationFrame(frame);
-  });
-  const keys={ArrowUp:'up',ArrowDown:'down',Space:'action'};
+    last=performance.now();
+    frame=requestAnimationFrame(loop);
+  };
+  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump',KeyX:'action'};
   addEventListener('keydown',event=>{
-    if(state.running && keys[event.code] && !event.target.closest('button,a,input,select')){event.preventDefault();input(keys[event.code]);}
+    const control=codes[event.code];
+    if(!control || phase!=='playing' || event.target.closest('button,a,input,select')) return;
+    event.preventDefault();
+    keys.add(control);
+    if(!event.repeat) {
+      if(control==='jump') jump();
+      if(control==='action') action();
+    }
   });
-  addEventListener('keyup',event=>active.delete(keys[event.code]));
-  addEventListener('blur',()=>active.clear());
+  addEventListener('keyup',event=>keys.delete(codes[event.code]));
+  addEventListener('blur',()=>{keys.clear();mobile.clear();});
+  bindTouchJoystick(byId('touch-stick'),direction=>{
+    mobile.delete('left');mobile.delete('right');
+    if(direction==='left'||direction==='right') mobile.add(direction);
+  },{horizontal:true});
   document.querySelectorAll('[data-control]').forEach(button=>{
     const control=button.dataset.control;
-    button.addEventListener('pointerdown',event=>{event.preventDefault();button.setPointerCapture(event.pointerId);input(control);});
-    for(const name of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(name,()=>active.delete(control));
-    button.addEventListener('click',event=>{if(event.detail===0){input(control);active.delete(control);}});
+    const activate=()=>{if(control==='jump')jump();else action();};
+    button.onpointerdown=event=>{
+      event.preventDefault();button.setPointerCapture(event.pointerId);mobile.add(control);activate();
+    };
+    for(const event of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(event,()=>mobile.delete(control));
+    button.onclick=event=>{if(event.detail===0)activate();};
   });
+  for (const image of [sprites,poster,backdrop]) image.onload=()=>{if(phase!=='playing') draw();};
+  reset();
 })();

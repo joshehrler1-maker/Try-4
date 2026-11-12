@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="assets/game-fullscreen.css">
 <script src="assets/game-fullscreen.js" defer></script>
 <link rel="stylesheet" href="assets/pawcade-visuals.css">
-<body class="arcade-visuals"><main data-fullscreen-game><header><a href="https://joshehrler1-maker.github.io/Try-4/">SUPER PAW HEROES</a><a href="pawcade-classics.html">BACK TO PAWCADE</a></header><h1>Crystal Spring</h1><img src="assets/scenes/pawcade-mystic.webp" alt="Luna in the Purple Mystic Halls" width="900" height="300" style="display:block;width:100%;height:auto;aspect-ratio:3/1;object-fit:cover;border-radius:.8rem;margin:.6rem 0"><div class="hud"><div>Score<strong id="score">0</strong></div><div>Time<strong id="clock">45</strong></div><div>Bonus pairs<strong id="pairs">0 / 3</strong></div></div><div class="arena"><canvas width="640" height="480" data-hd="480" aria-label="Crystal catching arena"></canvas><div class="overlay" id="overlay"><h2 id="message">Crystal Catacombs</h2><p id="details">Launch Whisker and Luna to catch drifting crystals before time runs out.</p><button id="start">Play</button></div></div><div class="controls"><button id="jump" disabled>Launch Whisker</button><button id="pause" disabled>Pause</button></div><p class="hint">Drag across the cave to steer. Tap the cave or press Launch to jump. On a keyboard, use ← → and Space. Whisker catches red, Luna catches purple, and either hero catches gold. Three red-purple pairs add 8 seconds. Avoid dark shards.</p></main>
+<body class="arcade-visuals"><main data-fullscreen-game><header><a href="https://joshehrler1-maker.github.io/Try-4/">SUPER PAW HEROES</a><a href="pawcade-classics.html">BACK TO PAWCADE</a></header><h1>Crystal Spring</h1><img src="assets/scenes/pawcade-mystic.webp" alt="Luna in the Purple Mystic Halls" width="900" height="300" style="display:block;width:100%;height:auto;aspect-ratio:3/1;object-fit:cover;border-radius:.8rem;margin:.6rem 0"><div class="hud"><div>Score<strong id="score">0</strong></div><div>Time<strong id="clock">45</strong></div><div>Bonus pairs<strong id="pairs">0 / 3</strong></div></div><div class="arena"><canvas width="640" height="480" data-hd="480" aria-label="Crystal catching arena"></canvas><div class="overlay" id="overlay"><h2 id="message">Crystal Catacombs</h2><p id="details">Launch Whisker and Luna to catch drifting crystals before time runs out.</p><button id="start">Play</button></div></div><link rel="stylesheet" href="assets/touch-joystick.css"><script src="assets/touch-joystick.js"></script><div class="controls"><div class="touch-joystick" id="touch-stick" role="img" aria-label="Drag to move"><span></span></div><button id="jump" disabled>Launch Whisker</button><button id="pause" disabled>Pause</button></div><p class="hint">Drag across the cave to steer. Tap the cave or press Launch to jump. On a keyboard, use ← → and Space. Whisker catches red, Luna catches purple, and either hero catches gold. Three red-purple pairs add 8 seconds. Avoid dark shards.</p></main>
 <script src="assets/game-hd.js"></script>
 <script>
 const byId = id => document.getElementById(id);
@@ -15,6 +15,8 @@ const assets = ['data:image/webp;base64,UklGRvYFAQBXRUJQVlA4IOoFAQAQGQKdASoxAhgB
 const heroNames = ['Whisker','Luna'];
 const colors = ['#ffd986','#ff576b','#c68aff','#382349'];
 const keys = new Set();
+let stickDirection = '';
+bindTouchJoystick(byId('touch-stick'), dir => { stickDirection = dir; }, {horizontal:true});
 const clamp = (n,min,max) => Math.min(max,Math.max(min,n));
 let mode='ready', score=0, time=45, x=320, hero=0, flight=-1, nextSpawn=0, items=[], sparks=[], counts=[0,0], best=0, notice='', noticeTime=0;
 try { best=Number(localStorage.getItem('paw-crystal-best'))||0; } catch {}
@@ -94,7 +96,7 @@ function collect(item){
 function update(dt){
   time-=dt; nextSpawn-=dt; noticeTime-=dt;
   if(nextSpawn<=0){spawn();nextSpawn=.49+Math.random()*.22;}
-  const direction=Number(keys.has('ArrowRight'))-Number(keys.has('ArrowLeft'));
+  const direction=Number(keys.has('ArrowRight') || stickDirection==='right')-Number(keys.has('ArrowLeft') || stickDirection==='left');
   x=clamp(x+direction*370*dt,48,592);
   if(flight>=0){
     flight+=dt;

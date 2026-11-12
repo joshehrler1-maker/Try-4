@@ -11,3 +11,10 @@ body.game-fullscreen-lock{overflow:hidden}
 [data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .arena:has(canvas[data-hd="480"]){width:min(100%,900px,calc(64dvh * 4 / 3))}
 [data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .arena:has(canvas[data-hd="420"]){width:min(100%,900px,calc(64dvh * 4 / 3))}
 [data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .arena:has(canvas[data-hd="390"]){width:min(100%,900px,calc(64dvh * 20 / 13))}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) #side-canvas{width:min(100%,calc(60dvh * 800 / 380))}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls{justify-content:center}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) h1{margin:.2rem 0}
+#cabinet:is(:fullscreen,.game-fullscreen-expanded) #cabinet-scene{display:none}
+#cabinet:is(:fullscreen,.game-fullscreen-expanded) #board{width:min(100%,54dvh,36rem)}
+body.open-world-fullscreen:is(:fullscreen,.game-fullscreen-expanded){padding:0;overflow:hidden}
+body.open-world-fullscreen .game-fullscreen-tools{position:fixed;top:0;right:0;z-index:12}

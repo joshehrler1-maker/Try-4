@@ -195,7 +195,7 @@
     field.style.backgroundImage = 'linear-gradient(#101632b8,#101632bd), url("assets/scenes/' + (mode === 'flame' ? 'red-flame-caves' : 'cyan-frost-caverns') + '.webp")';
     field.style.backgroundPosition = 'center';
     field.style.backgroundSize = 'cover';
-    field.hidden=mode==='mystic';board.hidden=mode!=='mystic';byId('directions').hidden=mode==='mystic';
+    field.hidden=mode==='mystic';board.hidden=mode!=='mystic';byId('directions').hidden=mode==='mystic';byId('mystic-controls').hidden=mode!=='mystic';
     byId('status').textContent='Ready to play.';byId('pause').disabled=true;
     board.replaceChildren();ctx.clearRect(0,0,400,400);
     document.querySelectorAll('[data-game]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.game===mode)));
@@ -245,7 +245,8 @@
   });
   addEventListener('storage',hud);
   document.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>select(b.dataset.game));
-  document.querySelectorAll('[data-dir]').forEach(b=>b.onclick=()=>move(b.dataset.dir));
+  bindTileJoystick(byId('mystic-stick'),board,()=>8,byId('select-gem'));
+  bindTouchJoystick(byId('touch-stick'), dir => { if (dir) move(dir); }, {repeat: 140});
   byId('start').onclick=start;
   byId('pause').onclick=()=>{
     phase=phase==='paused'?'playing':'paused';

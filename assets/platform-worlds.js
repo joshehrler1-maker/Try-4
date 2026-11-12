@@ -1,0 +1,28 @@
+// Each row defines an opening, a course mechanic and a distinct finish.
+window.pawtopiaCourses = [
+ ['Ember Foundry','Whisker','Stoke the cold forge','Ring the evacuation bell','stomp','lift','vent'],
+ ['Moonlit Library','Luna','Follow the runaway book','Return the moon atlas','slide','shelf','sentry'],
+ ['Coral Courier','Luna','Launch from the tide pool','Deliver the pearl to the lighthouse','swim','current','eel'],
+ ['Clocktower Relay','Bolt','Wind the stopped town clock','Set the rooftop clock to sunrise','dash','belt','drone'],
+ ['Seed Garden','Ivy','Wake the seed lantern','Plant the last seed on the summit','vine','spring','beetle'],
+ ['Waterfall Climb','Frost','Cross the spray bridge','Free the frozen waterfall','glide','lift','drone'],
+ ['Lantern Festival','Melody','Light the first parade lantern','Launch the sky lantern','throw','spring','sentry'],
+ ['Crystal Polarity','Bolt','Power up the mine cart','Reconnect the opposite crystal cores','flip','belt','drone'],
+ ['Stage Beat','Melody','Play the opening note','Play the encore chord','pulse','spring','beetle'],
+ ['Quarry Rescue','Stone','Enter the quarry elevator','Lift the final rescue cage','grapple','lift','sentry'],
+ ['Sunset Wind Sail','Whisker','Catch the first updraft','Land on the windmill deck','glide','current','eel'],
+ ['Cloud City','Luna','Board the cloud ferry','Open the sky observatory','double','spring','drone'],
+ ['Thunder Harbor','Frost','Launch from the breakwater','Ground the thunder conductor','shield','belt','vent'],
+ ['Autumn Trail','Spark','Follow the feather trail','Photograph the migrating flock','photo','shelf','eel'],
+ ['Inverted Observatory','Shadow','Step into the reversed dome','Align the star projector','flip','lift','beetle'],
+ ['Bamboo Village','Ivy','Open the bamboo garden gate','Restore the village lantern tree','vine','shelf','eel'],
+ ['Steamworks','Bolt','Release pressure from the intake valve','Shut down the runaway boiler','pulse','belt','vent'],
+ ['Snow Village','Frost','Take the trail from the hearth','Relight the village furnace','shield','spring','sentry'],
+ ['Canyon Crossing','Stone','Enter the canyon from the rope bridge','Raise the drawbridge','grapple','current','vent'],
+ ['Submarine Dock','Spark','Dive from the research pier','Surface inside the submarine dock','swim','lift','sentry'],
+ ['Neon Circuit','Shadow','Break out of the arcade cabinet','Cross the photo-finish beam','dash','spring','beetle'],
+ ['Marble Temple','Luna','Open the lower temple seal','Turn the final marble lock','double','shelf','vent'],
+ ['Swamp Ferry','Ivy','Leave the reed landing','Moor the ferry at the firefly pier','bubble','current','beetle'],
+ ['Sunflower Flight','Spark','Take flight from the sunflower hill','Pollinate the last giant bloom','bubble','spring','drone'],
+ ['Starship Cargo','Whisker','Launch from the cargo airlock','Dock the rescue pod','throw','lift','eel']
+];

@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="assets/game-fullscreen.css">
 <script src="assets/game-fullscreen.js" defer></script>
 <link rel="stylesheet" href="assets/pawcade-visuals.css">
-<body class="arcade-visuals">
+<link rel="stylesheet" href="assets/touch-joystick.css"><script src="assets/touch-joystick.js"></script><body class="arcade-visuals">
 <main data-fullscreen-game><nav><a href="index.html">Super Paw Heroes</a><a href="pawcade-classics.html">Back to Pawcade</a></nav>
 <h1>Frost’s Snowball Factory</h1>
 <div class="hud"><span id="level">Level 1</span><span id="lives">Lives 3</span><span id="score">Score 0</span><span id="best">Best 0</span></div>
 <div class="arena"><canvas width="560" height="420" data-hd="420" aria-label="Snowball Factory playfield"></canvas>
 <div class="screen" id="screen"><h2 id="title">Snowball Factory</h2><p id="summary">Help Frost dodge runaway snowballs, then push through the warehouse to the exit.</p><button id="action">Start game</button></div></div>
-<div class="controls"><button id="pause" disabled>Pause</button><button id="escape" hidden>Escape (−1 life)</button><div class="controls" id="move" aria-label="Warehouse movement" hidden><button data-dir="up" aria-label="Move up">↑</button><button data-dir="left" aria-label="Move left">←</button><button data-dir="down" aria-label="Move down">↓</button><button data-dir="right" aria-label="Move right">→</button></div></div>
+<div class="controls"><button id="pause" disabled>Pause</button><button id="escape" hidden>Escape (−1 life)</button><div class="controls" id="move" aria-label="Movement controls" hidden><div class="touch-joystick" id="touch-stick" role="img" aria-label="Drag to move"><span></span></div></div></div>
 <p class="hint" id="hint">Move with your mouse, drag on touchscreens, or use the arrow keys. Watch for launchers that flash before they fire.</p></main>
 <script src="assets/pawtopia-save.js"></script>
 <script src="assets/game-hd.js"></script>
@@ -30,6 +30,7 @@ const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const dirs={up:[0,-1],left:[-1,0],down:[0,1],right:[1,0]};
 const arrows={ArrowUp:'up',ArrowLeft:'left',ArrowDown:'down',ArrowRight:'right'};
 const held=new Set();
+let touchDirection='';
 const special={gold:['#ffd773','★'],life:['#ff749e','♥'],small:['#c497ff','↓'],large:['#ff8889','↑'],slow:['#90baff','−'],fast:['#82f9ff','+']};
 const cell=49, left=84, top=37;
 const puzzles=[
@@ -49,7 +50,8 @@ function hud(){
 function controls(){
   const active=mode==='play';
   el('pause').disabled=!active;
-  el('escape').hidden=el('move').hidden=!active||stage!=='warehouse';
+  el('escape').hidden=!active||stage!=='warehouse';
+  el('move').hidden=!active;
 }
 function screen(title,summary,label,action){
   mode='menu';
@@ -81,7 +83,7 @@ function loadWarehouse(){
     if(tile==='E')exitCell={x,y};
     return tile==='B'||tile==='P'?tile:'.';
   }));
-  el('hint').textContent='Use the arrows or swipe. Push wooden crates up or right, collect purple crates for 10 points, and reach the glowing exit.';
+  el('hint').textContent='Drag the joystick or swipe. Push wooden crates up or right, collect purple crates for 10 points, and reach the glowing exit.';
   screen('Warehouse','Push wooden crates up or right and reach the exit at the top. Purple crates are worth 10 points.','Enter warehouse',activate);
 }
 function nextLevel(){
@@ -139,7 +141,7 @@ function movePlayer(dx,dy){
 }
 function update(dt){
   let dx=0,dy=0;
-  for(const key of held){dx+=dirs[key][0];dy+=dirs[key][1];}
+  for(const key of new Set(touchDirection ? [...held,touchDirection] : held)){dx+=dirs[key][0];dy+=dirs[key][1];}
   const length=Math.hypot(dx,dy)||1;
   movePlayer(dx/length*295*dt,dy/length*295*dt);
   shield=Math.max(0,shield-dt);
@@ -252,7 +254,7 @@ addEventListener('keydown',e=>{
 addEventListener('keyup',e=>held.delete(arrows[e.code]));
 addEventListener('blur',()=>held.clear());
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});
-document.querySelectorAll('[data-dir]').forEach(button=>button.onclick=()=>step(button.dataset.dir));
+bindTouchJoystick(el('touch-stick'), dir => { touchDirection=dir; if (dir && stage==='warehouse') step(dir); }, {repeat: 170});
 el('action').onclick=start;
 el('pause').onclick=pause;
 el('escape').onclick=()=>{if(mode==='play'&&stage==='warehouse'){lives--;if(lives>0)nextLevel();else finish();}};
