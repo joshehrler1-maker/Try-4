@@ -95,3 +95,46 @@ window.pawtopiaVariants = [
  [485,3.4,480,1.3,20,1],[225,15,495,1.65,21,0],[255,11,500,2.2,22,3],[220,7,470,2.6,23,4],
  [276,13,485,1.3,24,0]
 ];
+
+// Sections use authored silhouettes. Each tuple is [start, height, width, surface].
+window.pawtopiaRooms = {
+ hills:[[0,326,465],[465,293,235],[700,258,220],[990,326,430],[1300,228,145],[1500,326,700]],
+ highway:[[0,326,780],[230,220,190],[520,158,240],[855,326,300],[1180,280,230],[1450,235,270],[1760,326,440]],
+ reef:[[0,326,2200],[250,140,360,'current'],[710,225,320,'current'],[1190,108,350,'current'],[1660,206,330,'current']],
+ speedway:[[0,326,2200],[380,250,250,'spring'],[660,205,420,'belt'],[1230,242,320,'spring'],[1620,176,400,'belt']],
+ canopy:[[0,326,300],[275,260,180,'spring'],[510,197,210,'spring'],[780,130,210],[1040,210,220,'spring'],[1310,155,260],[1660,250,310],[1940,326,260]],
+ festival:[[0,326,610],[665,286,205],[925,254,300],[1290,216,160],[1500,257,235],[1790,326,410]],
+ rooftops:[[0,326,330],[400,273,350],[820,224,170],[1060,151,350],[1470,218,260],[1790,326,410]],
+ inversion:[[0,326,385],[590,326,325],[1110,326,270],[1630,326,570],[385,78,205,'ceiling'],[915,78,195,'ceiling'],[1380,78,250,'ceiling']],
+ rhythm:[[0,326,2200],[480,283,65,'hazard'],[745,283,95,'hazard'],[1050,283,130,'hazard'],[1430,283,70,'hazard'],[1690,283,125,'hazard']],
+ rails:[[0,326,380],[570,270,210],[955,226,220],[1360,195,270],[1830,326,370],[410,145,145,'rail'],[790,109,135,'rail'],[1185,91,135,'rail'],[1650,114,150,'rail']],
+ dream:[[0,326,420],[490,255,230],[830,197,250,'spring'],[1180,125,230],[1490,214,250],[1810,326,390]],
+ summit:[[0,326,330],[360,280,160],[570,222,160],[800,163,160],[1070,110,300],[1430,167,200],[1710,224,210],[1980,326,220]],
+ docks:[[0,326,360],[425,300,190,'spring'],[680,255,250],[1010,298,135,'spring'],[1210,235,230],[1520,265,240,'spring'],[1830,326,370]],
+ grove:[[0,326,760],[240,245,160],[510,190,220],[820,286,350],[1240,245,310],[1600,325,600],[1790,200,220]],
+ labyrinth:[[0,326,2200],[320,253,250],[640,194,320],[1020,131,320],[1420,176,220],[1700,235,275],[1950,278,180]],
+ roots:[[0,326,310],[350,272,160],[570,232,195],[820,180,195],[1070,118,330],[1440,155,190],[1670,214,220],[1940,326,260]],
+ arena:[[0,326,2200],[470,240,200],[980,218,200],[1500,240,200]],
+ bazaar:[[0,326,500],[560,300,235],[850,255,235],[1140,209,320],[1510,260,310],[1870,326,330]],
+ traps:[[0,326,350],[465,326,255],[827,274,260],[1160,274,260],[1510,326,690],[545,290,64,'hazard'],[1260,239,55,'hazard']],
+ barracks:[[0,326,2200],[390,264,190],[780,215,230],[1220,258,235],[1710,212,220]],
+ escape:[[0,326,2200],[330,250,270,'belt'],[745,202,450],[1260,255,315,'belt'],[1730,215,220]],
+ castle:[[0,326,450],[480,289,180],[690,249,195],[930,209,300],[1310,239,260],[1630,281,255],[1940,326,260]],
+ marsh:[[0,326,325],[390,299,185,'spring'],[652,266,205,'spring'],[938,235,230,'spring'],[1230,280,200],[1505,252,260,'spring'],[1830,326,370]],
+ fabric:[[0,326,480],[540,272,320],[920,230,420,'spring'],[1410,253,370],[1840,326,360]],
+ hangar:[[0,326,920],[300,260,310],[990,310,530],[1120,224,240],[1590,326,610]]
+};
+window.pawtopiaRoomPlans = [
+ 'hills grove rooftops inversion hills castle','highway barracks summit rails highway arena',
+ 'reef reef inversion reef labyrinth reef','speedway highway escape speedway rooftops speedway',
+ 'canopy roots marsh canopy grove summit','docks summit dream roots docks summit',
+ 'rooftops festival dream rooftops canopy arena','inversion labyrinth inversion rails inversion inversion',
+ 'rhythm rhythm rhythm rhythm rhythm rhythm','rails highway rails summit rails rails',
+ 'dream rooftops dream summit canopy dream','summit roots rails summit rooftops summit',
+ 'docks marsh docks castle docks arena','grove hills canopy grove bazaar roots',
+ 'labyrinth inversion labyrinth roots labyrinth barracks','roots canopy roots summit roots dream',
+ 'arena arena barracks arena arena arena','bazaar rooftops traps bazaar castle arena',
+ 'traps castle traps rails traps summit','barracks highway barracks docks arena barracks',
+ 'escape speedway escape highway escape escape','castle traps castle summit castle arena',
+ 'marsh canopy marsh grove docks marsh','fabric grove fabric rooftops fabric dream','hangar barracks hangar highway arena hangar'
+];

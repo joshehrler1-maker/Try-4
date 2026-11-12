@@ -26,13 +26,13 @@
   const index = Number(selection);
   const [name, hero, opening, ending, coursePower, terrain] = courses[index];
   const [reference, movement, enemyPattern, prologue, epilogue] = window.pawtopiaStyles[index];
-  const [runSpeed, handling, jumpSpeed, cadence, layoutSeed, goalType] = window.pawtopiaVariants[index];
+  const [runSpeed, handling, jumpSpeed, cadence, , goalType] = window.pawtopiaVariants[index];
   const chapters = window.pawtopiaChapters[index];
   const special = {buster:'throw',roll:'dash',float:'bubble',beat:'pulse',airlift:'vine',
     airdash:'dash',pogo:'stomp',blaster:'throw',shooter:'throw',whip:'pulse',momentum:'dash'};
   const power = special[movement] || (movement in {stomp:1,swim:1,glide:1,flip:1,grapple:1,throw:1} ? movement : coursePower);
   const descriptions = {
-    stomp:'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Hold Jump to swim upward',
+    stomp:'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim',
     dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
     throw:'Press Action to throw a crystal', flip:'Press Action to reverse gravity',
     pulse:'Press Action to release a shockwave', grapple:'Press Action to pull toward overhead rails',
@@ -41,7 +41,7 @@
   };
   const movementGuide = {
     buster:'Fire your arm cannon with Action.', roll:'Roll through enemies with Action.',
-    float:'Hold Action to float.', beat:'Use Action on the beat to send out a strong pulse.',
+    float:'Hold Action to float.', beat:'You run automatically. Jump over the beat barriers and use Action to pulse.',
     airdash:'Press Action to dash forward or upward while airborne.',
     pogo:'Hold Jump while stomping to bounce higher.',
     precision:'Jump from ledge edges to clear wider gaps.',
@@ -75,29 +75,35 @@
   const powerButton = document.querySelector('[data-control="action"]');
   powerButton.hidden = power === 'stomp' || power === 'double' || power === 'swim' || power === 'glide';
   byId('side-player').hidden = false;
+  if (power==='swim') byId('touch-stick').setAttribute('aria-label','Drag in four directions to swim');
   byId('side-title').textContent = hero + ' · ' + name;
   byId('side-rules').textContent = (movementGuide[movement] || descriptions[power] + '.') + ' ' + prologue;
   const platforms = [];
   const enemies = [];
   const crystals = [];
-  let player, boss, phase, camera, frame, last, clock, chapter, taken, attacks, hazards;
-  for (let stage = 0; stage < sections; stage++) {
+  let player, boss, phase, camera, frame, last, clock, chapter, taken, attacks, hazards, escape;
+  const plan = window.pawtopiaRoomPlans[index].split(' ');
+  for (const [stage, room] of plan.entries()) {
     const start = stage * sectionSize;
-    platforms.push({x:start,y:ground,w:350,kind:'floor'});
-    for (let chunk = 0; chunk < 5; chunk++) {
-      const layout = (layoutSeed * 17 + stage * (layoutSeed % 7 + 3) + chunk * (layoutSeed + 1)) % 23;
-      const x = start + 350 + chunk * 350;
-      const gap = 36 + (layout * 7 + stage * 4) % (movement==='precision'?78:62);
-      const elevation = movement==='grapple' || movement==='airlift' ? 34 : 0;
-      platforms.push({x:x+gap,y:ground,w:350-gap,kind:'floor'});
-      platforms.push({x:x+gap+20,y:ground-55-layout%4*16-elevation,w:70+layout*4,kind:terrain});
-      crystals.push({x:x+gap+53,y:ground-92-layout%4*16-elevation});
-      enemies.push({x:x+gap+133,y:ground-23,offset:layout});
-      if ((layout+stage)%6===0) enemies.push({x:x+310,y:ground-23,offset:layout+2});
+    const pieces = window.pawtopiaRooms[room];
+    for (const [slot, [x, y, w, kind = 'floor']] of pieces.entries()) {
+      platforms.push({x:start+x,y,w,kind});
+      if (['hazard','rail','ceiling'].includes(kind)) continue;
+      if (x>150 || w>850) {
+        const count = Math.max(1, Math.floor(w / (room==='arena' ? 420 : 540)));
+        for(let encounter=0;encounter<count;encounter++) {
+          const offset = Math.round(w*(encounter+1)/(count+1));
+          enemies.push({x:start+x+offset,y:y-23,offset:slot+stage+encounter});
+        }
+      }
+      if(x>0) crystals.push({x:start+x+w*.58,y:y-35});
     }
-    platforms.push({x:start+2100,y:ground,w:100,kind:'floor'});
+    if (room==='rhythm') {
+      for (let beat=0;beat<4;beat++) crystals.push({x:start+375+beat*415,y:225});
+    }
   }
   platforms.push({x:finish,y:ground,w:850,kind:'floor'});
+  const returnFloor={x:0,y:ground,w:finish,kind:'floor'};
   if (finale === 'summit') {
     for (let i=0;i<4;i++) platforms.push({x:finish+310+i*110,y:ground-38-i*31,w:119,kind:'lift'});
   }
@@ -113,6 +119,7 @@
     enemies.forEach(e => {e.dead = false;e.shotAt=0;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
+    escape = null;
     attacks = [];
     hazards = [];
     phase = 'ready';
@@ -125,6 +132,7 @@
   }
   function jump() {
     if (phase !== 'playing') return;
+    if (power==='flip') return;
     if (player.on || power === 'swim' || (power === 'double' && player.jumps < 2)) {
       player.vy = -jumpSpeed * player.gravity;
       player.on = false;
@@ -138,8 +146,16 @@
       player.vx = player.facing * (movement==='roll'?460:660);
       if (movement==='airdash' && !player.on && held('jump')) player.vy=-420;
     }
-    if (power === 'flip') {player.gravity *= -1; player.on = false;}
-    if (power === 'vine' || power === 'grapple') player.vy = -590;
+    if (power === 'flip' && player.on) {player.gravity *= -1; player.on = false;}
+    if (power === 'vine') player.vy = -590;
+    if (power === 'grapple') {
+      const anchor = platforms.find(ledge => ledge.kind==='rail' && Math.abs(ledge.x+ledge.w/2-player.x)<230);
+      if (anchor) {
+        player.vy=-610;
+        player.vx=Math.sign(anchor.x+anchor.w/2-player.x)*400;
+        player.grapple=.35;
+      }
+    }
     if (power === 'throw' || power === 'pulse' || power === 'photo') {
       const onBeat = clock % .65 < .2 || clock % .65 > .52;
       const speed = movement==='whip' ? 240 : power==='throw' ? 700 : 400;
@@ -155,7 +171,8 @@
     hud();
   }
   function respawn() {
-    player = resetPlayer(chapter * sectionSize + 100);
+    player = resetPlayer(escape ? finish+635 : chapter * sectionSize + 100);
+    if (escape) escape=95;
     player.grace = 1.1;
     attacks = [];
     hazards = [];
@@ -165,25 +182,47 @@
   const close = (a,b,x,y) => Math.abs(a.x-b.x)<x && Math.abs(a.y-b.y)<y;
   function step(dt) {
     clock += dt;
+    if (escape) {
+      escape-=dt;
+      if (escape<=0) {respawn();return;}
+      if (player.x<115) {phase='won';status(ending+'!');return;}
+      if (Math.floor(escape)!==Math.floor(escape+dt)) status('Escape back to the entrance · '+Math.ceil(escape)+'s');
+    }
     const p = player;
     p.grace = Math.max(0,p.grace-dt);
     p.power = Math.max(0,p.power-dt);
-    const steer = Number(held('right')) - Number(held('left'));
+    const steer = movement==='beat' ? 1 : Number(held('right')) - Number(held('left'));
+    const vertical = Number(held('down'))-Number(held('up') || held('jump'));
     if (steer) p.facing = steer;
     const topSpeed = runSpeed;
     const acceleration = steer ? handling : Math.max(1.6,handling*.8);
-    if (!(power === 'dash' && p.power > .22)) p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
+    p.grapple=Math.max(0,(p.grapple||0)-dt);
+    if (!(power === 'dash' && p.power > .22) && !p.grapple) p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
     p.x = Math.max(30,Math.min(finish+770,p.x+p.vx*dt));
     const oldY = p.y;
     const body = power === 'slide' && held('action') ? 12 : 22;
-    if (power === 'swim' && held('jump')) p.vy = Math.max(-225,p.vy-dt*1850);
+
     const floating = (power === 'glide' && held('jump')) || (power === 'bubble' && held('action'));
-    p.vy = floating ? Math.min(p.vy,65) + dt*90 : p.vy+dt*1050*p.gravity;
+    if (power==='swim') p.vy += (vertical*230-p.vy)*Math.min(1,dt*5);
+    else if (power==='bubble' && held('action')) p.vy += (-160-p.vy)*Math.min(1,dt*5);
+    else if (floating && p.vy>0) p.vy=Math.min(72,p.vy+dt*90);
+    else p.vy+=dt*(movement==='precision'?1210:1050)*p.gravity;
     p.y += p.vy*dt;
     p.on = false;
-    if (p.gravity < 0 && p.y < 48) {p.y=48;p.vy=0;p.on=true;p.jumps=0;}
-    for (const ledge of platforms) {
+    if ((p.gravity < 0 || power==='swim') && p.y < 48) {p.y=48;p.vy=0;p.on=true;p.jumps=0;}
+    for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
       if (p.x < ledge.x-8 || p.x > ledge.x+ledge.w+8) continue;
+      if (ledge.kind==='hazard') {
+        if (p.y+body>ledge.y && p.y-body<ground) hit();
+        continue;
+      }
+      if (ledge.kind==='rail') continue;
+      if (ledge.kind==='ceiling') {
+        if (p.gravity<0 && p.vy<=0 && oldY-body>=ledge.y && p.y-body<=ledge.y) {
+          p.y=ledge.y+body;p.vy=0;p.on=true;
+        }
+        continue;
+      }
       if (ledge.kind === 'shelf' && p.y+body > ledge.y+20 && p.y-body < ledge.y+20 && p.vy < 0) {
         p.y=ledge.y+20+body;p.vy=0;
       }
@@ -241,7 +280,12 @@
         finale === 'crystals' ? taken>=3 :
         finale === 'summit' ? p.y<230 : true
       );
-      if (p.x>exitX-20 && exitReady) {phase='won';status(ending+'!');}
+      if (p.x>exitX-20 && exitReady) {
+        if (index===20 && escape===null) {
+          escape=95;
+          status('Reset triggered. Race back to the entrance!');
+        } else if (index!==20) {phase='won';status(ending+'!');}
+      }
     }
     camera = Math.max(0,Math.min(finish+70,p.x-238));
   }
@@ -282,13 +326,13 @@
     }
     ctx.save();
     ctx.translate(-camera,0);
-    const ledgeColors={floor:'#25364a',shelf:'#71648d',spring:'#579578',belt:'#a56b4b',current:'#387d9b',lift:'#547d9c'};
-    for (const ledge of platforms) {
+    const ledgeColors={rail:'#d6b87f',ceiling:'#7258a8',hazard:'#e64562',floor:'#25364a',shelf:'#71648d',spring:'#579578',belt:'#a56b4b',current:'#387d9b',lift:'#547d9c'};
+    for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
       const gradient=ctx.createLinearGradient(0,ledge.y,0,ledge.y+54);
       gradient.addColorStop(0,ledgeColors[ledge.kind]);gradient.addColorStop(1,'#0c1220');
       ctx.fillStyle=gradient;
-      ctx.fillRect(ledge.x,ledge.y,ledge.w,ledge.kind==='floor'?65:18);
+      ctx.fillRect(ledge.x,ledge.y,ledge.w,ledge.kind==='hazard'?43:ledge.kind==='floor'?65:18);
       ctx.fillStyle='#ffffff73';
       ctx.fillRect(ledge.x,ledge.y,ledge.w,3);
     }
@@ -358,7 +402,7 @@
     last=performance.now();
     frame=requestAnimationFrame(loop);
   };
-  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump',KeyX:'action'};
+  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'?'up':'jump',KeyW:power==='swim'?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action'};
   addEventListener('keydown',event=>{
     const control=codes[event.code];
     if(!control || phase!=='playing' || event.target.closest('button,a,input,select')) return;
@@ -372,9 +416,9 @@
   addEventListener('keyup',event=>keys.delete(codes[event.code]));
   addEventListener('blur',()=>{keys.clear();mobile.clear();});
   bindTouchJoystick(byId('touch-stick'),direction=>{
-    mobile.delete('left');mobile.delete('right');
-    if(direction==='left'||direction==='right') mobile.add(direction);
-  },{horizontal:true});
+    for (const axis of ['left','right','up','down']) mobile.delete(axis);
+    if(direction) mobile.add(direction);
+  },{horizontal:power!=='swim'});
   document.querySelectorAll('[data-control]').forEach(button=>{
     const control=button.dataset.control;
     const activate=()=>{if(control==='jump')jump();else action();};
