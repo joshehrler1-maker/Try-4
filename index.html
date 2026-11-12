@@ -18,9 +18,10 @@
 <style>
 .pawtopia-atlas{position:relative;isolation:isolate;aspect-ratio:3/2;border:3px solid #f7d485;border-radius:22px;overflow:hidden;background:#164e49;box-shadow:0 12px 30px #0008}.atlas-sign{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:grid;place-items:center;text-align:center;width:max-content;max-width:32%;min-height:44px;padding:5px clamp(5px,1.5vw,15px);line-height:1.1;font-weight:900;font-size:clamp(11px,2vw,20px);color:#33200c;background:linear-gradient(#fff1b2,#efbf65);border:2px solid #75491f;border-radius:9px;box-shadow:0 3px 0 #542f1b,0 5px 9px #0007}.atlas-sign:hover,.atlas-sign:focus-visible{background:#fff8d1;z-index:1;outline:3px solid white;outline-offset:2px}.atlas-sign:active{transform:translate(-50%,-46%)}.atlas-note{margin:.6rem 0;text-align:center;color:#d8eaff}#coloring-book,#challenge,#pawtopia{scroll-margin-top:110px}
 </style>
+<link rel="stylesheet" href="assets/crystal-regions.css">
 </head>
 <body><a class="skip-link" href="#main-content">Skip to main content</a><button type="button" id="fullscreen-top" style="display:block;width:calc(100% - 24px);max-width:700px;margin:12px auto;padding:16px;background:#ffe17b;color:#17213a;border:2px solid #fff2b0;border-radius:12px;font:800 20px system-ui">⛶ Full Screen</button>
-<header><a class="logo" href="index.html">🐾 SUPER <b>PAW HEROES</b></a><nav aria-label="Main navigation"><a href="#pawtopia">World Map</a><a href="#hero-headquarters">Hero Profile</a><a href="pawtopia-arcade.html">Games Room</a><a href="#coloring-book">Bookshop</a><a href="#games">Adventures</a><a href="studio.html">🛠️ Creator Studio</a><a href="#challenge">⚡ Challenge</a><a href="#explore">🌟 Explore</a><a href="#families">💛 Families</a><a href="readiness.html">📱 Setup & Status</a></nav></header>
+<header><a class="logo" href="index.html">🐾 SUPER <b>PAW HEROES</b></a><nav aria-label="Main navigation"><a href="#pawtopia">World Map</a><a href="#crystal-regions">Crystal Regions</a><a href="#hero-headquarters">Hero Profile</a><a href="pawtopia-arcade.html">Games Room</a><a href="#coloring-book">Bookshop</a><a href="#games">Adventures</a><a href="studio.html">🛠️ Creator Studio</a><a href="#challenge">⚡ Challenge</a><a href="#explore">🌟 Explore</a><a href="#families">💛 Families</a><a href="readiness.html">📱 Setup & Status</a></nav></header>
 <main id="main-content">
 <div class="hero"><div class="hero-content"><span class="tag">✨ Kindness is a superpower!</span><h1>Super Paw Heroes</h1><p>Super Paw Heroes follows Whisker and Luna, two cat superheroes. Their <a href="coloring-book.html" style="text-decoration:underline">Crystal Catacombs coloring book</a> includes 100 printable coloring and activity pages for kids and families. You can also play games set in their world.</p><div class="actions"><a class="btn" href="#pawtopia">Explore Pawtopia</a><a class="btn alt" href="https://payhip.com/b/rk4E5">🎨 Shop the Crystal Catacombs Coloring Book</a><a class="btn alt" href="#games">🎮 Play Now</a><a class="btn alt" href="studio.html">🛠️ Open Creator Studio</a><a class="btn alt" href="universe-center.html">🐱 Meet the Heroes</a></div></div></div>
 
@@ -86,6 +87,22 @@
   render();
 })();
 </script>
+<section class="content" id="crystal-regions" aria-labelledby="crystal-regions-heading">
+<h2 id="crystal-regions-heading">Explore the Crystal Catacombs</h2>
+<p>Choose a region to discover its terrain and meet its hero.</p>
+<ul class="crystal-grid">
+<li><a class="crystal-link" style="--crystal:#ff7883" href="crystal-regions/red-flame-caves.html"><span>Red Flame Caves</span><small>Whisker</small></a></li>
+<li><a class="crystal-link" style="--crystal:#d3a1ff" href="crystal-regions/purple-mystic-halls.html"><span>Purple Mystic Halls</span><small>Luna</small></a></li>
+<li><a class="crystal-link" style="--crystal:#83b8ff" href="crystal-regions/blue-tech-mines.html"><span>Blue Tech Mines</span><small>Bolt</small></a></li>
+<li><a class="crystal-link" style="--crystal:#90e797" href="crystal-regions/green-life-groves.html"><span>Green Life Groves</span><small>Ivy</small></a></li>
+<li><a class="crystal-link" style="--crystal:#ffae72" href="crystal-regions/orange-volcanic-depths.html"><span>Orange Volcanic Depths</span><small>Blaze</small></a></li>
+<li><a class="crystal-link" style="--crystal:#80e9f3" href="crystal-regions/cyan-frost-caverns.html"><span>Cyan Frost Caverns</span><small>Frost</small></a></li>
+<li><a class="crystal-link" style="--crystal:#aaa8ff" href="crystal-regions/indigo-shadow-tunnels.html"><span>Indigo Shadow Tunnels</span><small>Shadow</small></a></li>
+<li><a class="crystal-link" style="--crystal:#ffe475" href="crystal-regions/yellow-light-ruins.html"><span>Yellow Light Ruins</span><small>Spark</small></a></li>
+<li><a class="crystal-link" style="--crystal:#ffa5db" href="crystal-regions/pink-harmony-grotto.html"><span>Pink Harmony Grotto</span><small>Melody</small></a></li>
+<li><a class="crystal-link" style="--crystal:#e6b68d" href="crystal-regions/brown-earth-quarries.html"><span>Brown Earth Quarries</span><small>Stone</small></a></li>
+</ul>
+</section>
 <section class="content" id="coloring-book" aria-labelledby="coloring-book-title"><div class="note" style="border:2px solid #d4a2ff;background:linear-gradient(135deg,#243577,#40205f)"><span class="pill">Now available · Printable PDF</span><h2 id="coloring-book-title" style="margin-top:16px">Crystal Catacombs Printable Coloring Book</h2><p class="lead" style="margin-bottom:18px">Join Whisker and Luna in a printable cat coloring book with 100 coloring and activity pages across 10 story chapters. Explore Pawtopia while discovering kindness, teamwork and courage.</p><p><strong>100 activity pages + front and back covers · US Letter · $7.99 USD</strong></p><p>Family coloring time and creative prompts, with both glow-style and ink-saving black-and-white PDFs included. Try the free three-page sample on the book page.</p><div class="actions"><a class="btn" href="coloring-book.html">Explore the Book &amp; Free Sample</a>
 <a class="btn alt" href="surreal-worlds-coloring-book.html">Surreal Worlds Coloring Book</a>
 <a class="btn alt" href="https://payhip.com/SuperPawHeroesMore">Browse All Printable Coloring Books</a></div><p><a style="color:#ffe36c;text-decoration:underline" href="https://payhip.com/SuperPawHeroesMore/blog/news/5-screen-free-rainy-day-coloring-activities-for-families">5 rainy-day coloring activities</a> · <a style="color:#ffe36c;text-decoration:underline" href="https://payhip.com/SuperPawHeroesMore/blog/news/how-to-print-crystal-catacombs-coloring-pages-and-save-color-ink">Printing and ink-saving guide</a></p><p style="font-size:13px">Parents and caregivers: this is a digital download for personal household use. No physical book or supplies are shipped. Printing costs are separate. Glow is a visual effect; ordinary printed pages do not glow in the dark.</p></div></section>
