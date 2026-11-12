@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pawtopia Arcade | Super Paw Heroes</title>
+<meta name="description" content="Play three free Super Paw Heroes arcade games with Whisker and Luna.">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#080f25;color:#f8f7ff;font:1rem/1.5 system-ui,sans-serif}header,main,footer{width:min(100% - 2rem,64rem);margin:auto}header{padding:1rem 0}a{color:#ffde87}h1{font-size:clamp(2.7rem,8vw,5rem);line-height:1;margin:.4rem 0}h2{margin:.3rem 0}.hero{min-height:24rem;display:grid;align-content:end;padding:clamp(1.25rem,5vw,3rem);border-radius:1.25rem;background:linear-gradient(0deg,#090f29 2%,#090f2960 75%),url(assets/whisker-luna-master.webp) center 30%/cover}.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.8rem;margin:1rem 0}.games button{text-align:left}button{font:inherit;min-height:48px;color:inherit;background:#222e59;border:1px solid #7789c4;border-radius:.75rem;padding:.55rem .8rem;cursor:pointer}button[aria-pressed=true],.start{background:#ffde87;color:#211b32;font-weight:750}button:focus-visible,a:focus-visible{outline:3px solid #8bf9ff;outline-offset:3px}.play{padding:1rem;border-radius:1rem;background:radial-gradient(ellipse at 50% 0,#33347a,#131b38 70%);border:1px solid #646eb0}.hud{display:flex;gap:1rem;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;max-width:25rem;margin:1rem auto}.grid button{aspect-ratio:1;font-size:clamp(1.15rem,6vw,2rem);padding:.15rem;touch-action:manipulation;background:linear-gradient(150deg,#344780,#1a2448)}.grid button:disabled{opacity:.78;cursor:default}.grid button[data-lit=true]{background:#554277;border-color:#d2a4ff}.sponsor{margin:5rem auto 2rem;max-width:46rem;padding:1.5rem;text-align:center;border:1px solid #536081;border-radius:.75rem;color:#d5dcf4}.sponsor small{display:block;text-transform:uppercase;letter-spacing:.12em}footer{padding:1rem 0 2rem}
+</style>
+</head>
+<body>
+<header><a href="./">Super Paw Heroes</a></header>
+<main>
+<section class="hero"><h1>Pawtopia Arcade</h1><p>Play with Whisker and Luna.</p></section>
+<nav class="games" aria-label="Arcade games">
+<button type="button" data-mode="lantern" aria-pressed="true">Lantern Festival</button>
+<button type="button" data-mode="crystal" aria-pressed="false">Crystal Echo</button>
+<button type="button" data-mode="defense" aria-pressed="false">Iron Fang Defense</button>
+</nav>
+<section class="play" aria-labelledby="game-title">
+<h2 id="game-title"></h2><p id="rules"></p>
+<div class="hud"><span id="score"></span><span id="best"></span></div>
+<div class="grid" id="grid" role="group" aria-label="Game tiles"></div>
+<p id="status" role="status"></p><button class="start" id="start" type="button">Start game</button>
+</section>
+<aside class="sponsor" aria-label="House advertisement"><small>From Super Paw Heroes</small><a href="coloring-book.html">Try the free Crystal Catacombs coloring pages</a></aside>
+</main>
+<footer><a href="super-paw-3d.html">Play the Crystal Catacombs 3D RPG</a></footer>
+<script>
+const games = {
+  lantern: { title: 'Lantern Festival', rules: 'Help Whisker catch glowing lanterns. Each lantern moves when you catch it or after one second. You have 20 seconds.' },
+  crystal: { title: 'Crystal Echo', rules: 'Help Luna repeat the order of the flashing crystals. Each round adds one crystal.' },
+  defense: { title: 'Iron Fang Defense', rules: 'Tap the Iron Fang robots and leave the shielded townsfolk alone. One new pair appears after each choice or timeout. You have 20 seconds.' }
+};
+const byId = id => document.getElementById(id);
+const selectors = [...document.querySelectorAll('[data-mode]')];
+const tiles = Array.from({length: 16}, (_, index) => {
+  const tile = document.createElement('button');
+  tile.type = 'button';
+  tile.addEventListener('click', () => choose(index));
+  byId('grid').append(tile);
+  return tile;
+});
+let mode = 'lantern';
+let score = 0;
+let best = 0;
+let timer;
+let next;
+let running = false;
+let accepting = false;
+let target = -1;
+let decoy = -1;
+let sequence = [];
+let step = 0;
+const randomTile = () => Math.floor(Math.random() * tiles.length);
+const status = message => byId('status').textContent = message;
+function scoreboard() {
+  if (score > best) {
+    best = score;
+    try { localStorage.setItem('pawtopia-arcade-' + mode, String(best)); } catch {}
+  }
+  byId('score').textContent = 'Score: ' + score;
+  byId('best').textContent = 'Best: ' + best;
+}
+function draw(highlight = -1) {
+  tiles.forEach((tile, index) => {
+    const lit = index === highlight;
+    let symbol = mode === 'crystal' ? '◇' : '·';
+    let label = 'Tile ' + (index + 1);
+    if (lit) { symbol = '💎'; label += ', glowing crystal'; }
+    if (index === target) {
+      symbol = mode === 'lantern' ? '🏮' : '🤖';
+      label += mode === 'lantern' ? ', lantern' : ', Iron Fang robot';
+    }
+    if (index === decoy) { symbol = '🛡️'; label += ', shielded townsfolk'; }
+    tile.textContent = symbol;
+    tile.setAttribute('aria-label', label);
+    tile.dataset.lit = String(lit);
+    tile.disabled = !running || !accepting;
+  });
+}
+function stop() {
+  clearTimeout(timer);
+  clearTimeout(next);
+  running = accepting = false;
+  target = decoy = -1;
+  draw();
+  byId('start').textContent = 'Play again';
+}
+function select(modeName) {
+  mode = modeName;
+  stop();
+  score = best = 0;
+  try { best = Number(localStorage.getItem('pawtopia-arcade-' + mode)) || 0; } catch {}
+  selectors.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
+  byId('game-title').textContent = games[mode].title;
+  byId('rules').textContent = games[mode].rules;
+  byId('start').textContent = 'Start game';
+  status('');
+  scoreboard();
+}
+function spawn() {
+  target = randomTile();
+  decoy = mode === 'defense' ? (target + 1 + Math.floor(Math.random() * 15)) % 16 : -1;
+  draw();
+  next = setTimeout(spawn, mode === 'defense' ? 1400 : 1000);
+}
+function crystalRound() {
+  sequence.push(randomTile());
+  accepting = false;
+  step = 0;
+  status('Watch the crystals.');
+  draw();
+  let preview = 0;
+  function flash() {
+    if (preview === sequence.length) {
+      accepting = true;
+      status('Your turn.');
+      draw();
+      return;
+    }
+    draw(sequence[preview++]);
+    next = setTimeout(() => {
+      draw();
+      next = setTimeout(flash, 230);
+    }, 440);
+  }
+  next = setTimeout(flash, 400);
+}
+function choose(index) {
+  if (!running || !accepting) return;
+  if (mode === 'crystal') {
+    if (index !== sequence[step]) {
+      stop();
+      status('Sequence missed. Final score: ' + score);
+      return;
+    }
+    if (++step === sequence.length) {
+      score++;
+      scoreboard();
+      crystalRound();
+    }
+    return;
+  }
+  if (index !== target && index !== decoy) return;
+  score = index === target ? score + 1 : Math.max(0, score - 1);
+  scoreboard();
+  clearTimeout(next);
+  spawn();
+}
+function start() {
+  stop();
+  running = true;
+  score = 0;
+  sequence = [];
+  scoreboard();
+  byId('start').textContent = 'Restart game';
+  if (mode === 'crystal') {
+    crystalRound();
+    return;
+  }
+  accepting = true;
+  status('Go! You have 20 seconds.');
+  spawn();
+  timer = setTimeout(() => {
+    stop();
+    status('Time is up. Final score: ' + score);
+  }, 20000);
+}
+selectors.forEach(button => button.addEventListener('click', () => select(button.dataset.mode)));
+byId('start').addEventListener('click', start);
+select('lantern');
+</script>
+</body>
+</html>
