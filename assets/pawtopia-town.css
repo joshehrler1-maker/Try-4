@@ -25,3 +25,8 @@ section{scroll-margin-top:5rem}
 .town-map a,.town-map a:last-child{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);display:grid;place-items:center;width:15%;min-height:8%;padding:.15em;border:2px solid #513469;border-radius:50%;background:#e3f7fc;color:#2b2141;text-align:center;text-decoration:none;line-height:1.05;font-size:clamp(.57rem,2.65cqw,1rem);box-shadow:0 2px 0 #231b34aa}
 .town-map a:hover,.town-map a:focus-visible{z-index:2;background:#ffebad;outline:2px solid #422862;outline-offset:2px}
 .shop-scene{display:block;width:min(100%,26rem);height:auto;aspect-ratio:1.45;object-fit:cover;border-radius:.4rem;margin:.6rem 0 1rem}
+
+#album{display:grid;grid-template-columns:repeat(auto-fit,minmax(8rem,1fr));gap:.6rem;padding:0;list-style:none}
+#album li{border:1px solid #d6b875;border-radius:.45rem;padding:.45rem;background:#fff3d5;font-weight:700}
+#album img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:.25rem;margin-bottom:.35rem}
+#album .missing img{filter:grayscale(1);opacity:.65}

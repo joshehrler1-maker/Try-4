@@ -13,7 +13,8 @@
       ['Defense Gear', 'Crystal Shield', 12], ['Flower Shop', 'Glowbell Bouquet', 5],
       ['Hero Clothing', 'Festival Cape', 10], ['Gifts Galore', 'Ribbon Gift Box', 5],
       ['Garden Supplies', 'Glowbell Seeds', 4], ['Fine Furniture', 'Velvet Cat Bed', 12],
-      ['The Bakery', 'Honey Paw Roll', 3], ['Collector Cards', 'Whisker Collector Card', 7]
+      ['The Bakery', 'Honey Paw Roll', 3], ['Collector Cards', 'Whisker Collector Card', 7],
+      ['Collector Cards', 'Luna Collector Card', 7], ['Collector Cards', 'Bolt Collector Card', 7]
     ].map(([store, label, price]) => ({ store, label, price }))
   ];
   const moves = { Strike: 'Charge', Guard: 'Strike', Charge: 'Guard' };
@@ -30,6 +31,22 @@
     const collection = Object.entries(p.townCollection).map(([name, count]) => name + ' × ' + count);
     if (collection.length) byId('items').textContent += '. Collection: ' + collection.join(', ');
     byId('box').textContent = 'Stored: ' + p.storageBox.food + ' snacks, ' + p.storageBox.shards + ' shards';
+    const cards = [['Whisker', 'red-flame-caves'], ['Luna', 'purple-mystic-halls'], ['Bolt', 'blue-tech-mines']].map(([hero, region]) => {
+      const card = document.createElement('li');
+      const count = p.townCollection[hero + ' Collector Card'] || 0;
+      const image = document.createElement('img');
+      image.src = 'assets/scenes/' + region + '.webp';
+      image.alt = '';
+      image.loading = 'lazy';
+      image.width = 160;
+      image.height = 90;
+      card.classList.toggle('missing', !count);
+      card.append(image, hero + (count ? ' · collected × ' + count : ' · missing'));
+      return card;
+    });
+    byId('album').replaceChildren(...cards);
+    const completed = [p.lastWish, p.lastSoup, p.lastArena, p.lastInterest].filter(date => date === day).length;
+    byId('daily-progress').textContent = completed + ' of 4 daily activities completed today.';
     byId('wish').disabled = p.lastWish === day;
     byId('wish').textContent = p.lastWish === day ? 'Gift collected today' : 'Visit the Wishing Well';
     byId('interest').disabled = p.lastInterest === day || p.bankCoins < 100;

@@ -22,6 +22,7 @@
 <script src="assets/pawtopia-save.js"></script>
 <link rel="stylesheet" href="assets/pawtopia-scenes.css">
 <link rel="stylesheet" href="assets/pawtopia-illustrated.css">
+<link rel="stylesheet" href="assets/pawtopia-explore.css">
 </head>
 <body class="pawtopia-scene pawtopia-art"><a class="skip-link" href="#main-content">Skip to main content</a><button type="button" id="fullscreen-top" style="display:block;width:calc(100% - 24px);max-width:700px;margin:12px auto;padding:16px;background:#ffe17b;color:#17213a;border:2px solid #fff2b0;border-radius:12px;font:800 20px system-ui">⛶ Full Screen</button>
 <header><a class="logo" href="index.html">🐾 SUPER <b>PAW HEROES</b></a><nav aria-label="Main navigation"><a href="#pawtopia">World Map</a><a href="pawtopia-town.html">Town Square</a><a href="#crystal-regions">Crystal Regions</a><a href="pawtopia-companions.html">Companions</a><a href="#hero-headquarters">Hero Profile</a><a href="pawtopia-arcade.html">Games Room</a><a href="#coloring-book">Bookshop</a><a href="#games">Adventures</a><a href="studio.html">🛠️ Creator Studio</a><a href="#challenge">⚡ Challenge</a><a href="#explore">🌟 Explore</a><a href="#families">💛 Families</a><a href="readiness.html">📱 Setup & Status</a></nav></header>
@@ -30,6 +31,8 @@
 
 <section class="content" id="pawtopia" aria-labelledby="pawtopia-heading">
 <h2 id="pawtopia-heading">Explore Pawtopia</h2>
+<nav class="paw-world-nav" aria-label="Explore Pawtopia"><a href="index.html#pawtopia" aria-current="page">Explore</a><a href="pawtopia-companions.html">Companions</a><a href="pawtopia-arcade.html">Games Room</a><a href="pawtopia-town.html">Shops</a><a href="pawtopia-town.html#dailies">Dailies</a><a href="pawtopia-town.html#card-album">Card Album</a><a href="index.html#crystal-regions">Crystal Regions</a></nav>
+
 <div class="world-profile" id="hero-headquarters" style="scroll-margin-top:110px"><div><strong>Hero headquarters</strong><p id="world-save" role="status">Choose your hero.</p></div><div><button type="button" data-world-hero="Whisker">Whisker</button> <button type="button" data-world-hero="Luna">Luna</button> <button type="button" id="world-daily">Claim daily coins</button></div></div>
 <p class="atlas-note">Tap a sign to visit a place in Pawtopia.</p>
 <div class="pawtopia-atlas" aria-label="Illustrated map of Pawtopia">
@@ -39,6 +42,8 @@
 <a class="atlas-sign" style="--x:17%;--y:88%" href="super-paw-3d.html" aria-label="Crystal Catacombs. Explore the 3D adventure">Crystal Catacombs</a>
 <a class="atlas-sign" style="--x:50%;--y:88%" href="#coloring-book" aria-label="Coloring Book Shop. Browse books and try free pages">Coloring Book Shop</a>
 <a class="atlas-sign" style="--x:83%;--y:88%" href="#challenge" aria-label="Hero Training. Take the Hero Choice Challenge">Hero Training</a>
+<a class="atlas-sign" style="--x:22%;--y:16%" href="pawtopia-companions.html">Companion Cottage</a>
+<a class="atlas-sign" style="--x:78%;--y:16%" href="#crystal-regions">Crystal Regions</a>
 </div>
 <h3>Games by location</h3>
 <div class="world-map" aria-label="Games by location">
@@ -95,18 +100,7 @@
 <section class="content" id="crystal-regions" aria-labelledby="crystal-regions-heading">
 <h2 id="crystal-regions-heading">Explore the Crystal Catacombs</h2>
 <p>Choose a region to discover its terrain and meet its hero.</p>
-<ul class="crystal-grid">
-<li><a class="crystal-link" style="--crystal:#ff7883" href="crystal-regions/red-flame-caves.html"><span>Red Flame Caves</span><small>Whisker</small></a></li>
-<li><a class="crystal-link" style="--crystal:#d3a1ff" href="crystal-regions/purple-mystic-halls.html"><span>Purple Mystic Halls</span><small>Luna</small></a></li>
-<li><a class="crystal-link" style="--crystal:#83b8ff" href="crystal-regions/blue-tech-mines.html"><span>Blue Tech Mines</span><small>Bolt</small></a></li>
-<li><a class="crystal-link" style="--crystal:#90e797" href="crystal-regions/green-life-groves.html"><span>Green Life Groves</span><small>Ivy</small></a></li>
-<li><a class="crystal-link" style="--crystal:#ffae72" href="crystal-regions/orange-volcanic-depths.html"><span>Orange Volcanic Depths</span><small>Blaze</small></a></li>
-<li><a class="crystal-link" style="--crystal:#80e9f3" href="crystal-regions/cyan-frost-caverns.html"><span>Cyan Frost Caverns</span><small>Frost</small></a></li>
-<li><a class="crystal-link" style="--crystal:#aaa8ff" href="crystal-regions/indigo-shadow-tunnels.html"><span>Indigo Shadow Tunnels</span><small>Shadow</small></a></li>
-<li><a class="crystal-link" style="--crystal:#ffe475" href="crystal-regions/yellow-light-ruins.html"><span>Yellow Light Ruins</span><small>Spark</small></a></li>
-<li><a class="crystal-link" style="--crystal:#ffa5db" href="crystal-regions/pink-harmony-grotto.html"><span>Pink Harmony Grotto</span><small>Melody</small></a></li>
-<li><a class="crystal-link" style="--crystal:#e6b68d" href="crystal-regions/brown-earth-quarries.html"><span>Brown Earth Quarries</span><small>Stone</small></a></li>
-</ul>
+<nav class="paw-map" aria-label="Crystal Regions map"><img src="assets/scenes/crystal-world-map.webp" width="1024" height="1024" alt="" decoding="async"><a class="paw-sign" href="crystal-regions/red-flame-caves.html" style="--x:25%;--y:15%;--crystal:#ff7883">Red Flame Caves</a><a class="paw-sign" href="crystal-regions/purple-mystic-halls.html" style="--x:75%;--y:15%;--crystal:#d3a1ff">Purple Mystic Halls</a><a class="paw-sign" href="crystal-regions/blue-tech-mines.html" style="--x:25%;--y:31%;--crystal:#83b8ff">Blue Tech Mines</a><a class="paw-sign" href="crystal-regions/green-life-groves.html" style="--x:75%;--y:31%;--crystal:#90e797">Green Life Groves</a><a class="paw-sign" href="crystal-regions/orange-volcanic-depths.html" style="--x:25%;--y:47%;--crystal:#ffae72">Orange Volcanic Depths</a><a class="paw-sign" href="crystal-regions/cyan-frost-caverns.html" style="--x:75%;--y:47%;--crystal:#80e9f3">Cyan Frost Caverns</a><a class="paw-sign" href="crystal-regions/indigo-shadow-tunnels.html" style="--x:25%;--y:64%;--crystal:#aaa8ff">Indigo Shadow Tunnels</a><a class="paw-sign" href="crystal-regions/yellow-light-ruins.html" style="--x:75%;--y:64%;--crystal:#ffe475">Yellow Light Ruins</a><a class="paw-sign" href="crystal-regions/pink-harmony-grotto.html" style="--x:25%;--y:82%;--crystal:#ffa5db">Pink Harmony Grotto</a><a class="paw-sign" href="crystal-regions/brown-earth-quarries.html" style="--x:75%;--y:82%;--crystal:#e6b68d">Brown Earth Quarries</a></nav>
 </section>
 <section class="content" id="coloring-book" aria-labelledby="coloring-book-title"><div class="note story-shop" style="border:2px solid #d4a2ff;background:linear-gradient(135deg,#243577,#40205f)"><span class="pill">Now available · Printable PDF</span><h2 id="coloring-book-title" style="margin-top:16px">Crystal Catacombs Printable Coloring Book</h2><p class="lead" style="margin-bottom:18px">Join Whisker and Luna in a printable cat coloring book with 100 coloring and activity pages across 10 story chapters. Explore Pawtopia while discovering kindness, teamwork and courage.</p><p><strong>100 activity pages + front and back covers · US Letter · $7.99 USD</strong></p><p>Family coloring time and creative prompts, with both glow-style and ink-saving black-and-white PDFs included. Try the free three-page sample on the book page.</p><div class="actions"><a class="btn" href="coloring-book.html">Explore the Book &amp; Free Sample</a>
 <a class="btn alt" href="surreal-worlds-coloring-book.html">Surreal Worlds Coloring Book</a>

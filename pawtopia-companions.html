@@ -9,6 +9,7 @@
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/companion-cottage.js"></script>
 <link rel="stylesheet" href="assets/pawtopia-scenes.css">
+<link rel="stylesheet" href="assets/pawtopia-explore.css">
 </head>
 <body class="pawtopia-scene cottage-art">
 <header class="top">
@@ -16,13 +17,16 @@
   <nav aria-label="Pawtopia"><a href="pawtopia-town.html">Town Square</a><a href="index.html#crystal-regions">Crystal Regions</a><a href="pawtopia-arcade.html">Games Room</a></nav>
 </header>
 <main>
+<nav class="paw-world-nav" aria-label="Explore Pawtopia"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html" aria-current="page">Companions</a><a href="pawtopia-arcade.html">Games Room</a><a href="pawtopia-town.html">Shops</a><a href="pawtopia-town.html#dailies">Dailies</a><a href="pawtopia-town.html#card-album">Card Album</a><a href="index.html#crystal-regions">Crystal Regions</a></nav>
+
   <section class="hero" aria-labelledby="title">
     <div><p class="location">Pawtopia</p><h1 id="title">Companion Cottage</h1><p>Give a cat a home, then head to the Games Room to earn coins for food and toys.</p><a class="button" href="pawtopia-arcade.html">Play arcade games</a></div>
     <img src="assets/scenes/cottage.webp" alt="Pawtopia cottage with a fireplace, cat tree and sunset window" width="836" height="470">
   </section>
+  <nav class="paw-map" aria-label="Illustrated Companion Cottage map"><img src="assets/scenes/cottage-world-map.webp" width="1024" height="1024" alt="" decoding="async"><a class="paw-sign" href="#companion-title" style="--x:25%;--y:39%">Companion Bed</a><a class="paw-sign" href="#companion-care" style="--x:75%;--y:39%">Snack Kitchen</a><a class="paw-sign" href="#companion-care" style="--x:25%;--y:87%">Play Corner</a><a class="paw-sign" href="#shop-title" style="--x:75%;--y:87%">Cottage Shop</a></nav>
   <p class="wallet"><strong id="coins">0</strong> Paw Coins</p>
   <div class="panels">
-    <section class="panel" aria-labelledby="companion-title">
+    <section class="panel" id="companion-care" aria-labelledby="companion-title">
       <h2 id="companion-title">Your companion</h2>
       <form id="adopt">
         <label for="cat-name">Name your cat</label>

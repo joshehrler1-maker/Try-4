@@ -22,10 +22,13 @@
 <link rel="stylesheet" href="assets/pawcade-visuals.css">
 <link rel="stylesheet" href="assets/game-fullscreen.css">
 <script src="assets/game-fullscreen.js" defer></script>
+<link rel="stylesheet" href="assets/pawtopia-explore.css">
 </head>
 <body class="pawtopia-scene arcade-art arcade-visuals">
 <header><a href="pawtopia-town.html">Town Square</a> · <a href="./">Super Paw Heroes</a> · <a href="pawtopia-companions.html">Companion Cottage</a><p id="arcade-wallet" aria-live="polite"></p><p>Beat your personal best to earn Paw Coins for your companion.</p><p><a href="pawcade-classics.html">Play the Crystal Regions collection at Pawcade</a></p></header><div class="pawtopia-arcade-scene" aria-hidden="true"></div>
 <main>
+<nav class="paw-world-nav" aria-label="Explore Pawtopia"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html">Companions</a><a href="pawtopia-arcade.html" aria-current="page">Games Room</a><a href="pawtopia-town.html">Shops</a><a href="pawtopia-town.html#dailies">Dailies</a><a href="pawtopia-town.html#card-album">Card Album</a><a href="index.html#crystal-regions">Crystal Regions</a></nav>
+
 <section class="hero"><h1>Pawtopia Arcade</h1><p>Play with Whisker and Luna.</p></section>
 <section class="game-directory" aria-labelledby="directory-title">
 <h2 id="directory-title">Games Room</h2>
@@ -34,18 +37,18 @@
 <label>Category<select id="game-category"><option value="">All games</option><option value="Action">Action</option><option value="Puzzles">Puzzles</option></select></label>
 </div>
 <p id="game-results" role="status">6 games</p>
-<nav class="games" aria-label="Arcade games">
-<button type="button" data-mode="lantern" data-category="Action" aria-pressed="true"><img src="assets/scenes/arcade.webp" alt="" width="320" height="150">Lantern Festival<small>Action · Festival Grounds</small></button>
-<button type="button" data-mode="crystal" data-category="Puzzles" aria-pressed="false"><img src="assets/scenes/pawcade-mystic.webp" alt="" width="320" height="150">Crystal Echo<small>Puzzles · Crystal Catacombs</small></button>
-<button type="button" data-mode="defense" data-category="Action" aria-pressed="false"><img src="assets/scenes/pawcade-flame.webp" alt="" width="320" height="150">Iron Fang Defense<small>Action · Festival Grounds</small></button>
-<button type="button" data-mode="courier" data-category="Action" aria-pressed="false"><img src="assets/scenes/pawtopia.webp" alt="" width="320" height="150">Town Square Courier<small>Action · Town Square</small></button>
-<button type="button" data-mode="forge" data-category="Puzzles" aria-pressed="false"><img src="assets/scenes/green-life-groves.webp" alt="" width="320" height="150">Pawgrove Forge<small>Puzzles · Pawgrove</small></button>
-<button type="button" data-mode="beacons" data-category="Puzzles" aria-pressed="false"><img src="assets/scenes/catacombs.webp" alt="" width="320" height="150">Catacombs Beacons<small>Puzzles · Crystal Catacombs</small></button>
+<nav class="games paw-map" aria-label="Illustrated arcade game map"><img src="assets/scenes/games-world-map.webp" width="1024" height="1024" alt="" decoding="async">
+<button class="paw-sign" style="--x:25%;--y:27%" type="button" data-mode="lantern" data-category="Action" aria-pressed="true">Lantern Festival<small>Action · Festival Grounds</small></button>
+<button class="paw-sign" style="--x:75%;--y:27%" type="button" data-mode="crystal" data-category="Puzzles" aria-pressed="false">Crystal Echo<small>Puzzles · Crystal Catacombs</small></button>
+<button class="paw-sign" style="--x:25%;--y:55%" type="button" data-mode="defense" data-category="Action" aria-pressed="false">Iron Fang Defense<small>Action · Festival Grounds</small></button>
+<button class="paw-sign" style="--x:75%;--y:55%" type="button" data-mode="courier" data-category="Action" aria-pressed="false">Town Square Courier<small>Action · Town Square</small></button>
+<button class="paw-sign" style="--x:25%;--y:87%" type="button" data-mode="forge" data-category="Puzzles" aria-pressed="false">Pawgrove Forge<small>Puzzles · Pawgrove</small></button>
+<button class="paw-sign" style="--x:75%;--y:87%" type="button" data-mode="beacons" data-category="Puzzles" aria-pressed="false">Catacombs Beacons<small>Puzzles · Crystal Catacombs</small></button>
 </nav>
 </section>
 <section class="play" id="game-panel" data-fullscreen-game aria-labelledby="game-title">
 <img class="echo-art" id="echo-art" src="assets/scenes/pawcade-mystic.webp" width="900" height="300" alt="Luna among the crystals of the Purple Mystic Halls" hidden>
-<h2 id="game-title"></h2><p id="rules"></p>
+<h2 id="game-title" tabindex="-1"></h2><p id="rules"></p>
 <div class="hud"><span id="score"></span><span id="best"></span></div>
 <div class="grid" id="grid" role="group" aria-label="Game tiles"></div>
 <p id="status" role="status"></p><button class="start" id="start" type="button">Start game</button><button class="echo-sound" id="echo-sound" type="button" aria-pressed="false" hidden>Sound off</button>
@@ -352,7 +355,10 @@ function start() {
     status('Time is up. Final score: ' + score);
   }, 20000);
 }
-selectors.forEach(button => button.addEventListener('click', () => select(button.dataset.mode)));
+selectors.forEach(button => button.addEventListener('click', () => {
+  select(button.dataset.mode);
+  byId('game-title').focus();
+}));
 byId('start').addEventListener('click', start);
 const gameSearch = byId('game-search');
 const gameCategory = byId('game-category');

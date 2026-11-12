@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="assets/pawtopia-town.css">
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/pawtopia-town.js"></script>
+<link rel="stylesheet" href="assets/pawtopia-explore.css">
 </head>
 <body>
 <header><a href="index.html">Super Paw Heroes</a><strong id="wallet"></strong></header>
@@ -18,6 +19,8 @@
 <a href="#arena">Training Arena</a><a href="#gazette">Gazette</a>
 </nav>
 <main>
+<nav class="paw-world-nav" aria-label="Explore Pawtopia"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html">Companions</a><a href="pawtopia-arcade.html">Games Room</a><a href="pawtopia-town.html" aria-current="page">Shops</a><a href="pawtopia-town.html#dailies">Dailies</a><a href="pawtopia-town.html#card-album">Card Album</a><a href="index.html#crystal-regions">Crystal Regions</a></nav>
+
 <div class="banner"><h1>Pawtopia Town Square</h1></div>
 <nav class="town-map" aria-label="Illustrated Pawtopia shop map">
 <img src="assets/scenes/town-shop-map.webp" width="1024" height="1024" alt="">
@@ -53,6 +56,7 @@
 <label for="quantity">Quantity</label> <input id="quantity" type="number" required min="1" max="9999" value="1">
 <button name="action" value="store">Store</button> <button name="action" value="retrieve">Retrieve</button></form>
 <p id="items"></p><p id="box"></p></section>
+<section id="card-album"><h2>Hero Card Album</h2><p>Collect hero cards from the <a href="#shops" data-shop="Collector Cards">Collector Cards shop</a>.</p><ul id="album"></ul></section>
 <section id="bank"><h2>Golden Paw Bank</h2>
 <img class="shop-scene" src="assets/scenes/town-bank.webp" width="500" height="500" loading="lazy" alt="">
 <p id="balance"></p><form id="bank-form"><label for="amount">Paw Coins</label> <input id="amount" type="number" required min="1" max="999999999" value="1">
@@ -63,6 +67,7 @@
 <button id="trade">Accept the shopkeeper’s offer</button></section>
 <section id="dailies"><h2>Daily Visits</h2>
 <img class="shop-scene" src="assets/scenes/town-well.webp" width="500" height="500" loading="lazy" alt=""><p>The Wishing Well grants a daily gift. The Soup Kitchen feeds a hungry companion if you have fewer than 10 Paw Coins across your wallet and bank.</p>
+<p id="daily-progress"></p>
 <button id="wish">Visit the Wishing Well</button> <button id="soup">Visit the Soup Kitchen</button></section>
 <section id="arena"><h2>Training Arena</h2>
 <img class="shop-scene" src="assets/scenes/town-arena.webp" width="500" height="500" loading="lazy" alt=""><p>Choose a move against Bolt’s practice bot. Strike beats Charge, Guard beats Strike, and Charge beats Guard. Win two rounds first to earn today’s 8-Paw-Coin prize.</p>
