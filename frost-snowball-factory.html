@@ -17,6 +17,7 @@
 <p class="hint" id="hint">Move with your mouse, drag on touchscreens, or use the arrow keys. Watch for launchers that flash before they fire.</p></main>
 <script src="assets/pawtopia-save.js"></script>
 <script>
+(() => {
 const el=id=>document.getElementById(id);
 const field=document.querySelector('canvas');
 const ctx=field.getContext('2d');
@@ -260,4 +261,5 @@ function frame(now){
   prev=now;paint(now/1000);requestAnimationFrame(frame);
 }
 hud();requestAnimationFrame(frame);
+})();
 </script></body></html>
