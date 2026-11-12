@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const byId = id => document.getElementById(id);
-  const scenery = 'assets/scenes/side-scroll-worlds.webp';
+  const scenery = 'assets/scenes/platform-levels.webp';
   const courses = window.pawtopiaCourses;
   const catalog = byId('side-catalog');
   if (!catalog) return;
@@ -24,7 +24,13 @@
   const selection = new URLSearchParams(location.search).get('game');
   if (selection === null || !/^\d+$/.test(selection) || !courses[Number(selection)]) return;
   const index = Number(selection);
-  const [name, hero, opening, ending, power, terrain, enemy] = courses[index];
+  const [name, hero, opening, ending, coursePower, terrain] = courses[index];
+  const [reference, movement, enemyPattern, prologue, epilogue] = window.pawtopiaStyles[index];
+  const [runSpeed, handling, jumpSpeed, cadence, layoutSeed, goalType] = window.pawtopiaVariants[index];
+  const chapters = window.pawtopiaChapters[index];
+  const special = {buster:'throw',roll:'dash',float:'bubble',beat:'pulse',airlift:'vine',
+    airdash:'dash',pogo:'stomp',blaster:'throw',shooter:'throw',whip:'pulse',momentum:'dash'};
+  const power = special[movement] || (movement in {stomp:1,swim:1,glide:1,flip:1,grapple:1,throw:1} ? movement : coursePower);
   const descriptions = {
     stomp:'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Hold Jump to swim upward',
     dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
@@ -33,11 +39,24 @@
     double:'Jump again in midair', shield:'Hold Action to deflect hazards',
     photo:'Press Action to stun enemies with a flash', bubble:'Hold Action to float'
   };
+  const movementGuide = {
+    buster:'Fire your arm cannon with Action.', roll:'Roll through enemies with Action.',
+    float:'Hold Action to float.', beat:'Use Action on the beat to send out a strong pulse.',
+    airdash:'Press Action to dash forward or upward while airborne.',
+    pogo:'Hold Jump while stomping to bounce higher.',
+    precision:'Jump from ledge edges to clear wider gaps.',
+    whip:'Press Action to strike nearby enemies with your whip.',
+    momentum:'Hold a direction to build speed. Press Action to burst forward.'
+  };
   const ctx = canvas.getContext('2d');
   const backdrop = new Image();
   backdrop.src = scenery;
   const sprites = new Image();
   sprites.src = 'assets/scenes/platform-sprites.webp';
+  const enemyArt = new Image();
+  enemyArt.src = 'assets/scenes/platform-enemies.webp';
+  const heroArt = new Image();
+  heroArt.src = 'assets/scenes/platform-heroes.webp';
   const poster = new Image();
   poster.src = 'assets/whisker-luna-master.webp';
   const mobile = new Set();
@@ -48,7 +67,7 @@
   const sections = 6;
   const sectionSize = 2200;
   const finish = sections * sectionSize;
-  const finale = ['guardian','switch','sprint','guardian','summit'][index%5];
+  const finale = ['guardian','sprint','switch','crystals','summit'][goalType];
   const exitX = finish+720;
   const ground = 326;
   const checkpoint = x => Math.floor(x / sectionSize) * sectionSize;
@@ -57,28 +76,33 @@
   powerButton.hidden = power === 'stomp' || power === 'double' || power === 'swim' || power === 'glide';
   byId('side-player').hidden = false;
   byId('side-title').textContent = hero + ' · ' + name;
-  byId('side-rules').textContent = descriptions[power] + '. Reach the end of all six stages.';
+  byId('side-rules').textContent = (movementGuide[movement] || descriptions[power] + '.') + ' ' + prologue;
   const platforms = [];
   const enemies = [];
   const crystals = [];
-  let player, boss, phase, camera, frame, last, clock, chapter, taken, attacks;
+  let player, boss, phase, camera, frame, last, clock, chapter, taken, attacks, hazards;
   for (let stage = 0; stage < sections; stage++) {
     const start = stage * sectionSize;
     platforms.push({x:start,y:ground,w:350,kind:'floor'});
     for (let chunk = 0; chunk < 5; chunk++) {
-      const layout = (index * 7 + stage * 3 + chunk * (index + 1)) % 11;
+      const layout = (layoutSeed * 17 + stage * (layoutSeed % 7 + 3) + chunk * (layoutSeed + 1)) % 23;
       const x = start + 350 + chunk * 350;
-      const gap = 46 + (layout * 7 + stage * 4) % 67;
+      const gap = 36 + (layout * 7 + stage * 4) % (movement==='precision'?78:62);
+      const elevation = movement==='grapple' || movement==='airlift' ? 34 : 0;
       platforms.push({x:x+gap,y:ground,w:350-gap,kind:'floor'});
-      platforms.push({x:x+gap+20,y:ground-55-layout%4*16,w:74+layout*5,kind:terrain});
-      crystals.push({x:x+gap+53,y:ground-92-layout%4*16});
-      enemies.push({x:x+gap+133,y:ground-23,type:enemy,offset:layout});
+      platforms.push({x:x+gap+20,y:ground-55-layout%4*16-elevation,w:70+layout*4,kind:terrain});
+      crystals.push({x:x+gap+53,y:ground-92-layout%4*16-elevation});
+      enemies.push({x:x+gap+133,y:ground-23,offset:layout});
+      if ((layout+stage)%6===0) enemies.push({x:x+310,y:ground-23,offset:layout+2});
     }
     platforms.push({x:start+2100,y:ground,w:100,kind:'floor'});
   }
   platforms.push({x:finish,y:ground,w:850,kind:'floor'});
   if (finale === 'summit') {
-    for (let i=0;i<4;i++) platforms.push({x:finish+310+i*110,y:ground-38-i*31,w:119,kind:'shelf'});
+    for (let i=0;i<4;i++) platforms.push({x:finish+310+i*110,y:ground-38-i*31,w:119,kind:'lift'});
+  }
+  if (finale === 'crystals') {
+    for(let i=0;i<3;i++) crystals.push({x:finish+140+i*160,y:ground-24});
   }
   const resetPlayer = (x = 100) => ({
     x,y:ground-22,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0
@@ -86,34 +110,41 @@
   function reset() {
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0};
-    enemies.forEach(e => {e.dead = false;});
+    enemies.forEach(e => {e.dead = false;e.shotAt=0;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
     attacks = [];
+    hazards = [];
     phase = 'ready';
-    status(opening + '.');
+    status(opening + '. Gameplay reference: ' + reference + '.');
     hud();
     draw();
   }
   function hud() {
-    byId('side-progress').textContent = 'Stage ' + Math.min(sections,chapter+1) + ' / ' + sections + ' · Hearts ' + player.health + ' · Crystals ' + taken;
+    byId('side-progress').textContent = 'Stage ' + Math.min(sections,chapter+1) + ' / ' + sections + ' · ' + chapters[chapter] + ' · Hearts ' + player.health + ' · Crystals ' + taken;
   }
   function jump() {
     if (phase !== 'playing') return;
     if (player.on || power === 'swim' || (power === 'double' && player.jumps < 2)) {
-      player.vy = -500 * player.gravity;
+      player.vy = -jumpSpeed * player.gravity;
       player.on = false;
       player.jumps++;
     }
   }
   function action() {
-    if (phase !== 'playing' || player.power > 0) return;
-    player.power = .48;
-    if (power === 'dash') player.vx = player.facing * 660;
+    if (phase !== 'playing' || player.power > 0 || (movement==='airdash' && player.on)) return;
+    player.power = movement==='buster' || movement==='shooter' ? .24 : .48;
+    if (power === 'dash') {
+      player.vx = player.facing * (movement==='roll'?460:660);
+      if (movement==='airdash' && !player.on && held('jump')) player.vy=-420;
+    }
     if (power === 'flip') {player.gravity *= -1; player.on = false;}
     if (power === 'vine' || power === 'grapple') player.vy = -590;
     if (power === 'throw' || power === 'pulse' || power === 'photo') {
-      attacks.push({x:player.x,y:player.y,v:player.facing*(power==='throw'?700:400),life:power==='throw'?.8:.36});
+      const onBeat = clock % .65 < .2 || clock % .65 > .52;
+      const speed = movement==='whip' ? 240 : power==='throw' ? 700 : 400;
+      const life = movement==='whip' ? .24 : movement==='beat' && onBeat ? .72 : power==='throw' ? .8 : .36;
+      attacks.push({x:player.x,y:player.y,v:player.facing*speed,life});
     }
   }
   function hit() {
@@ -127,6 +158,7 @@
     player = resetPlayer(chapter * sectionSize + 100);
     player.grace = 1.1;
     attacks = [];
+    hazards = [];
     status('Back at the stage checkpoint.');
     hud();
   }
@@ -138,8 +170,9 @@
     p.power = Math.max(0,p.power-dt);
     const steer = Number(held('right')) - Number(held('left'));
     if (steer) p.facing = steer;
-    const topSpeed = power === 'dash' ? 390 : 245;
-    if (!(power === 'dash' && p.power > .22)) p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*10);
+    const topSpeed = runSpeed;
+    const acceleration = steer ? handling : Math.max(1.6,handling*.8);
+    if (!(power === 'dash' && p.power > .22)) p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
     p.x = Math.max(30,Math.min(finish+770,p.x+p.vx*dt));
     const oldY = p.y;
     const body = power === 'slide' && held('action') ? 12 : 22;
@@ -165,21 +198,31 @@
     if (p.y > height+65) {respawn();return;}
     const stage = Math.min(sections-1,Math.floor(checkpoint(p.x)/sectionSize));
     if (oldY <= height && p.x>=finish && p.x-p.vx*dt<finish) {
-      status(({guardian:'Defeat the guardian, then reach the exit.',switch:'Reach the marker and press Jump or Action.',sprint:'Cross the finish at full speed.',summit:'Climb the ledges to reach the exit.'})[finale]);
+      status(({guardian:'Defeat the guardian, then reach the exit.',switch:'Reach the marker and press Jump or Action.',crystals:'Collect three crystals, then reach the exit.',sprint:'Cross the finish at full speed.',summit:'Climb the ledges to reach the exit.'})[finale]);
     }
-    if (stage > chapter) {chapter=stage;status('Checkpoint reached.');hud();}
+    if (stage > chapter) {
+      chapter=stage;
+      status(chapters[stage] + ' · ' + (stage===sections-1 ? ending : 'Checkpoint reached.'));
+      hud();
+    }
     for (const c of crystals) {
       if (!c.taken && close(p,c,24,29)) {c.taken=true;taken++;hud();}
     }
     for (const attack of attacks) {attack.x+=attack.v*dt;attack.life-=dt;}
     attacks = attacks.filter(a => a.life>0);
+    for (const shot of hazards) {shot.x+=shot.v*dt;shot.life-=dt;if(close(p,shot,18,22)){shot.life=0;hit();}}
+    hazards = hazards.filter(shot=>shot.life>0);
     for (const foe of enemies) {
-      if (foe.dead || Math.abs(foe.x-p.x)>180) continue;
+      if (foe.dead || Math.abs(foe.x-p.x)>360) continue;
+      if (enemyPattern==='turret' && clock>=foe.shotAt) {
+        hazards.push({x:foe.x,y:foe.y,v:Math.sign(p.x-foe.x)*180,life:2});
+        foe.shotAt=clock+cadence;
+      }
       const position = foePosition(foe);
       if (attacks.some(a => close(a,position,28,28))) foe.dead=true;
       if (!foe.dead && close(p,position,29,34)) {
         if ((p.vy>65 && oldY<position.y-17) || (power==='dash' && p.power>.22)) {
-          foe.dead=true;p.vy=-320;
+          foe.dead=true;p.vy=movement==='pogo' && held('jump') ? -560 : -320;
         } else hit();
       }
     }
@@ -195,6 +238,7 @@
       const exitReady = !boss.health && (
         finale === 'switch' ? held('action') || held('jump') :
         finale === 'sprint' ? Math.abs(p.vx)>185 :
+        finale === 'crystals' ? taken>=3 :
         finale === 'summit' ? p.y<230 : true
       );
       if (p.x>exitX-20 && exitReady) {phase='won';status(ending+'!');}
@@ -202,19 +246,32 @@
     camera = Math.max(0,Math.min(finish+70,p.x-238));
   }
   function foePosition(foe) {
-    const t = clock + foe.offset;
-    return {x:foe.x+Math.sin(t*1.6)*(foe.type==='vent'?0:34),y:foe.y-(foe.type==='drone'||foe.type==='eel'?24+Math.sin(t*3)*21:0)};
+    const t = clock * (2 / cadence) + foe.offset;
+    const chase = Math.sign(player.x-foe.x);
+    const wave = Math.sin(t*2.1);
+    switch (enemyPattern) {
+      case 'turret': return {x:foe.x,y:foe.y};
+      case 'charge': return {x:foe.x+chase*Math.max(0,wave)*96,y:foe.y};
+      case 'hopper': return {x:foe.x+wave*24,y:foe.y-Math.max(0,Math.sin(t*3.5))*63};
+      case 'swoop': return {x:foe.x+wave*78,y:foe.y-50-Math.cos(t*2.1)*42};
+      case 'school': return {x:foe.x+wave*55,y:foe.y-33-Math.sin(t*3)*27};
+      case 'pursuit': return {x:foe.x+chase*(32+wave*36),y:foe.y-12};
+      case 'rhythm': return {x:foe.x+Math.round(wave)*34,y:foe.y-Math.max(0,wave)*30};
+      default: return {x:foe.x+wave*34,y:foe.y};
+    }
   }
-  function sprite(cell,x,y,w,h,reverse=false) {
-    if (!sprites.naturalWidth) return false;
-    const size = sprites.naturalWidth/4;
+  function atlasSprite(image,columns,cell,x,y,w,h,reverse=false,rows=columns) {
+    if (!image.naturalWidth) return false;
+    const sw = image.naturalWidth/columns;
+    const sh = image.naturalHeight/rows;
     ctx.save();
     ctx.translate(x,y);
     if (reverse) ctx.scale(-1,1);
-    ctx.drawImage(sprites,cell%4*size,Math.floor(cell/4)*size,size,size,-w/2,-h/2,w,h);
+    ctx.drawImage(image,cell%columns*sw,Math.floor(cell/columns)*sh,sw,sh,-w/2,-h/2,w,h);
     ctx.restore();
     return true;
   }
+  const sprite = (...args) => atlasSprite(sprites,4,...args);
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -240,8 +297,8 @@
     }
     for (const foe of enemies) if(!foe.dead && foe.x>=camera-80 && foe.x<camera+width+80) {
       const at=foePosition(foe);
-      const cell=({sentry:8,drone:9,beetle:10,vent:11,eel:9})[foe.type];
-      if(!sprite(cell,at.x,at.y,66,66,true)){ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);}
+      const cell = index;
+      if(!atlasSprite(enemyArt,5,cell,at.x,at.y,73,73)){ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);}
     }
     if (boss.health && camera+width>finish) {
       if(!sprite(12,boss.x,boss.y,116,116,true)){ctx.fillStyle='#ad505c';ctx.fillRect(boss.x-34,boss.y-38,68,76);}
@@ -254,22 +311,36 @@
     for (const a of attacks) {
       ctx.fillStyle='#ffe9a9';ctx.beginPath();ctx.arc(a.x,a.y,9,0,Math.PI*2);ctx.fill();
     }
+    for(const shot of hazards) {
+      ctx.fillStyle='#ff8479';ctx.beginPath();ctx.arc(shot.x,shot.y,7,0,Math.PI*2);ctx.fill();
+    }
     const p=player;
     const light=['Luna','Ivy','Frost','Melody','Spark'].includes(hero);
     const pose=!p.on?3:Math.abs(p.vx)>15?1+Math.floor(clock*10)%2:0;
     const cell = power==='slide' && held('action') ? 13 :
       light && !p.on && (power==='double' || power==='vine') ? 14 : (light?4:0)+pose;
     ctx.globalAlpha=p.grace && Math.floor(clock*12)%2?.55:1;
-    if(!sprite(cell,p.x,p.y-12,81,81,p.facing<0) && poster.naturalWidth) {
+    const roster = ['Bolt','Ivy','Frost','Melody','Stone','Spark','Shadow'];
+    const rosterIndex = roster.indexOf(hero);
+    const companionDrawn = rosterIndex>=0 && atlasSprite(heroArt,8,rosterIndex*4+pose,p.x,p.y-12,81,81,p.facing<0,4);
+    if(!companionDrawn && !sprite(cell,p.x,p.y-12,81,81,p.facing<0) && poster.naturalWidth) {
       const sw=poster.naturalWidth/2;
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
     }
     ctx.restore();
+    if (phase==='won') {
+      ctx.fillStyle='#100c27c9';ctx.fillRect(0,0,width,height);
+      ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 27px system-ui';
+      ctx.fillText(ending,width/2,155,740);
+      ctx.font='18px system-ui';ctx.fillText(epilogue,width/2,195,740);
+      ctx.fillText(taken+' crystals collected',width/2,232);
+      return;
+    }
     if (phase!=='playing') {
       ctx.fillStyle='#100c27c9';ctx.fillRect(0,0,width,height);
       ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 32px system-ui';
-      ctx.fillText(phase==='won'?ending:name,width/2,165);
-      ctx.font='18px system-ui';ctx.fillText(phase==='won'?'Adventure complete · '+taken+' crystals':opening,width/2,206);
+      ctx.fillText(name,width/2,165);
+      ctx.font='18px system-ui';ctx.fillText(opening,width/2,206);
     }
   }
   function loop(now) {
@@ -313,6 +384,6 @@
     for(const event of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(event,()=>mobile.delete(control));
     button.onclick=event=>{if(event.detail===0)activate();};
   });
-  for (const image of [sprites,poster,backdrop]) image.onload=()=>{if(phase!=='playing') draw();};
+  for (const image of [sprites,poster,backdrop,enemyArt,heroArt]) image.onload=()=>{if(phase!=='playing') draw();};
   reset();
 })();
