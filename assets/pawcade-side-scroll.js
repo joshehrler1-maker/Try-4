@@ -1159,6 +1159,36 @@
     }
     ctx.restore();
   }
+  // Small deterministic stage-specific surface accents. Draw-only; no collision changes.
+  function drawPlatformAccents({x,y,w,kind}) {
+    if(w<34 || kind==='hazard' || kind==='ceilingSpikes') return;
+    const stage=Math.min(sections-1,Math.max(0,Math.floor(x/sectionSize)));
+    const [face,recess,rim]=courseMaterials[index];
+    const motif=(index*7+stage*3)%5;
+    const pitch=motif===0?38:motif===1?48:motif===2?57:motif===3?43:65;
+    const first=Math.ceil((Math.max(x,camera-15)-x)/pitch);
+    const last=Math.min(Math.floor(w/pitch),Math.ceil((camera+width-x)/pitch));
+    ctx.save();
+    ctx.beginPath();ctx.rect(x,y-8,w,15);ctx.clip();
+    ctx.strokeStyle=rim;ctx.fillStyle=face;ctx.lineWidth=1.4;
+    for(let k=first;k<=last;k++){
+      const px=x+k*pitch+pitch*.38;
+      if(px>x+w-9) continue;
+      const seed=(k*13+index*17+stage*29)%7;
+      if(motif===0){ // carved stone blocks
+        ctx.globalAlpha=.48;ctx.strokeRect(px,y-4,14,5);
+      } else if(motif===1){ // metal rivets
+        ctx.globalAlpha=.68;ctx.beginPath();ctx.arc(px,y-1,1.8,0,Math.PI*2);ctx.fill();
+      } else if(motif===2){ // crystal seams
+        ctx.globalAlpha=.55;ctx.beginPath();ctx.moveTo(px,y-5);ctx.lineTo(px+4,y-2);ctx.lineTo(px,y+1);ctx.stroke();
+      } else if(motif===3){ // leaf/wood grain
+        ctx.globalAlpha=.5;ctx.beginPath();ctx.ellipse(px,y-2,5,1.8,-.25,0,Math.PI*2);ctx.stroke();
+      } else { // alternating inset tile caps
+        ctx.globalAlpha=.45;ctx.fillRect(px,y-3,7+seed,2);
+      }
+    }
+    ctx.restore();
+  }
   function drawLandingEdge({x,y,w}) {
     const rim=courseMaterials[index][2];
     // Two tones keep the landing line visible against both bright and dark scenery.
@@ -1185,6 +1215,7 @@
     ctx.fillStyle='#fff6dd';
     ctx.fillRect(x,y,Math.min(7,w),3);
     ctx.fillRect(x+Math.max(0,w-7),y,Math.min(7,w),3);
+    drawPlatformAccents({x,y,w,kind:'landing'});
   }
   function draw() {
     ctx.fillStyle='#211332';
