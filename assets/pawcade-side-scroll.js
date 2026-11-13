@@ -1090,10 +1090,24 @@
     'ridge','ridge','ridge','works','grove','works','grove','works','ridge',
     'ridge','reef','works','works','grove','grove','works'
   ];
+  // Three independent parallax planes, tuned per adventure and chapter.
+  // Background scenery never changes collision or platform geometry.
   const sceneryLayers = [
+    {speed:.105, baseline:270, spacing:170, scale:.48, opacity:.18},
     {speed:.24, baseline:310, spacing:118, scale:.72, opacity:.32},
     {speed:.49, baseline:372, spacing:150, scale:1, opacity:.64}
   ];
+  function stageSceneryLayer(layer, plane) {
+    const stage=Math.min(sections-1,Math.max(0,chapter));
+    const seed=(index*37+stage*19+plane*11)%17;
+    return {
+      ...layer,
+      spacing:layer.spacing+seed*3,
+      baseline:layer.baseline+(seed%5-2)*4,
+      scale:layer.scale*(.94+(seed%6)*.025),
+      opacity:layer.opacity*(.93+(seed%4)*.035)
+    };
+  }
   function drawSceneryLayer({speed,baseline,spacing,scale,opacity}) {
     const shift=camera*speed;
     const first=Math.floor(shift/spacing)-1;
@@ -1187,10 +1201,11 @@
         ctx.restore();
       }
     }
-    drawSceneryLayer(sceneryLayers[0]);
+    drawSceneryLayer(stageSceneryLayer(sceneryLayers[0],0));
     ctx.fillStyle=worldLight;ctx.fillRect(0,0,width,height);
+    drawSceneryLayer(stageSceneryLayer(sceneryLayers[1],1));
     drawAtmosphere(false);
-    drawSceneryLayer(sceneryLayers[1]);
+    drawSceneryLayer(stageSceneryLayer(sceneryLayers[2],2));
     ctx.fillStyle=sceneHaze;ctx.fillRect(0,0,width,height);
     ctx.save();
     ctx.translate(-camera,0);
