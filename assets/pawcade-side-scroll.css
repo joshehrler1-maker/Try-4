@@ -74,3 +74,27 @@ a{color:#ffdb99}h1,h2{font-family:Georgia,serif;color:#ffe7b5}
 @media(prefers-reduced-motion:no-preference){
   #side-player .side-controls button{transition:transform .09s ease,filter .09s ease}
 }
+
+/* Fullscreen landscape: pin the gamepad to the lower screen corners. */
+#side-player:is(:fullscreen,.game-fullscreen-expanded){position:relative;overflow:hidden}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls{
+  position:absolute;left:0;right:0;bottom:0;z-index:20;
+  margin:0;padding:8px max(12px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  background:transparent;pointer-events:none;
+  display:flex;justify-content:space-between;align-items:flex-end;
+}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls>*{pointer-events:auto}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls .touch-joystick{
+  margin-right:auto;align-self:flex-end;
+}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls button{
+  align-self:flex-end;
+}
+@media(orientation:landscape) and (max-height:520px){
+  #side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls .touch-joystick{
+    width:clamp(66px,20dvh,90px);height:clamp(66px,20dvh,90px);flex-basis:clamp(66px,20dvh,90px);
+  }
+  #side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls button{
+    min-height:clamp(44px,13dvh,58px);
+  }
+}
