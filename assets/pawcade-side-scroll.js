@@ -1056,24 +1056,87 @@
     }
     ctx.restore();
   }
+  // Choose silhouette families in the same order as the game catalog.
+  const sceneryShapes = [
+    'works','works','reef','works','grove','ridge','works','ridge','works',
+    'ridge','ridge','ridge','works','grove','works','grove','works','ridge',
+    'ridge','reef','works','works','grove','grove','works'
+  ];
+  const sceneryLayers = [
+    {speed:.24, baseline:310, spacing:118, scale:.72, opacity:.32},
+    {speed:.49, baseline:372, spacing:150, scale:1, opacity:.64}
+  ];
+  function drawSceneryLayer({speed,baseline,spacing,scale,opacity}) {
+    const shift=camera*speed;
+    const first=Math.floor(shift/spacing)-1;
+    const [face,recess,rim]=courseMaterials[index];
+    ctx.save();
+    ctx.globalAlpha=opacity;
+    const shade=ctx.createLinearGradient(0,baseline-125,0,height);
+    shade.addColorStop(0,face);
+    shade.addColorStop(.88,recess);
+    ctx.fillStyle=shade;
+    ctx.strokeStyle=rim;
+    ctx.lineWidth=1;
+    for(let tile=first;tile<=first+Math.ceil(width/spacing)+2;tile++) {
+      const x=tile*spacing-shift;
+      const rise=(47+Math.abs((tile*73+index*31)%79))*scale;
+      const top=baseline-rise;
+      ctx.beginPath();
+      ctx.moveTo(x,baseline);
+      switch(sceneryShapes[index]) {
+        case 'works':
+          ctx.lineTo(x+12,top+26);
+          ctx.lineTo(x+spacing*.25,top+26);
+          ctx.lineTo(x+spacing*.25,top);
+          ctx.lineTo(x+spacing*.57,top);
+          ctx.lineTo(x+spacing*.57,top+17);
+          ctx.lineTo(x+spacing*.82,top+17);
+          ctx.lineTo(x+spacing,baseline);
+          break;
+        case 'grove':
+          ctx.bezierCurveTo(x+18,top+65,x-4,top+13,x+spacing*.32,top+9);
+          ctx.bezierCurveTo(x+spacing*.57,top-18,x+spacing*.86,top+8,x+spacing*.86,top+33);
+          ctx.quadraticCurveTo(x+spacing*.98,top+48,x+spacing,baseline);
+          break;
+        case 'reef':
+          ctx.bezierCurveTo(x+5,top+46,x+spacing*.18,top+16,x+spacing*.32,top+30);
+          ctx.bezierCurveTo(x+spacing*.49,top+54,x+spacing*.49,top-24,x+spacing*.72,top+7);
+          ctx.quadraticCurveTo(x+spacing*.9,top+18,x+spacing,baseline);
+          break;
+        default:
+          ctx.lineTo(x+spacing*.29,top+25);
+          ctx.lineTo(x+spacing*.52,top);
+          ctx.lineTo(x+spacing*.79,top+30);
+          ctx.lineTo(x+spacing,baseline);
+      }
+      ctx.fill();
+      ctx.globalAlpha=opacity*.34;
+      ctx.stroke();
+      ctx.globalAlpha=opacity;
+    }
+    ctx.restore();
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
     if (backdrop.naturalWidth) {
       const tile=backdrop.naturalWidth/5;
-      const offset=(camera*.27)%width;
+      const offset=(camera*.11)%width;
       for (let panel=0;panel<2;panel++) {
         ctx.save();
-        const flipped=(Math.floor(camera*.27/width)+panel)%2;
+        const flipped=(Math.floor(camera*.11/width)+panel)%2;
         ctx.translate(panel*width-offset+(flipped?width:0),0);
         if(flipped) ctx.scale(-1,1);
         ctx.drawImage(backdrop,index%5*tile,Math.floor(index/5)*tile,tile,tile,0,0,width,height);
         ctx.restore();
       }
     }
+    drawSceneryLayer(sceneryLayers[0]);
     ctx.fillStyle=worldLight;ctx.fillRect(0,0,width,height);
-    ctx.fillStyle=sceneHaze;ctx.fillRect(0,0,width,height);
     drawAtmosphere(false);
+    drawSceneryLayer(sceneryLayers[1]);
+    ctx.fillStyle=sceneHaze;ctx.fillRect(0,0,width,height);
     ctx.save();
     ctx.translate(-camera,0);
     for (const wall of walls) {
