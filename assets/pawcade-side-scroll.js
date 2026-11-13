@@ -1189,6 +1189,52 @@
     }
     ctx.restore();
   }
+  // Twenty platform constructions, distributed deterministically across each
+  // game's six regions. Decorations are clipped to the solid face and do not
+  // modify platform positions, hitboxes, or movement behavior.
+  function drawPlatformConstruction(ledge,depth) {
+    const {x,y,w,kind}=ledge;
+    if(w<22 || depth<10 || kind==='hazard' || kind==='ceilingSpikes') return;
+    const stage=Math.min(sections-1,Math.max(0,Math.floor(x/sectionSize)));
+    const model=((index*11+stage*7+Math.floor(x/117)*3)%20+20)%20;
+    const [face,recess,rim]=courseMaterials[index];
+    const faceDepth=Math.min(depth,kind==='floor'?62:29);
+    const pitch=24+(model%5)*9;
+    const first=Math.max(0,Math.floor((camera-x)/pitch)-1);
+    const last=Math.min(Math.ceil(w/pitch),Math.ceil((camera+width-x)/pitch)+1);
+    ctx.save();
+    ctx.beginPath();ctx.rect(x,y,w,faceDepth);ctx.clip();
+    ctx.lineWidth=1.5;
+    ctx.strokeStyle=rim;
+    ctx.fillStyle=rim;
+    ctx.globalAlpha=.46;
+    for(let n=first;n<=last;n++){
+      const px=x+n*pitch, py=y+5, mid=px+pitch*.5;
+      switch(model){
+        case 0: ctx.strokeRect(px+2,py,pitch-5,faceDepth-10);break; // masonry
+        case 1: ctx.beginPath();ctx.arc(mid,py+7,4,0,7);ctx.stroke();break; // rivets
+        case 2: ctx.beginPath();ctx.moveTo(px+2,py+13);ctx.lineTo(mid,py);ctx.lineTo(px+pitch-2,py+13);ctx.stroke();break; // crystals
+        case 3: ctx.beginPath();ctx.ellipse(mid,py+7,11,3,-.3,0,7);ctx.stroke();break; // timber
+        case 4: ctx.fillRect(px+3,py,pitch-6,3);break; // tiles
+        case 5: ctx.beginPath();ctx.moveTo(px,py+18);ctx.lineTo(mid,py+3);ctx.lineTo(px+pitch,py+18);ctx.stroke();break; // truss
+        case 6: ctx.strokeRect(px+5,py+4,pitch-10,9);break; // cargo
+        case 7: ctx.beginPath();ctx.arc(mid,py+10,7,0,7);ctx.stroke();break; // gear
+        case 8: ctx.fillRect(px+5,py+3,3,17);ctx.fillRect(px+13,py+3,3,17);break; // bamboo
+        case 9: ctx.beginPath();ctx.moveTo(px+3,py+18);ctx.lineTo(mid,py+1);ctx.lineTo(px+pitch-3,py+18);ctx.closePath();ctx.stroke();break; // peaks
+        case 10: ctx.beginPath();ctx.moveTo(px+4,py+5);ctx.lineTo(mid,py+14);ctx.lineTo(px+pitch-4,py+5);ctx.stroke();break; // waves
+        case 11: ctx.fillRect(px+3,py+3,pitch-6,2);ctx.fillRect(px+8,py+10,pitch-16,2);break; // circuit
+        case 12: ctx.beginPath();ctx.arc(mid,py+9,8,Math.PI,0);ctx.stroke();break; // arches
+        case 13: ctx.beginPath();ctx.moveTo(px+4,py+4);ctx.lineTo(px+pitch-4,py+16);ctx.moveTo(px+4,py+16);ctx.lineTo(px+pitch-4,py+4);ctx.stroke();break; // braces
+        case 14: ctx.fillRect(mid-2,py,4,18);ctx.fillRect(mid-9,py+7,18,3);break; // carved crosses
+        case 15: ctx.beginPath();ctx.moveTo(px+3,py+13);ctx.quadraticCurveTo(mid,py-5,px+pitch-3,py+13);ctx.stroke();break; // vines
+        case 16: ctx.strokeRect(px+3,py+3,pitch-6,13);ctx.fillRect(mid-2,py+7,4,4);break; // panels
+        case 17: ctx.beginPath();ctx.moveTo(px+3,py+14);ctx.lineTo(mid,py+2);ctx.lineTo(px+pitch-3,py+14);ctx.stroke();ctx.fillRect(mid-2,py+5,4,4);break; // gemstones
+        case 18: ctx.fillRect(px+3,py+4,pitch-6,2);ctx.fillRect(px+3,py+12,pitch-6,2);break; // layered beams
+        case 19: ctx.beginPath();ctx.arc(mid,py+9,8,0,7);ctx.arc(mid,py+9,3,0,7);ctx.stroke();break; // coils
+      }
+    }
+    ctx.restore();
+  }
   function drawLandingEdge({x,y,w}) {
     const rim=courseMaterials[index][2];
     // Two tones keep the landing line visible against both bright and dark scenery.
@@ -1307,6 +1353,7 @@
           atlasSprite(image,4,cell,ledge.x+(part+.5)*tileWidth,ledge.y+depth*.5,tileWidth,depth,false,rows);
         }
         if(ledge.kind!=='hazard' && ledge.kind!=='rail' && ledge.kind!=='ceiling') {
+          drawPlatformConstruction(ledge,depth);
           if(ledge.dropAt===undefined) drawLandingEdge(ledge);
         }
         continue;
@@ -1327,7 +1374,10 @@
       gradient.addColorStop(0,ledgeColors[ledge.kind]);gradient.addColorStop(1,'#0c1220');
       ctx.fillStyle=gradient;
       ctx.fillRect(ledge.x,ledge.y,ledge.w,ledge.kind==='hazard'?43:ledge.kind==='floor'?65:18);
-      if(ledge.kind!=='rail' && ledge.kind!=='ceiling' && ledge.dropAt===undefined) drawLandingEdge(ledge);
+      if(ledge.kind!=='rail' && ledge.kind!=='ceiling') {
+        drawPlatformConstruction(ledge,depth);
+        if(ledge.dropAt===undefined) drawLandingEdge(ledge);
+      }
       if (ledge.kind==='belt' || ledge.kind==='spring' || ledge.kind==='lift') {
         ctx.fillStyle='#ffffff4d';
         for(let x=ledge.x+9;x<ledge.x+ledge.w-7;x+=20) ctx.fillRect(x,ledge.y+8,7,3);
