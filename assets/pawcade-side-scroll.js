@@ -253,6 +253,7 @@
       player.vy = -jumpSpeed * player.gravity;
       player.on = false;
       player.jumps++;
+      playCue(220,390,.09);
       player.coyote=0;
       player.jumpBuffer=0;
       player.jumpCut=power!=='swim';
@@ -351,8 +352,57 @@
       case 'return': shot({v:p.facing*strength,returning:true,life:1.1,damage:2});break;
     }
   }
+  const pauseButton=byId('side-pause');
+  const soundButton=byId('side-sound');
+  let audio, sound=false;
+  soundButton.onclick=()=>{
+    const Audio=window.AudioContext || window.webkitAudioContext;
+    if(!Audio) return;
+    try {
+      audio ??= new Audio();
+      sound=!sound;
+      if(sound) audio.resume().catch(()=>{});
+      soundButton.setAttribute('aria-pressed',String(sound));
+      soundButton.textContent=sound?'Sound on':'Sound off';
+      playCue(440,660);
+    } catch {sound=false;}
+  };
+  function playCue(from,to,length=.12) {
+    if(!sound || audio?.state!=='running') return;
+    const now=audio.currentTime;
+    const tone=audio.createOscillator();
+    const volume=audio.createGain();
+    tone.frequency.setValueAtTime(from,now);
+    tone.frequency.exponentialRampToValueAtTime(to,now+length);
+    volume.gain.setValueAtTime(.045,now);
+    volume.gain.exponentialRampToValueAtTime(.001,now+length);
+    tone.connect(volume);volume.connect(audio.destination);
+    tone.start(now);tone.stop(now+length);
+  }
+  function togglePause() {
+    if (phase==='playing') {
+      phase='paused';
+      cancelAnimationFrame(frame);
+      keys.clear();mobile.clear();releaseAction(false);
+      pauseButton.textContent='Resume';
+      status('Paused.');
+      draw();
+    } else if (phase==='paused') {
+      phase='playing';
+      pauseButton.textContent='Pause';
+      canvas.focus({preventScroll:true});
+      accumulator=0;
+      last=performance.now();
+      frame=requestAnimationFrame(loop);
+    }
+  }
+  pauseButton.onclick=togglePause;
+  document.addEventListener?.('visibilitychange',()=>{
+    if(document.hidden && phase==='playing') togglePause();
+  });
   function hit() {
     if (player.grace > 0 || (power === 'shield' && held('action'))) return;
+    playCue(210,85,.18);
     player.health--;
     player.grace = 1.25;
     if (player.health <= 0) {respawn();return true;}
@@ -479,7 +529,7 @@
       hud();
     }
     for (const c of crystals) {
-      if (!c.taken && close(p,c,24,29)) {if(c.refill){p.dashUsed=false;p.power=0;}c.taken=true;taken++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
+      if (!c.taken && close(p,c,24,29)) {if(c.refill){p.dashUsed=false;p.power=0;}c.taken=true;playCue(650,980);taken++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
     }
     for (const attack of attacks) {
       if(attack.returning && attack.life<.55) attack.v=Math.sign(p.x-attack.x)*420;
@@ -560,6 +610,7 @@
       if (guardian.pattern==='barrage') hazards.push({x:boss.x+aim*44,y:boss.y-55,v:aim*200,life:2.6});
       boss.nextShot=t+(guardian.pattern==='volley'?.9:1.55);
     }
+    boss.warning=(['volley','sweep','barrage'].includes(guardian.pattern) && boss.nextShot-t<.3) || (guardian.pattern==='charge' && cycle>.68 && cycle<1);
     const shielded=guardian.pattern==='charge' && cycle>=1 && cycle<2;
     const attack=attacks.find(a=>a.life>0 && close(a,boss,49+(a.radius||0),42));
     const stomp=close(p,boss,47,52) && p.vy>70 && (oldY<boss.y-18 || p.pogo);
@@ -664,6 +715,10 @@
     }
     if (boss.health && camera+width>finish) {
       if(!atlasSprite(enemyArt,5,index,boss.x,boss.y,126,126) && !sprite(12,boss.x,boss.y,116,116,true)){ctx.fillStyle='#ad505c';ctx.fillRect(boss.x-34,boss.y-38,68,76);}
+      if(boss.warning){
+        ctx.strokeStyle='#ffce71';ctx.lineWidth=3;
+        ctx.beginPath();ctx.ellipse(boss.x,boss.y-6,59,48,0,0,Math.PI*2);ctx.stroke();
+      }
       ctx.fillStyle='#f77c8b';ctx.fillRect(boss.x-36,boss.y-54,boss.health*14,5);
     }
     ctx.fillStyle=boss.health?'#78487c':'#e0bd64';
@@ -711,8 +766,8 @@
     if (phase!=='playing') {
       ctx.fillStyle='#100c27c9';ctx.fillRect(0,0,width,height);
       ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 32px system-ui';
-      ctx.fillText(name,width/2,165);
-      ctx.font='18px system-ui';ctx.fillText(opening,width/2,206);
+      ctx.fillText(phase==='paused'?'Paused':name,width/2,165);
+      ctx.font='18px system-ui';ctx.fillText(phase==='paused'?'Resume when ready':opening,width/2,206);
     }
   }
   const tick = 1/120;
@@ -726,6 +781,7 @@
     last=now;
     draw();
     if(phase==='playing') frame=requestAnimationFrame(loop);
+    if(phase==='won') {pauseButton.disabled=true;playCue(440,880,.3);}
   }
   function startRun(saved) {
     cancelAnimationFrame(frame);
@@ -743,6 +799,8 @@
       hud();
     }
     phase='playing';
+    pauseButton.disabled=false;
+    pauseButton.textContent='Pause';
     byId('side-start').textContent='Restart';
     canvas.focus({preventScroll:true});
     accumulator=0;
@@ -754,6 +812,7 @@
   resumeButton.onclick=()=>{const saved=readCheckpoint();if(saved)startRun(saved);};
   const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'?'up':'jump',KeyW:power==='swim'||movement==='airdash'?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
   addEventListener('keydown',event=>{
+    if(event.code==='KeyP' && !event.repeat && (phase==='playing'||phase==='paused')) {event.preventDefault();togglePause();return;}
     const control=codes[event.code];
     if(!control || phase!=='playing' || event.target.closest('button,a,input,select')) return;
     event.preventDefault();
@@ -773,10 +832,13 @@
   document.querySelectorAll('[data-control]').forEach(button=>{
     const control=button.dataset.control;
     const activate=()=>{if(control==='jump')jump();else if(control==='technique')useTechnique();else action();};
+    let pointer=null;
     button.onpointerdown=event=>{
+      if(pointer!==null || phase!=='playing') return;
+      pointer=event.pointerId;
       event.preventDefault();button.setPointerCapture(event.pointerId);mobile.add(control);activate();
     };
-    for(const event of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(event,()=>{mobile.delete(control);if(control==='action')releaseAction(event==='pointerup');});
+    for(const event of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(event,e=>{if(e.pointerId!==pointer)return;pointer=null;mobile.delete(control);if(control==='action')releaseAction(event==='pointerup');});
     button.onclick=event=>{if(event.detail===0){activate();if(control==='action')releaseAction(true);}};
   });
   for (const image of [sprites,poster,backdrop,enemyArt,heroArt]) image.onload=()=>{if(phase!=='playing') draw();};
