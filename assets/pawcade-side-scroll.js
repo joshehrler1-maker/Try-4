@@ -271,6 +271,42 @@
         crystals.push({x:bx+bw/2,y:by-35});
       }
     }
+    // Individually paced challenge pockets for all six chapters. These
+    // supplement, rather than replace, the existing authored room geometry.
+    const challengeSeed=(index*23+stage*17)%7;
+    const challengeX=start+Math.min(sectionSize-570,450+challengeSeed*36);
+    const challengeTypes={
+      momentum:['belt','belt','floor'],
+      roll:['barrel','floor','barrel'],
+      pogo:['pogo','floor','pogo'],
+      grapple:['floor','rail','floor'],
+      swim:['current','current','current'],
+      float:['spring','floor','spring'],
+      glide:['lift','floor','lift'],
+      airlift:['lift','floor','lift'],
+      airdash:['floor','lift','floor'],
+      flip:['floor','floor','floor'],
+      beat:['spring','spring','floor'],
+      precision:['floor','shelf','floor'],
+      vine:['spring','floor','spring'],
+      bubble:['current','floor','current']
+    };
+    const challengeKinds=challengeTypes[movement]||['floor','shelf','floor'];
+    const challengeHeights=[277,249,223,258,234,267];
+    for(let part=0;part<3;part++){
+      const cx=challengeX+part*138;
+      const cy=challengeHeights[(stage+part+index)%6];
+      const cw=85+(part===1?19:0);
+      platforms.push({x:cx,y:cy,w:cw,kind:challengeKinds[part]});
+      if(part===1) crystals.push({x:cx+cw/2,y:cy-45});
+    }
+    // A guarded optional reward on the alternate route. Existing enemy AI
+    // handles this encounter, so no new combat controls are required.
+    if(index!==7 && index!==14){
+      const guardX=challengeX+290;
+      enemies.push({x:guardX,y:ground-23,offset:stage+index+31,turret:movement==='shooter'||movement==='buster'});
+      crystals.push({x:challengeX+340,y:190});
+    }
     if(index===0 && stage===1){
       landmarks.push({cell:0,x:start+610,y:223,w:66,h:39});
       for(let i=0;i<4;i++) platforms.push({x:start+735+i*115,y:210-i*19,w:94,kind:'floor',switchBridge:true});
@@ -761,7 +797,8 @@
       chapterReveal=2;
       if(index===0)showFoundryStory(stage);
       saveCheckpoint();
-      status(chapters[stage] + ' · ' + (stage===sections-1 ? ending : 'Checkpoint reached.'));
+      const nextBeat=stage===sections-1 ? ending : (stage%2===0 ? epilogue : prologue);
+      status(chapters[stage] + ' · ' + nextBeat + ' · Checkpoint saved.');
       hud();
     }
     for (const c of crystals) {
