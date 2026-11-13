@@ -98,3 +98,55 @@ a{color:#ffdb99}h1,h2{font-family:Georgia,serif;color:#ffe7b5}
     min-height:clamp(44px,13dvh,58px);
   }
 }
+
+/* Approved concept: a separate illustrated controller deck BELOW the playfield. */
+#side-player .side-controls{
+  position:relative!important;inset:auto!important;
+  display:flex;align-items:center;justify-content:space-between;
+  min-height:clamp(116px,23dvh,178px);width:100%;margin:0!important;
+  padding:clamp(10px,2vw,18px)!important;
+  border:3px solid rgba(255,210,100,.85);border-radius:20px;
+  background:
+    linear-gradient(100deg,rgba(11,32,84,.92),rgba(63,26,111,.66) 46%,rgba(8,30,85,.94)),
+    url('../assets/whisker-luna-master.webp') center 43%/auto 235% no-repeat;
+  box-shadow:inset 0 0 0 3px #4ad7ff90,inset 0 0 25px #a366ff88,0 8px 22px #0008;
+  isolation:isolate;overflow:hidden;
+}
+#side-player .side-controls::before{
+  content:'SUPER PAW HEROES  ★  ' attr(data-stage-title);
+  position:absolute;left:23%;right:29%;top:7px;text-align:center;
+  font:900 clamp(9px,1.8vw,16px) system-ui,sans-serif;letter-spacing:.06em;
+  color:#fff0b3;text-shadow:0 2px 5px #10042b,0 0 9px #8b58ff;
+  pointer-events:none;
+}
+#side-player .side-controls::after{
+  content:'👍  WHISKER  ★  LUNA  👍';
+  position:absolute;left:25%;right:29%;bottom:9px;text-align:center;
+  font:900 clamp(10px,2vw,16px) system-ui,sans-serif;
+  color:white;text-shadow:0 2px 5px #10042b,0 0 9px #aa78ff;
+  pointer-events:none;
+}
+#side-player .side-controls[data-stage-theme="1"]{border-color:#82ecff;filter:hue-rotate(12deg)}
+#side-player .side-controls[data-stage-theme="2"]{border-color:#ffbe67;filter:hue-rotate(-18deg)}
+#side-player .side-controls[data-stage-theme="3"]{border-color:#cfa0ff;filter:hue-rotate(32deg)}
+#side-player .side-controls[data-stage-theme="4"]{border-color:#93f6ba;filter:hue-rotate(66deg)}
+#side-player .side-controls[data-stage-theme="5"]{border-color:#ffd978;filter:hue-rotate(-42deg)}
+#side-player .side-controls .touch-joystick{position:relative;z-index:1;flex-shrink:0}
+#side-player .side-controls button{position:relative;z-index:1;flex-shrink:0}
+#side-player:is(:fullscreen,.game-fullscreen-expanded){overflow:auto!important}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls{
+  position:relative!important;bottom:auto!important;left:auto!important;right:auto!important;
+  margin-top:4px!important;
+}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) #side-canvas{
+  width:min(100%,calc(65dvh * 800 / 380));max-height:65dvh;object-fit:contain;
+}
+@media(orientation:landscape) and (max-height:520px){
+  #side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls{
+    min-height:clamp(82px,24dvh,124px);padding:6px 12px!important;
+  }
+  #side-player:is(:fullscreen,.game-fullscreen-expanded) #side-canvas{
+    max-height:56dvh;width:min(100%,calc(56dvh * 800 / 380));
+  }
+  #side-player .side-controls::after{display:none}
+}
