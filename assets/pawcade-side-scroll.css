@@ -35,3 +35,42 @@ a{color:#ffdb99}h1,h2{font-family:Georgia,serif;color:#ffe7b5}
 #side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls{
   justify-content:space-between;max-width:none;width:100%;
 }
+
+/* Polished translucent mobile gamepad, shared by all 25 adventures. */
+#side-player .side-controls{user-select:none;-webkit-user-select:none}
+#side-player .side-controls .touch-joystick{
+  border:2px solid rgba(193,231,255,.72);
+  background:radial-gradient(circle at 35% 25%,rgba(132,174,242,.40),rgba(26,37,77,.68) 70%);
+  box-shadow:inset 0 0 0 6px rgba(255,255,255,.07),0 6px 20px rgba(0,0,0,.27);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+#side-player .side-controls .touch-joystick>span{
+  background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(139,176,249,.82));
+  box-shadow:0 3px 10px rgba(0,0,0,.42),inset 0 1px 2px rgba(255,255,255,.7);
+}
+#side-player .side-controls button{
+  border:1px solid rgba(227,212,255,.7);
+  border-radius:999px;
+  background:linear-gradient(145deg,rgba(119,79,174,.78),rgba(43,33,92,.72));
+  box-shadow:0 4px 13px rgba(0,0,0,.28),inset 0 1px 1px rgba(255,255,255,.26);
+  color:#fff;min-height:clamp(48px,9dvh,62px);
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  -webkit-tap-highlight-color:transparent;
+}
+#side-player .side-controls button[data-control="jump"]{
+  background:linear-gradient(145deg,rgba(56,171,211,.85),rgba(22,83,158,.78));
+  border-color:rgba(178,245,255,.85);
+}
+#side-player .side-controls button:active,
+#side-player .side-controls button[aria-pressed="true"]{
+  transform:scale(.95);filter:brightness(1.22);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.35),0 0 12px rgba(132,219,255,.4);
+}
+#side-player .side-controls button:focus-visible,
+#side-player .side-controls .touch-joystick:focus-visible{
+  outline:3px solid #fff0a6;outline-offset:3px;
+}
+@media(prefers-reduced-motion:no-preference){
+  #side-player .side-controls button{transition:transform .09s ease,filter .09s ease}
+}
