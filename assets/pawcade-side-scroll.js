@@ -1243,7 +1243,45 @@
     ['Into Furnace Keep','The keeper is trapped behind the bell platform. Whisker braces as the furnace crab blocks the last crossing.'],
     ['The all-clear','The keeper rings the bell again. Across the foundry, the crew answers with a cheer.']
   ];
-  let storyDialog;
+  let storyDialog, storyFrame;
+  const foundryShots=[
+    [0,.20,.28,'#ffad65'],[1,.64,.32,'#ffd189'],[2,.35,.58,'#ec8b65'],
+    [3,.78,.34,'#ffae73'],[4,.42,.63,'#a9ddd9'],[5,.70,.24,'#ff754b'],[6,.51,.31,'#ffdb8c']
+  ];
+  function playFoundryShot(scene) {
+    const [,focusX,focusY,tint]=foundryShots[scene];
+    const started=performance.now();
+    function render(now){
+      if(!storyDialog.open)return;
+      const t=(now-started)/1000;
+      const zoom=reducedMotion?1.13:1.10+Math.min(t,8)*.024;
+      const w=width*zoom,h=height*zoom;
+      draw();
+      if(backdrop.naturalWidth){
+        const tile=backdrop.naturalWidth/5;
+        ctx.drawImage(backdrop,0,0,tile,tile,(width-w)*focusX,(height-h)*focusY,w,h);
+      }
+      const shade=ctx.createLinearGradient(0,0,0,height);
+      shade.addColorStop(0,'#140d1ac9');
+      shade.addColorStop(.46,'#20111c20');
+      shade.addColorStop(1,'#140d1af2');
+      ctx.fillStyle=shade;ctx.fillRect(0,0,width,height);
+      if(!reducedMotion){
+        ctx.save();
+        ctx.fillStyle=tint;
+        for(let i=0;i<30;i++){
+          const x=(i*139+t*(12+i%7))%width;
+          const y=height-(i*53+t*(19+i%11))%height;
+          ctx.globalAlpha=.2+.18*Math.sin(t*2+i);
+          ctx.fillRect(x,y,1+i%3,1+i%3);
+        }
+        ctx.restore();
+      }
+      ctx.fillStyle='#100b15';ctx.fillRect(0,0,width,19);ctx.fillRect(0,height-19,width,19);
+      if(!reducedMotion)storyFrame=requestAnimationFrame(render);
+    }
+    storyFrame=requestAnimationFrame(render);
+  }
   function showFoundryStory(scene) {
     clearInput();
     if(!storyDialog){
@@ -1260,6 +1298,8 @@
       storyDialog.append(title,line,advance);
       byId('side-player').append(storyDialog);
       storyDialog.addEventListener('close',()=>{
+        cancelAnimationFrame(storyFrame);
+        draw();
         clearInput();
         canvas.focus({preventScroll:true});
         if(phase==='playing'){
@@ -1273,6 +1313,7 @@
     storyDialog.children[1].textContent=line;
     storyDialog.children[2].textContent=scene===6?'Close':'Continue';
     storyDialog.showModal();
+    playFoundryShot(scene);
   }
   function loop(now) {
     accumulator += Math.min(.075,Math.max(0,(now-last)/1000));
