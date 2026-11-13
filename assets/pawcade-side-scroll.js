@@ -254,7 +254,7 @@
     reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
-    enemies.forEach(e => {e.dead = false;e.shotAt=0;});
+    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.bashed=null;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
@@ -399,7 +399,20 @@
         p.morphed=!p.morphed;
         break;
       }
-      case 'bash': if(nearby(125)){p.vy=-strength;p.vx=-p.facing*strength*.7;p.grapple=.22;}break;
+      case 'bash': {
+        const target=nearby(125);
+        if(!target) break;
+        const dx=Number(held('right'))-Number(held('left'));
+        const dy=Number(held('down'))-Number(held('up'));
+        const length=Math.hypot(dx,dy)||1;
+        const position=foePosition(target);
+        p.vx=(dx || (dy ? 0 : p.facing*.65))*strength/length;
+        p.vy=(dy || (dx ? 0 : -1))*strength/length;
+        p.grapple=.27;
+        target.bashed={x:position.x,y:position.y,vx:-p.vx*.75,vy:-p.vy*.75,until:clock+.48};
+        burst(position.x,position.y,'#a8ffd9',12);
+        break;
+      }
       case 'parry': {
         const target=hazards.find(h=>h.parry && h.life>0 && close(p,h,55,55));
         if(target && !p.on){target.life=0;p.vy=-470;p.grace=.35;}
@@ -711,7 +724,7 @@
       }
       const position = foePosition(foe);
       if (attacks.some(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)))) foe.dead=true;
-      if (!foe.dead && close(p,position,29,34)) {
+      if (!foe.dead && !(foe.bashed && clock<foe.bashed.until) && close(p,position,29,34)) {
         if ((p.vy>65 && oldY<position.y-17) || (power==='dash' && p.power>.22)) {
           foe.dead=true;p.vy=p.pogo || (movement==='pogo' && held('jump')) ? -560 : -320;p.pogo=false;p.on=false;
         } else if (hit()) return;
@@ -788,6 +801,10 @@
     } else if (close(p,boss,44,42)) hit();
   }
   function foePosition(foe) {
+    if(foe.bashed && clock<foe.bashed.until){
+      const t=.48-(foe.bashed.until-clock);
+      return {x:foe.bashed.x+foe.bashed.vx*t,y:foe.bashed.y+foe.bashed.vy*t};
+    }
     if (foe.turret) return {x:foe.x,y:foe.y};
     const t = clock * (2 / cadence) + foe.offset;
     const chase = Math.sign(player.x-foe.x);
@@ -1247,7 +1264,7 @@
   byId('side-start').onclick=()=>startRun(null);
   resumeButton.hidden=!readCheckpoint();
   resumeButton.onclick=()=>{const saved=readCheckpoint();if(saved)startRun(saved);};
-  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'?'up':'jump',KeyW:power==='swim'||movement==='airdash'?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
+  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||index===15?'up':'jump',KeyW:power==='swim'||movement==='airdash'||index===15?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
   addEventListener('keydown',event=>{
     if(event.code==='KeyP' && !event.repeat && (phase==='playing'||phase==='paused')) {event.preventDefault();togglePause();return;}
     const control=codes[event.code];
@@ -1268,7 +1285,7 @@
   const resetStick=bindTouchJoystick(byId('touch-stick'),direction=>{
     for (const axis of ['left','right','up','down']) mobile.delete(axis);
     if(direction) for(const axis of direction.split(' ')) mobile.add(axis);
-  },{horizontal:power!=='swim' && index!==3 && movement!=='airdash',diagonal:power==='swim'||movement==='airdash'});
+  },{horizontal:power!=='swim' && index!==3 && movement!=='airdash' && index!==15,diagonal:power==='swim'||movement==='airdash'||index===15});
   document.querySelectorAll('[data-control]').forEach(button=>{
     const control=button.dataset.control;
     const activate=()=>{if(control==='jump')jump();else if(control==='technique')useTechnique();else action();};
