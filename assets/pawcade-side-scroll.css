@@ -10,3 +10,28 @@ a{color:#ffdb99}h1,h2{font-family:Georgia,serif;color:#ffe7b5}
 .side-hud button{background:#ffdf9e;color:#281738}
 #side-status{min-height:1.5em}
 @media(max-width:470px){.side-controls button{flex:1 1 auto;font-size:.82rem}}
+
+/* Shared ergonomic layout for all 25 side-scroll adventures. */
+#side-player .side-controls{
+  display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;
+  width:100%;gap:clamp(4px,1.2vw,12px);padding-inline:max(0px,env(safe-area-inset-left)) max(0px,env(safe-area-inset-right));
+  touch-action:manipulation;
+}
+#side-player .side-controls .touch-joystick{
+  flex:0 0 clamp(72px,15vw,92px);width:clamp(72px,15vw,92px);height:clamp(72px,15vw,92px);
+  margin-right:auto;touch-action:none;
+}
+#side-player .side-controls button{
+  flex:0 1 auto;min-width:0;white-space:nowrap;
+  padding-inline:clamp(6px,1.5vw,14px);touch-action:none;
+}
+#side-player .side-controls button[data-control="jump"]{order:3}
+#side-player .side-controls button[data-control="action"]{order:1}
+#side-player .side-controls button[data-control="technique"]{order:2}
+@media(max-width:470px){
+  #side-player .side-controls{gap:4px}
+  #side-player .side-controls button{flex:0 1 auto;font-size:clamp(.65rem,2.8vw,.85rem);padding-inline:5px}
+}
+#side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls{
+  justify-content:space-between;max-width:none;width:100%;
+}
