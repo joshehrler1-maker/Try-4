@@ -1196,7 +1196,38 @@
     const {x,y,w,kind}=ledge;
     if(w<22 || depth<10 || kind==='hazard' || kind==='ceilingSpikes') return;
     const stage=Math.min(sections-1,Math.max(0,Math.floor(x/sectionSize)));
-    const model=((index*11+stage*7+Math.floor(x/117)*3)%20+20)%20;
+    // Reference-inspired construction families (not copied sprites or layouts).
+    // Each adventure has its own palette of platform motifs, based on the
+    // movement challenges and setting of its named gameplay inspiration.
+    const platformFamilies = [
+      [0,4,9,12,15,18],   // Mario: masonry, arches, outdoor ledges
+      [1,5,6,11,16,19],  // Mega Man X: industrial/technical
+      [2,10,12,15,17],   // Ecco: reef, waves, coral/crystal
+      [1,5,7,11,16,18],  // Sonic: mechanical ramps and bridges
+      [3,5,8,9,15,18],   // DKC: timber, jungle and rope supports
+      [2,9,12,15,17],    // Rayman: fantasy platforms
+      [4,10,12,14,17],   // Kirby: playful rounded motifs
+      [2,11,13,16,19],   // VVVVVV: gravity circuitry
+      [1,4,11,16,19],    // Geometry Dash: rhythmic geometric panels
+      [0,5,6,13,18],    // Bionic Commando: quarry beams
+      [3,9,10,12,15],   // Klonoa: wind and wooden decks
+      [2,9,12,15,17],   // Celeste: climbing cliffs
+      [0,1,5,13,17],    // Shovel Knight: armored stonework
+      [3,8,10,15,18],   // Yoshi: nature and trails
+      [1,2,11,16,19],   // Metroid: observatory tech
+      [3,8,9,15,17],    // Ori: luminous woodland
+      [1,5,7,11,19],    // Cuphead: factory machinery
+      [0,3,9,12,18],    // Aladdin: village rooftops
+      [0,5,12,13,14],   // Prince of Persia: palace stone
+      [1,5,6,11,16],    // Contra: military docks
+      [1,4,7,11,19],    // Pizza Tower: frantic arcade machinery
+      [0,12,13,14,17],  // Castlevania: temple architecture
+      [3,8,10,15,18],   // DuckTales: wooden ferry
+      [3,8,9,15,17],    // flower flight: organic platforms
+      [1,5,6,11,16,19]  // starship cargo: modular hulls
+    ];
+    const family=platformFamilies[index] || platformFamilies[0];
+    const model=family[((Math.floor(x/117)*3+stage*7)%family.length+family.length)%family.length];
     const [face,recess,rim]=courseMaterials[index];
     const faceDepth=Math.min(depth,kind==='floor'?62:29);
     const pitch=24+(model%5)*9;
