@@ -23,6 +23,10 @@ window.bindTouchJoystick = function (base, onChange, options = {}) {
     const distance = Math.hypot(x, y);
     const scale = Math.min(1, box.width * .27 / (distance || 1));
     knob.style.transform = 'translate(' + x * scale + 'px,' + y * scale + 'px)';
+    if(options.diagonal && distance>=11 && Math.min(Math.abs(x),Math.abs(y))>=distance*.38){
+      change((x<0?'left':'right')+' '+(y<0?'up':'down'));
+      return;
+    }
     change(distance < 11 ? '' : Math.abs(x) > Math.abs(y) ? (x < 0 ? 'left' : 'right') : (y < 0 ? 'up' : 'down'));
   }
   base.addEventListener('pointerdown', event => {
