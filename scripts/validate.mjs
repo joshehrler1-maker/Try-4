@@ -1,3 +1,4 @@
+import {spawnSync} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -17,7 +18,18 @@ for (const file of fs.readdirSync(root).filter(f => /\.(html|js|json|webmanifest
  if (file.endsWith('.js')) {new vm.Script(source, {filename:file}); checks++;}
  if (!file.endsWith('.html')) continue;
  for (const match of source.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
-  if (!/\bsrc\s*=/.test(match[1])) {new vm.Script(match[2], {filename:file}); checks++;}
+  if (/\bsrc\s*=/.test(match[1])) continue;
+  const type = match[1].match(/\btype\s*=\s*["']([^"']+)["']/i)?.[1].toLowerCase();
+  if (type === 'application/ld+json') {
+   JSON.parse(match[2]);
+  } else if (type === 'module') {
+   const result = spawnSync(process.execPath, ['--input-type=module', '--check'], {input: match[2], encoding: 'utf8'});
+   ok(result.status === 0, file + ': ' + (result.error || result.stderr));
+   continue;
+  } else {
+   new vm.Script(match[2], {filename:file});
+  }
+  checks++;
  }
  for (const match of source.matchAll(/(?:href|src)=["']([^"']+)["']/g)) {
   const ref = match[1];
@@ -38,7 +50,7 @@ const handlers = {};
 let offline = false, deleted = [];
 const scope = 'https://example.test/Try-4/';
 const cached = new Map();
-const cache = {addAll:async files => {for (const f of files) {ok(known(f), `Missing offline file ${f}`);cached.set(new URL(f,scope).href, {file:f});}},match:async request => cached.get(new URL(typeof request === 'string'?request:request.url,scope).href)};
+const cache = {addAll:async files => {for (const f of files) {ok(known(f.split("?")[0]), `Missing offline file ${f}`);cached.set(new URL(f,scope).href, {file:f});}},match:async request => cached.get(new URL(typeof request === 'string'?request:request.url,scope).href)};
 const context = {URL, Set, Promise, Response, self:{registration:{scope},addEventListener:(name,fn)=>handlers[name]=fn},caches:{open:async ()=>cache,keys:async ()=>['try4-public-v0','other-app'],delete:async name=>deleted.push(name)},fetch:async request=>{if(offline) throw Error('offline');return {live:request.url};}};
 vm.runInNewContext(read('sw.js'),context);
 let task;
@@ -49,6 +61,8 @@ async function request(url,method='GET') {let response;handlers.fetch({request:{
 ok((await request(scope+'index.html')).live, 'Online navigation must use network');
 offline = true;
 ok((await request(scope+'index.html')).file === 'index.html', 'Offline navigation must use cached page');
+ok((await request(scope+'pawcade-side-scroll.html?game=24')).file === 'pawcade-side-scroll.html', 'Every Pawcade game must open offline');
+ok(await request(scope+'pawcade-side-scroll.html?game=25') === undefined, 'Unknown game routes must not use the offline game page');
 ok(await request(scope+'operations-center.html') === undefined, 'Do not cache owner preparation tools');
 ok(await request(scope+'index.html?private=1') === undefined,'Do not cache query-bearing requests');
 ok(await request('https://third-party.test/index.html') === undefined,'Do not intercept third parties');
