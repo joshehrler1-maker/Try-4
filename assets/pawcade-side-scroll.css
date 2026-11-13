@@ -161,3 +161,19 @@ a{color:#ffdb99}h1,h2{font-family:Georgia,serif;color:#ffe7b5}
   background-repeat:no-repeat;
 }
 #side-player .side-controls::after{display:none}
+
+/* Android-friendly controls: protect button hit targets and fit landscape screens. */
+#side-player .side-controls{isolation:isolate;min-height:94px}
+#side-player .side-controls button,
+#side-player .side-controls .touch-joystick{position:relative;z-index:2}
+#side-player .side-controls button{min-width:54px}
+#side-player .side-hud{align-items:center;row-gap:.45rem}
+#side-player .side-hud button{touch-action:manipulation}
+#side-player #side-progress{line-height:1.45;overflow-wrap:anywhere}
+@media (orientation:landscape) and (max-height:520px){
+  #side-player{padding:clamp(4px,1.4vh,9px)}
+  #side-player .side-controls{min-height:76px;margin:.25rem 0}
+  #side-player .side-controls .touch-joystick{flex-basis:76px;width:76px;height:76px}
+  #side-player .side-controls button{min-height:50px}
+  #side-player .side-hud{margin:.2rem 0}
+}
