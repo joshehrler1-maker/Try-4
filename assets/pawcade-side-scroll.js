@@ -99,6 +99,36 @@
   const held = key => mobile.has(key) || keys.has(key);
   const width = 800;
   const height = 380;
+  // Per-game handling profiles inspired by the feel of each reference game.
+  // Multipliers preserve existing abilities and collision rules.
+  const motionProfiles = [
+    [1,1,1,1],      // Ember: responsive classic jumping
+    [1.08,1.12,1,1],// Library: precise action-platforming
+    [.82,.8,.78,.62],// Coral: buoyant underwater steering
+    [1.24,.58,1.02,1],// Clocktower: momentum and longer run-up
+    [1.05,.8,.98,1],// Garden: weighty rolling
+    [1,.95,.85,.82],// Waterfall: airy glide
+    [.94,1.15,.9,.9],// Lantern: forgiving float
+    [1,1.15,1,1],   // Crystal: precise gravity changes
+    [1.1,1.2,1,1],  // Stage Beat: sharp rhythmic inputs
+    [.96,1,1.06,1], // Quarry: weighty grapple
+    [1.06,.96,.88,.85],// Sunset: wind-borne motion
+    [1,1.1,1,1],    // Cloud: precise air dash
+    [1.02,1.04,1.08,1],// Thunder: firm pogo landing
+    [.95,1.06,.95,1],// Autumn: deliberate aiming
+    [1.02,1.08,1,1],// Observatory: responsive exploration
+    [1.06,1.04,.88,.9],// Bamboo: flowing movement
+    [1.02,1.08,1.02,1],// Steamworks: snappy dodges
+    [1,1.08,.96,1], // Snow: controlled platforming
+    [.96,1.1,1.08,1],// Canyon: precision jumps
+    [.96,1,.83,.7], // Submarine: swimming inertia
+    [1.28,.62,1.03,1],// Neon: high-speed momentum
+    [.96,1.08,1.04,1],// Marble: deliberate attacks
+    [.94,.95,.84,.82],// Swamp: float and bounce
+    [.96,.96,.82,.8],// Sunflower: airborne travel
+    [1.04,1.1,1.02,1] // Starship: action run-and-gun
+  ];
+  const [speedFactor,controlFactor,gravityFactor,airFactor]=motionProfiles[index];
   const sections = 6;
   const sectionSize = index===0 ? 3020 : 2200;
   const finish = sections * sectionSize;
@@ -665,11 +695,11 @@
     const steer = movement==='beat' ? 1 : Number(held('right')) - Number(held('left'));
     const vertical = Number(held('down'))-Number(held('up') || held('jump'));
     if (steer) p.facing = steer;
-    const topSpeed = runSpeed;
+    const topSpeed = runSpeed * speedFactor;
     const reversing = steer && Math.sign(p.vx) !== steer;
-    const acceleration = p.onIce ? handling*.28 : steer
+    const acceleration = (p.onIce ? handling*.28 : steer
       ? handling * (p.on ? (reversing ? 1.35 : 1) : .72)
-      : Math.max(1.6,handling*(p.on ? .95 : .45));
+      : Math.max(1.6,handling*(p.on ? .95 : .45))) * controlFactor * (p.on ? 1 : airFactor);
     if (index===3 && p.spin && !held('down')) {
       p.vx=p.facing*(520+p.spin*50);p.power=.65;p.spin=0;
     }
@@ -699,7 +729,7 @@
     if (power==='swim') p.vy += (vertical*230-p.vy)*Math.min(1,dt*5);
     else if (power==='bubble' && held('action') && p.y>55) p.vy += (-160-p.vy)*Math.min(1,dt*5);
     else if (floating && p.vy>0) p.vy=Math.min(72,p.vy+dt*90);
-    else if (!(movement==='airdash' && p.power>.22)) p.vy+=dt*(movement==='precision'?1210:1050)*p.gravity;
+    else if (!(movement==='airdash' && p.power>.22)) p.vy+=dt*(movement==='precision'?1210:1050)*gravityFactor*p.gravity;
     p.y += p.vy*dt;
     if(index===11){
       const prism=landmarks.find(prop=>prop.cell===5);
