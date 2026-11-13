@@ -945,6 +945,15 @@
       ctx.restore();
     }
 
+    if(index===3 && p.power>.22){
+      ctx.save();
+      ctx.strokeStyle='#ffcf85';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.ellipse(p.x,p.y+3,28,22,0,-Math.PI*.78,Math.PI*.45);
+      ctx.stroke();
+      ctx.restore();
+    }
     if(p.grapple || p.power>.22 && power==='dash'){
       ctx.fillStyle='#9be8ff60';
       for(let i=1;i<=3;i++) ctx.fillRect(p.x-p.facing*(22+i*12),p.y-9+i*4,12,2);
