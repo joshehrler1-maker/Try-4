@@ -78,7 +78,7 @@
   const width = 800;
   const height = 380;
   const sections = 6;
-  const sectionSize = 2200;
+  const sectionSize = index===0 ? 3020 : 2200;
   const finish = sections * sectionSize;
   const finale = ['guardian','sprint','switch','crystals','summit'][goalType];
   const guardian = {
@@ -117,7 +117,7 @@
   const airCapacity=18;
   const looseRings=[];
   let chapterReveal=0;
-  const saveKey='pawcade-platform-checkpoint-v1-'+index;
+  const saveKey='pawcade-platform-checkpoint-'+(index===0?'v2-':'v1-')+index;
   const resumeButton=byId('side-resume');
   function readCheckpoint() {
     try {
@@ -153,6 +153,14 @@
         }
       }
       if(x>0) crystals.push({x:start+x+w*.58,y:y-35});
+    }
+    if(index===0){
+      platforms.push({x:start+2170,y:326,w:300,kind:'floor'});
+      platforms.push({x:start+2525,y:326,w:270,kind:'floor'});
+      platforms.push({x:start+2840,y:326,w:180,kind:'floor'});
+      platforms.push({x:start+2500+stage*30,y:245-stage%3*18,w:105,kind:'floor'});
+      crystals.push({x:start+2570,y:212-stage%3*18});
+      enemies.push({x:start+2660,y:303,offset:stage+8});
     }
     const feature=setPieces[stage];
     const anchor=start+1050;
