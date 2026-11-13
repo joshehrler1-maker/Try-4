@@ -1150,6 +1150,22 @@
     // Two tones keep the landing line visible against both bright and dark scenery.
     ctx.fillStyle='#10101d';
     ctx.fillRect(x-1,y-2,w+2,8);
+    // A slim perspective top face makes the landing surface readable without
+    // changing the platform collision geometry or obscuring the character.
+    const topDepth=Math.min(9,Math.max(3,w*.035));
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    ctx.lineTo(x+Math.min(7,w*.08),y-topDepth);
+    ctx.lineTo(x+w-Math.min(7,w*.08),y-topDepth);
+    ctx.lineTo(x+w,y);
+    ctx.closePath();
+    const topLight=ctx.createLinearGradient(0,y-topDepth,0,y+2);
+    topLight.addColorStop(0,'rgba(255,255,255,.36)');
+    topLight.addColorStop(1,'rgba(255,255,255,.09)');
+    ctx.fillStyle=topLight;
+    ctx.fill();
+    ctx.restore();
     ctx.fillStyle=rim;
     ctx.fillRect(x,y,w,3);
     ctx.fillStyle='#fff6dd';
