@@ -958,6 +958,104 @@
     }
     ctx.restore();
   }
+  // Base material, recess, and edge highlight for each catalog entry.
+  const courseMaterials = [
+    ['#59404a','#21151e','#dda973'], // Ember Foundry
+    ['#32475b','#182638','#94c6d4'], // Moonlit Library
+    ['#974f68','#302747','#ffbaa8'], // Coral Courier
+    ['#846244','#30242c','#f5ce86'], // Clocktower Relay
+    ['#686940','#263625','#dce294'], // Seed Garden
+    ['#517988','#203c54','#b5eafa'], // Waterfall Climb
+    ['#993f52','#442542','#ffd291'], // Lantern Festival
+    ['#5d4090','#272144','#dca3ff'], // Crystal Polarity
+    ['#703471','#272049','#ff9fdf'], // Stage Beat
+    ['#776660','#38343b','#e5bd91'], // Quarry Rescue
+    ['#9c6247','#4d3138','#ffca88'], // Sunset Wind Sail
+    ['#777eac','#343558','#e4e8ff'], // Cloud City
+    ['#465c6c','#232d48','#9fdbeb'], // Thunder Harbor
+    ['#95573b','#4e302e','#ffba6d'], // Autumn Trail
+    ['#484f82','#242142','#b7c7ff'], // Inverted Observatory
+    ['#658155','#303d29','#c5eaa6'], // Bamboo Village
+    ['#865a48','#382833','#ffb776'], // Steamworks
+    ['#5b7896','#2a3b58','#e2f2ff'], // Snow Village
+    ['#a16649','#4f332f','#ffd1a3'], // Canyon Crossing
+    ['#356979','#19384b','#91e8df'], // Submarine Dock
+    ['#553c79','#201736','#ff8ce1'], // Neon Circuit
+    ['#777493','#35334d','#e0cdeb'], // Marble Temple
+    ['#526948','#293e38','#c6ec85'], // Swamp Ferry
+    ['#a77b43','#4d422b','#ffe3a1'], // Sunflower Flight
+    ['#4e6488','#252d46','#b0ddff']  // Starship Cargo
+  ];
+  // Change the construction pattern as well as the color of the panels.
+  const chapterPanels = [
+    [44,18,0], [65,23,1], [34,16,2],
+    [76,26,3], [52,20,4], [88,30,5]
+  ];
+  function drawCoursePlatform({x,y,w}) {
+    const [face,recess,rim]=courseMaterials[index];
+    const stage=Math.min(chapterPanels.length-1,Math.floor(x/sectionSize));
+    const [spacing,thickness,pattern]=chapterPanels[stage];
+    const depth=y>=ground?height-y:thickness;
+    const end=Math.min(x+w,camera+width);
+    const first=x+Math.max(0,Math.floor((camera-x)/spacing))*spacing;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x,y,w,height-y);
+    ctx.clip();
+    if(y<ground) {
+      ctx.globalAlpha=.65;
+      for(let panel=first;panel<end;panel+=spacing) {
+        ctx.fillStyle=recess;
+        ctx.fillRect(panel+5,y+depth,10,height-y-depth);
+        ctx.fillStyle=face;
+        ctx.fillRect(panel+5,y+depth,3,height-y-depth);
+      }
+      ctx.globalAlpha=1;
+    }
+    const surface=ctx.createLinearGradient(0,y,0,y+depth);
+    surface.addColorStop(0,face);
+    surface.addColorStop(1,recess);
+    ctx.fillStyle=surface;
+    ctx.fillRect(x,y,w,depth);
+    ctx.fillStyle=rim;
+    ctx.fillRect(x,y,w,2);
+    for(let panel=first;panel<end;panel+=spacing) {
+      const left=panel+6;
+      ctx.fillStyle=recess;
+      ctx.fillRect(left,y+6,spacing-12,depth-9);
+      ctx.fillStyle=rim;
+      ctx.strokeStyle=rim;
+      ctx.globalAlpha=.55;
+      switch(pattern) {
+        case 0:
+          ctx.fillRect(left+3,y+9,3,3);
+          ctx.fillRect(left+spacing-19,y+9,3,3);
+          break;
+        case 1:
+        case 3:
+          ctx.beginPath();
+          ctx.moveTo(left+3,y+depth-5);
+          ctx.lineTo(left+spacing/2-6,y+8);
+          ctx.lineTo(left+spacing-15,y+depth-5);
+          if(pattern===3) ctx.closePath();
+          ctx.stroke();
+          break;
+        case 2:
+          for(let rib=4;rib<spacing-13;rib+=5) ctx.fillRect(left+rib,y+8,2,depth-13);
+          break;
+        case 4:
+          ctx.fillRect(left+5,y+9,spacing-22,2);
+          ctx.fillRect(left+5,y+13,spacing-22,1);
+          break;
+        case 5:
+          ctx.strokeRect(left+6,y+9,spacing-24,depth-15);
+          ctx.fillRect(left+spacing/2-7,y+12,3,depth-21);
+          break;
+      }
+      ctx.globalAlpha=1;
+    }
+    ctx.restore();
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -997,22 +1095,8 @@
         drawLibraryPlatform(ledge);
         continue;
       }
-      if(index===0 && ledge.kind==='floor'){
-        const {x,y,w}=ledge;
-        const iron=ctx.createLinearGradient(0,y,0,y+48);
-        iron.addColorStop(0,'#52505a');
-        iron.addColorStop(.23,'#2c2932');
-        iron.addColorStop(1,'#130e18');
-        ctx.fillStyle=iron;ctx.fillRect(x,y,w,48);
-        ctx.fillStyle='#dda973';ctx.fillRect(x,y,w,2);
-        ctx.fillStyle='#7a462d';ctx.fillRect(x,y+8,w,3);
-        for(let dx=12;dx<w-12;dx+=44){
-          ctx.fillStyle='#171019';ctx.fillRect(x+dx,y+16,24,15);
-          ctx.fillStyle='#b86a38';
-          for(let slit=3;slit<23;slit+=5)ctx.fillRect(x+dx+slit,y+19,2,8);
-          ctx.fillStyle='#f5b570';ctx.fillRect(x+dx-4,y+11,2,2);
-        }
-        ctx.fillStyle='#4a2627';ctx.fillRect(x,y+45,w,3);
+      if(ledge.kind==='floor' && !ledge.switchBridge){
+        drawCoursePlatform(ledge);
         continue;
       }
       if(index===3 && Math.floor(ledge.x/sectionSize)===3 && ledge.kind==='spring' &&
