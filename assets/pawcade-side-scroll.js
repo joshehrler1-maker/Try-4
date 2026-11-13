@@ -5,6 +5,10 @@
   const courses = window.pawtopiaCourses;
   const catalog = byId('side-catalog');
   if (!catalog) return;
+  if (!Array.isArray(courses) || !Array.isArray(window.pawtopiaStyles) || !Array.isArray(window.pawtopiaVariants) || !Array.isArray(window.pawtopiaTechniques) || !Array.isArray(window.pawtopiaChapters)) {
+    catalog.textContent = 'The games could not load. Please refresh the page.';
+    return;
+  }
   catalog.replaceChildren(...courses.map(([name], index) => {
     const link = document.createElement('a');
     link.className = 'side-card';
@@ -22,7 +26,14 @@
   const canvas = byId('side-canvas');
   if (!canvas) return;
   const selection = new URLSearchParams(location.search).get('game');
-  if (selection === null || !/^\d+$/.test(selection) || !courses[Number(selection)]) return;
+  if (selection === null) return;
+  if (!/^\d+$/.test(selection) || !courses[Number(selection)] || !window.pawtopiaStyles[Number(selection)] || !window.pawtopiaVariants[Number(selection)] || !window.pawtopiaTechniques[Number(selection)] || !window.pawtopiaChapters[Number(selection)]) {
+    const notice = document.createElement('p');
+    notice.setAttribute('role', 'alert');
+    notice.textContent = 'This game is unavailable. Choose another adventure below.';
+    catalog.before(notice);
+    return;
+  }
   const index = Number(selection);
   const [name, hero, opening, ending, coursePower, terrain] = courses[index];
   const [reference, movement, enemyPattern, prologue, epilogue] = window.pawtopiaStyles[index];
@@ -501,8 +512,13 @@
     }
   }
   pauseButton.onclick=togglePause;
-  document.addEventListener?.('visibilitychange',()=>{
+  document.addEventListener('visibilitychange',()=>{
     if(document.hidden && phase==='playing') togglePause();
+    else if(document.hidden) clearInput();
+  });
+  window.addEventListener('blur',()=>{
+    if(phase==='playing') togglePause();
+    else clearInput();
   });
   function burst(x,y,color,count) {
     for(let i=0;i<count && particles.length<96;i++){
