@@ -34,7 +34,7 @@
     airdash:'dash',pogo:'stomp',blaster:'throw',shooter:'throw',whip:'pulse',momentum:'dash'};
   const power = special[movement] || (movement in {stomp:1,swim:1,glide:1,flip:1,grapple:1,throw:1} ? movement : coursePower);
   const descriptions = {
-    stomp:'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim',
+    stomp:'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim. Surface or visit a bubbling vent for air',
     dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
     throw:'Press Action to throw a crystal', flip:'Press Action to reverse gravity',
     pulse:'Press Action to release a shockwave', grapple:'Press Action below an overhead rail to attach. Steer to swing, then press Release Cable to let go',
@@ -112,6 +112,7 @@
   let player, boss, phase, camera, frame, last, clock, chapter, taken, attacks, hazards, escape;
   const particles=[];
   let rings=0;
+  const airCapacity=18;
   const looseRings=[];
   let chapterReveal=0;
   const saveKey='pawcade-platform-checkpoint-v1-'+index;
@@ -201,7 +202,7 @@
     }
     if(index===0 && stage===1) landmarks.push({cell:0,x:start+610,y:223,w:66,h:39});
     if(index===2 && stage===2) landmarks.push({cell:4,x:start+540,y:205,w:58,h:64});
-    if(index===2 && stage===3) landmarks.push({cell:7,x:start+470,y:268,w:72,h:75});
+    if(index===2) landmarks.push({cell:7,x:start+(stage===3?670:980),y:270,w:72,h:75});
     if(index===11 && stage===1) landmarks.push({cell:5,x:start+1010,y:122,w:76,h:70});
     if (index===11) {
       crystals.push({x:start+690,y:226,refill:true},{x:start+1295,y:173,refill:true});
@@ -238,7 +239,7 @@
   }
   const tunnels = index===14 ? plan.map((room,stage)=>({x:stage*sectionSize+480,w:130,y:ground-33})) : [];
   const resetPlayer = (x = 100) => ({
-    x,y:ground-22,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0,spin:0,dashUsed:false,chargeStart:null,jumpBuffer:0,coyote:0,jumpCut:false
+    x,y:ground-22,air:airCapacity,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0,spin:0,dashUsed:false,chargeStart:null,jumpBuffer:0,coyote:0,jumpCut:false
   });
   function reset() {
     player = resetPlayer();
@@ -260,7 +261,7 @@
     draw();
   }
   function hud() {
-    byId('side-progress').textContent = 'Stage ' + Math.min(sections,chapter+1) + ' / ' + sections + ' · ' + chapters[chapter] + ' · Hearts ' + player.health + (index===3 ? ' · Rings '+rings : ' · Crystals '+taken);
+    byId('side-progress').textContent = 'Stage ' + Math.min(sections,chapter+1) + ' / ' + sections + ' · ' + chapters[chapter] + ' · Hearts ' + player.health + (index===3 ? ' · Rings '+rings : ' · Crystals '+taken) + (index===2?' · Air '+Math.ceil(player.air)+'s':'');
   }
   function jump(buffer = true) {
     if (phase !== 'playing') return;
@@ -379,7 +380,7 @@
       }
       case 'bash': if(nearby(125)){p.vy=-strength;p.vx=-p.facing*strength*.7;p.grapple=.22;}break;
       case 'parry': {
-        const target=hazards.find(h=>h.life>0 && close(p,h,55,55));
+        const target=hazards.find(h=>h.parry && h.life>0 && close(p,h,55,55));
         if(target && !p.on){target.life=0;p.vy=-470;p.grace=.35;}
         break;
       }
@@ -612,6 +613,13 @@
     }
     if (power==='bubble' && p.y<48) {p.y=48;p.vy=0;}
     if (p.y > height+65) {respawn();return;}
+    if(index===2){
+      const previous=Math.ceil(p.air);
+      const breathing=p.y<=67 || landmarks.some(vent=>vent.cell===7 && close(p,vent,41,60));
+      p.air=breathing ? airCapacity : Math.max(0,p.air-dt);
+      if(p.air===0){respawn();status('Out of air. Swim to the surface or a bubbling vent.');return;}
+      if(Math.ceil(p.air)!==previous) hud();
+    }
     const stage = Math.min(sections-1,Math.floor(checkpoint(p.x)/sectionSize));
     if (oldY <= height && p.x>=finish && p.x-p.vx*dt<finish) {
       status(({guardian:guardian?.hint,switch:'Reach the marker and press Jump or Action.',crystals:'Collect three crystals, then reach the exit.',sprint:'Cross the finish at full speed.',summit:'Climb the ledges to reach the exit.'})[finale]);
@@ -654,7 +662,7 @@
     for (const foe of enemies) {
       if (foe.dead || Math.abs(foe.x-p.x)>360) continue;
       if ((foe.turret || enemyPattern==='turret' || index===16) && clock>=foe.shotAt) {
-        hazards.push({x:foe.x,y:foe.y,v:Math.sign(p.x-foe.x)*180,life:2});
+        hazards.push({x:foe.x,y:foe.y,v:Math.sign(p.x-foe.x)*180,life:2,parry:index===16});
         foe.shotAt=clock+cadence;
       }
       const position = foePosition(foe);
@@ -712,13 +720,15 @@
       case 'barrage': boss.x+=95;break;
     }
     const ranged=['volley','sweep','barrage'].includes(guardian.pattern);
+    const volleyPhase=guardian.pattern==='volley' ? (boss.health<=1?3:boss.health<=3?2:1) : 0;
     if(ranged && !boss.aim && boss.nextShot-t<.3) boss.aim=Math.sign(p.x-boss.x)||-1;
     if (ranged && t>=boss.nextShot) {
       const aim=boss.aim || Math.sign(p.x-boss.x) || -1;
       boss.aim=0;
-      hazards.push({x:boss.x+aim*44,y:boss.y+12,v:aim*235,life:2.6});
+      hazards.push({x:boss.x+aim*44,y:boss.y+12,v:aim*(235+volleyPhase*15),life:2.6,parry:volleyPhase>0});
+      if(volleyPhase>=2) hazards.push({x:boss.x+aim*44,y:boss.y-42,v:aim*220,life:2.6});
       if (guardian.pattern==='barrage') hazards.push({x:boss.x+aim*44,y:boss.y-55,v:aim*200,life:2.6});
-      boss.nextShot=t+(guardian.pattern==='volley'?.9:1.55);
+      boss.nextShot=t+(volleyPhase ? 1.14-volleyPhase*.18 : 1.55);
     }
     boss.warning=(['volley','sweep','barrage'].includes(guardian.pattern) && boss.nextShot-t<.3) || (guardian.pattern==='charge' && cycle>.68 && cycle<1);
     const shielded=guardian.pattern==='charge' && cycle>=1 && cycle<2;
@@ -963,7 +973,7 @@
         ctx.strokeStyle='#ffce7199';
         ctx.setLineDash([9,7]);
         const tracks=boss.aim
-          ? (guardian.pattern==='barrage'?[boss.y+12,boss.y-55]:[boss.y+12])
+          ? (guardian.pattern==='barrage'?[boss.y+12,boss.y-55]:guardian.pattern==='volley' && boss.health<=3?[boss.y+12,boss.y-42]:[boss.y+12])
           : [ground-8];
         for(const y of tracks){
           const start=boss.aim ? boss.x+boss.aim*44 : boss.x;
@@ -1004,11 +1014,11 @@
       ctx.fillStyle='#ffe9a9';ctx.beginPath();ctx.arc(a.x,a.y,a.radius||9,0,Math.PI*2);ctx.fill();
     }
     for(const shot of hazards) {
-      if(index===16 && atlasSprite(combatArt,3,2,shot.x,shot.y,21,21,false,2)) continue;
+      if(shot.parry && atlasSprite(combatArt,3,2,shot.x,shot.y,21,21,false,2)) continue;
       ctx.save();
       ctx.translate(shot.x,shot.y);
       if(shot.v<0) ctx.scale(-1,1);
-      ctx.fillStyle=index===16?'#ff86dc':'#ff8479';
+      ctx.fillStyle=shot.parry?'#ff86dc':'#ff8479';
       ctx.strokeStyle='#471723';
       ctx.lineWidth=2;
       ctx.beginPath();
