@@ -30,6 +30,17 @@
   const wallMoves = movement==='buster' || movement==='airdash';
   const [techniqueName, technique, strength] = window.pawtopiaTechniques[index];
   const chapters = window.pawtopiaChapters[index];
+  const controllerDeck = document.querySelector('#side-player .side-controls');
+  let controllerStage = -1;
+  function syncControllerArt(stage) {
+    if (!controllerDeck || controllerStage === stage) return;
+    controllerStage = stage;
+    controllerDeck.dataset.stageTheme = String(stage % 6);
+    controllerDeck.dataset.stageTitle = (chapters[stage] || 'Adventure').slice(0,48);
+    controllerDeck.setAttribute('aria-label', name + ' — Stage ' + (stage+1) + ': ' + (chapters[stage] || 'Adventure') + ' touch controls');
+  }
+  syncControllerArt(0);
+
   const special = {buster:'throw',roll:'dash',float:'bubble',beat:'pulse',airlift:'vine',
     airdash:'dash',pogo:'stomp',blaster:'throw',shooter:'throw',whip:'pulse',momentum:'dash'};
   const power = special[movement] || (movement in {stomp:1,swim:1,glide:1,flip:1,grapple:1,throw:1} ? movement : coursePower);
@@ -691,6 +702,7 @@
     }
     if (stage > chapter && p.on) {
       chapter=stage;
+      syncControllerArt(chapter);
       chapterReveal=2;
       if(index===0)showFoundryStory(stage);
       saveCheckpoint();
@@ -1575,8 +1587,10 @@
     cancelAnimationFrame(frame);
     clearInput();
     reset();
+    syncControllerArt(0);
     if (saved) {
       chapter=saved.stage;
+      syncControllerArt(chapter);
       amberSwitch=saved.amberSwitch===true;
       reefCacheOpen=saved.reefCacheOpen===true;
       for(const i of saved.crystals) if(crystals[i]) crystals[i].taken=true;
