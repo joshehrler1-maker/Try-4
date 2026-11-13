@@ -112,6 +112,8 @@
   let player, boss, phase, camera, frame, last, clock, chapter, taken, attacks, hazards, escape;
   const particles=[];
   let rings=0;
+  let amberSwitch=false;
+  let reefCacheOpen=false;
   const airCapacity=18;
   const looseRings=[];
   let chapterReveal=0;
@@ -128,7 +130,7 @@
   function saveCheckpoint() {
     try {
       localStorage.setItem(saveKey,JSON.stringify({
-        stage:chapter,
+        stage:chapter,amberSwitch,reefCacheOpen,
         crystals:crystals.flatMap((c,i)=>c.taken?[i]:[]),
         enemies:enemies.flatMap((e,i)=>e.dead?[i]:[])
       }));
@@ -200,10 +202,16 @@
       case 'spikes': case 'traps':
         add(135,285,50,'hazard');add(450,285,70,'hazard');break;
     }
-    if(index===0 && stage===1) landmarks.push({cell:0,x:start+610,y:223,w:66,h:39});
-    if(index===2 && stage===2) landmarks.push({cell:4,x:start+540,y:205,w:58,h:64});
+    if(index===0 && stage===1){
+      landmarks.push({cell:0,x:start+610,y:223,w:66,h:39});
+      for(let i=0;i<4;i++) platforms.push({x:start+735+i*115,y:210-i*19,w:94,kind:'floor',switchBridge:true});
+    }
+    if(index===2 && stage===2){
+      landmarks.push({cell:4,x:start+540,y:205,w:58,h:64});
+      for(let i=0;i<5;i++) crystals.push({x:start+620+i*56,y:170-i*16,reefCache:true});
+    }
     if(index===2) landmarks.push({cell:7,x:start+(stage===3?670:980),y:270,w:72,h:75});
-    if(index===11 && stage===1) landmarks.push({cell:5,x:start+1010,y:122,w:76,h:70});
+    if(index===11 && stage===1) landmarks.push({cell:5,x:start+1010,y:169,w:76,h:70});
     if (index===11) {
       crystals.push({x:start+690,y:226,refill:true},{x:start+1295,y:173,refill:true});
     }
@@ -242,6 +250,8 @@
     x,y:ground-22,air:airCapacity,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0,spin:0,dashUsed:false,chargeStart:null,jumpBuffer:0,coyote:0,jumpCut:false
   });
   function reset() {
+    amberSwitch=false;
+    reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
     enemies.forEach(e => {e.dead = false;e.shotAt=0;});
@@ -252,6 +262,7 @@
     particles.length=0;
     looseRings.length=0;
     rings=0;
+    amberSwitch=false;
     chapterReveal=0;
     attacks = [];
     hazards = [];
@@ -273,7 +284,7 @@
       player.jumpCut=true;player.jumpAge=0;
       return;
     }
-    if(player.cable){player.cable=null;player.jumpBuffer=0;return;}
+    if(player.cable){player.cable=null;player.grapple=.18;player.jumpBuffer=0;return;}
     if (wallMoves && player.wall && !player.on) {
       player.jumpAge=0;
       player.vy=-jumpSpeed;
@@ -320,14 +331,17 @@
     if (power === 'flip' && player.on) {player.gravity *= -1; player.on = false;}
     if (power === 'vine') player.vy = -590;
     if (power === 'grapple') {
-      const anchor = platforms.find(ledge => ledge.kind==='rail' && Math.abs(ledge.x+ledge.w/2-player.x)<230);
+      const anchor = platforms.reduce((nearest, ledge) => {
+        if(ledge.kind!=='rail') return nearest;
+        const x=ledge.x+ledge.w/2;
+        const y=ledge.y+8;
+        const distance=Math.hypot(player.x-x,player.y-y);
+        if(player.y<=y+16 || Math.abs(player.x-x)>=230 || (nearest && distance>=nearest.distance)) return nearest;
+        return {x,y,distance};
+      },null);
       if (anchor && !player.cable) {
-        const x=anchor.x+anchor.w/2;
-        const y=anchor.y+8;
-        if(player.y>y+16){
-          player.cable={x,y,length:Math.hypot(player.x-x,player.y-y)};
+          player.cable={x:anchor.x,y:anchor.y,length:anchor.distance};
           player.vx+=player.facing*130;
-        }
       }
     }
     if (power === 'throw' || power === 'pulse' || power === 'photo') {
@@ -356,7 +370,14 @@
       case 'sweep': shot({v:0,radius:strength-20,life:.13}); break;
       case 'burst':
       case 'roll': p.vx=p.facing*strength;p.grapple=.25;p.grace=Math.max(p.grace,.25);break;
-      case 'reveal': p.sonar=2;p.sonarOrigin={x:p.x,y:p.y};break;
+      case 'reveal':
+        p.sonar=2;p.sonarOrigin={x:p.x,y:p.y};
+        if(!reefCacheOpen && landmarks.some(prop=>prop.cell===4 && Math.hypot(p.x-prop.x,p.y-prop.y)<=160)){
+          reefCacheOpen=true;
+          burst(p.x,p.y,'#82ffe6',12);
+          status('Sonar revealed a hidden crystal trail. Follow it upward.');
+        }
+        break;
       case 'launch': if(p.on){p.vy=-strength;p.vx=p.facing*350;p.grapple=.26;}break;
       case 'pull':
       case 'capture': {
@@ -367,7 +388,7 @@
       }
       case 'flip': action();break;
       case 'retry': respawn();break;
-      case 'release': p.cable=null;break;
+      case 'release': if(p.cable){p.cable=null;p.grapple=.18;}break;
       case 'climb': if(p.wall){p.vy=-strength;p.wallLock=.08;}break;
       case 'drop': if(!p.on){p.vy=strength;p.pogo=true;}break;
       case 'lob': shot({v:p.facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2});break;
@@ -557,6 +578,22 @@
     else if (floating && p.vy>0) p.vy=Math.min(72,p.vy+dt*90);
     else if (!(movement==='airdash' && p.power>.22)) p.vy+=dt*(movement==='precision'?1210:1050)*p.gravity;
     p.y += p.vy*dt;
+    if(index===11){
+      const prism=landmarks.find(prop=>prop.cell===5);
+      const inside=close(p,prism,prism.w/2+12,prism.h/2+body);
+      if(inside && p.power>.22 && p.dashUsed && !p.inPrism){
+        p.inPrism=true;
+        burst(p.x,p.y,'#dda4ff',10);
+        status('Dream prism: dash through to recharge.');
+      } else if(!inside && p.inPrism){
+        p.inPrism=false;
+        p.dashUsed=false;
+        p.power=0;
+        burst(p.x,p.y,'#82ffe6',10);
+        playCue(550,880);
+      }
+    }
+
     if(p.cable){
       const dx=p.x-p.cable.x,dy=p.y-p.cable.y;
       const distance=Math.hypot(dx,dy);
@@ -573,6 +610,7 @@
     if (((p.gravity < 0 && power!=='flip') || power==='swim') && p.y < 48) {p.y=48;p.vy=0;p.on=true;p.jumps=0;}
     let landed = false;
     for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
+      if(ledge.switchBridge && !amberSwitch) continue;
       if (p.x < ledge.x-8 || p.x > ledge.x+ledge.w+8) continue;
       if(ledge.kind==='ceilingSpikes'){
         if(p.y-body<ledge.y){respawn();return;}
@@ -620,6 +658,12 @@
       if(p.air===0){respawn();status('Out of air. Swim to the surface or a bubbling vent.');return;}
       if(Math.ceil(p.air)!==previous) hud();
     }
+    if(index===0 && !amberSwitch && p.on && landmarks.some(prop=>prop.cell===0 && close(p,prop,31,24))){
+      amberSwitch=true;
+      burst(p.x,p.y,'#ffce71',16);
+      playCue(390,780);
+      status('Amber switch activated. The upper bridge is open.');
+    }
     const stage = Math.min(sections-1,Math.floor(checkpoint(p.x)/sectionSize));
     if (oldY <= height && p.x>=finish && p.x-p.vx*dt<finish) {
       status(({guardian:guardian?.hint,switch:'Reach the marker and press Jump or Action.',crystals:'Collect three crystals, then reach the exit.',sprint:'Cross the finish at full speed.',summit:'Climb the ledges to reach the exit.'})[finale]);
@@ -632,7 +676,7 @@
       hud();
     }
     for (const c of crystals) {
-      if (!c.taken && close(p,c,24,29)) {if(c.refill){p.dashUsed=false;p.power=0;}c.taken=true;burst(c.x,c.y,c.refill?'#82ffe6':'#ffdb80',9);playCue(650,980);taken++;if(index===3)rings++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
+      if (!c.taken && (!c.reefCache || reefCacheOpen) && close(p,c,24,29)) {if(c.refill){p.dashUsed=false;p.power=0;}c.taken=true;burst(c.x,c.y,c.refill?'#82ffe6':'#ffdb80',9);playCue(650,980);taken++;if(index===3)rings++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
     }
     for(let i=looseRings.length-1;i>=0;i--){
       const ring=looseRings[i];
@@ -780,6 +824,7 @@
   function castShadow(x,y,radius) {
     let surface=Infinity;
     for(const ledge of escape ? [...platforms,returnFloor] : platforms) {
+      if(ledge.switchBridge && !amberSwitch) continue;
       if(ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
       if(ledge.kind==='hazard'||ledge.kind==='ceilingSpikes'||ledge.kind==='rail'||ledge.kind==='ceiling') continue;
       if(x>=ledge.x && x<=ledge.x+ledge.w && ledge.y>=y) surface=Math.min(surface,ledge.y);
@@ -860,6 +905,7 @@
     const ledgeColors={drop:'#d59155',barrel:'#a76c40',pogo:'#9e76c5',ice:'#8edaf3',rail:'#d6b87f',ceiling:'#7258a8',hazard:'#e64562',floor:'#25364a',shelf:'#71648d',spring:'#579578',belt:'#a56b4b',current:'#387d9b',lift:'#547d9c'};
     for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
       if (ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
+      if(ledge.switchBridge && !amberSwitch) continue;
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
       if(index===3 && Math.floor(ledge.x/sectionSize)===3 && ledge.kind==='spring' &&
          atlasSprite(propArt,4,2,ledge.x+ledge.w/2,ledge.y+14,ledge.w,28,false,2)) continue;
@@ -943,7 +989,9 @@
       ctx.fillText(reached?'✓ '+(stage+1):String(stage+1),x,ground-68);
     }
     for(const prop of landmarks) {
-      if(prop.x>=camera-85 && prop.x<=camera+width+85) atlasSprite(propArt,4,prop.cell,prop.x,prop.y,prop.w,prop.h,false,2);
+      if(prop.x<camera-85 || prop.x>camera+width+85) continue;
+      const pressed=prop.cell===0 && amberSwitch;
+      atlasSprite(propArt,4,prop.cell,prop.x,prop.y+(pressed?6:0),prop.w,pressed?prop.h-12:prop.h,false,2);
     }
     function drawRing(x,y){
       if(atlasSprite(combatArt,3,0,x,y,20,24,false,2)) return;
@@ -951,7 +999,7 @@
       ctx.beginPath();ctx.ellipse(x,y,7,10,0,0,Math.PI*2);ctx.stroke();
     }
     for(const ring of looseRings) drawRing(ring.x,ring.y);
-    for (const c of crystals) if (!c.taken && c.x>=camera && c.x<camera+width) {
+    for (const c of crystals) if (!c.taken && (!c.reefCache || reefCacheOpen) && c.x>=camera && c.x<camera+width) {
       if(index===3){drawRing(c.x,c.y);continue;}
       if(player.sonar && close(player,c,310,300)){ctx.strokeStyle='#9bf4ff';ctx.strokeRect(c.x-18,c.y-18,36,36);}
       if(c.refill && atlasSprite(propArt,4,1,c.x,c.y,38,44,false,2)) continue;
@@ -1177,6 +1225,8 @@
     reset();
     if (saved) {
       chapter=saved.stage;
+      amberSwitch=saved.amberSwitch===true;
+      reefCacheOpen=saved.reefCacheOpen===true;
       for(const i of saved.crystals) if(crystals[i]) crystals[i].taken=true;
       for(const i of saved.enemies) if(enemies[i]) enemies[i].dead=true;
       taken=crystals.filter(c=>c.taken).length;
