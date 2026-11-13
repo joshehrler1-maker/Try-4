@@ -898,6 +898,66 @@
     }
     ctx.restore();
   }
+  // Moonlit Library's six chapters use different structural materials.
+  const libraryPlatforms = [
+    ['#32475b','#182638','#94c6d4','#506e81',52,'rivets'],
+    ['#3b6175','#172f4a','#b5f7ff','#6599b9',42,'ice'],
+    ['#655640','#302634','#f4ce87','#a77b48',60,'braces'],
+    ['#48425e','#221b37','#d6a7ff','#8671ac',46,'conduits'],
+    ['#604236','#2d242d','#e9af74','#99674d',38,'sleepers'],
+    ['#285457','#142b36','#88ecd7','#4b9e98',58,'grates']
+  ];
+  function drawLibraryPlatform({x,y,w}) {
+    const stage=Math.min(libraryPlatforms.length-1,Math.floor(x/sectionSize));
+    const [face,shadow,rim,trim,spacing,detail]=libraryPlatforms[stage];
+    const depth=y>=ground?height-y:22;
+    const material=ctx.createLinearGradient(0,y,0,y+depth);
+    material.addColorStop(0,face);
+    material.addColorStop(1,shadow);
+    ctx.fillStyle=material;
+    ctx.fillRect(x,y,w,depth);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x,y,w,height-y);
+    ctx.clip();
+    if(y<ground) {
+      // Recessed pilings visually join static ledges to the scenery below.
+      ctx.fillStyle=shadow;
+      for(let post=x+Math.min(12,w/4);post<x+w;post+=Math.max(58,spacing*2)) {
+        ctx.fillRect(post,y+depth,11,height-y-depth);
+        ctx.fillStyle=trim;
+        ctx.fillRect(post,y+depth,2,height-y-depth);
+        ctx.fillStyle=shadow;
+      }
+    }
+    ctx.fillStyle=rim;
+    ctx.fillRect(x,y,w,2);
+    ctx.fillStyle=trim;
+    ctx.fillRect(x,y+5,w,2);
+    for(let left=x+8;left<x+w;left+=spacing) {
+      ctx.fillStyle=shadow;
+      ctx.fillRect(left,y+9,spacing-14,10);
+      ctx.strokeStyle=trim;
+      ctx.fillStyle=rim;
+      if(detail==='rivets') {
+        ctx.fillRect(left+4,y+12,3,3);
+        ctx.fillRect(left+spacing-22,y+12,3,3);
+      } else if(detail==='ice' || detail==='braces') {
+        ctx.beginPath();
+        ctx.moveTo(left+2,y+18);
+        ctx.lineTo(left+spacing*.35,y+9);
+        ctx.lineTo(left+spacing*.6,y+18);
+        ctx.stroke();
+      } else if(detail==='conduits') {
+        ctx.fillRect(left+4,y+13,spacing-23,2);
+      } else {
+        for(let bar=left+4;bar<left+spacing-16;bar+=6) {
+          ctx.fillRect(bar,y+11,detail==='grates'?1:3,6);
+        }
+      }
+    }
+    ctx.restore();
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -933,6 +993,10 @@
       if (ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
       if(ledge.switchBridge && !amberSwitch) continue;
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
+      if(index===1 && ledge.kind==='floor' && !ledge.switchBridge){
+        drawLibraryPlatform(ledge);
+        continue;
+      }
       if(index===0 && ledge.kind==='floor'){
         const {x,y,w}=ledge;
         const iron=ctx.createLinearGradient(0,y,0,y+48);
