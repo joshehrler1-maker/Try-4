@@ -692,6 +692,7 @@
     if (stage > chapter && p.on) {
       chapter=stage;
       chapterReveal=2;
+      if(index===0)showFoundryStory(stage);
       saveCheckpoint();
       status(chapters[stage] + ' · ' + (stage===sections-1 ? ending : 'Checkpoint reached.'));
       hud();
@@ -1233,16 +1234,56 @@
   }
   const tick = 1/120;
   let accumulator = 0;
+  const foundryStory = [
+    ['The silent bell','The morning shift never heard the all-clear. Whisker follows warm air rising through the cooling vents.'],
+    ['The amber signal','A maintenance lamp blinks twice. Someone inside is still trying to signal the surface.'],
+    ['Tracks in the ash','Boot prints cross the cinder hills. The bell keeper made it this far before the furnace crab broke loose.'],
+    ['A bridge above the fire','A voice calls from beyond the suspended bridges. Whisker answers and takes the high route.'],
+    ['The cooling banks','Whisker spots the keeper’s dropped wrench beside a cooling channel. The furnace controls are close.'],
+    ['Into Furnace Keep','The keeper is trapped behind the bell platform. Whisker braces as the furnace crab blocks the last crossing.'],
+    ['The all-clear','The keeper rings the bell again. Across the foundry, the crew answers with a cheer.']
+  ];
+  let storyDialog;
+  function showFoundryStory(scene) {
+    clearInput();
+    if(!storyDialog){
+      storyDialog=document.createElement('dialog');
+      storyDialog.style.cssText='position:fixed;top:auto;bottom:4vh;width:min(88vw,560px);padding:18px 22px;border:1px solid #edac66;border-radius:14px;background:#241725;color:#fff4e2;box-shadow:0 8px 30px #0009';
+      const title=document.createElement('h2');
+      title.id='foundry-story-title';
+      storyDialog.setAttribute('aria-labelledby',title.id);
+      const line=document.createElement('p');
+      const advance=document.createElement('button');
+      advance.type='button';
+      advance.textContent='Continue';
+      advance.onclick=()=>storyDialog.close();
+      storyDialog.append(title,line,advance);
+      byId('side-player').append(storyDialog);
+      storyDialog.addEventListener('close',()=>{
+        clearInput();
+        canvas.focus({preventScroll:true});
+        if(phase==='playing'){
+          last=performance.now();
+          frame=requestAnimationFrame(loop);
+        }
+      });
+    }
+    const [title,line]=foundryStory[scene];
+    storyDialog.children[0].textContent=title;
+    storyDialog.children[1].textContent=line;
+    storyDialog.children[2].textContent=scene===6?'Close':'Continue';
+    storyDialog.showModal();
+  }
   function loop(now) {
     accumulator += Math.min(.075,Math.max(0,(now-last)/1000));
-    while (accumulator >= tick && phase==='playing') {
+    while (accumulator >= tick && phase==='playing' && !storyDialog?.open) {
       step(tick);
       accumulator-=tick;
     }
     last=now;
     draw();
-    if(phase==='playing') frame=requestAnimationFrame(loop);
-    if(phase==='won') {pauseButton.disabled=true;playCue(440,880,.3);}
+    if(phase==='playing' && !storyDialog?.open) frame=requestAnimationFrame(loop);
+    if(phase==='won') {pauseButton.disabled=true;playCue(440,880,.3);if(index===0)showFoundryStory(6);}
   }
   function startRun(saved) {
     cancelAnimationFrame(frame);
@@ -1267,7 +1308,8 @@
     canvas.focus({preventScroll:true});
     accumulator=0;
     last=performance.now();
-    frame=requestAnimationFrame(loop);
+    if(index===0 && !saved){draw();showFoundryStory(0);}
+    else frame=requestAnimationFrame(loop);
   }
   byId('side-start').onclick=()=>startRun(null);
   resumeButton.hidden=!readCheckpoint();
