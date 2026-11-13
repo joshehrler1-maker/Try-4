@@ -232,6 +232,45 @@
       case 'spikes': case 'traps':
         add(135,285,50,'hazard');add(450,285,70,'hazard');break;
     }
+    // Optional upper routes make each chapter less linear without blocking
+    // the main path. Each game's movement identity determines its route type.
+    // Keep this outside the feature switch so all 25 adventures receive it.
+    if(index!==7 && index!==14) { // gravity-flip games need clear ceiling lanes
+      const routeKinds={
+        momentum:['belt','floor','floor'],
+        roll:['barrel','floor','floor'],
+        pogo:['pogo','floor','pogo'],
+        glide:['floor','lift','floor'],
+        airlift:['lift','floor','lift'],
+        airdash:['floor','floor','lift'],
+        grapple:['floor','rail','floor'],
+        swim:['current','current','floor'],
+        float:['spring','floor','spring'],
+        beat:['spring','floor','spring'],
+        shooter:['floor','shelf','floor'],
+        buster:['floor','shelf','floor'],
+        precision:['floor','floor','shelf'],
+        vine:['spring','floor','spring'],
+        throw:['floor','floor','shelf'],
+        pulse:['spring','floor','spring'],
+        shield:['floor','ice','floor'],
+        whip:['shelf','floor','shelf'],
+        bubble:['current','floor','current'],
+        photo:['shelf','floor','shelf']
+      };
+      const route=(routeKinds[movement]||['floor','floor','lift']);
+      const seed=(index*13+stage*7)%5;
+      const routeX=start+Math.min(sectionSize-660,1330+seed*45);
+      const heights=[245,211,239,203,228];
+      for(let branch=0;branch<3;branch++){
+        const bx=routeX+branch*(155+seed*3);
+        const by=heights[(branch+stage+index)%heights.length];
+        const bw=92+(branch%2)*20;
+        // Only add a short, optional elevated chain; never remove floor paths.
+        platforms.push({x:bx,y:by,w:bw,kind:route[branch]});
+        crystals.push({x:bx+bw/2,y:by-35});
+      }
+    }
     if(index===0 && stage===1){
       landmarks.push({cell:0,x:start+610,y:223,w:66,h:39});
       for(let i=0;i<4;i++) platforms.push({x:start+735+i*115,y:210-i*19,w:94,kind:'floor',switchBridge:true});
