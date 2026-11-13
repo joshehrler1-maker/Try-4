@@ -933,6 +933,24 @@
       if (ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
       if(ledge.switchBridge && !amberSwitch) continue;
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
+      if(index===0 && ledge.kind==='floor'){
+        const {x,y,w}=ledge;
+        const iron=ctx.createLinearGradient(0,y,0,y+48);
+        iron.addColorStop(0,'#52505a');
+        iron.addColorStop(.23,'#2c2932');
+        iron.addColorStop(1,'#130e18');
+        ctx.fillStyle=iron;ctx.fillRect(x,y,w,48);
+        ctx.fillStyle='#dda973';ctx.fillRect(x,y,w,2);
+        ctx.fillStyle='#7a462d';ctx.fillRect(x,y+8,w,3);
+        for(let dx=12;dx<w-12;dx+=44){
+          ctx.fillStyle='#171019';ctx.fillRect(x+dx,y+16,24,15);
+          ctx.fillStyle='#b86a38';
+          for(let slit=3;slit<23;slit+=5)ctx.fillRect(x+dx+slit,y+19,2,8);
+          ctx.fillStyle='#f5b570';ctx.fillRect(x+dx-4,y+11,2,2);
+        }
+        ctx.fillStyle='#4a2627';ctx.fillRect(x,y+45,w,3);
+        continue;
+      }
       if(index===3 && Math.floor(ledge.x/sectionSize)===3 && ledge.kind==='spring' &&
          atlasSprite(propArt,4,2,ledge.x+ledge.w/2,ledge.y+14,ledge.w,28,false,2)) continue;
       if(index===9 && ledge.kind==='rail' &&
@@ -1202,8 +1220,10 @@
     ctx.globalAlpha=p.grace && Math.floor(clock*12)%2?.55:1;
     const roster = ['Bolt','Ivy','Frost','Melody','Stone','Spark','Shadow'];
     const rosterIndex = roster.indexOf(hero);
-    const companionDrawn = rosterIndex>=0 && atlasSprite(heroArt,8,rosterIndex*4+pose,p.x,p.y-17,81,81,p.facing<0,4);
-    if(!companionDrawn && !sprite(cell,p.x,p.y-15,81,81,p.facing<0) && poster.naturalWidth) {
+    const heroSize=index===0?107:81;
+    const heroLift=(heroSize-81)/2;
+    const companionDrawn = rosterIndex>=0 && atlasSprite(heroArt,8,rosterIndex*4+pose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4);
+    if(!companionDrawn && !sprite(cell,p.x,p.y-15-heroLift,heroSize,heroSize,p.facing<0) && poster.naturalWidth) {
       const sw=poster.naturalWidth/2;
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
     }
