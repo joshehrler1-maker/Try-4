@@ -138,3 +138,287 @@ window.pawtopiaRoomPlans = [
  'escape speedway escape highway escape escape','castle traps castle summit castle arena',
  'marsh canopy marsh grove docks marsh','fabric grove fabric rooftops fabric dream','hangar barracks hangar highway arena hangar'
 ];
+
+// Secondary moves are separate from the primary Action so each keeps its own input.
+window.pawtopiaTechniques = [
+ ['Cape Spin','sweep',75],['Dash Boots','burst',510],['Sonar','reveal',310],
+ ['Rolling Attack','roll',420],['Barrel Launch','launch',575],['Air Punch','sweep',84],
+ ['Inhale','pull',115],['Gravity Flip','flip',0],['Quick Restart','retry',0],
+ ['Release Cable','release',0],['Wind Ring','capture',135],['Climb','climb',165],
+ ['Shovel Drop','drop',620],['Aim Egg','lob',325],['Morph Ball','morph',0],
+ ['Bash','bash',470],['Parry','parry',0],['Sword Slash','sweep',65],
+ ['Ledge Grab','grab',0],['Swap Weapon','swap',0],['Super Taunt','taunt',190],
+ ['Cross Throw','return',420],['Cane Bounce','drop',550],['Yarn Pull','pull',150],
+ ['Grenade','lob',410]
+];
+
+// Six authored stage profiles per adventure. Each entry pairs a room shape
+// with a stage-specific set piece placed in the room's second half.
+window.pawtopiaSetPieces = [
+ 'blocks spring blocks bridge blocks tower',
+ 'turrets lifts turrets tower lifts turrets',
+ 'kelp current reef kelp current reef',
+ 'speed spring speed tower spring speed',
+ 'barrels vines barrels vines spring barrels',
+ 'ice tower glide ice lifts glide',
+ 'float blocks float tower glide float',
+ 'ceiling ceiling tower ceiling bridge ceiling',
+ 'spikes steps spikes spring steps spikes',
+ 'cable tower cable lifts cable cable',
+ 'ring glide ring tower ring glide',
+ 'tower dash tower dash glide dash',
+ 'pogo bridge pogo tower spikes pogo',
+ 'eggs blocks eggs vines steps eggs',
+ 'crawl turrets crawl lifts crawl turrets',
+ 'vines bash vines tower bash glide',
+ 'turrets dodge dodge turrets dodge turrets',
+ 'steps lifts dodge steps bridge steps',
+ 'traps steps traps bridge traps tower',
+ 'turrets bridge turrets tower dodge turrets',
+ 'speed blocks speed spring speed bridge',
+ 'steps turrets tower traps steps tower',
+ 'pogo vines pogo bridge pogo steps',
+ 'yarn spring yarn vines glide yarn',
+ 'turrets lifts bridge turrets dodge tower'
+];
+
+// Individually authored routes in reference-stage order.
+Object.assign(window.pawtopiaRooms, {
+  convoy:[[0,326,380],[400,289,230],[670,250,220],[920,300,250],[1220,268,230],[1490,240,280],[1810,326,390]],
+  iceworks:[[0,326,420,'ice'],[458,282,220,'ice'],[735,247,260,'ice'],[1030,326,300,'ice'],[1380,286,310,'ice'],[1740,326,460]],
+  airfield:[[0,326,330],[365,270,180,'lift'],[590,212,195],[830,165,240],[1125,211,205],[1390,254,225],[1660,285,240],[1940,326,260]],
+  generator:[[0,326,650],[710,326,540],[1300,326,900],[380,285,100,'hazard'],[990,236,155],[1510,284,65,'hazard'],[1800,210,245]],
+  minecart:[[0,326,2200],[240,276,385,'belt'],[680,241,330,'belt'],[1090,287,360,'belt'],[1500,244,430,'belt']],
+  floodgate:[[0,326,2200],[335,285,215,'current'],[600,231,230,'lift'],[920,181,250],[1240,243,270,'current'],[1580,285,300,'current']],
+  coast:[[0,326,2200],[290,285,250,'spring'],[620,235,430,'belt'],[1130,202,300],[1500,250,440,'belt']],
+  chemical:[[0,326,620],[670,326,1530],[370,265,260,'belt'],[700,195,330,'belt'],[1120,240,260,'spring'],[1440,177,480,'belt']],
+  ruins:[[0,326,2200],[240,247,280],[570,193,295],[930,230,270],[1260,267,250,'current'],[1600,195,310]],
+  pinball:[[0,326,2200],[310,300,75,'spring'],[530,220,130,'spring'],[825,167,155,'spring'],[1110,265,150,'spring'],[1430,205,130,'spring'],[1750,280,195,'belt']],
+  volcano:[[0,326,520],[580,291,180,'spring'],[820,231,290],[1160,275,160,'spring'],[1370,239,290],[1720,326,480]],
+  cavern:[[0,326,420],[470,289,250],[790,237,245],[1110,282,230],[1420,225,250],[1740,326,460],[1840,285,56,'hazard']]
+});
+window.pawtopiaRoomPlans[1]='convoy iceworks airfield generator minecart floodgate';
+window.pawtopiaRoomPlans[3]='coast chemical ruins pinball volcano cavern';
+window.pawtopiaChapters[1]=['Convoy Ambush','Frozen Archive','Airship Platforms','Generator Blackout','Minecart Run','Floodgate Vault'];
+window.pawtopiaChapters[3]=['Coastal Run','Chemical Works','Sunken Ruins','Pinball Hall','Volcanic Ridge','Crystal Cavern'];
+window.pawtopiaSetPieces[1]='turrets ice lifts dodge speed current';
+window.pawtopiaSetPieces[3]='speed speed bridge spring glide traps';
+
+Object.assign(window.pawtopiaRooms, {
+  seedDeck:[[0,326,660],[280,249,140,'barrel'],[710,326,570],[880,239,190],[1330,289,320],[1700,326,500]],
+  seedRigging:[[0,326,390],[350,270,200],[570,211,175,'barrel'],[810,149,275],[1130,205,215],[1390,254,310],[1740,326,460]],
+  seedGalley:[[0,326,510],[560,275,240],[850,229,290],[1190,270,240,'barrel'],[1490,223,250],[1780,326,420]],
+  seedLocker:[[0,326,2200],[300,273,280,'current'],[640,231,265],[960,272,230,'current'],[1240,219,350],[1630,276,290,'current']],
+  seedTopsail:[[0,326,365],[400,286,190,'spring'],[630,224,220,'spring'],[890,166,265],[1210,201,265],[1510,252,255],[1810,326,390]],
+  seedNest:[[0,326,2200],[390,245,150],[745,201,185,'barrel'],[1060,155,220],[1350,201,185],[1655,245,150]],
+  eggMeadow:[[0,326,2200],[345,256,145],[740,236,150],[1160,249,175],[1595,225,170]],
+  eggRavine:[[0,326,485],[550,291,290],[900,245,230],[1190,280,320],[1560,326,640],[1850,286,55,'hazard']],
+  eggCave:[[0,326,2200],[310,273,230],[590,218,260],[890,185,210],[1150,240,260],[1470,277,290]],
+  eggFort:[[0,326,2200],[390,253,180],[745,212,175],[1080,249,170],[1410,211,180],[1760,255,180]],
+  eggDonuts:[[0,326,385],[415,284,145,'drop'],[604,251,145,'drop'],[795,218,170,'drop'],[1010,255,165,'drop'],[1220,285,185,'drop'],[1450,263,205,'drop'],[1705,326,495]],
+  eggStilts:[[0,326,2200],[360,281,185],[670,244,170],[980,281,165],[1280,238,235],[1650,269,175]]
+});
+window.pawtopiaRoomPlans[4]='seedDeck seedRigging seedGalley seedLocker seedTopsail seedNest';
+window.pawtopiaRoomPlans[13]='eggMeadow eggRavine eggCave eggFort eggDonuts eggStilts';
+window.pawtopiaChapters[4]=['Seedship Deck','High Rigging','Sunset Galley','Flooded Locker','Topsail Ascent','Canopy Nest'];
+window.pawtopiaChapters[13]=['Egg-Toss Meadow','Falling Rock Ravine','Roundstone Cave','Amber Fort','Donut Lift Crossing','Stilt Patrol'];
+window.pawtopiaSetPieces[4]='barrels vines barrels current spring tower';
+window.pawtopiaSetPieces[13]='eggs traps steps turrets bridge eggs';
+
+Object.assign(window.pawtopiaRooms, {
+  forgeTrail:[[0,326,440],[500,285,290],[850,248,235],[1140,305,420],[1620,326,580]],
+  switchHall:[[0,326,2200],[420,242,290],[830,201,370],[1320,240,410]],
+  forgeHills:[[0,326,660],[690,289,295],[1030,251,290],[1370,283,310],[1730,326,470]],
+  forgeBridges:[[0,326,370],[430,275,210],[705,221,250],[1020,246,230],[1320,280,300],[1690,326,510]],
+  forgeBanks:[[0,326,410],[470,289,240,'current'],[770,258,295],[1120,285,255,'current'],[1440,251,270],[1780,326,420]],
+  forgeKeep:[[0,326,500],[560,294,280],[910,263,310],[1280,226,360],[1710,326,490],[1840,285,65,'hazard']],
+  cloudCity:[[0,326,410],[470,278,215],[760,226,225],[1050,177,210],[1330,228,310],[1710,326,490]],
+  cloudDream:[[0,326,460],[525,269,210],[810,213,205],[1100,169,230],[1430,246,310],[1810,326,390]],
+  cloudResort:[[0,326,520],[580,273,250],[895,235,215],[1170,269,255],[1490,235,240],[1800,326,400],[1910,285,45,'hazard']],
+  cloudRidge:[[0,326,410],[470,281,175,'spring'],[720,215,205,'spring'],[1010,170,220],[1320,215,240,'spring'],[1640,278,240],[1940,326,260]],
+  cloudMirror:[[0,326,2200],[360,249,210],[640,198,220],[925,151,220],[1220,202,235],[1510,259,245]],
+  cloudReflection:[[0,326,355],[420,282,205],[685,244,220],[980,205,230],[1290,161,240],[1600,218,235],[1910,326,290]]
+});
+window.pawtopiaRoomPlans[0]='forgeTrail switchHall forgeHills forgeBridges forgeBanks forgeKeep';
+window.pawtopiaRoomPlans[11]='cloudCity cloudDream cloudResort cloudRidge cloudMirror cloudReflection';
+window.pawtopiaChapters[0]=['Foundry Trail','Amber Switch Hall','Cinder Hills','Suspended Bridges','Cooling Banks','Furnace Keep'];
+window.pawtopiaChapters[11]=['Forsaken Towers','Dream Passage','Storm Lodge','Golden Cloud Ridge','Mirror Vault','Reflection Ascent'];
+window.pawtopiaSetPieces[0]='blocks blocks spring bridge current tower';
+window.pawtopiaSetPieces[11]='dash dash traps spring dash glide';
+
+Object.assign(window.pawtopiaRooms, {
+  coralBay:[[0,326,2200],[320,240,250,'current'],[820,177,260],[1340,234,355,'current']],
+  coralChannels:[[0,326,2200],[380,170,420],[970,229,280,'current'],[1470,140,350]],
+  coralCaves:[[0,326,2200],[280,142,260,'ceiling'],[660,241,410],[1240,152,285,'ceiling'],[1610,216,340]],
+  coralVents:[[0,326,2200],[410,262,120,'hazard'],[780,179,330,'current'],[1190,262,110,'hazard'],[1580,216,320,'current']],
+  coralLagoon:[[0,326,2200],[320,254,270],[735,217,280],[1240,174,280],[1650,254,280,'current']],
+  coralRidge:[[0,326,2200],[330,271,240],[670,226,225],[1000,176,240],[1380,135,250],[1770,224,270]],
+  observatorySurface:[[0,326,520],[580,282,285],[940,235,280],[1300,273,310],[1680,326,520]],
+  observatoryBurrow:[[0,326,2200],[610,250,260],[975,198,290],[1380,247,290]],
+  observatoryHeat:[[0,326,730],[790,326,560],[1420,326,780],[890,285,100,'hazard'],[1620,285,130,'hazard'],[1800,234,240]],
+  observatoryWreck:[[0,326,2200],[290,251,260],[670,215,285],[1110,250,295],[1560,205,355]],
+  observatoryTide:[[0,326,2200],[340,262,225,'current'],[700,219,280],[1110,170,300],[1530,236,350,'current']],
+  observatoryCore:[[0,326,440],[495,273,240],[805,218,240],[1110,174,280],[1470,226,290],[1820,326,380]]
+});
+window.pawtopiaRoomPlans[2]='coralBay coralChannels coralCaves coralVents coralLagoon coralRidge';
+window.pawtopiaRoomPlans[14]='observatorySurface observatoryBurrow observatoryHeat observatoryWreck observatoryTide observatoryCore';
+window.pawtopiaChapters[2]=['Home Reef','Kelp Channels','Undercaves','Thermal Vents','Pearl Lagoon','Deepwater Ridge'];
+window.pawtopiaChapters[14]=['Surface Approach','Burrow Network','Thermal Galleries','Wrecked Observatory','Tidal Labyrinth','Lower Core'];
+window.pawtopiaSetPieces[2]='reef current kelp dodge reef current';
+window.pawtopiaSetPieces[14]='turrets crawl traps lifts current tower';
+
+Object.assign(window.pawtopiaRooms, {
+  moonVillage:[[0,326,520],[580,289,250],[890,245,230],[1170,282,290],[1510,326,690],[1690,285,50,'hazard']],
+  moonGate:[[0,326,560],[380,265,190],[620,233,190],[870,194,240],[1165,230,250],[1470,280,225],[1750,326,450]],
+  moonChapel:[[0,326,460],[510,276,210],[775,224,195],[1025,168,280],[1360,226,230],[1640,269,250],[1950,326,250]],
+  moonHalls:[[0,326,2200],[365,250,240],[685,206,230],[1000,249,240],[1350,203,270],[1800,285,58,'hazard']],
+  moonShip:[[0,326,440],[495,285,300],[850,245,220],[1120,204,260],[1440,249,250],[1750,326,450]],
+  moonGallery:[[0,326,2200],[410,255,195],[655,205,175],[895,157,250],[1210,208,220],[1500,250,290]],
+  ferryJungle:[[0,326,410],[455,291,210,'pogo'],[725,250,245],[1030,284,245,'pogo'],[1340,245,310],[1710,326,490]],
+  ferryManor:[[0,326,2200],[280,251,230],[600,200,250],[965,242,245],[1325,192,280],[1700,257,240]],
+  ferryMine:[[0,326,510],[565,276,225],[850,230,255,'pogo'],[1165,273,260],[1490,236,220,'pogo'],[1770,326,430]],
+  ferrySnow:[[0,326,440,'ice'],[495,291,265,'ice'],[820,247,270],[1150,285,230,'ice'],[1430,248,280],[1770,326,430,'ice']],
+  ferryMoon:[[0,326,385],[435,273,175,'pogo'],[675,213,220],[965,160,240,'pogo'],[1270,210,230],[1570,265,240],[1880,326,320]],
+  ferryReturn:[[0,326,2200],[375,247,200],[690,207,225],[1035,251,235,'pogo'],[1405,211,220],[1745,262,230]]
+});
+window.pawtopiaRoomPlans[21]='moonVillage moonGate moonChapel moonHalls moonShip moonGallery';
+window.pawtopiaRoomPlans[22]='ferryJungle ferryManor ferryMine ferrySnow ferryMoon ferryReturn';
+window.pawtopiaChapters[21]=['Ruined Village','Moon Gate','Marble Chapel','Inner Halls','Phantom Ship','Silver Gallery'];
+window.pawtopiaChapters[22]=['Jungle Relics','Haunted Manor','Gem Mines','Snowbound Pass','Moon Outpost','Return to the Manor'];
+window.pawtopiaSetPieces[21]='steps turrets tower traps bridge tower';
+window.pawtopiaSetPieces[22]='pogo blocks pogo ice pogo steps';
+
+// Each row is a complete course. Heights and widths are authored per chapter.
+// A platform tuple is [x, y, width, optional surface].
+const remainingPawcadeRoutes = {
+  5:[
+    ['Forest Rescue','glide',[[0,326,530],[590,278,250],[920,206,240],[1250,261,340],[1660,326,540]]],
+    ['Castle Banquet','lifts',[[0,326,2200],[310,245,220],[630,196,245,'lift'],[1030,229,280],[1530,190,320]]],
+    ['Ocean Laboratory','current',[[0,326,2200],[280,271,380,'current'],[740,212,250],[1080,155,310],[1490,236,320,'current']]],
+    ['Warrior Ridge','tower',[[0,326,390],[450,285,220],[740,235,205],[1020,190,280],[1370,248,275],[1710,326,490]]],
+    ['Dark Summit','ice',[[0,326,490,'ice'],[550,282,300,'ice'],[925,220,320],[1320,262,320,'ice'],[1710,326,490]]],
+    ['Musical Escape','spring',[[0,326,2200],[370,283,150,'spring'],[740,283,90,'hazard'],[1140,250,220,'spring'],[1650,283,110,'hazard']]]
+  ],
+  6:[
+    ['Spring Breeze','float',[[0,326,660],[700,272,290],[1050,221,280],[1400,278,300],[1750,326,450]]],
+    ['Footrace Ridge','speed',[[0,326,2200],[310,276,350,'belt'],[780,213,400],[1360,258,370,'belt']]],
+    ['Cavern Treasure','blocks',[[0,326,2200],[290,244,210],[615,193,300],[1040,230,380],[1540,179,390]]],
+    ['Airship Revenge','turrets',[[0,326,450],[520,283,260],[850,224,290],[1220,262,290],[1600,326,600]]],
+    ['Starlight World','glide',[[0,326,395],[460,265,270],[810,191,275],[1180,149,290],[1540,234,310],[1910,326,290]]],
+    ['Lantern Arena','dodge',[[0,326,2200],[580,239,140],[1060,190,155],[1650,239,150]]]
+  ],
+  7:[
+    ['Transporter Deck','ceiling',[[0,326,580],[835,326,570],[1690,326,510],[580,95,255,'ceiling'],[1405,95,285,'ceiling']]],
+    ['Laboratory Shaft','ceiling',[[0,326,415],[670,326,415],[1400,326,330],[1940,326,260],[415,120,255,'ceiling'],[1085,92,315,'ceiling'],[1730,124,210,'ceiling']]],
+    ['Warp Grid','bridge',[[0,326,430],[740,326,470],[1540,326,660],[430,105,310,'ceiling'],[1210,85,330,'ceiling']]],
+    ['Intermission Rails','ceiling',[[0,326,520],[735,326,355],[1360,326,445],[2010,326,190],[520,88,215,'ceiling'],[1090,102,270,'ceiling'],[1805,115,205,'ceiling']]],
+    ['Tower Interior','tower',[[0,326,570],[820,326,440],[1570,326,630],[570,130,250,'ceiling'],[1260,110,310,'ceiling']]],
+    ['Final Flip','ceiling',[[0,326,470],[730,326,310],[1320,326,290],[1910,326,290],[470,92,260,'ceiling'],[1040,130,280,'ceiling'],[1610,84,300,'ceiling']]]
+  ],
+  8:[
+    ['Stereo Steps','spikes',[[0,326,2200],[440,286,45,'hazard'],[755,286,65,'hazard'],[1080,286,75,'hazard'],[1470,286,48,'hazard']]],
+    ['Backbeat Blocks','steps',[[0,326,2200],[450,266,130],[760,286,70,'hazard'],[1230,265,140],[1690,286,95,'hazard']]],
+    ['Polarity Pulse','spikes',[[0,326,2200],[470,286,80,'hazard'],[820,286,52,'hazard'],[1280,286,110,'hazard'],[1740,286,60,'hazard']]],
+    ['Dry Circuit','spring',[[0,326,2200],[415,280,150,'spring'],[810,286,95,'hazard'],[1340,269,170,'spring'],[1760,286,70,'hazard']]],
+    ['Bassline Flight','steps',[[0,326,2200],[390,269,170],[790,286,110,'hazard'],[1200,259,205],[1720,286,115,'hazard']]],
+    ['Final Beat','spikes',[[0,326,2200],[475,286,100,'hazard'],[875,286,75,'hazard'],[1375,286,105,'hazard'],[1820,286,95,'hazard']]]
+  ],
+  9:[
+    ['Landing Gantry','cable',[[0,326,430],[520,288,250],[900,241,310],[1360,263,310],[1810,326,390],[520,125,160,'rail']]],
+    ['Industrial Base','turrets',[[0,326,2200],[410,252,260],[890,193,245],[1450,244,360],[740,116,180,'rail']]],
+    ['Canopy Wires','cable',[[0,326,405],[530,276,245],[920,228,250],[1310,188,265],[1740,326,460],[910,108,185,'rail']]],
+    ['Lift Shaft','lifts',[[0,326,475],[555,282,210,'lift'],[865,230,250,'lift'],[1230,174,290],[1640,260,270],[1990,326,210]]],
+    ['Quarry Defenses','cable',[[0,326,2200],[365,245,240],[800,207,250],[1300,237,360],[660,105,180,'rail']]],
+    ['Rescue Gantries','cable',[[0,326,420],[520,277,210],[890,225,280],[1320,175,310],[1760,326,440],[460,130,160,'rail']]]
+  ],
+  10:[
+    ['Windmill Village','ring',[[0,326,550],[625,274,245],[945,224,250],[1280,275,310],[1670,326,530]]],
+    ['Tree Village','glide',[[0,326,450],[530,261,235],[860,196,280],[1230,148,300],[1620,253,310],[1990,326,210]]],
+    ['Sunken Palace','ring',[[0,326,2200],[410,235,280],[840,184,260],[1260,232,250],[1710,200,255]]],
+    ['Wind Kingdom Ruins','tower',[[0,326,500],[565,279,220],[850,229,240],[1160,177,280],[1530,241,265],[1860,326,340]]],
+    ['Dream Foundry','ring',[[0,326,2200],[365,269,270,'belt'],[795,216,315],[1280,177,270],[1710,258,265,'belt']]],
+    ['Moonlit Windmill','glide',[[0,326,425],[505,271,225],[810,209,260],[1160,160,320],[1550,230,320],[1930,326,270]]]
+  ],
+  12:[
+    ['Plains Approach','pogo',[[0,326,510],[575,291,245,'pogo'],[890,246,290],[1240,278,285],[1600,326,600]]],
+    ['Sunken Treasure','bridge',[[0,326,2200],[345,258,240,'current'],[755,218,250],[1240,260,280,'current'],[1650,197,270]]],
+    ['Lava Yard','pogo',[[0,326,410],[485,283,205,'pogo'],[780,226,260],[1130,271,240,'pogo'],[1460,225,285],[1810,326,390]]],
+    ['Clockwork Tower','tower',[[0,326,520],[575,279,195,'belt'],[855,225,210],[1150,176,290],[1530,240,300,'belt'],[1900,326,300]]],
+    ['Airship Deck','spikes',[[0,326,2200],[400,258,230],[845,219,290],[1260,286,88,'hazard'],[1630,235,310]]],
+    ['Storm Relay','pogo',[[0,326,430],[505,275,235,'pogo'],[825,219,240],[1150,172,290],[1520,248,300],[1900,326,300]]]
+  ],
+  15:[
+    ['Spirit Glade','vines',[[0,326,530],[600,278,240],[910,215,290],[1280,167,310],[1680,326,520]]],
+    ['Water Vein','bash',[[0,326,2200],[370,252,205],[725,202,265],[1150,150,255],[1570,228,310]]],
+    ['Flood Escape','tower',[[0,326,390],[455,282,205],[745,220,215],[1050,158,285],[1420,232,285],[1790,326,410]]],
+    ['Wind Valley','glide',[[0,326,450],[530,276,250],[850,211,260],[1220,158,280],[1580,234,310],[1950,326,250]]],
+    ['Frozen Ruins','ice',[[0,326,550,'ice'],[610,284,250,'ice'],[940,232,280],[1310,263,320,'ice'],[1720,326,480]]],
+    ['Firebreak Ascent','bash',[[0,326,480],[555,285,200],[835,231,245],[1160,174,290],[1540,237,295],[1900,326,300]]]
+  ],
+  16:[
+    ['Root Cellar','turrets',[[0,326,2200],[570,251,180],[1080,209,195],[1620,251,190]]],
+    ['Boiler Frogs','dodge',[[0,326,2200],[340,278,185],[770,229,210],[1270,250,225],[1710,283,165]]],
+    ['Garden Machinery','dodge',[[0,326,2200],[370,249,155],[785,199,180],[1235,245,170],[1660,194,170]]],
+    ['Carnival Track','speed',[[0,326,2200],[410,275,340,'belt'],[880,209,300],[1380,249,400,'belt']]],
+    ['Junkyard Press','turrets',[[0,326,2200],[470,245,230],[925,205,200],[1400,239,290],[1835,286,58,'hazard']]],
+    ['Boiler Breaker','dodge',[[0,326,2200],[460,250,170],[930,207,220],[1450,251,180],[1780,211,205]]]
+  ],
+  17:[
+    ['Market Rooftops','steps',[[0,326,520],[575,284,265],[910,230,260],[1240,277,310],[1640,326,560]]],
+    ['Palace Dungeon','traps',[[0,326,2200],[450,286,70,'hazard'],[790,232,250],[1230,286,65,'hazard'],[1650,205,275]]],
+    ['Cave Approach','bridge',[[0,326,435],[505,280,255],[840,226,290],[1200,264,310],[1590,326,610]]],
+    ['Lava Flight','spring',[[0,326,390],[460,285,220,'spring'],[770,215,235],[1100,165,270],[1450,239,290],[1820,326,380]]],
+    ['Lantern Interior','lifts',[[0,326,2200],[345,263,240,'lift'],[720,202,260],[1160,152,285],[1630,240,310]]],
+    ['Frozen Palace','ice',[[0,326,485,'ice'],[555,282,285,'ice'],[915,229,270],[1255,260,325,'ice'],[1660,326,540]]]
+  ],
+  18:[
+    ['Prison Steps','traps',[[0,326,500],[550,283,240],[850,250,290],[1200,280,270],[1550,326,650],[1745,286,52,'hazard']]],
+    ['Guard Corridor','steps',[[0,326,2200],[375,255,200],[740,213,230],[1180,252,260],[1680,205,230]]],
+    ['Collapsing Hall','bridge',[[0,326,425],[485,290,205,'drop'],[745,250,240,'drop'],[1040,218,235],[1340,258,285,'drop'],[1700,326,500]]],
+    ['Blade Gallery','traps',[[0,326,2200],[460,285,60,'hazard'],[815,237,235],[1240,286,60,'hazard'],[1670,218,275]]],
+    ['Mirror Passage','tower',[[0,326,510],[570,280,210],[845,228,230],[1150,177,290],[1510,239,310],[1890,326,310]]],
+    ['Palace Bridge','steps',[[0,326,415],[475,286,235],[770,247,230],[1060,210,270],[1390,251,300],[1760,326,440]]]
+  ],
+  19:[
+    ['Street Insertion','turrets',[[0,326,2200],[335,264,200],[725,216,230],[1190,251,240],[1670,200,260]]],
+    ['Perimeter Sweep','dodge',[[0,326,2200],[500,250,170],[925,205,190],[1410,254,260],[1840,286,60,'hazard']]],
+    ['Carrier Climb','tower',[[0,326,480],[555,283,210],[840,228,230],[1150,177,275],[1510,242,310],[1900,326,300]]],
+    ['Highway Convoy','bridge',[[0,326,520],[575,289,250,'belt'],[880,246,265],[1210,282,305,'belt'],[1580,326,620]]],
+    ['Alien Junction','dodge',[[0,326,2200],[380,243,215],[795,195,260],[1270,240,285],[1760,209,255]]],
+    ['Dock Core','turrets',[[0,326,2200],[475,259,180],[875,215,230],[1320,259,240],[1760,218,205]]]
+  ],
+  20:[
+    ['Lobby Sprint','speed',[[0,326,2200],[355,273,365,'belt'],[840,223,420],[1420,259,410,'belt']]],
+    ['Dungeon Heat','blocks',[[0,326,505],[555,291,280],[905,239,285],[1250,278,320],[1650,326,550]]],
+    ['Western Run','speed',[[0,326,2200],[280,270,345,'belt'],[760,211,330],[1310,258,500,'belt']]],
+    ['Haunted Circuit','spring',[[0,326,2200],[380,276,180,'spring'],[710,217,315],[1170,268,230,'spring'],[1610,208,330]]],
+    ['Factory Dash','speed',[[0,326,620],[670,326,1530],[385,264,370,'belt'],[865,214,360,'belt'],[1420,260,490,'belt']]],
+    ['Tower Reset','bridge',[[0,326,2200],[450,253,260],[850,207,300],[1310,252,320],[1770,221,240]]]
+  ],
+  23:[
+    ['Grass Patch','yarn',[[0,326,560],[620,284,290],[980,242,295],[1345,274,300],[1720,326,480]]],
+    ['Stitched Desert','spring',[[0,326,450],[520,282,230,'spring'],[825,215,260],[1170,263,285],[1530,222,290],[1880,326,320]]],
+    ['Threaded Treats','yarn',[[0,326,2200],[330,253,220],[740,192,290],[1220,239,300],[1690,191,305]]],
+    ['Felt Ocean','vines',[[0,326,2200],[370,275,250,'current'],[780,225,280],[1230,169,280],[1680,245,310,'current']]],
+    ['Snowy Seams','ice',[[0,326,525,'ice'],[585,281,270,'ice'],[930,220,285],[1300,259,310,'ice'],[1700,326,500]]],
+    ['Patchwork Orbit','yarn',[[0,326,450],[520,268,240],[850,207,250],[1180,156,290],[1550,225,300],[1930,326,270]]]
+  ],
+  24:[
+    ['Outpost Landing','turrets',[[0,326,2200],[390,262,205],[770,210,280],[1230,256,280],[1720,200,250]]],
+    ['Mountain Convoy','lifts',[[0,326,495],[555,281,240,'lift'],[875,228,260],[1210,184,290],[1580,251,290],[1940,326,260]]],
+    ['River Crossing','bridge',[[0,326,450],[510,286,270],[850,235,260],[1180,273,270],[1520,226,280],[1870,326,330]]],
+    ['City Siege','turrets',[[0,326,2200],[315,245,275],[735,195,285],[1190,250,290],[1680,206,260]]],
+    ['Factory Assault','dodge',[[0,326,600],[660,326,1540],[390,254,330,'belt'],[880,215,280],[1380,258,350,'belt']]],
+    ['Cargo Stronghold','tower',[[0,326,2200],[460,249,220],[820,201,270],[1240,155,285],[1670,235,320]]]
+  ]
+};
+for (const [index, stages] of Object.entries(remainingPawcadeRoutes)) {
+  const keys = stages.map(([, , platforms], stage) => {
+    const key = 'course' + index + 'Stage' + (stage + 1);
+    window.pawtopiaRooms[key] = platforms;
+    return key;
+  });
+  window.pawtopiaRoomPlans[index] = keys.join(' ');
+  window.pawtopiaChapters[index] = stages.map(([title]) => title);
+  window.pawtopiaSetPieces[index] = stages.map(([, feature]) => feature).join(' ');
+}
