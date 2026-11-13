@@ -1117,6 +1117,17 @@
     }
     ctx.restore();
   }
+  function drawLandingEdge({x,y,w}) {
+    const rim=courseMaterials[index][2];
+    // Two tones keep the landing line visible against both bright and dark scenery.
+    ctx.fillStyle='#10101d';
+    ctx.fillRect(x-1,y-2,w+2,8);
+    ctx.fillStyle=rim;
+    ctx.fillRect(x,y,w,3);
+    ctx.fillStyle='#fff6dd';
+    ctx.fillRect(x,y,Math.min(7,w),3);
+    ctx.fillRect(x+Math.max(0,w-7),y,Math.min(7,w),3);
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -1156,14 +1167,19 @@
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
       if(index===1 && ledge.kind==='floor' && !ledge.switchBridge){
         drawLibraryPlatform(ledge);
+        drawLandingEdge(ledge);
         continue;
       }
       if(ledge.kind==='floor' && !ledge.switchBridge){
         drawCoursePlatform(ledge);
+        drawLandingEdge(ledge);
         continue;
       }
       if(index===3 && Math.floor(ledge.x/sectionSize)===3 && ledge.kind==='spring' &&
-         atlasSprite(propArt,4,2,ledge.x+ledge.w/2,ledge.y+14,ledge.w,28,false,2)) continue;
+         atlasSprite(propArt,4,2,ledge.x+ledge.w/2,ledge.y+14,ledge.w,28,false,2)) {
+        drawLandingEdge(ledge);
+        continue;
+      }
       if(index===9 && ledge.kind==='rail' &&
          atlasSprite(propArt,4,3,ledge.x+ledge.w/2,ledge.y+10,42,39,false,2)) {
         ctx.fillStyle='#aab7c6';ctx.fillRect(ledge.x,ledge.y,ledge.w,4);
@@ -1201,8 +1217,7 @@
           atlasSprite(image,4,cell,ledge.x+(part+.5)*tileWidth,ledge.y+depth*.5,tileWidth,depth,false,rows);
         }
         if(ledge.kind!=='hazard' && ledge.kind!=='rail' && ledge.kind!=='ceiling') {
-          ctx.fillStyle=atmosphere[0]+'66';
-          ctx.fillRect(ledge.x,ledge.y,ledge.w,1);
+          if(ledge.dropAt===undefined) drawLandingEdge(ledge);
         }
         continue;
       }
@@ -1222,8 +1237,7 @@
       gradient.addColorStop(0,ledgeColors[ledge.kind]);gradient.addColorStop(1,'#0c1220');
       ctx.fillStyle=gradient;
       ctx.fillRect(ledge.x,ledge.y,ledge.w,ledge.kind==='hazard'?43:ledge.kind==='floor'?65:18);
-      ctx.fillStyle='#ffffff73';
-      ctx.fillRect(ledge.x,ledge.y,ledge.w,3);
+      if(ledge.kind!=='rail' && ledge.kind!=='ceiling' && ledge.dropAt===undefined) drawLandingEdge(ledge);
       if (ledge.kind==='belt' || ledge.kind==='spring' || ledge.kind==='lift') {
         ctx.fillStyle='#ffffff4d';
         for(let x=ledge.x+9;x<ledge.x+ledge.w-7;x+=20) ctx.fillRect(x,ledge.y+8,7,3);
