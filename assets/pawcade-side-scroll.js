@@ -1227,7 +1227,11 @@
       [1,5,6,11,16,19]  // starship cargo: modular hulls
     ];
     const family=platformFamilies[index] || platformFamilies[0];
-    const model=family[((Math.floor(x/117)*3+stage*7)%family.length+family.length)%family.length];
+    // Individual games have different construction cadence, not merely colors.
+    const gamePitch=[113,89,137,73,131,109,127,83,61,149,107,97,101,139,79,151,67,103,157,71,59,163,137,127,73][index];
+    const placement=Math.floor(x/gamePitch);
+    const kindOffset=({floor:0,drop:1,barrel:2,pogo:3,ice:4,rail:5,shelf:6,spring:7,belt:8,lift:9,current:10,ceiling:11})[kind]||0;
+    const model=family[((placement*(index%4+1)+stage*(index%5+2)+kindOffset)%family.length+family.length)%family.length];
     const [face,recess,rim]=courseMaterials[index];
     const faceDepth=Math.min(depth,kind==='floor'?62:29);
     const pitch=24+(model%5)*9;
