@@ -307,7 +307,9 @@
     const pieces = window.pawtopiaRooms[room];
     for (const [slot, [x, y, w, kind = 'floor']] of pieces.entries()) {
       platforms.push({x:start+x,y,w,kind});
-      if (['hazard','rail','ceiling'].includes(kind)) continue;
+      // Decorative, dangerous, temporary and overhead surfaces are not
+      // safe enemy spawn locations. Keep encounters on stable walkable ledges.
+      if (['hazard','rail','ceiling','ceilingSpikes','current','drop'].includes(kind) || w<65) continue;
       if (x>150 || w>850) {
         // Stage-specific encounter density: later chapters add one
         // opponent only on sufficiently broad, walkable platforms.
