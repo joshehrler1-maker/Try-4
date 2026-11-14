@@ -618,3 +618,13 @@ for (const [room, slot, x, y, width] of [
 ]) {
   window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
 }
+
+Object.assign(window.pawtopiaRooms, {
+  forgeSwitchbacks: [[0,326,390],[445,290,180],[690,247,165],[930,210,210],
+    [1195,268,215],[1480,305,280],[1815,326,385]],
+  forgeFloodplain: [[0,326,420],[470,285,210],[735,252,180,'lift'],
+    [975,286,220],[1260,233,185],[1510,290,255],[1820,326,380]]
+});
+window.pawtopiaRoomPlans[0] += ' forgeSwitchbacks forgeFloodplain';
+window.pawtopiaChapters[0].push('Smelter Switchbacks','Floodgate Crossing');
+window.pawtopiaSetPieces[0] += ' steps lifts';
