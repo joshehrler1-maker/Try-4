@@ -6229,14 +6229,9 @@
   // Unlike detached motion badges, paws and arms remain connected to the foe.
   function drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,stride,attackPose){
     const dir=faceLeft?-1:1;
-    // Distinct stride timing for every adventure, keeping step phase driven
-    // by distance traveled rather than elapsed wall-clock time.
-    const worldStrideRates=[
-      .86,.69,.58,1.02,.91,.62,.78,1.08,1.19,.73,
-      .64,.83,.88,.76,.67,.98,1.12,.72,1.15,.55,
-      1.27,.81,.70,.61,.94
-    ];
-    const phase=(foe._gait||0)*(worldStrideRates[index]??.8);
+    // Use the existing course movement model until each game's stride
+    // timing is measured and verified against its OWN reference.
+    const phase=(foe._gait||0)*(0.8+(index%5)*.11);
     // Clamp the animation speed when the simulation skips frames. This
     // protects Android browsers from a huge limb snap after tab switching.
     // Plant the feet during a strike, then blend back into the world-specific
@@ -6247,15 +6242,9 @@
     const defensiveAttack=[1,7,9,14,17,22].includes(index);
     const rushingAttack=[0,3,8,15,20].includes(index);
     const swimmingAttack=[2,19].includes(index);
-    // Authored separately for all 25 adventures, from Foundry clamp-lunges
-    // to Starship grapple snaps. Each value controls the amount of planted
-    // stance during an attack, without changing gameplay collision or damage.
-    const worldAttackPlant=[
-      .32,.88,.10,.43,.57,.18,.28,.82,.35,.91,
-      .22,.66,.50,.73,.84,.38,.76,.86,.31,.12,
-      .26,.90,.78,.19,.58
-    ];
-    const plantStrength=worldAttackPlant[index]??(swimmingAttack?.12:defensiveAttack?.85:rushingAttack?.38:.6);
+    // Use the existing locomotion family until the corresponding game's
+    // reference attack is reviewed; never invent 25 counterpart timings.
+    const plantStrength=swimmingAttack?.12:defensiveAttack?.85:rushingAttack?.38:.6;
     const attackPlant=Math.min(.85,Math.max(0,attackPose||0)*plantStrength);
     const gaitBlend=Math.min(1,Math.max(0,stride||0))*(1-attackPlant);
     // Smooth attack-driven gait suppression across consecutive rendered frames.
