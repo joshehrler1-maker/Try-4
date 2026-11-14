@@ -176,7 +176,11 @@
   if (power==='swim') byId('touch-stick').setAttribute('aria-label','Drag in four directions to swim');
   byId('side-title').textContent = hero + ' · ' + name;
   const controlsGuide = [
-    'Keyboard: A/D or arrows to move, Space for '+(power==='flip'?'Flip':'Jump')+'.',
+    movement==='beat' ? 'Auto-run. Press Space to jump.' :
+      power==='swim' ? 'Keyboard: W/A/S/D or arrow keys to swim.' :
+      index===3 ? 'Keyboard: A/D or Left/Right to run. Hold S or Down and tap Space to charge your spin dash.' :
+      movement==='airdash' ? 'Keyboard: A/D or Left/Right to move, Space to jump, W/S or Up/Down to aim your dash.' :
+      'Keyboard: A/D or Left/Right to move, Space for '+(power==='flip'?'Flip':'Jump')+'.',
     powerButton.hidden || index===3 ? '' : powerButton.textContent+' uses X.',
     techniqueButton && !techniqueButton.hidden ? techniqueName+' uses C.' : '',
     'On touch, use the joystick and the labeled buttons.'
