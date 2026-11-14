@@ -4567,7 +4567,10 @@
   function drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,stride,attackPose){
     const dir=faceLeft?-1:1;
     const phase=(foe._gait||0)*(0.8+(index%5)*.11);
-    const swing=reducedMotion?0:Math.sin(phase)*Math.min(1,stride);
+    // Clamp the animation speed when the simulation skips frames. This
+    // protects Android browsers from a huge limb snap after tab switching.
+    const gaitBlend=Math.min(1,Math.max(0,stride||0));
+    const swing=reducedMotion?0:Math.sin(phase)*gaitBlend;
     const reach=reducedMotion?0:attackPose;
     // Individual game families get different windup and recoil timing.
     // Keep the pose attached to the existing foe sprite, not a floating cue.
