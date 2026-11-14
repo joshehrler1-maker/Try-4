@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>3)return;
-    const spacing=[230,188,205,178][index];
-    const shift=camera*([.22,.16,.19,.27][index]);
+    if(index<0 || index>5)return;
+    const spacing=[230,188,205,178,226,196][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -1669,6 +1669,52 @@
         ctx.stroke();
         ctx.fillStyle='#d6b67a';
         ctx.beginPath();ctx.arc(cx,cy,3,0,Math.PI*2);ctx.fill();
+      }else if(index===4){
+        // Seed Garden: broad trunks, branching boughs, and layered seed pods.
+        const trunkX=x+95, crownY=123+variation*10;
+        ctx.fillStyle='#38513e';
+        ctx.beginPath();ctx.moveTo(trunkX-13,292);ctx.lineTo(trunkX-9,crownY+22);
+        ctx.lineTo(trunkX+10,crownY+22);ctx.lineTo(trunkX+17,292);ctx.closePath();ctx.fill();
+        ctx.strokeStyle='#476c4b';ctx.lineWidth=9;ctx.lineCap='round';
+        for(let b=0;b<3;b++){
+          const side=b%2?-1:1;
+          ctx.beginPath();ctx.moveTo(trunkX,crownY+78-b*18);
+          ctx.quadraticCurveTo(trunkX+side*31,crownY+24-b*12,trunkX+side*(43+b*5),crownY+18-b*11);
+          ctx.stroke();
+        }
+        for(let leaf=0;leaf<8;leaf++){
+          const a=leaf*Math.PI*.75;
+          const lx=trunkX+Math.cos(a)*(32+leaf%3*8);
+          const ly=crownY+Math.sin(a)*24;
+          ctx.fillStyle=leaf%2?'#6eac6a':'#8bc279';
+          ctx.globalAlpha=.8;
+          ctx.beginPath();ctx.ellipse(lx,ly,23,13,a*.4,0,Math.PI*2);ctx.fill();
+        }
+        ctx.globalAlpha=1;
+        ctx.fillStyle='#e7bd75';
+        for(let seed=0;seed<3;seed++){
+          ctx.beginPath();ctx.ellipse(trunkX-23+seed*22,crownY+22+seed%2*9,3,5,.3,0,Math.PI*2);ctx.fill();
+        }
+      }else if(index===5){
+        // Waterfall Climb: terraced stone cliffs and luminous falling water.
+        const cliffTop=95+variation*19;
+        ctx.fillStyle='#344c64';
+        ctx.beginPath();ctx.moveTo(x+17,293);ctx.lineTo(x+17,cliffTop+26);
+        ctx.lineTo(x+42,cliffTop+26);ctx.lineTo(x+42,cliffTop);
+        ctx.lineTo(x+135,cliffTop);ctx.lineTo(x+135,293);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#5a7284';
+        for(let ledge=0;ledge<3;ledge++)ctx.fillRect(x+28,cliffTop+21+ledge*37,90,5);
+        ctx.fillStyle='#a6e8f3';ctx.globalAlpha=.72;
+        const streamX=x+70+variation*4;
+        ctx.fillRect(streamX,cliffTop+4,19,289-cliffTop);
+        ctx.fillStyle='#e3fcff';ctx.globalAlpha=.65;
+        for(let streak=0;streak<5;streak++){
+          const sy=cliffTop+17+streak*39;
+          ctx.fillRect(streamX+3+(streak%3)*5,sy,2,21);
+        }
+        ctx.globalAlpha=.45;
+        ctx.beginPath();ctx.ellipse(streamX+9,287,29,7,0,0,Math.PI*2);ctx.fill();
+        ctx.globalAlpha=1;
       }
     }
     ctx.restore();
