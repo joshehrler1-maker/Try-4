@@ -1171,7 +1171,7 @@
     }
     if (anchor) {
           player.cable={x:anchor.x,y:anchor.y,length:anchor.distance,maxLength:Math.max(240,anchor.distance)};
-          player.vx+=player.facing*130;
+          player.vx+=Math.sign(anchor.x-player.x)*130;
           playCue(180,620,.14);
     }
     if (power === 'throw' || power === 'pulse' || power === 'photo') {
@@ -1224,7 +1224,7 @@
     if (fire && phase==='playing') {
       playCue(charged?610:420,charged?160:245,charged?.21:.09);
       attacks.push({
-      x:player.x,y:player.y,v:player.facing*(charged?850:680),life:.85,radius:charged?22:8,damage:charged?2:1,blasterShot:true
+      x:player.x,y:player.y,v:((Number(held('right'))-Number(held('left')))||player.facing)*(charged?850:680),life:.85,radius:charged?22:8,damage:charged?2:1,blasterShot:true
       });
     }
   }
@@ -1268,7 +1268,7 @@
           status('Sonar revealed a hidden crystal trail. Follow it upward.');
         }
         break;
-      case 'launch': if(p.on){p.vy=-strength;p.vx=p.facing*350;p.grapple=.26;p.on=false;p.coyote=0;}break;
+      case 'launch': if(p.on){p.vy=-strength;p.vx=facing*350;p.grapple=.26;p.on=false;p.coyote=0;}break;
       case 'pull':
       case 'capture': {
         if(p.carry){shot({v:facing*550,damage:2});p.carry=false;break;}
@@ -1350,7 +1350,7 @@
     }
     const after=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,p.ledgeGrip,p.pogo,attacks.length];
     if(activated || technique==='reveal' || after.some((value,i)=>value!==before[i])){
-      signatureEffect={x:player.x,y:player.y,facing:player.facing,at:clock};
+      signatureEffect={x:player.x,y:player.y,facing,at:clock};
       if(technique==='parry' || technique==='reveal') playCue(520,1020,.16);
       else if(technique==='drop' || technique==='retry') playCue(325,96,.17);
       else playCue(240,510,.13);
