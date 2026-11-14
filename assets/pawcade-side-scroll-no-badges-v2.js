@@ -375,6 +375,33 @@
       }
       if(x>0) crystals.push({x:start+x+w*.58,y:y-35});
     }
+    // Optional elevated routes above long, safe ground runs. Each game uses
+    // its own width, cadence and elevation profile, inspired by its traversal
+    // identity rather than copied level geometry. These are real collidable
+    // platforms, not decorative overlays; keep the original main path intact.
+    const routeWidths=[125,165,190,220,135,155,145,110,95,180,165,115,150,140,175,125,185,155,120,200,235,145,130,150,195];
+    const routeHeights=[76,100,92,68,88,108,85,115,62,110,94,122,83,90,112,118,78,95,108,102,65,105,87,100,90];
+    const longGround=pieces.filter(([rx,ry,rw,rk='floor'])=>
+      rk==='floor' && ry>=310 && rw>=560);
+    for(const [rx,ry,rw] of longGround){
+      const routeCount=rw>=1250?3:rw>=850?2:1;
+      for(let route=0;route<routeCount;route++){
+        const routeW=routeWidths[index]+((stage+route)%3-1)*12;
+        const localX=rx+Math.round(rw*(route+1)/(routeCount+1)-routeW*.5);
+        const routeY=ry-routeHeights[index]-((stage+route)%3)*17;
+        if(localX<rx+185 || localX+routeW>rx+rw-95) continue;
+        const worldX=start+localX;
+        // Do not block authored upper routes, hazards, or moving platforms.
+        const overlaps=platforms.some(ledge=>
+          ledge.x<worldX+routeW+24 && ledge.x+ledge.w>worldX-24 &&
+          Math.abs(ledge.y-routeY)<57);
+        if(!overlaps){
+          platforms.push({x:worldX,y:routeY,w:routeW,kind:'floor',
+            optionalRoute:true});
+          crystals.push({x:worldX+routeW*.5,y:routeY-35});
+        }
+      }
+    }
     if(index===0){
       const remaining=stageWidths[stage]-2170;
       const gap=stage%3===0?52:64;
