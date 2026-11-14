@@ -93,3 +93,21 @@ test('all 25 games provide bounded enemy reaction distance', () => {
     'reaction distances must provide a safe, bounded approach corridor');
   assert.ok(new Set(distances).size >= 8, 'enemy spacing must reflect different counterpart mechanics');
 });
+
+
+test('counterpart-inspired enemy motion profiles cover all games without invalid physics', () => {
+  const runtime = fs.readFileSync(path.join(__dirname, '../assets/pawcade-side-scroll-no-badges-v2.js'), 'utf8');
+  const match = runtime.match(/const enemyProfiles\s*=\s*(\[[\s\S]*?\]);/);
+  assert.ok(match, 'missing per-game enemy motion profiles');
+  const profiles = vm.runInNewContext(match[1], {}, {timeout:1000});
+  assert.equal(profiles.length, count, 'enemy motion must be configured for all games');
+  for (let i = 0; i < count; i++) {
+    const [tempo, reach, rise] = profiles[i];
+    assert.equal(profiles[i].length, 3, 'malformed enemy profile in game ' + i);
+    assert.ok(Number.isFinite(tempo) && tempo > 0 && tempo <= 2, 'invalid enemy tempo in game ' + i);
+    assert.ok(Number.isFinite(reach) && reach >= 0 && reach <= 200, 'invalid enemy reach in game ' + i);
+    assert.ok(Number.isFinite(rise) && rise >= 0 && rise <= 100, 'invalid enemy rise in game ' + i);
+  }
+  assert.ok(new Set(profiles.map(row => row.join(','))).size >= 20,
+    'enemy movement profiles must retain substantial game-to-game variety');
+});
