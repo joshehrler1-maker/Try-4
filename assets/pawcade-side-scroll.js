@@ -1671,6 +1671,31 @@
       }
     }
     ctx.restore();
+    // A narrow bevel and inset underside add a readable 2.5D profile
+    // without painting over the actual collision surface. Limit drawing
+    // to the viewport to keep long levels inexpensive on Android.
+    const bevelDepth=Math.min(12,Math.max(5,topDepth+3));
+    const bevelStart=Math.max(x,camera-8);
+    const bevelEnd=Math.min(x+w,camera+width+8);
+    if(bevelEnd>bevelStart){
+      const edgeShade=ctx.createLinearGradient(0,y+3,0,y+bevelDepth);
+      edgeShade.addColorStop(0,'rgba(0,0,0,.08)');
+      edgeShade.addColorStop(.5,'rgba(0,0,0,.32)');
+      edgeShade.addColorStop(1,'rgba(0,0,0,.48)');
+      ctx.fillStyle=edgeShade;
+      ctx.fillRect(bevelStart,y+3,bevelEnd-bevelStart,bevelDepth-3);
+      ctx.save();
+      ctx.globalAlpha=.46;
+      ctx.strokeStyle=rim;ctx.lineWidth=1;
+      const seamSpacing=44+(index%5)*7;
+      const firstSeam=Math.ceil((bevelStart-x)/seamSpacing);
+      const lastSeam=Math.floor((bevelEnd-x)/seamSpacing);
+      for(let seam=firstSeam;seam<=lastSeam;seam++){
+        const sx=x+seam*seamSpacing;
+        ctx.beginPath();ctx.moveTo(sx,y+4);ctx.lineTo(sx,y+bevelDepth-1);ctx.stroke();
+      }
+      ctx.restore();
+    }
     ctx.fillStyle='#fff6dd';
     ctx.fillRect(x,y,Math.min(7,w),3);
     ctx.fillRect(x+Math.max(0,w-7),y,Math.min(7,w),3);
