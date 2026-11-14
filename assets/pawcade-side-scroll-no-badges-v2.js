@@ -1294,6 +1294,9 @@
           p.parryFlash={x:target.x,y:target.y,time:clock};
           activated=true;
           p.vy=-470;
+          p.jumpBuffer=0;
+          p.coyote=0;
+          p.jumpCut=false;
           p.grace=Math.max(p.grace,.35);
           if(!reducedMotion) burst(target.x,target.y,'#ff86dc',10);
         }
