@@ -747,7 +747,10 @@
         climb:{width:102,gap:140,heights:[287,244,197]}
       };
       const islandProfile=islandProfiles[islandFamilies[index]];
-      const islandX=start+Math.min(sectionSize-650,780+((index*11+stage*19)%5)*38);
+      const islandSpan=islandProfile.gap*2+islandProfile.width+12;
+      const islandX=start+Math.max(180,Math.min(
+        stageWidths[stage]-islandSpan-95,
+        780+((index*11+stage*19)%5)*38));
       for(let island=0;island<3;island++){
         const iw=islandProfile.width+(island===1?12:0);
         const ix=islandX+island*islandProfile.gap;
