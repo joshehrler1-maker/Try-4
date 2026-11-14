@@ -2693,6 +2693,17 @@
         ctx.lineTo(side*6,5);ctx.closePath();ctx.fill();ctx.stroke();
         ctx.restore();
       }
+      // Furnace Crab: a visible forward-facing sensor and leading foot
+      // distinguish its travel direction from its symmetrical pincers.
+      // The entire crab is already mirrored by faceLeft above.
+      ctx.save();
+      ctx.fillStyle='#fff5ca';ctx.strokeStyle='#593443';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.ellipse(10,-12,5,4,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#28243c';ctx.beginPath();ctx.arc(12,-12,2,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#ffb66b';ctx.lineWidth=3;ctx.lineCap='round';
+      const step=reducedMotion?0:Math.sin(gait)*3;
+      ctx.beginPath();ctx.moveTo(9,8);ctx.lineTo(14+step,13);ctx.lineTo(20+step,14);
+      ctx.stroke();ctx.restore();
       const chest=ctx.createLinearGradient(-12,-7,12,10);
       chest.addColorStop(0,'#fff1bc');chest.addColorStop(.5,'#c66e53');
       chest.addColorStop(1,'#673a45');
