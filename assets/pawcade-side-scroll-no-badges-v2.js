@@ -159,6 +159,41 @@
     [545,106,170,170], // 23 Stitched Desert x507..759 spring top276
     [877, 69,170,170]  // 24 Mountain Convoy x849..1149 top239
   ];
+  // Original game-specific Stage 3 and Stage 4 painted scene props.
+  // All positions are stage-local; render offset comes from stageStarts.
+  // Not 3D hero models or animations; no additional collision geometry.
+  const thirdStageLandmarkPaths = [
+    'assets/scenes/neon-circuit/western-run-turbo-road-sign.svg',
+    'assets/scenes/marble-temple/marble-chapel-moon-window.svg',
+    'assets/scenes/swamp-ferry/gem-mines-crystal-winch.svg',
+    'assets/scenes/sunflower-flight/threaded-treats-ribbon-wheel.svg',
+    'assets/scenes/starship-cargo/river-crossing-coolant-valve.svg'
+  ];
+  const thirdStageLandmarkPositions = [
+    [775, 57,170,170], // 20 Western Run: belt+raised x743..1076 top227
+    [785, 54,170,170], // 21 Marble Chapel x775..970 top224
+    [575,106,170,170], // 22 Gem Mines x565..790 top276
+    [720, 34,170,170], // 23 Threaded Treats x683..1065 top204
+    [835, 82,170,170]  // 24 River Crossing x805..1142 top252
+  ];
+  const fourthStageLandmarkPaths = [
+    'assets/scenes/neon-circuit/haunted-circuit-ghost-mirror.svg',
+    'assets/scenes/marble-temple/inner-halls-balance-pendulum.svg',
+    'assets/scenes/swamp-ferry/snowbound-pass-ice-ferry-marker.svg',
+    'assets/scenes/sunflower-flight/felt-ocean-petal-buoy.svg',
+    'assets/scenes/starship-cargo/city-siege-defense-repeater.svg'
+  ];
+  const fourthStageLandmarkPositions = [
+    [725, 61,170,170], // 20 Haunted Circuit x682..1022 top231
+    [725, 36,170,170], // 21 Inner Halls x685..915 top206
+    [525,121,170,170], // 22 Snowbound Pass ice x483..772 top291
+    [780, 59,170,170], // 23 Felt Ocean x740..1085 top229
+    [780, 25,170,170]  // 24 City Siege x735..1020 top195
+  ];
+  const thirdStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
+  if (thirdStageLandmark) thirdStageLandmark.src = thirdStageLandmarkPaths[index - 20];
+  const fourthStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
+  if (fourthStageLandmark) fourthStageLandmark.src = fourthStageLandmarkPaths[index - 20];
   const secondStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
   if (secondStageLandmark) secondStageLandmark.src = secondStageLandmarkPaths[index - 20];
   const firstStageLandmark = index < firstStageLandmarkPaths.length ? new Image() : null;
@@ -6963,6 +6998,20 @@
       const artX = stageStarts[1] + localX;
       if (artX + artW >= camera && artX <= camera + width) {
         ctx.drawImage(secondStageLandmark, artX, artY, artW, artH);
+      }
+    }
+    if (thirdStageLandmark?.naturalWidth && sections >= 3) {
+      const [localX,artY,artW,artH] = thirdStageLandmarkPositions[index - 20];
+      const artX = stageStarts[2] + localX;
+      if (artX + artW >= camera && artX <= camera + width) {
+        ctx.drawImage(thirdStageLandmark, artX, artY, artW, artH);
+      }
+    }
+    if (fourthStageLandmark?.naturalWidth && sections >= 4) {
+      const [localX,artY,artW,artH] = fourthStageLandmarkPositions[index - 20];
+      const artX = stageStarts[3] + localX;
+      if (artX + artW >= camera && artX <= camera + width) {
+        ctx.drawImage(fourthStageLandmark, artX, artY, artW, artH);
       }
     }
     for (const wall of walls) {
