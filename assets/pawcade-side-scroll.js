@@ -1690,6 +1690,14 @@
     new Path2D('M0-5V5M-5 0H5M-4-4L4 4M-4 4L4-4M-8 5H8'), // sunflower
     new Path2D('M-8-5H8V5H-8ZM-3-5V5M3-5V5M-3 0H3'), // cargo latch
   ];
+  const platformPlaqueFrames = [
+    new Path2D('M-13-7H13V7H-13Z'),
+    new Path2D('M-15 0L-11-7H11L15 0 11 7H-11Z'),
+    new Path2D('M-14 7V-2Q-14-8 0-8Q14-8 14-2V7Z'),
+    new Path2D('M-15-5H-10V-8H10V-5H15V5H10V8H-10V5H-15Z'),
+    new Path2D('M-14-7H14L11 7H-11Z'),
+    new Path2D('M0-9L15-5V5L0 9-15 5V-5Z'),
+  ];
   function drawLandingEdge({x,y,w,kind}) {
     const rim=courseMaterials[index][2];
     // Two tones keep the landing line visible against both bright and dark scenery.
@@ -1783,10 +1791,15 @@
       ctx.lineWidth=1;
       for(let panel=first;panel<=last;panel++){
         const center=x+24+panel*spacing;
-        ctx.fillStyle='#161423';
-        ctx.fillRect(center-12,y+12,24,15);
         ctx.save();
         ctx.translate(center,y+19);
+        const stage=Math.min(platformPlaqueFrames.length-1,Math.floor(center/sectionSize));
+        const frame=platformPlaqueFrames[stage];
+        ctx.fillStyle='#161423';
+        ctx.fill(frame);
+        ctx.globalAlpha=.48;
+        ctx.stroke(frame);
+        ctx.globalAlpha=1;
         ctx.stroke(platformFaceArt[index]);
         ctx.restore();
       }
