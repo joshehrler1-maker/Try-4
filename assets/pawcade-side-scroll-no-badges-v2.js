@@ -2018,7 +2018,8 @@
         const underside=ledge.y+(ceiling?0:20);
         if((!ceiling || p.gravity<0) && p.vy<0 &&
            oldY-body>=underside && p.y-body<=underside &&
-           (!upperContact || underside>upperContact.y)){
+           (!upperContact || underside>upperContact.y ||
+            (underside===upperContact.y && ceiling))){
           upperContact={y:underside,ceiling};
         }
         if(ceiling) continue;
@@ -2035,6 +2036,8 @@
       p.jumpCut=false;
       if(upperContact.ceiling){
         p.on=true;
+        p.coyote=0;
+        p.jumpBuffer=0;
         p.jumps=0;
         p.dashUsed=false;
       }
