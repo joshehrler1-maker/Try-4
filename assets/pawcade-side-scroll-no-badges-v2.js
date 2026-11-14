@@ -4562,6 +4562,48 @@
     }
     ctx.restore();
   }
+  // Original procedural limb art, attached to the sprite's body pivot.
+  // Unlike detached motion badges, paws and arms remain connected to the foe.
+  function drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,stride,attackPose){
+    const dir=faceLeft?-1:1;
+    const phase=(foe._gait||0)*(0.8+(index%5)*.11);
+    const swing=reducedMotion?0:Math.sin(phase)*Math.min(1,stride);
+    const reach=reducedMotion?0:attackPose;
+    const mechanical=[4,12,16,20,24].includes(index);
+    const swimmer=[2,19].includes(index);
+    const radius=mechanical?5.4:4.3;
+    const outline=mechanical?'#344052':'#3d3454';
+    const armor=mechanical?'#9aaec8':swimmer?'#72c8ce':'#9476b4';
+    const paw=mechanical?'#d9bd75':swimmer?'#9fe9d4':'#d8b9a0';
+    ctx.save();
+    ctx.lineCap='round';ctx.lineJoin='round';
+    // Articulated limbs draw BEHIND existing artwork, preserving each game's
+    // distinct enemy face, armor, silhouette, and hitbox.
+    for(const side of [-1,1]){
+      const hip=at.x+side*13,shoulder=at.x+side*20;
+      const legSwing=airborne?Math.sin(clock*5+side)*5:swing*side*9;
+      const kneeX=hip+legSwing*.65;
+      const kneeY=at.y+4+(airborne?-5:Math.abs(swing)*2);
+      const footX=kneeX+legSwing*.45+dir*3;
+      const footY=at.y+18-(airborne?7:Math.max(0,side*swing)*5);
+      ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
+      ctx.beginPath();ctx.moveTo(hip,at.y-6);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
+      ctx.strokeStyle=armor;ctx.lineWidth=radius;
+      ctx.beginPath();ctx.moveTo(hip,at.y-6);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
+      ctx.fillStyle=paw;ctx.beginPath();ctx.ellipse(footX+dir*2,footY,6,3.3,0,0,Math.PI*2);ctx.fill();
+      const armSwing=airborne?Math.sin(clock*6+side)*7:-side*swing*8;
+      const elbowX=shoulder+armSwing*.6+dir*reach*7;
+      const elbowY=at.y-18+Math.abs(armSwing)*.3-reach*4;
+      const handX=elbowX+armSwing*.5+dir*reach*13;
+      const handY=at.y-6-reach*13;
+      ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
+      ctx.beginPath();ctx.moveTo(shoulder,at.y-28);ctx.lineTo(elbowX,elbowY);ctx.lineTo(handX,handY);ctx.stroke();
+      ctx.strokeStyle=armor;ctx.lineWidth=radius;
+      ctx.beginPath();ctx.moveTo(shoulder,at.y-28);ctx.lineTo(elbowX,elbowY);ctx.lineTo(handX,handY);ctx.stroke();
+      ctx.fillStyle=paw;ctx.beginPath();ctx.arc(handX,handY,radius*.9,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  }
   function drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft){
     if(reducedMotion || foe.dead) return;
     // Distinct chapter animation timing prevents late-stage enemies from
@@ -4611,19 +4653,8 @@
           4+stride*4,1.2,0,0,Math.PI*2);ctx.fill();
       }
     }
-    // Distinct secondary motion families: flicker, sweep, orbit, pulse, sparkle.
-    if(family===0){
-      ctx.beginPath();ctx.moveTo(-8,-38);ctx.quadraticCurveTo(-15+Math.sin(phase)*4,-48,-4,-54);ctx.stroke();
-    }else if(family===1){
-      ctx.beginPath();ctx.moveTo(-20,-30);ctx.quadraticCurveTo(0,-43+Math.sin(phase)*5,20,-30);ctx.stroke();
-    }else if(family===2){
-      ctx.beginPath();ctx.ellipse(0,-26,24,6+Math.sin(phase)*2,0,0,Math.PI*2);ctx.stroke();
-    }else if(family===3){
-      ctx.beginPath();ctx.arc(0,-26,19+Math.sin(phase)*2,Math.PI*1.12,Math.PI*1.88);ctx.stroke();
-    }else{
-      for(let n=0;n<3;n++){const a=phase+n*2.094;ctx.beginPath();
-        ctx.arc(Math.cos(a)*22,-27+Math.sin(a)*14,1.5,0,Math.PI*2);ctx.fill();}
-    }
+    // No detached overhead circles, arches or U-shaped motion ornaments.
+    // All new limb art is anchored directly to the enemy body.
     ctx.restore();
   }
   function drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing){
@@ -4957,6 +4988,7 @@
       ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5,
         (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression);
       ctx.translate(-at.x,-at.y-19-footstep);
+      drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing,attackPose);
       else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft,attackPose);
