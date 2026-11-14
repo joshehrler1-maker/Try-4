@@ -1007,3 +1007,33 @@ window.pawtopiaRooms.iceworks = [[0,326,435],[483,291,240,"ice"],[760,253,275,"i
 window.pawtopiaRooms.generator = [[0,326,630],[685,326,560],[1300,326,900],[397,285,85,"hazard"],[804,279,192],[1038,248,200],[1505,284,80,"hazard"],[1636,277,167],[1848,233,238]];
 window.pawtopiaRooms.minecart = [[0,326,2200],[248,278,381,"belt"],[683,233,297,"belt"],[1031,270,265],[1348,244,315,"belt"],[1717,285,305,"belt"]];
 window.pawtopiaRooms.floodgate = [[0,326,2200],[295,282,249,"current"],[590,245,218,"lift"],[858,204,257],[1168,246,250,"current"],[1471,223,244],[1768,275,288,"current"]];
+
+// Refine individual crossings while retaining each platform's behavior.
+for (const [room, slot, x, y, width] of [
+  ["forgeFloodplain",3,954,283,255],
+  ["floodgate",3,850,210,272],
+  ["coralCaves",2,625,230,449],
+  ["ruins",2,575,218,319],
+  ["seedGalley",2,832,233,315],
+  ["course5Stage3",2,705,208,322],
+  ["course6Stage3",3,974,231,455],
+  ["course7Stage3",3,294,105,575],
+  ["course8Stage3",2,862,286,63],
+  ["course9Stage3",2,884,230,305],
+  ["course10Stage3",2,790,196,301],
+  ["cloudResort",3,1118,259,306],
+  ["course12Stage3",2,745,239,309],
+  ["eggCave",3,865,205,245],
+  ["observatoryHeat",5,1778,235,293],
+  ["course15Stage3",3,1018,175,331],
+  ["course17Stage3",2,804,244,342],
+  ["course18Stage3",2,727,250,278],
+  ["course19Stage3",3,1120,197,322],
+  ["course20Stage3",1,228,279,443],
+  ["moonChapel",3,1000,189,321],
+  ["ferryMine",3,1148,266,279],
+  ["course23Stage3",2,683,204,382],
+  ["course24Stage3",2,805,252,337],
+]) {
+  window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+}
