@@ -2639,6 +2639,14 @@
     ctx.stroke();
     ctx.restore();
   }
+  function exitMarkerLabel(bossHealth,finale,taken,index) {
+    if(bossHealth) return 'DEFEAT BARON';
+    if(finale==='crystals' && taken<3) return 'CRYSTALS '+taken+'/3';
+    if(finale==='switch') return index===20?'ACTIVATE RESET':'ACTIVATE SWITCH';
+    if(finale==='sprint') return 'RUN THROUGH';
+    if(finale==='summit') return 'UPPER EXIT';
+    return index===20?'RESET':'EXIT';
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -2925,7 +2933,7 @@
       ctx.textAlign='center';
       ctx.font='bold 12px system-ui';
       ctx.fillStyle=exitLocked?'#ffbed0':'#ffe8a8';
-      ctx.fillText(exitLocked?'LOCKED':index===20?'RESET':'EXIT',exitX+12,markerY-8);
+      ctx.fillText(exitMarkerLabel(boss.health,finale,taken,index),exitX+12,markerY-8);
       ctx.restore();
     }
     for (const a of attacks) {
