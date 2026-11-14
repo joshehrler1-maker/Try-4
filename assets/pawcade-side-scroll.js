@@ -2101,8 +2101,8 @@
   // Original platform silhouettes for three distinct reference-inspired
   // worlds. All decorative elements remain outside the collision system.
   function drawSignaturePlatformArt(x,y,w,stage){
-    if(index>2 || w<70)return;
-    const interval=index===0?90:index===1?115:130;
+    if(index>5 || w<70)return;
+    const interval=[90,115,130,105,112,124][index];
     const first=Math.max(0,Math.floor((camera-x)/interval)-1);
     const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
     ctx.save();ctx.lineJoin='round';
@@ -2131,6 +2131,48 @@
         }
         ctx.strokeStyle='#e6cf9d';ctx.lineWidth=3;
         ctx.beginPath();ctx.moveTo(px-30,y+3);ctx.lineTo(px+30,y+3);ctx.stroke();
+      }else if(index===3){
+        // Clocktower Relay: speedway trusses and rotating mechanical cogs.
+        ctx.strokeStyle='#d4ad6e';ctx.lineWidth=3;ctx.fillStyle='#48536a';
+        ctx.beginPath();ctx.moveTo(px-28,y+4);ctx.lineTo(px+28,y+4);
+        ctx.lineTo(px+16,y+23);ctx.lineTo(px-16,y+23);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        ctx.save();ctx.translate(px,y+14);
+        if(!reducedMotion)ctx.rotate(clock*.45);
+        for(let tooth=0;tooth<8;tooth++){
+          ctx.rotate(Math.PI/4);ctx.fillStyle='#e0bf8d';
+          ctx.fillRect(-2,-14,4,6);
+        }
+        ctx.strokeStyle='#f4d39c';ctx.lineWidth=2;
+        ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle='#32475e';ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.fill();
+        ctx.restore();
+      }else if(index===4){
+        // Seed Garden: living root buttresses and climbing leaflets.
+        ctx.strokeStyle='#7b573c';ctx.lineWidth=5;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(px,y+4);
+        ctx.bezierCurveTo(px-8,y+14,px-20,y+13,px-22,y+29);
+        ctx.moveTo(px,y+4);ctx.bezierCurveTo(px+8,y+14,px+20,y+13,px+22,y+29);
+        ctx.stroke();
+        for(const side of [-1,1]){
+          ctx.fillStyle=side<0?'#80bc64':'#b8df72';ctx.strokeStyle='#4d8451';ctx.lineWidth=1;
+          ctx.beginPath();ctx.moveTo(px+side*10,y+16);
+          ctx.quadraticCurveTo(px+side*23,y+3,px+side*29,y+12);
+          ctx.quadraticCurveTo(px+side*23,y+23,px+side*10,y+16);
+          ctx.fill();ctx.stroke();
+        }
+      }else if(index===5){
+        // Waterfall Climb: translucent ice columns with a cascading rim.
+        const ice=ctx.createLinearGradient(px-20,y,px+20,y+30);
+        ice.addColorStop(0,'#b8eff9');ice.addColorStop(.5,'#458da9');
+        ice.addColorStop(1,'#d8faff');
+        ctx.fillStyle=ice;ctx.strokeStyle='#d5fbff';ctx.lineWidth=1.8;
+        ctx.beginPath();ctx.moveTo(px-19,y+3);ctx.lineTo(px+19,y+3);
+        ctx.lineTo(px+13,y+28);ctx.lineTo(px+2,y+22);
+        ctx.lineTo(px-11,y+31);ctx.closePath();ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#f1ffff';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-10,y+6);ctx.lineTo(px-8,y+23);
+        ctx.moveTo(px+6,y+5);ctx.lineTo(px+3,y+19);ctx.stroke();
       }else{
         // Coral Courier: fan-shaped reef ledges and layered shell supports.
         ctx.fillStyle='#3c8794';ctx.strokeStyle='#a7e9d9';ctx.lineWidth=2;
