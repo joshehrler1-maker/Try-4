@@ -1130,6 +1130,7 @@
       const speed = movement==='whip' ? 240 : power==='throw' ? 700 : 400;
       const life = movement==='whip' ? .24 : movement==='beat' && onBeat ? .72 : power==='throw' ? .8 : .36;
       const projectile={x:player.x,y:player.y,v:player.facing*speed,life};
+      if(index===8) projectile.accent=onBeat;
       if(index===21 && movement==='whip'){
         projectile.whip=true;
         projectile.originX=player.x;
@@ -1223,6 +1224,7 @@
         const target=hazards.find(h=>h.parry && h.life>0 && close(p,h,55,55));
         if(target && !p.on){
           target.life=0;
+          p.parryFlash={x:target.x,y:target.y,time:clock};
           activated=true;
           p.vy=-470;
           p.grace=Math.max(p.grace,.35);
@@ -5837,6 +5839,23 @@
         ctx.restore();
         continue;
       }
+      if(index===8){
+        ctx.save();
+        ctx.translate(a.x,a.y);
+        ctx.scale(a.v<0?-1:1,1);
+        ctx.strokeStyle=a.accent?'#ffe39b':'#a8eaff';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.moveTo(-13,3);
+        ctx.lineTo(-6,3);
+        ctx.lineTo(-2,-8);
+        ctx.lineTo(3,9);
+        ctx.lineTo(7,-3);
+        ctx.lineTo(13,-3);
+        ctx.stroke();
+        ctx.restore();
+        continue;
+      }
       const radius=a.radius||9;
       if(index===13 && a.motionTrail==='lob'){
         ctx.save();
@@ -6487,6 +6506,19 @@
         ctx.stroke();
       }
       ctx.restore();
+    }
+    if(index===16 && !reducedMotion && p.parryFlash){
+      const age=clock-p.parryFlash.time;
+      if(age<.2){
+        ctx.save();
+        ctx.globalAlpha=1-age/.2;
+        ctx.strokeStyle='#fff0fa';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.arc(p.parryFlash.x,p.parryFlash.y,8+age*90,0,Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
     drawAtmosphere(true);
     if(chapterReveal>0 && phase==='playing') {
