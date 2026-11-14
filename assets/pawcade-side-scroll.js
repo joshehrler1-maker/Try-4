@@ -3426,12 +3426,23 @@
       // Visual-only; enemy AI, hitboxes, timing and damage remain untouched.
       const blendDt=Math.min(.05,Math.max(0,elapsed));
       const poseTarget=firing?1:anticipation?.55:0;
-      const poseRate=poseTarget>(foe._attackPose||0)?16:7;
+      // Attack pose profiles vary by world: quick jabs, heavy windups,
+      // spring-loaded strikes and slow mechanical recoveries.
+      const attackProfiles=[
+        [13,5],[9,7],[18,10],[7,4],[15,8],
+        [19,9],[11,6],[8,5],[16,11],[6,4],
+        [17,8],[12,7],[10,5],[14,9],[8,6],
+        [16,8],[7,4],[11,6],[19,10],[9,5],
+        [20,12],[6,4],[13,7],[17,9],[8,5]
+      ];
+      const poseRate=poseTarget>(foe._attackPose||0)?
+        attackProfiles[index][0]:attackProfiles[index][1];
       foe._attackPose=(foe._attackPose||0)+(poseTarget-(foe._attackPose||0))*
         (1-Math.exp(-poseRate*blendDt));
       const attackPose=reducedMotion?0:foe._attackPose;
       const squash=attackPose*.045;
-      const attackTilt=(faceLeft?-1:1)*attackPose*.055;
+      const attackStyle=[.04,.025,.07,.018,.09,.05,.065,.03,.085,.02,.075,.045,.06,.055,.035,.08,.022,.04,.095,.028,.07,.025,.065,.09,.032][index];
+      const attackTilt=(faceLeft?-1:1)*attackPose*attackStyle;
       // Height-following spring adds a soft touchdown and recovery to jumping
       // foes; the pose is cosmetic and cannot alter their collision geometry.
       const previousY=foe._previousDrawY;
