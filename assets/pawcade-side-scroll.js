@@ -3954,9 +3954,11 @@
     const charging=enemyPattern==='charge' && Math.abs(at.x-foe.x)>enemyReach*.45;
     const pursuing=enemyPattern==='pursuit' && nearby;
     const rhythmic=enemyPattern==='rhythm' && foe.y-at.y>enemyRise*.55;
+    const lateRaider=foe.archetype===3 &&
+      (foe.spawnChapter??chapter)>=3 && nearby && !recoveringShot;
     const turning=enemyPattern==='patrol' && foe.patrolLeft!==undefined &&
       Math.min(at.x-foe.patrolLeft,foe.patrolRight-at.x)<5;
-    if(!(recoveringShot || diving || hopping || charging || pursuing || rhythmic || turning)) return;
+    if(!(recoveringShot || diving || hopping || charging || pursuing || rhythmic || turning || lateRaider)) return;
     const facing=faceLeft?-1:1;
     ctx.save();
     ctx.translate(at.x,at.y);
@@ -3973,7 +3975,7 @@
       ctx.moveTo(-10,-37);ctx.lineTo(-4,-37);ctx.lineTo(0,-44);ctx.lineTo(4,-34);ctx.lineTo(10,-34);
     }else{
       ctx.moveTo(20,-16);ctx.lineTo(28,-10);ctx.lineTo(20,-4);
-      if(charging){ctx.moveTo(27,-16);ctx.lineTo(35,-10);ctx.lineTo(27,-4);}
+      if(charging || lateRaider){ctx.moveTo(27,-16);ctx.lineTo(35,-10);ctx.lineTo(27,-4);}
     }
     ctx.stroke();
     ctx.restore();
