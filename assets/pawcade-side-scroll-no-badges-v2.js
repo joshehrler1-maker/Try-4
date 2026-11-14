@@ -61,7 +61,7 @@
   const descriptions = {
     stomp:index===0?'Land on enemies to bounce. Hold Jump for a higher rebound.':'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim. Charge into enemies from the front. Surface or visit a bubbling vent for air',
     dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
-    throw:index===13?'Throw a crystal with Action. Hold the joystick up or use W/Up to arc the throw':'Press Action to throw a crystal', flip:index===7?'Press Flip (X or Space on keyboard) while on the floor or ceiling to reverse gravity. Floor and ceiling spikes send you back to the chapter checkpoint':'Press Action to reverse gravity',
+    throw:index===13?'Throw a crystal with Action. Hold the joystick up or use W/Up to arc the throw':index===19?'Press Action to fire. Hold the joystick up or use W/Up to aim diagonally. Switch weapons for spread fire.':'Press Action to throw a crystal', flip:index===7?'Press Flip (X or Space on keyboard) while on the floor or ceiling to reverse gravity. Floor and ceiling spikes send you back to the chapter checkpoint':'Press Action to reverse gravity',
     pulse:'Press Action to release a shockwave', grapple:'Press Action below an overhead rail to attach. Steer to swing. In Quarry Rescue, steer up to reel in or down to extend the cable. Press Release Cable to let go',
     double:'Jump again in midair', shield:'Hold Action to deflect hazards',
     photo:'Press Action to stun enemies with a flash', bubble:'Hold Action to float'
@@ -69,7 +69,7 @@
   const movementGuide = {
     buster:'Tap Fire to shoot, or hold and release to charge. Jump again while sliding against a wall to kick off.', roll:'Roll through enemies with Action. Press Jump during a roll to leap after leaving a ledge.',
     float:index===6?'Hold Float (X on keyboard) to rise. Release it to descend.':'Hold Action to float.', beat:'You run automatically. Jump over the beat barriers and press Pulse (X on keyboard) when the beat meter reads PULSE NOW.',
-    airdash:'Press Dash in midair. Steer up or down to aim it, and jump against walls to kick off.',
+    airdash:'Press Dash in midair. Steer up or down to aim it, and jump against walls to kick off. Collect a mint crystal or exit a dream prism to chain another dash.',
     pogo:'Hold Jump while stomping to bounce higher.',
     precision:'Jump from ledge edges to clear wider gaps.',
     whip:'Press Action to strike nearby enemies with your whip.',
