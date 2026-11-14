@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>15)return;
-    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224,202,228][index];
-    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15,.12,.18][index]);
+    if(index<0 || index>17)return;
+    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224,202,228,210,236][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15,.12,.18,.23,.14][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -1930,6 +1930,56 @@
         ctx.lineTo(x+165,roof+19);ctx.lineTo(x+66,roof+19);
         ctx.closePath();ctx.fill();
         ctx.fillStyle='#d7bb85';ctx.fillRect(x+105,roof+52,20,65);
+      }else if(index===16){
+        // Steamworks: piston housings, riveted boilers and exhaust pipes.
+        const boilerX=x+79,boilerY=165+variation*9;
+        ctx.fillStyle='#364453';
+        ctx.fillRect(x+35,boilerY+33,131,107);
+        ctx.fillStyle='#647c84';
+        ctx.beginPath();ctx.ellipse(boilerX,boilerY+51,38,51,0,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#c9a47d';ctx.lineWidth=4;
+        ctx.beginPath();ctx.ellipse(boilerX,boilerY+51,31,43,0,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle='#b7d4cf';
+        ctx.beginPath();ctx.arc(boilerX,boilerY+51,10,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#506a77';
+        ctx.fillRect(x+129,boilerY-64,17,101);
+        ctx.fillRect(x+126,boilerY-68,23,8);
+        ctx.strokeStyle='#d6b18d';ctx.lineWidth=2;
+        for(let rivet=0;rivet<5;rivet++){
+          ctx.beginPath();ctx.arc(x+151,boilerY+43+rivet*17,2,0,Math.PI*2);ctx.stroke();
+        }
+        ctx.fillStyle='#d8e3df';ctx.globalAlpha=.28;
+        for(let puff=0;puff<3;puff++){
+          ctx.beginPath();ctx.arc(x+136+puff*10,boilerY-78-puff*17,13+puff*4,0,Math.PI*2);ctx.fill();
+        }
+        ctx.globalAlpha=1;
+      }else if(index===17){
+        // Snow Village: pitched snow roofs, warm windows and frosted pines.
+        const roofY=151+variation*11;
+        ctx.fillStyle='#52627c';
+        ctx.fillRect(x+54,roofY+34,116,121);
+        ctx.fillStyle='#e7f2fa';
+        ctx.beginPath();ctx.moveTo(x+42,roofY+36);ctx.lineTo(x+112,roofY-22);
+        ctx.lineTo(x+181,roofY+36);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#a6c3da';
+        ctx.beginPath();ctx.moveTo(x+53,roofY+35);ctx.lineTo(x+112,roofY-10);
+        ctx.lineTo(x+169,roofY+35);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#f8d7a0';
+        for(let window=0;window<3;window++){
+          ctx.fillRect(x+66+window*31,roofY+62,17,24);
+        }
+        ctx.fillStyle='#e8f4fc';
+        for(let pine=0;pine<2;pine++){
+          const px=x+20+pine*180;
+          ctx.beginPath();ctx.moveTo(px,roofY-17);ctx.lineTo(px-25,roofY+90);
+          ctx.lineTo(px+25,roofY+90);ctx.closePath();ctx.fill();
+        }
+        ctx.globalAlpha=.75;ctx.fillStyle='#ffffff';
+        for(let flake=0;flake<7;flake++){
+          const fx=x+12+flake*29,fy=102+((flake*37+variation*19)%135);
+          ctx.beginPath();ctx.arc(fx,fy,1.5+flake%2,0,Math.PI*2);ctx.fill();
+        }
+        ctx.globalAlpha=1;
       }
     }
     ctx.restore();
