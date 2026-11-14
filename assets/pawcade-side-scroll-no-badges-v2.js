@@ -4149,10 +4149,44 @@
           ctx.moveTo(mx+4,y-4.5);ctx.lineTo(mx+12,y-4.5);ctx.stroke();
         }
       }else if(['leaf','petal','coral','wood','wind','wave','cloud','snow'].includes(marking)){
-        ctx.ellipse(mx,y-4.5,marking==='petal'?5:7,1.7,n%2?.35:-.35,0,Math.PI*2);
+        // Individually drawn silhouettes, not the same oval recolored
+        // for eight otherwise unrelated game worlds.
+        if(marking==='leaf'||marking==='petal'){
+          const radius=marking==='petal'?4:7;
+          ctx.ellipse(mx,y-4.5,radius,1.7,n%2?.45:-.45,0,Math.PI*2);
+          if(marking==='leaf'){ctx.moveTo(mx-4,y-4.5);ctx.lineTo(mx+4,y-4.5);}
+        }else if(marking==='coral'){
+          ctx.moveTo(mx-5,y-3);ctx.lineTo(mx-2,y-6);ctx.lineTo(mx+1,y-4);
+          ctx.lineTo(mx+4,y-7);ctx.moveTo(mx+1,y-4);ctx.lineTo(mx+6,y-3);
+        }else if(marking==='wood'){
+          ctx.moveTo(mx-6,y-5);ctx.bezierCurveTo(mx-1,y-7,mx+1,y-2,mx+7,y-5);
+        }else if(marking==='snow'){
+          ctx.moveTo(mx-5,y-4.5);ctx.lineTo(mx+5,y-4.5);
+          ctx.moveTo(mx,y-7);ctx.lineTo(mx,y-2);
+        }else if(marking==='cloud'){
+          ctx.arc(mx-3,y-4,2,Math.PI,0);ctx.arc(mx+2,y-5,3,Math.PI,0);
+        }else if(marking==='wave'){
+          ctx.moveTo(mx-7,y-4);ctx.bezierCurveTo(mx-3,y-7,mx,y-1,mx+7,y-4);
+        }else{
+          ctx.moveTo(mx-7,y-4);ctx.quadraticCurveTo(mx-2,y-7,mx+1,y-4);
+          ctx.moveTo(mx+2,y-5);ctx.lineTo(mx+7,y-6);
+        }
         ctx.stroke();
       }else if(['speed','beat','chevron','hazard','cable'].includes(marking)){
-        ctx.moveTo(mx-4,y-6);ctx.lineTo(mx+2,y-3);ctx.lineTo(mx+7,y-6);ctx.stroke();
+        if(marking==='beat'){
+          ctx.moveTo(mx-7,y-4);ctx.lineTo(mx-3,y-4);ctx.lineTo(mx-1,y-7);
+          ctx.lineTo(mx+2,y-2);ctx.lineTo(mx+4,y-5);ctx.lineTo(mx+7,y-5);
+        }else if(marking==='cable'){
+          ctx.moveTo(mx-7,y-5);ctx.bezierCurveTo(mx-3,y-2,mx+3,y-7,mx+7,y-4);
+        }else if(marking==='hazard'){
+          ctx.moveTo(mx-5,y-3);ctx.lineTo(mx,y-7);ctx.lineTo(mx+5,y-3);
+        }else if(marking==='speed'){
+          ctx.moveTo(mx-7,y-5);ctx.lineTo(mx+3,y-5);
+          ctx.moveTo(mx-2,y-3);ctx.lineTo(mx+7,y-3);
+        }else{
+          ctx.moveTo(mx-5,y-6);ctx.lineTo(mx,y-3);ctx.lineTo(mx+5,y-6);
+        }
+        ctx.stroke();
       }else{
         ctx.moveTo(mx-4,y-6);ctx.lineTo(mx,y-3);ctx.lineTo(mx+4,y-6);ctx.closePath();ctx.stroke();
       }
