@@ -857,3 +857,39 @@ for (const [room, placements] of Object.entries({
     window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
   }
 }
+
+// Later platform pass for Waterfall Climb, Lantern Festival, Autumn Trail, Snow Village and Sunflower Flight.
+for (const [room, slot, x, y, width] of [
+  ["course5Stage1",2,899,199,277],
+  ["course5Stage2",3,994,221,326],
+  ["course5Stage3",2,718,215,295],
+  ["course5Stage4",3,1010,198,298],
+  ["course5Stage5",2,885,225,381],
+  ["course5Stage6",3,1060,244,293],
+  ["course6Stage1",2,1000,204,332],
+  ["course6Stage2",2,728,218,472],
+  ["course6Stage3",3,1000,242,430],
+  ["course6Stage4",2,826,240,336],
+  ["course6Stage5",2,754,204,348],
+  ["course6Stage6",2,1000,190,246],
+  ["eggMeadow",2,640,228,241],
+  ["eggRavine",2,863,257,280],
+  ["eggCave",3,870,196,232],
+  ["eggFort",3,1020,254,227],
+  ["eggDonuts",3,778,228,185],
+  ["eggStilts",3,940,280,213],
+  ["course17Stage1",2,874,248,318],
+  ["course17Stage2",2,740,246,312],
+  ["course17Stage3",2,817,237,323],
+  ["course17Stage4",2,745,226,278],
+  ["course17Stage5",2,693,216,304],
+  ["course17Stage6",2,896,241,298],
+  ["course23Stage1",2,928,247,342],
+  ["course23Stage2",2,801,229,302],
+  ["course23Stage3",2,702,210,351],
+  ["course23Stage4",2,740,229,345],
+  ["course23Stage5",2,892,231,326],
+  ["course23Stage6",2,818,220,290],
+]) {
+  window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+}
