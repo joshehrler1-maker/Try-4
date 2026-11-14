@@ -750,3 +750,22 @@ for (const [room, placements] of Object.entries(cloudCityChapterPlacements)) {
     window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
   }
 }
+
+// Moonlit Library and Seed Garden chapter placement adjustments.
+const chapterPlatformPlacements = {
+  iceworks: [[2,704,247,298]],
+  airfield: [[2,590,219,182],[3,824,174,258]],
+  generator: [[4,987,248,205]],
+  minecart: [[2,681,253,348]],
+  floodgate: [[3,918,198,265]],
+  seedRigging: [[3,799,155,274]],
+  seedGalley: [[2,842,244,301]],
+  seedLocker: [[2,627,239,292]],
+  seedTopsail: [[3,878,171,280]],
+  seedNest: [[3,1012,156,257],[4,1325,199,201]],
+};
+for (const [room, placements] of Object.entries(chapterPlatformPlacements)) {
+  for (const [slot, x, y, width] of placements) {
+    window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+  }
+}
