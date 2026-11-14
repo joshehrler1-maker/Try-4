@@ -64,7 +64,7 @@
     photo:'Press Action to stun enemies with a flash', bubble:'Hold Action to float'
   };
   const movementGuide = {
-    buster:'Tap Fire to shoot, or hold and release to charge. Jump again while sliding against a wall to kick off.', roll:'Roll through enemies with Action.',
+    buster:'Tap Fire to shoot, or hold and release to charge. Jump again while sliding against a wall to kick off.', roll:'Roll through enemies with Action. Press Jump during a roll to leap after leaving a ledge.',
     float:index===6?'Hold Float (X on keyboard) to rise. Release it to descend.':'Hold Action to float.', beat:'You run automatically. Jump over the beat barriers and press Pulse (X on keyboard) in the gold timing zones.',
     airdash:'Press Dash in midair. Steer up or down to aim it, and jump against walls to kick off.',
     pogo:'Hold Jump while stomping to bounce higher.',
@@ -526,7 +526,8 @@
       player.jumpCut=true;
       return;
     }
-    if (player.on || player.coyote>0 || power === 'swim' || (power === 'double' && player.jumps < 2)) {
+    const rollJump=index===4 && movement==='roll' && player.power>.22 && player.jumps===0;
+    if (player.on || rollJump || player.coyote>0 || power === 'swim' || (power === 'double' && player.jumps < 2)) {
       player.vy = -jumpSpeed * jumpFactor * player.gravity;
       player.on = false;
       player.jumps++;
@@ -785,7 +786,7 @@
     const p = player;
     p.coyote=p.on ? .085 : Math.max(0,p.coyote-dt);
     p.jumpBuffer=Math.max(0,p.jumpBuffer-dt);
-    if (p.jumpBuffer && (p.on || p.coyote>0)) jump(false);
+    if (p.jumpBuffer && (p.on || p.coyote>0 || (index===4 && movement==='roll' && p.power>.22 && p.jumps===0))) jump(false);
     p.jumpAge=(p.jumpAge||0)+dt;
     if (p.jumpCut && !held('jump') && p.jumpAge>=.035) {
       if (p.vy < -jumpSpeed*.45) p.vy=-jumpSpeed*.45;
@@ -2971,7 +2972,7 @@
     }
     const light=['Luna','Ivy','Frost','Melody','Spark'].includes(hero);
     const attacking=p.power>.22 && power!=='dash';
-    const rolling=(index===3 && (p.spin>0 || p.power>.22)) || (movement==='roll' && p.grapple>0);
+    const rolling=(index===3 && (p.spin>0 || p.power>.22)) || (movement==='roll' && p.power>.22);
     const rushing=p.grapple>0 || (power==='dash' && p.power>.22);
     const braking=p.on && Math.abs(p.vx)>runSpeed*.42 &&
       ((p.vx>0 && held('left')) || (p.vx<0 && held('right')));
