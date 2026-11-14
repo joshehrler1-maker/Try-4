@@ -667,6 +667,7 @@
       const signatureX=start+Math.max(220,Math.min(
         stageWidths[stage]-signatureSpan-100,
         1510+stage%3*47));
+      const signatureFits=stageWidths[stage]>=signatureSpan+320;
       for(const [slot,[dx,sy,sw,kind]] of signature.entries()){
         const sx=signatureX+dx;
         const height=sy+((stage+slot)%3-1)*8;
