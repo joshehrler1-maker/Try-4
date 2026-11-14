@@ -3967,8 +3967,6 @@
         const chapterStyle=stage%4;
         const cell=[48,62,54,72][chapterStyle];
         ctx.save();
-        ctx.fillStyle=['#54354b','#4c3543','#473e51','#59404a'][chapterStyle];
-        ctx.fillRect(visibleStart,y+5,visibleEnd-visibleStart,13);
         // Layered bevel and furnace bounce-light create a stylized 3D
         // platform silhouette without adding expensive image textures.
         const sideShade=ctx.createLinearGradient(0,y+4,0,y+19);
@@ -3982,6 +3980,18 @@
         ctx.fillRect(visibleStart,y+5,visibleEnd-visibleStart,2);
         ctx.fillStyle='rgba(24,15,35,.55)';
         ctx.fillRect(visibleStart,y+16,visibleEnd-visibleStart,2);
+        // A subtle perspective return at each visible deck end makes the
+        // top and side read as one solid 2.5D object, not separate stripes.
+        ctx.strokeStyle='rgba(255,221,175,.5)';
+        ctx.lineWidth=1.2;
+        if(x>=camera-20 && x<=camera+width+20){
+          ctx.beginPath();ctx.moveTo(x+4,y-5);ctx.lineTo(x,y+5);
+          ctx.lineTo(x,y+18);ctx.stroke();
+        }
+        if(x+w>=camera-20 && x+w<=camera+width+20){
+          ctx.beginPath();ctx.moveTo(x+w-4,y-5);ctx.lineTo(x+w,y+5);
+          ctx.lineTo(x+w,y+18);ctx.stroke();
+        }
         ctx.strokeStyle='#ffbf73';ctx.lineWidth=2;
         ctx.beginPath();ctx.moveTo(visibleStart,y+5);ctx.lineTo(visibleEnd,y+5);ctx.stroke();
         for(let k=Math.floor((visibleStart-x)/cell);k<=Math.ceil((visibleEnd-x)/cell);k++){
