@@ -819,27 +819,43 @@
     // Platform rhythm is based on the counterpart's movement vocabulary:
     // rapid runways, staggered aerial landings, tight climbing steps,
     // underwater current lanes and deliberate precision jumps.
-    const rhythmFamilies=[
-      'steps','precision','water','run','steps','aerial','aerial',
-      'precision','run','climb','aerial','climb','steps','steps',
-      'precision','aerial','run','steps','precision','water',
-      'run','precision','steps','aerial','run'
+    // Twenty-five independently tuned optional traversal profiles. Values
+    // describe original Super Paw Heroes geometry, not copied game maps.
+    // Distances are offsets from the preceding landing, not a uniform grid.
+    const traversalProfiles=[
+      {gaps:[0,196,154],widths:[166,108,142],rises:[0,-36,18]}, // 01 Foundry: broad launch, raised spring, safe catch
+      {gaps:[0,132,118],widths:[104,78,102],rises:[-12,-64,28]}, // 02 Library: vertical wall-jump rhythm
+      {gaps:[0,244,206],widths:[198,174,160],rises:[-32,26,-38]}, // 03 Coral: generous current lanes
+      {gaps:[0,326,232],widths:[284,138,248],rises:[4,-28,22]}, // 04 Clocktower: high-speed runways
+      {gaps:[0,178,172],widths:[142,116,152],rises:[2,-42,-14]}, // 05 Garden: staggered barrel routes
+      {gaps:[0,146,132],widths:[120,106,112],rises:[10,-56,-84]}, // 06 Waterfall: ascending lifts
+      {gaps:[0,166,194],widths:[130,146,118],rises:[4,-18,-48]}, // 07 Lantern: forgiving floating landings
+      {gaps:[0,124,128],widths:[90,78,92],rises:[-16,-66,42]}, // 08 Polarity: precision ledges
+      {gaps:[0,206,188],widths:[156,108,154],rises:[6,-36,8]}, // 09 Beat: measured jump intervals
+      {gaps:[0,206,148],widths:[136,98,122],rises:[12,-74,-92]}, // 10 Quarry: grapple height changes
+      {gaps:[0,218,172],widths:[160,124,148],rises:[0,-42,-68]}, // 11 Wind: capture-assisted traversal
+      {gaps:[0,126,136],widths:[94,86,92],rises:[12,-68,-108]}, // 12 Cloud: precision climbing
+      {gaps:[0,194,174],widths:[146,138,150],rises:[2,-44,-18]}, // 13 Harbor: bounce and recovery
+      {gaps:[0,182,166],widths:[140,112,136],rises:[4,-42,-66]}, // 14 Autumn: flutter gaps
+      {gaps:[0,144,166],widths:[120,110,126],rises:[-8,-62,-86]}, // 15 Observatory: compact gates
+      {gaps:[0,164,152],widths:[128,108,132],rises:[8,-52,-82]}, // 16 Bamboo: glide and wall routes
+      {gaps:[0,252,210],widths:[208,166,194],rises:[2,-34,10]}, // 17 Steamworks: battle arenas
+      {gaps:[0,186,146],widths:[156,112,148],rises:[6,-44,-62]}, // 18 Snow: rope and ice ledges
+      {gaps:[0,136,146],widths:[108,98,112],rises:[0,-56,-22]}, // 19 Canyon: careful ledges
+      {gaps:[0,236,202],widths:[188,146,174],rises:[-34,24,-44]}, // 20 Submarine: submerged lanes
+      {gaps:[0,294,224],widths:[262,148,228],rises:[2,-28,12]}, // 21 Speed: long sliding approaches
+      {gaps:[0,152,158],widths:[112,102,118],rises:[8,-48,-76]}, // 22 Temple: branching steps
+      {gaps:[0,176,182],widths:[136,110,140],rises:[0,-44,-16]}, // 23 Swamp: bouncing crossings
+      {gaps:[0,174,196],widths:[124,112,134],rises:[12,-46,-70]}, // 24 Sunflower: aerial platforms
+      {gaps:[0,258,212],widths:[214,158,190],rises:[0,-34,16]}  // 25 Starship: cargo decks
     ];
-    const rhythm=rhythmFamilies[index];
-    const rhythmProfiles={
-      run:{spacing:164,width:132,rises:[0,-12,0]},
-      aerial:{spacing:148,width:96,rises:[16,-32,9]},
-      climb:{spacing:132,width:102,rises:[18,-17,-45]},
-      precision:{spacing:146,width:78,rises:[12,-25,17]},
-      water:{spacing:160,width:130,rises:[-25,22,-8]},
-      steps:{spacing:138,width:108,rises:[13,-18,-35]}
-    };
-    const profile=rhythmProfiles[rhythm];
+    const profile=traversalProfiles[index]||traversalProfiles[0];
+    let cx=challengeX;
     for(let part=0;part<3;part++){
-      const cx=challengeX+part*profile.spacing;
+      cx+=profile.gaps[part];
       const cy=Math.max(110,challengeHeights[(stage+index)%6]+
         profile.rises[part]+((stage%3)-1)*8);
-      const cw=profile.width+(part===1?12:0);
+      const cw=profile.widths[part]+(part===1?12:0);
       if(!clearLane && addOptionalLanding(cx,cy,cw,challengeKinds[part]) &&
          part===1) crystals.push({x:cx+cw/2,y:cy-45});
     }
