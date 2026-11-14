@@ -4308,7 +4308,22 @@
     ctx.fill();
     ctx.save();
     ctx.clip();
-    drawLandingTrim(x,y,w,topDepth);
+    if(index===0 && kind==='floor'){
+      const stone=ctx.createLinearGradient(0,y-topDepth,0,y);
+      stone.addColorStop(0,'#ad8c7a');
+      stone.addColorStop(.55,'#746278');
+      stone.addColorStop(1,'#453b56');
+      ctx.fillStyle=stone;
+      ctx.fillRect(x,y-topDepth,w,topDepth);
+      ctx.fillStyle='#392c40';
+      for(let seam=Math.ceil(x/38)*38;seam<x+w;seam+=38){
+        ctx.fillRect(seam,y-topDepth,2,topDepth);
+      }
+      ctx.fillStyle='#ffbd82';
+      ctx.fillRect(x,y-2,w,2);
+    } else {
+      drawLandingTrim(x,y,w,topDepth);
+    }
     ctx.restore();
     if(index===17 && kind==='shelf'){
       ctx.clip();
