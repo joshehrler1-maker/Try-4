@@ -111,3 +111,43 @@ test('counterpart-inspired enemy motion profiles cover all games without invalid
   assert.ok(new Set(profiles.map(row => row.join(','))).size >= 20,
     'enemy movement profiles must retain substantial game-to-game variety');
 });
+
+
+test('first-stage scenic art stays tied to its own stage surface, file and offline cache', () => {
+  const runtime = fs.readFileSync(path.join(__dirname, '../assets/pawcade-side-scroll-no-badges-v2.js'), 'utf8');
+  const html = fs.readFileSync(path.join(__dirname, '../pawcade-side-scroll.html'), 'utf8');
+  const worker = fs.readFileSync(path.join(__dirname, '../sw.js'), 'utf8');
+  const literal = name => {
+    const match = runtime.match(new RegExp('const ' + name + '\\s*=\\s*(\\[[\\s\\S]*?\\]);'));
+    assert.ok(match, 'missing ' + name);
+    return vm.runInNewContext(match[1], {}, {timeout: 1000});
+  };
+  const files = literal('firstStageLandmarkPaths');
+  const positions = literal('firstStageLandmarkPositions');
+  assert.equal(files.length, 20, '20 active Stage 1 scenic assets required');
+  assert.equal(positions.length, files.length, 'each active art file must have a location');
+  assert.equal(new Set(files).size, files.length, 'no art may be reused across games');
+  assert.match(runtime, /drawImage\(firstStageLandmark, artX, artY, artW, artH\)/);
+  for (let i=0; i<files.length; i++) {
+    const asset = files[i];
+    assert.ok(asset.startsWith('assets/scenes/') && asset.endsWith('.svg'), 'invalid asset path for ' + i);
+    const absolute = path.join(__dirname,'..',asset);
+    assert.ok(fs.existsSync(absolute), 'missing scene art ' + asset);
+    const svg = fs.readFileSync(absolute,'utf8');
+    assert.ok(svg.startsWith('<svg') && svg.trimEnd().endsWith('</svg>'), 'invalid art wrapper ' + asset);
+    assert.ok(worker.includes("'" + asset + "'"), 'art missing from offline precache: ' + asset);
+    const [x,y,width,height] = positions[i];
+    assert.ok([x,y,width,height].every(Number.isFinite) && width > 0 && height > 0,
+      'invalid prop dimensions in ' + w.pawtopiaCourses[i][0]);
+    const center = x + width / 2, bottom = y + height;
+    const stage1Room = w.pawtopiaRoomPlans[i].split(/\s+/)[0];
+    const geometry = w.pawtopiaRooms[stage1Room];
+    const grounded = geometry.some(([sx,sy,span,kind]) =>
+      sx <= center && center < sx + span && sy === bottom &&
+      !['hazard','ceiling','ceilingSpikes','rail','current'].includes(kind));
+    assert.ok(grounded, w.pawtopiaCourses[i][0] + ' scene prop is not aligned to Stage 1 support');
+  }
+  for (const [,url] of html.matchAll(/(?:href|src)="(assets\/[^"]+\?[^"]+)"/g)) {
+    assert.ok(worker.includes("'" + url + "'"), 'offline game runtime mismatch: ' + url);
+  }
+});
