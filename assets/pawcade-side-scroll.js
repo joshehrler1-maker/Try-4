@@ -3055,6 +3055,50 @@
     ctx.restore();
   }
   const enemyCueColors = ["#ffc282","#80dffe","#81ffe1","#ffd66d","#c8ed85","#c4f4ff","#ffe29a","#deb0ff","#ff91dd","#ffd18b","#ffbf98","#e6e2ff","#8aeaff","#ffbb76","#adbfff","#b9ff96","#ff9d62","#ddf4ff","#ffd1a2","#7affdc","#ff8ce1","#e0c5ff","#d1fb87","#ffeaa1","#a9d7ff"];
+  // Game-specific visual insignias: rendered in the existing enemy pass, without
+  // changing hitboxes, physics, damage, spawn tables, or the canonical sprite art.
+  const enemyInsignias=['clamp','book','wave','clock','seed','mist','lantern','magnet','beat','quarry','wind','cloud','bolt','leaf','orbit','bamboo','steam','snow','canyon','sonar','neon','marble','bog','flower','cargo'];
+  function drawEnemyInsignia(at,foe){
+    if(foe.dead) return;
+    const theme=enemyInsignias[index];
+    const x=at.x,y=at.y-61;
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.lineWidth=2.2;
+    ctx.lineJoin='round';
+    ctx.strokeStyle=enemyCueColors[index];
+    ctx.fillStyle='#0a1734df';
+    ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.beginPath();
+    switch(theme){
+      case 'clamp':ctx.moveTo(-5,-6);ctx.lineTo(-5,5);ctx.lineTo(0,8);ctx.lineTo(5,5);ctx.lineTo(5,-6);break;
+      case 'book':ctx.moveTo(0,-6);ctx.lineTo(0,7);ctx.moveTo(0,-5);ctx.quadraticCurveTo(-5,-9,-8,-4);ctx.lineTo(-8,5);ctx.quadraticCurveTo(-3,2,0,7);ctx.quadraticCurveTo(4,2,8,5);ctx.lineTo(8,-4);ctx.quadraticCurveTo(4,-9,0,-5);break;
+      case 'wave':ctx.moveTo(-8,1);ctx.quadraticCurveTo(-4,-7,0,1);ctx.quadraticCurveTo(4,9,8,1);break;
+      case 'clock':ctx.arc(0,0,7,0,Math.PI*2);ctx.moveTo(0,-5);ctx.lineTo(0,0);ctx.lineTo(4,3);break;
+      case 'seed':ctx.ellipse(0,0,5,8,.4,0,Math.PI*2);ctx.moveTo(0,-5);ctx.lineTo(5,-9);break;
+      case 'mist':ctx.arc(-3,2,5,Math.PI,Math.PI*2);ctx.arc(3,-1,5,Math.PI,Math.PI*2);break;
+      case 'lantern':ctx.rect(-5,-5,10,12);ctx.moveTo(-3,-5);ctx.lineTo(0,-9);ctx.lineTo(3,-5);break;
+      case 'magnet':ctx.moveTo(-6,-7);ctx.lineTo(-6,3);ctx.arc(0,3,6,Math.PI,0,true);ctx.lineTo(6,-7);break;
+      case 'beat':ctx.moveTo(-8,1);ctx.lineTo(-4,1);ctx.lineTo(-1,-7);ctx.lineTo(3,7);ctx.lineTo(6,0);ctx.lineTo(8,0);break;
+      case 'quarry':ctx.moveTo(-7,4);ctx.lineTo(-3,-6);ctx.lineTo(5,-7);ctx.lineTo(8,5);ctx.closePath();break;
+      case 'wind':ctx.moveTo(-8,-4);ctx.quadraticCurveTo(8,-10,5,-2);ctx.moveTo(-8,4);ctx.quadraticCurveTo(8,-2,6,7);break;
+      case 'cloud':ctx.arc(-4,3,4,Math.PI,0);ctx.arc(2,-2,5,Math.PI,0);ctx.arc(7,3,3,Math.PI,0);break;
+      case 'bolt':ctx.moveTo(2,-9);ctx.lineTo(-5,1);ctx.lineTo(1,1);ctx.lineTo(-2,9);ctx.lineTo(7,-2);ctx.lineTo(1,-2);ctx.closePath();break;
+      case 'leaf':ctx.ellipse(0,0,5,9,.6,0,Math.PI*2);ctx.moveTo(-4,7);ctx.lineTo(5,-7);break;
+      case 'orbit':ctx.ellipse(0,0,9,4,.6,0,Math.PI*2);ctx.arc(0,0,2,0,Math.PI*2);break;
+      case 'bamboo':ctx.moveTo(-4,-8);ctx.lineTo(-4,8);ctx.moveTo(4,-8);ctx.lineTo(4,8);ctx.moveTo(-7,-2);ctx.lineTo(7,-2);ctx.moveTo(-7,4);ctx.lineTo(7,4);break;
+      case 'steam':ctx.moveTo(-6,7);ctx.quadraticCurveTo(-10,1,-5,-2);ctx.quadraticCurveTo(0,-5,-5,-8);ctx.moveTo(4,7);ctx.quadraticCurveTo(0,1,5,-2);ctx.quadraticCurveTo(10,-5,5,-8);break;
+      case 'snow':for(let k=0;k<3;k++){const a=k*Math.PI/3;ctx.moveTo(-8*Math.cos(a),-8*Math.sin(a));ctx.lineTo(8*Math.cos(a),8*Math.sin(a))}break;
+      case 'canyon':ctx.moveTo(-8,6);ctx.lineTo(-3,-5);ctx.lineTo(1,1);ctx.lineTo(5,-7);ctx.lineTo(8,6);break;
+      case 'sonar':for(let k=3;k<=9;k+=3){ctx.moveTo(k,0);ctx.arc(0,0,k,-.7,.7)}break;
+      case 'neon':ctx.rect(-7,-7,5,5);ctx.rect(1,-7,5,5);ctx.rect(-7,1,5,5);ctx.rect(1,1,5,5);break;
+      case 'marble':ctx.moveTo(0,-9);ctx.lineTo(8,-2);ctx.lineTo(5,7);ctx.lineTo(-5,7);ctx.lineTo(-8,-2);ctx.closePath();break;
+      case 'bog':ctx.arc(0,2,6,0,Math.PI*2);ctx.moveTo(-5,-5);ctx.lineTo(-2,-9);ctx.moveTo(5,-5);ctx.lineTo(2,-9);break;
+      case 'flower':for(let k=0;k<5;k++){const a=k*Math.PI*2/5;ctx.moveTo(Math.cos(a)*3,Math.sin(a)*3);ctx.lineTo(Math.cos(a)*9,Math.sin(a)*9)}ctx.arc(0,0,3,0,Math.PI*2);break;
+      case 'cargo':ctx.rect(-7,-6,14,13);ctx.moveTo(-7,-2);ctx.lineTo(0,2);ctx.lineTo(7,-2);ctx.moveTo(0,2);ctx.lineTo(0,7);break;
+    }
+    ctx.stroke();ctx.restore();
+  }
   function drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing){
     const recoveringShot=firing;
     const diving=airborne && at.y>foe.y-(enemyPattern==='school'?33:50);
@@ -3340,6 +3384,7 @@
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
       ctx.restore();
+      drawEnemyInsignia(at,foe);
       drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing);
       if(foe===bashReady){
         ctx.save();
