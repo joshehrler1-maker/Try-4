@@ -312,7 +312,11 @@
         const count = Math.max(1, Math.floor(w / (room==='arena' ? 420 : 540)));
         for(let encounter=0;encounter<count;encounter++) {
           const offset = Math.round(w*(encounter+1)/(count+1));
-          const foe={x:start+x+offset,y:y-23,offset:slot+stage+encounter};
+          // Deterministic encounter archetypes: different patrol rhythms
+          // within each stage, without randomizing checkpoint resumes.
+          const archetype=(stage*3+slot+encounter+index)%4;
+          const foe={x:start+x+offset,y:y-23,offset:slot+stage+encounter,
+            archetype,spawnChapter:stage};
           if(index===1 && !libraryEnemyPlaced && x>=250 && w>=100){
             foe.libraryEnemy=stage;
             foe.patrolLeft=start+x+22;
