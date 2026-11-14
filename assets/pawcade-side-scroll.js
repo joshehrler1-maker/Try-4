@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>13)return;
-    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224][index];
-    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15][index]);
+    if(index<0 || index>15)return;
+    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224,202,228][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15,.12,.18][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -1891,6 +1891,45 @@
           ctx.beginPath();ctx.ellipse(0,0,5,2.5,0,0,Math.PI*2);ctx.fill();ctx.restore();
         }
         ctx.globalAlpha=1;
+      }else if(index===14){
+        // Inverted Observatory: orbital instruments, starglass, and domes.
+        const cx=x+101,cy=151+variation*10;
+        ctx.fillStyle='#28334d';
+        ctx.fillRect(x+46,cy+25,111,116);
+        ctx.fillStyle='#465c81';
+        ctx.beginPath();ctx.arc(cx,cy+27,55,Math.PI,0);ctx.closePath();ctx.fill();
+        ctx.strokeStyle='#a3b5df';ctx.lineWidth=3;
+        ctx.beginPath();ctx.ellipse(cx,cy,62,27,-.42,0,Math.PI*2);ctx.stroke();
+        ctx.beginPath();ctx.ellipse(cx,cy,46,59,.38,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle='#d4ddff';
+        ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#8ba6d0';
+        for(let p=0;p<4;p++){
+          ctx.fillRect(x+55+p*24,cy+65,13,20);
+        }
+      }else if(index===15){
+        // Bamboo Village: clustered bamboo stalks and tiered pavilion roofs.
+        const base=286,top=100+variation*12;
+        for(let stalk=0;stalk<5;stalk++){
+          const bx=x+21+stalk*35;
+          ctx.fillStyle=stalk%2?'#537f61':'#6a986a';
+          ctx.fillRect(bx,top+(stalk%3)*20,10,base-top);
+          ctx.strokeStyle='#a3c88b';ctx.lineWidth=1.5;
+          for(let joint=0;joint<5;joint++){
+            const jy=top+35+joint*30+(stalk%3)*20;
+            ctx.beginPath();ctx.moveTo(bx,jy);ctx.lineTo(bx+10,jy);ctx.stroke();
+          }
+          ctx.fillStyle='#79ae7b';
+          ctx.beginPath();ctx.ellipse(bx-12,top+25,21,5,-.3,0,Math.PI*2);ctx.fill();
+        }
+        const roof=171+variation*9;
+        ctx.fillStyle='#544b57';ctx.fillRect(x+65,roof+24,99,93);
+        ctx.fillStyle='#9b675e';
+        ctx.beginPath();ctx.moveTo(x+50,roof+27);
+        ctx.quadraticCurveTo(x+117,roof-25,x+180,roof+27);
+        ctx.lineTo(x+165,roof+19);ctx.lineTo(x+66,roof+19);
+        ctx.closePath();ctx.fill();
+        ctx.fillStyle='#d7bb85';ctx.fillRect(x+105,roof+52,20,65);
       }
     }
     ctx.restore();
