@@ -880,11 +880,24 @@
     hazards = hazards.filter(shot=>shot.life>0);
     for (const foe of enemies) {
       if (foe.dead || Math.abs(foe.x-p.x)>360) continue;
-      if ((foe.turret || enemyPattern==='turret' || index===16) && clock>=foe.shotAt) {
-        hazards.push({x:foe.x,y:foe.y,v:Math.sign(p.x-foe.x)*180,life:2,parry:index===16});
+      const position = foePosition(foe);
+      // Fire from the visible enemy position, not its original spawn point.
+      // Do not shoot through walls or across different vertical lanes.
+      const inLane=Math.abs(p.y-position.y)<105;
+      const inRange=Math.abs(p.x-position.x)<320;
+      const direction=Math.sign(p.x-position.x);
+      const shotBlocked=platforms.some(ledge=>
+        ['floor','shelf','ceiling'].includes(ledge.kind) &&
+        ledge.x<Math.max(position.x,p.x) &&
+        ledge.x+ledge.w>Math.min(position.x,p.x) &&
+        ledge.y<Math.max(position.y,p.y)-6 &&
+        ledge.y+17>Math.min(position.y,p.y)+6
+      );
+      if ((foe.turret || enemyPattern==='turret' || index===16) &&
+          clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
+        hazards.push({x:position.x+direction*12,y:position.y,v:direction*180,life:2,parry:index===16});
         foe.shotAt=clock+cadence;
       }
-      const position = foePosition(foe);
       if (attacks.some(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)))) foe.dead=true;
       if (!foe.dead && !(foe.bashed && clock<foe.bashed.until) && close(p,position,29,34)) {
         if ((p.vy>65 && oldY<position.y-17) || (power==='dash' && p.power>.22)) {
