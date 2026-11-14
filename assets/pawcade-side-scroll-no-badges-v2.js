@@ -1167,11 +1167,12 @@
       landmarks.push({cell:0,x:start+610,y:223,w:66,h:39});
       for(let i=0;i<4;i++) platforms.push({x:start+735+i*115,y:210-i*19,w:94,kind:'floor',switchBridge:true});
     }
-    if(index===2 && stage===2){
-      landmarks.push({cell:4,x:start+540,y:205,w:58,h:64});
-      for(let i=0;i<5;i++) crystals.push({x:start+620+i*56,y:170-i*16,reefCache:true});
-    }
     if(index===2) {
+      const reefX=x=>start+Math.round(x*stageWidths[stage]/sectionSize);
+      if(stage===2){
+        landmarks.push({cell:4,x:reefX(540),y:205,w:58,h:64});
+        for(let i=0;i<5;i++) crystals.push({x:reefX(620+i*56),y:170-i*16,reefCache:true});
+      }
       // Air pockets mark safe pauses before and after each reef crossing.
       const pockets = [
         [[470,261],[1410,233]],
@@ -1182,7 +1183,7 @@
         [[566,264],[1490,215]],
       ][stage];
       for (const [x, y] of pockets) {
-        landmarks.push({cell:7,x:start+Math.round(x*stageWidths[stage]/sectionSize),y,w:72,h:75});
+        landmarks.push({cell:7,x:reefX(x),y,w:72,h:75});
       }
     }
     if(index===11 && stage===1) landmarks.push({cell:5,x:start+1010,y:169,w:76,h:70});
