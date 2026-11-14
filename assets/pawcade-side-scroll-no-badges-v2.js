@@ -1733,6 +1733,7 @@
       if (!p.on) p.spin=0;
       else if (held('down')) p.vx=0;
       else {
+        p.facing=steer||p.facing;
         p.vx=p.facing*(520+p.spin*50);
         p.power=.65;
         p.grapple=.18;
