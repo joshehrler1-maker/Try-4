@@ -1037,6 +1037,21 @@
         // reversals, keeping bash and vine actions separately controlled.
         const forestGrip=p.on?1.35:(reversing?1.22:1.15);
         p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*forestGrip);
+      }else if(index===16){
+        // Steamworks: deliberate run-and-gun footwork with quick grounded
+        // stopping, and limited midair reversals for telegraphed dodges.
+        const factoryGrip=p.on?(steer?1.28:1.65):(reversing?.56:.79);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*factoryGrip);
+      }else if(index===17){
+        // Snow Village: crisp ground starts, slippery momentum on ice,
+        // and a slightly softer airborne course correction.
+        const snowGrip=p.onIce?.58:(p.on?1.18:.88);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*snowGrip);
+      }else if(index===18){
+        // Canyon Crossing: grounded, committed parkour movement with
+        // low aerial authority, complementing the ledge-grab mechanic.
+        const canyonGrip=p.on?(reversing?1.4:1.08):(steer?.62:.42);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*canyonGrip);
       }else{
         p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
       }
