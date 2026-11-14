@@ -6236,6 +6236,38 @@
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
     }
     ctx.restore();
+    if(index===4 && rolling){
+      ctx.save();
+      ctx.translate(p.x,p.y+8);
+      ctx.scale(p.facing,1);
+      ctx.strokeStyle='#c6ed77';
+      ctx.lineWidth=3;
+      ctx.beginPath();
+      ctx.ellipse(0,0,23,17,-.32,.15,Math.PI*1.6);
+      ctx.stroke();
+      ctx.fillStyle='#a4d86b';
+      ctx.beginPath();
+      ctx.ellipse(-17,-12,8,3,-.65,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+    if(index===5 && gliding){
+      ctx.save();
+      ctx.translate(p.x,p.y-28);
+      ctx.strokeStyle='#e1f9ff';
+      ctx.lineWidth=2;
+      ctx.fillStyle='#73afd6';
+      ctx.beginPath();
+      ctx.moveTo(0,1);
+      ctx.quadraticCurveTo(-19,-14,-29,-2);
+      ctx.quadraticCurveTo(-11,-2,0,8);
+      ctx.quadraticCurveTo(11,-2,29,-2);
+      ctx.quadraticCurveTo(19,-14,0,1);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
     if(index===23 && gliding){
       ctx.save();
       ctx.translate(p.x,p.y-25);
