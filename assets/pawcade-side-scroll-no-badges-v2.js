@@ -328,7 +328,7 @@
         // Long acceleration corridors need more breathing room than
         // deliberate combat, precision and exploration passages.
         const worldReactionDistances=[
-          140,125,160,220,145,175,145,180,230,160,180,220,150,155,170,165,145,160,195,175,240,160,155,190,175
+          140,125,160,220,145,175,145,180,230,160,180,220,150,155,170,165,145,160,195,175,240,160,155,200,175
         ];
         const fastCourse=[3,7,8,11,20,23].includes(index);
         const combatCourse=[1,12,16,19,21,24].includes(index);
