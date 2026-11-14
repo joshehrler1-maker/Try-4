@@ -2128,6 +2128,10 @@
       const gliding=!p.on && held('jump') && p.vy>0;
       p.canopyOpen=Math.max(0,Math.min(1,(p.canopyOpen??0)+dt*(index===23?(gliding?8:-12):(gliding?12:-9))));
     }
+    if(index===6){
+      const lifting=!p.on && floatHasLift(p);
+      p.floatPose=Math.max(0,Math.min(1,(p.floatPose??0)+dt*(lifting?10:-7)));
+    }
     const stage = stageAt(p.x);
     if (oldY <= height && p.x>=finish && oldX<finish) {
       status(boss.health ? 'Baron Brasswhirl · '+guardian.hint : finaleExitHint);
@@ -6353,9 +6357,10 @@
       ctx.translate(0,p.y*2);ctx.scale(1,-1);
     }
     const feet=p.y+(p.morphed?12:22);
-    if(index===6 && !p.on && floatHasLift(p)){
+    if(index===6 && (reducedMotion ? !p.on && floatHasLift(p) : p.floatPose>0)){
+      const puff=reducedMotion?1:p.floatPose*(2-p.floatPose);
       ctx.translate(p.x,p.y);
-      ctx.scale(1.19,.94);
+      ctx.scale(1+.19*puff,1-.06*puff);
       ctx.translate(-p.x,-p.y);
     }
     if(p.morphed || squash){
