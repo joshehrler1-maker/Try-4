@@ -4580,7 +4580,11 @@
     // Keep the pose attached to the existing foe sprite, not a floating cue.
     const attackRhythm=[1.0,.75,1.3,1.2,.85,1.1,.7,1.4,1.25,.9,1.15,.8,
       1.35,.95,1.05,.65,1.3,1.1,.8,1.25,.95,1.4,.75,1.15,1.05][index];
-    const strikePhase=Math.min(1,reach*attackRhythm);
+    const strikePhase=Math.min(1,Math.max(0,reach*attackRhythm));
+    // Distinct reference-inspired action types: shield foes brace rather than
+    // punch, precision foes aim, and momentum foes strike in passing.
+    const defensiveWorld=[1,7,9,14,17,22].includes(index);
+    const precisionWorld=[4,11,13,16,21].includes(index);
     // Brief body-level recoil for confirmed bash states; no overhead markers.
     // A hit reaction must decay; a persistent bashed flag must not make
     // an enemy jitter forever. Advance only while the enemy is rendered.
@@ -4649,7 +4653,9 @@
       // alternate strikes, swimmers paddle, and flying foes bank their arms.
       const shooterWorld=[4,11,12,13,16,21,24].includes(index);
       const rushWorld=[0,3,8,15,20].includes(index);
-      const strike=shooterWorld?strikePhase*(side===dir?1:.55):
+      const strike=defensiveWorld?strikePhase*(side===dir?.35:.7):
+        precisionWorld?strikePhase*(side===dir?1.1:.35):
+        shooterWorld?strikePhase*(side===dir?1:.55):
         rushWorld?strikePhase*(side===dir?1:.25):strikePhase;
       const armSwing=airborne?Math.sin(animTime*6+side)*7:
         waterWorld?Math.sin(animTime*3.6+side*Math.PI)*6*poseArm:
