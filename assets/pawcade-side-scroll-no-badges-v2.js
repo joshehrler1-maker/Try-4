@@ -309,7 +309,7 @@
       platforms.push({x:start+x,y,w,kind});
       // Decorative, dangerous, temporary and overhead surfaces are not
       // safe enemy spawn locations. Keep encounters on stable walkable ledges.
-      if (['hazard','rail','ceiling','ceilingSpikes','current','drop'].includes(kind) || w<65) continue;
+      if (['hazard','rail','ceiling','ceilingSpikes','current','drop','spring','lift','pogo'].includes(kind) || w<65) continue;
       if (x>150 || w>850) {
         // Stage-specific encounter density: later chapters add one
         // opponent only on sufficiently broad, walkable platforms.
@@ -346,6 +346,9 @@
           const archetype=stage>=4 && (slot+encounter)%3===0 ? 3 :
             stage>=2 && (slot+encounter)%4===0 ? 2 :
             (stage*3+slot+encounter+index)%4;
+          // Keep the start of each chapter clear for checkpoint respawns.
+          // Do not remove foes elsewhere: the authored combat lanes remain.
+          if(x+offset<190) continue;
           const foe={x:start+x+offset,y:y-23,offset:slot+stage+encounter,
             archetype,spawnChapter:stage};
           if(index===1 && !libraryEnemyPlaced && x>=250 && w>=100){
