@@ -5884,16 +5884,38 @@
       ctx.lineTo(direction*(29+attackReach),-13);
       ctx.stroke();
     }else if(family===0){
-      ctx.beginPath();ctx.moveTo(-8,-38);ctx.quadraticCurveTo(-15+Math.sin(phase)*4,-48,-4,-54);ctx.stroke();
+      // Different furnace, wind, light and hull enemies use distinct
+      // antenna lengths and rhythms rather than identical motion loops.
+      const reach=9+(index%4)*3;
+      ctx.beginPath();ctx.moveTo(-8,-38);
+      ctx.quadraticCurveTo(-reach+Math.sin(phase)*4,-46-index%3*3,-4,-52-index%4*2);
+      ctx.stroke();
     }else if(family===1){
-      ctx.beginPath();ctx.moveTo(-20,-30);ctx.quadraticCurveTo(0,-43+Math.sin(phase)*5,20,-30);ctx.stroke();
+      const span=14+(index%4)*3;
+      ctx.beginPath();ctx.moveTo(-span,-30);
+      ctx.quadraticCurveTo(0,-39-index%3*3+Math.sin(phase)*5,span,-30);
+      if(index%2){ctx.moveTo(-span+3,-29);ctx.lineTo(-span+7,-24);}
+      ctx.stroke();
     }else if(family===2){
-      ctx.beginPath();ctx.ellipse(0,-26,24,6+Math.sin(phase)*2,0,0,Math.PI*2);ctx.stroke();
+      const radius=18+(index%5)*2;
+      ctx.beginPath();
+      ctx.ellipse(0,-26,radius,4+index%3+Math.sin(phase)*2,
+        (index%2?-.16:.16),0,Math.PI*2);
+      ctx.stroke();
     }else if(family===3){
-      ctx.beginPath();ctx.arc(0,-26,19+Math.sin(phase)*2,Math.PI*1.12,Math.PI*1.88);ctx.stroke();
+      const radius=15+(index%4)*3;
+      ctx.beginPath();ctx.arc(0,-26,radius+Math.sin(phase)*2,
+        Math.PI*(1.06+index%3*.04),Math.PI*(1.9-index%3*.03));
+      ctx.stroke();
     }else{
-      for(let n=0;n<3;n++){const a=phase+n*2.094;ctx.beginPath();
-        ctx.arc(Math.cos(a)*22,-27+Math.sin(a)*14,1.5,0,Math.PI*2);ctx.fill();}
+      const count=2+(index%3);
+      for(let n=0;n<count;n++){
+        const angle=phase+n*Math.PI*2/count;
+        ctx.beginPath();
+        ctx.arc(Math.cos(angle)*(17+index%4*2),
+          -27+Math.sin(angle)*(10+index%3*3),1.2+index%3*.3,0,Math.PI*2);
+        ctx.fill();
+      }
     }
     ctx.restore();
   }
