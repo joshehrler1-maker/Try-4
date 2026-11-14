@@ -314,6 +314,8 @@
         // Keep early chapters sparse and avoid overcrowding narrow ledges.
         const baseCount=Math.max(1,Math.floor(w/(room==='arena'?420:540)));
         const extraEncounter=stage>=3 && w>=720 && slot%3===stage%3 ? 1:0;
+        // Keep simultaneous enemy counts bounded on mobile while still
+        // giving later chapters denser encounters on large platforms.
         const count=Math.min(5,baseCount+extraEncounter);
         for(let encounter=0;encounter<count;encounter++) {
           // Alternate staggered encounter positions without changing the
