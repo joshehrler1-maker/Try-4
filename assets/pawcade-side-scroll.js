@@ -3769,7 +3769,11 @@
   }
   function drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft){
     if(reducedMotion || foe.dead) return;
-    const family=index%5, phase=clock*(2.1+index%4*.33)+foe.offset;
+    // Distinct chapter animation timing prevents late-stage enemies from
+    // repeating the exact same motion rhythm as opening-stage foes.
+    const family=index%5;
+    const animationPressure=1+Math.min(5,Math.max(0,chapter))*.035;
+    const phase=clock*(2.1+index%4*.33)*animationPressure+foe.offset;
     const stride=Math.min(1,Math.max(0,movingWeight||0));
     const direction=faceLeft?-1:1;
     ctx.save();ctx.translate(at.x,at.y);
