@@ -301,6 +301,7 @@
       }
       continue;
     }
+    let libraryEnemyPlaced=false;
     const pieces = window.pawtopiaRooms[room];
     for (const [slot, [x, y, w, kind = 'floor']] of pieces.entries()) {
       platforms.push({x:start+x,y,w,kind});
@@ -309,7 +310,14 @@
         const count = Math.max(1, Math.floor(w / (room==='arena' ? 420 : 540)));
         for(let encounter=0;encounter<count;encounter++) {
           const offset = Math.round(w*(encounter+1)/(count+1));
-          enemies.push({x:start+x+offset,y:y-23,offset:slot+stage+encounter});
+          const foe={x:start+x+offset,y:y-23,offset:slot+stage+encounter};
+          if(index===1 && !libraryEnemyPlaced && x>=250 && w>=100){
+            foe.libraryEnemy=stage;
+            foe.patrolLeft=start+x+22;
+            foe.patrolRight=start+x+w-22;
+            libraryEnemyPlaced=true;
+          }
+          enemies.push(foe);
         }
       }
       if(x>0) crystals.push({x:start+x+w*.58,y:y-35});
@@ -1430,6 +1438,24 @@
     ctx.stroke(foundryEarlyDetails[kind][1]);
     ctx.restore();
   }
+  const libraryEnemyArt=[["#9af1ff","#284576","M-25 11H22L17-8 7-8 4-21H-12L-16-8H-23Z","M-18 13h35m-29-18h17m6 4h11",36,0],["#ecf7ff","#365986","M-25 1L-15-15 -6-9 4-24 10-9 24-9 22 10 -7 16Z","M-17 2l11-6m10-7 9 9m-5 8h14",0,46],["#ddc7ff","#524283","M-28-6L-14-15 -2-8 7-19 17-12 29-3 12 1 3 13 -9 9Z","M-23-5l14 5 6 10m11-20 9 5",36,27],["#ffe495","#664835","M-20 14V-3L-11-10 -11-22 8-22 14-10 20-9 25 4 15 14Z","M-11-3h22m-17-13h12m8 9h11",0,0],["#f9a78e","#76394c","M-27 5L-22-10 -15-10 -7-19 5-16 10-8 25-6 27 9 -22 15Z","M-22 10h40m-26-19 11 3m12 0h10",54,0],["#b7ffda","#24646b","M-25 2Q-20-19-5-16L3-24 12-15Q29-11 24 7L12 14 -14 13Z","M-18 4q10 7 28 3m-14-20h13m4 6 8 4",30,20]].map(([light,dark,body,details,reach,rise])=>({
+    light,dark,body:new Path2D(body),details:new Path2D(details),reach,rise
+  }));
+  function drawLibraryEnemy(at,kind,faceLeft,firing){
+    const design=libraryEnemyArt[kind];
+    ctx.save();
+    ctx.translate(at.x,at.y);
+    if(faceLeft) ctx.scale(-1,1);
+    const shade=ctx.createRadialGradient(-9,-12,1,0,0,29);
+    shade.addColorStop(0,design.light);shade.addColorStop(1,design.dark);
+    ctx.fillStyle=shade;
+    ctx.fill(design.body);
+    ctx.strokeStyle=firing?'#fff8c2':design.light;
+    ctx.lineWidth=2;
+    ctx.lineCap='round';
+    ctx.stroke(design.details);
+    ctx.restore();
+  }
   function foePosition(foe) {
     if(foe.bashed && clock<foe.bashed.until){
       const t=.48-(foe.bashed.until-clock);
@@ -1462,6 +1488,13 @@
       }
       const shift=foe.foundryEnemy===1?0:foe.foundryEnemy===2?chase*surge**2*46:wave*24;
       return {x:patrolX(foe.x+shift),y:foe.y-(foe.foundryEnemy===1?hop*(2-hop)*49:0)};
+    }
+    if(foe.libraryEnemy!==undefined){
+      const design=libraryEnemyArt[foe.libraryEnemy];
+      const phase=clock*2.5+foe.offset;
+      const travel=foe.libraryEnemy===4?chase*Math.max(0,Math.sin(phase))**3:Math.sin(phase);
+      const lift=foe.libraryEnemy===1?Math.max(0,Math.sin(phase))**2:(1+Math.cos(phase))/2;
+      return {x:patrolX(foe.x+travel*design.reach),y:foe.y-lift*design.rise};
     }
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
@@ -3201,6 +3234,7 @@
         (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset);
+      else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe.libraryEnemy,faceLeft,firing);
       else if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
       else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
