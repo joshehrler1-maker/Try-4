@@ -1044,7 +1044,7 @@
     }
     // A guarded optional reward on the alternate route. Existing enemy AI
     // handles this encounter, so no new combat controls are required.
-    if(index!==7 && index!==14){
+    if(index!==7 && index!==14 && (index!==0 || stage>0)){
       const guardX=challengeX+290;
       // A guard needs an actual solid floor beneath it; otherwise the
       // procedural encounter may spawn over a pit or an elevated hazard.
@@ -5121,8 +5121,11 @@
       for(let seam=Math.ceil(x/38)*38;seam<x+w;seam+=38){
         ctx.fillRect(seam,y-topDepth,2,topDepth);
       }
-      ctx.fillStyle='#ffbd82';
-      ctx.fillRect(x,y-2,w,2);
+      // A dark seam under a warm lip keeps the forge landing readable against lava.
+      ctx.fillStyle='#291a24';
+      ctx.fillRect(x,y-1,w,3);
+      ctx.fillStyle='#ffe0aa';
+      ctx.fillRect(x,y-3,w,2);
     } else {
       drawLandingTrim(x,y,w,topDepth);
     }
