@@ -1912,6 +1912,43 @@
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
     }
     ctx.restore();
+    // Landing compression and takeoff trails are short, grounded cues.
+    // They track the player's feet and never affect collision geometry.
+    if(!reducedMotion){
+      const footY=p.y+(p.morphed?12:22);
+      const impact=Math.max(0,Math.min(1,(p.landingPose||0)/.13));
+      if(impact>.01){
+        ctx.save();
+        ctx.globalAlpha=impact*.58;
+        ctx.strokeStyle=light?'#c8b7ff':'#ffd39a';
+        ctx.lineWidth=2.5;
+        ctx.beginPath();
+        ctx.ellipse(p.x,footY+2,13+(1-impact)*29,3.5+(1-impact)*3,0,0,Math.PI*2);
+        ctx.stroke();
+        for(const direction of [-1,1]){
+          ctx.beginPath();
+          ctx.arc(p.x+direction*(18+(1-impact)*21),footY-2-(1-impact)*9,2.5+impact*2,0,Math.PI*2);
+          ctx.fillStyle=light?'#d9c5ff':'#ffe0ac';
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+      // A small wind trail conveys direction while gliding, without
+      // suggesting a character is standing on an invisible platform.
+      if(gliding){
+        ctx.save();
+        ctx.strokeStyle=light?'#b9a7ff99':'#b4e7ff99';
+        ctx.lineWidth=1.6;
+        for(let trail=0;trail<3;trail++){
+          const y=p.y-18+trail*10;
+          ctx.beginPath();
+          ctx.moveTo(p.x-p.facing*(19+trail*6),y);
+          ctx.lineTo(p.x-p.facing*(40+trail*9),y+3);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
     // Render the versioned, repository-backed original energy art in gameplay.
     // The first two sections of the SVG are slash arcs; the third is a paw.
     if(energyFxArt.complete && energyFxArt.naturalWidth && !reducedMotion &&
