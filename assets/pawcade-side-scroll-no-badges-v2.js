@@ -4617,11 +4617,19 @@
       ctx.strokeStyle=armor;ctx.lineWidth=radius;
       ctx.beginPath();ctx.moveTo(hip,at.y-6);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
       ctx.fillStyle=paw;ctx.beginPath();ctx.ellipse(footX+dir*2,footY,6,3.3,0,0,Math.PI*2);ctx.fill();
-      const armSwing=airborne?Math.sin(clock*6+side)*7:-side*swing*8*poseArm*chapterWeight;
-      const elbowX=shoulder+armSwing*.6+dir*reach*7;
-      const elbowY=at.y-18+Math.abs(armSwing)*.3-reach*4;
-      const handX=elbowX+armSwing*.5+dir*reach*13;
-      const handY=at.y-6-reach*13;
+      // Per-game combat pose: ranged threats brace both arms, rushers
+      // alternate strikes, swimmers paddle, and flying foes bank their arms.
+      const shooterWorld=[4,11,12,13,16,21,24].includes(index);
+      const rushWorld=[0,3,8,15,20].includes(index);
+      const strike=shooterWorld?reach*(side===dir?1:.55):
+        rushWorld?reach*(side===dir?1:.25):reach;
+      const armSwing=airborne?Math.sin(clock*6+side)*7:
+        waterWorld?Math.sin(clock*3.6+side*Math.PI)*6*poseArm:
+        -side*swing*8*poseArm*chapterWeight;
+      const elbowX=shoulder+armSwing*.6+dir*strike*7;
+      const elbowY=at.y-18+Math.abs(armSwing)*.3-strike*4;
+      const handX=elbowX+armSwing*.5+dir*strike*13;
+      const handY=at.y-6-strike*13;
       ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
       ctx.beginPath();ctx.moveTo(shoulder,at.y-28);ctx.lineTo(elbowX,elbowY);ctx.lineTo(handX,handY);ctx.stroke();
       ctx.strokeStyle=armor;ctx.lineWidth=radius;
