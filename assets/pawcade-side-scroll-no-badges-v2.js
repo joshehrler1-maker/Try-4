@@ -1779,6 +1779,21 @@
     if(phase==='playing') togglePause();
     else clearInput();
   });
+  // Mobile browsers may background a tab without reliably firing blur first.
+  // Suspend play and release held touches before navigating away or freezing.
+  window.addEventListener('pagehide',()=>{
+    if(phase==='playing') togglePause();
+    else clearInput();
+  });
+  window.addEventListener('freeze',()=>{
+    if(phase==='playing') togglePause();
+    else clearInput();
+  });
+  // Rotating a device can invalidate active touch coordinates and stick state.
+  window.addEventListener('orientationchange',clearInput);
+  window.addEventListener('pageshow',()=>{
+    if(phase!=='playing') clearInput();
+  });
   function burst(x,y,color,count) {
     for(let i=0;i<count && particles.length<96;i++){
       const angle=i/count*Math.PI*2;
