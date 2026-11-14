@@ -968,6 +968,9 @@
       .12,.14,.09,.115,.105,.13,.085,.11,.085,.1,.065,.085,.12,.13,.09][index];
     p.coyote=p.on ? edgeGrace : Math.max(0,p.coyote-dt);
     p.jumpBuffer=Math.min(inputBuffer,Math.max(0,p.jumpBuffer-dt));
+    // Preserve a freshly buffered jump through landing; the existing
+    // pre-movement jump check handles coyote jumps, while the post-
+    // collision check below handles a button press just before contact.
     if (p.jumpBuffer && (p.on || p.coyote>0 || (index===4 && movement==='roll' && p.power>.22 && p.jumps===0))) jump(false);
     p.jumpAge=(p.jumpAge||0)+dt;
     if (p.jumpCut && !held('jump') && p.jumpAge>=.035) {
@@ -1267,6 +1270,9 @@
       if (!landed && p.vy >= 0 && oldY+body <= ledge.y && p.y+body >= ledge.y) {
         if(!wasGrounded && p.vy>190) p.landingPose=.13;
         p.y = ledge.y-body;p.vy = 0;p.on = true;p.jumps = 0;p.dashUsed=false;
+        // Consume the buffered jump on the landing tick instead of
+        // requiring the player to wait until the next simulation frame.
+        if(p.jumpBuffer>0 && !p.pogo) jump(false);
         if(p.pogo){p.vy=-410;p.pogo=false;p.on=false;}
         p.jumpCut=false;
         landed = true;
