@@ -697,7 +697,8 @@
         enemies.push({x:guardX,y:guardFloor.y-23,
           offset:stage+index+31,
           patrolLeft:Math.max(guardFloor.x+20,guardX-50),
-          patrolRight:Math.min(guardFloor.x+guardFloor.w-20,guardX+50),
+          patrolRight:Math.max(guardX,
+            Math.min(guardFloor.x+guardFloor.w-20,guardX+50)),
           turret:movement==='shooter'||movement==='buster'});
         crystals.push({x:guardX+42,y:guardFloor.y-44});
       }
