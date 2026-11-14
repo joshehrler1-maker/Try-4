@@ -8600,6 +8600,7 @@
       for(const i of saved.enemies) if(enemies[i]) enemies[i].dead=true;
       taken=crystals.filter(c=>c.taken).length;
       player=resetPlayer(stageStarts[chapter]+100);
+      player.grace=1.1;
       camera=Math.max(0,player.x-238);
       status(chapters[chapter]+' · Checkpoint resumed.');
       hud();
