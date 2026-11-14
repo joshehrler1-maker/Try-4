@@ -625,7 +625,7 @@
       case 'capture': {
         if(p.carry){shot({v:p.facing*550,damage:2});p.carry=false;break;}
         const foe=nearby(strength);
-        if(foe){foe.dead=true;p.carry=true;status('Enemy caught. Press '+techniqueName+' again to throw.');}
+        if(foe){foe.dead=true;p.carry=true;status(index===10?'Enemy caught. Jump in midair for a boost, or use '+techniqueName+' again to throw.':'Enemy caught. Press '+techniqueName+' again to throw.');}
         break;
       }
       case 'flip': action();break;
@@ -2521,6 +2521,17 @@
   }
   const beatPeriod = .65;
   const isOnBeat = position => position < .2 || position > .52;
+  function drawWindSailCarry() {
+    if(index!==10 || phase!=='playing' || !player.carry) return;
+    ctx.save();
+    ctx.fillStyle='#302036';
+    ctx.fillRect(13,12,260,25);
+    ctx.fillStyle='#ffe0a5';
+    ctx.font='bold 11px system-ui';
+    ctx.textAlign='left';
+    ctx.fillText('Carrying enemy · Jump in midair or use '+techniqueName+' to throw',20,28,246);
+    ctx.restore();
+  }
   function drawGravityStatus() {
     if(index!==7 || power!=='flip' || phase!=='playing') return;
     const ready=player.on && player.power<=0;
@@ -3283,6 +3294,7 @@
       ctx.fillText(phase==='paused'?'Paused':name,width/2,165);
       ctx.font='18px system-ui';ctx.fillText(phase==='paused'?'Resume when ready':opening,width/2,206);
     }
+    drawWindSailCarry();
     drawGravityStatus();
     drawBeatMeter();
   }
