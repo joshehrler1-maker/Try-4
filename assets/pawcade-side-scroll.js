@@ -323,7 +323,11 @@
             Math.round(w*(encounter+1)/(count+1))+stagger));
           // Deterministic encounter archetypes: different patrol rhythms
           // within each stage, without randomizing checkpoint resumes.
-          const archetype=(stage*3+slot+encounter+index)%4;
+          // A later chapter deliberately introduces more raiders and
+          // skirmishers while retaining a mix of scouts and sentries.
+          const archetype=stage>=4 && (slot+encounter)%3===0 ? 3 :
+            stage>=2 && (slot+encounter)%4===0 ? 2 :
+            (stage*3+slot+encounter+index)%4;
           const foe={x:start+x+offset,y:y-23,offset:slot+stage+encounter,
             archetype,spawnChapter:stage};
           if(index===1 && !libraryEnemyPlaced && x>=250 && w>=100){
