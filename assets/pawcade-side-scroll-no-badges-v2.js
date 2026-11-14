@@ -384,17 +384,34 @@
     const longGround=pieces.filter(([rx,ry,rw,rk='floor'])=>
       rk==='floor' && ry>=310 && rw>=560);
     for(const [rx,ry,rw] of longGround){
+      const fastRoute=[3,8,20].includes(index);
+      const aerialRoute=[5,6,10,11,15,23].includes(index);
+      const precisionRoute=[7,9,14,18,21].includes(index);
+      const aquaticRoute=[2,19].includes(index);
       const routeCount=rw>=1250?3:rw>=850?2:1;
       for(let route=0;route<routeCount;route++){
-        const routeW=routeWidths[index]+((stage+route)%3-1)*12;
-        const localX=rx+Math.round(rw*(route+1)/(routeCount+1)-routeW*.5);
-        const routeY=ry-routeHeights[index]-((stage+route)%3)*17;
-        if(localX<rx+185 || localX+routeW>rx+rw-95) continue;
+        // Speed courses use broad landing decks; aerial courses use
+        // alternating stepping stones; precision courses use narrower,
+        // higher ledges. Swimming routes stay open for free movement.
+        const widthFactor=fastRoute?1.38:precisionRoute?.72:
+          aerialRoute?.82:aquaticRoute?.88:1;
+        const routeW=Math.round((routeWidths[index]+
+          ((stage+route)%3-1)*12)*widthFactor);
+        const routeDrift=aerialRoute?(route%2?48:-34):
+          precisionRoute?(route%2?-25:25):0;
+        const localX=rx+Math.round(rw*(route+1)/(routeCount+1)-
+          routeW*.5+routeDrift);
+        const routeRise=routeHeights[index]+
+          (precisionRoute?12:aerialRoute?9:fastRoute?-12:0);
+        const routeY=ry-routeRise-((stage+route)%3)*17;
+        if(localX<rx+185 || localX+routeW>rx+rw-95 ||
+           routeY<100) continue;
         const worldX=start+localX;
-        // Do not block authored upper routes, hazards, or moving platforms.
+        // Avoid intersecting any existing geometry, including hazards
+        // and overhead structures, not only similarly elevated ledges.
         const overlaps=platforms.some(ledge=>
-          ledge.x<worldX+routeW+24 && ledge.x+ledge.w>worldX-24 &&
-          Math.abs(ledge.y-routeY)<57);
+          ledge.x<worldX+routeW+18 && ledge.x+ledge.w>worldX-18 &&
+          Math.abs(ledge.y-routeY)<65);
         if(!overlaps){
           platforms.push({x:worldX,y:routeY,w:routeW,kind:'floor',
             optionalRoute:true});
