@@ -972,6 +972,12 @@
     const steer = movement==='beat' ? 1 : Number(held('right')) - Number(held('left'));
     const vertical = Number(held('down'))-Number(held('up') || held('jump'));
     if (steer) p.facing = steer;
+    // High-speed courses reward momentum but do not permit unlimited
+    // speed accumulation after springs, slopes or scripted launches.
+    const horizontalLimit=[1.3,1.2,1.15,2.25,1.5,1.25,1.2,1.15,1.25,
+      1.35,1.3,1.4,1.2,1.25,1.2,1.35,1.2,1.3,1.2,1.3,2.1,1.2,1.3,1.2,1.3][index];
+    const maxHorizontal=runSpeed*speedFactor*horizontalLimit;
+    if(Math.abs(p.vx)>maxHorizontal) p.vx=Math.sign(p.vx)*maxHorizontal;
     const speedRun=index===20 && p.on && steer && steer*p.vx>0;
     const topSpeed = runSpeed * speedFactor * (speedRun ? 1.32 : 1);
     const reversing = steer && Math.sign(p.vx) !== steer;
