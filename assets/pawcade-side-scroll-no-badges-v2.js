@@ -968,7 +968,12 @@
     if (p.jumpBuffer && (p.on || p.coyote>0 || (index===4 && movement==='roll' && p.power>.22 && p.jumps===0))) jump(false);
     p.jumpAge=(p.jumpAge||0)+dt;
     if (p.jumpCut && !held('jump') && p.jumpAge>=.035) {
-      if (p.vy < -jumpSpeed*.45) p.vy=-jumpSpeed*.45;
+      // Variable jump-height control is stronger in precision games,
+      // gentler in floaty and momentum-based adventures.
+      const releaseScale=[.43,.48,.62,.65,.5,.6,.58,.42,.72,.52,
+        .64,.36,.58,.54,.5,.55,.55,.5,.6,.62,.68,.55,.52,.62,.58][index];
+      if (p.vy < -jumpSpeed*releaseScale)
+        p.vy=-jumpSpeed*releaseScale;
       p.jumpCut=false;
     }
     p.techCooldown=Math.max(0,(p.techCooldown||0)-dt);
