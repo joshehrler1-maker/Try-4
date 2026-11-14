@@ -1192,7 +1192,17 @@
       530,690,790,610,720,620,780,690,740,450,850,750,650,500,800][index];
     const terminalRise=[780,820,410,850,760,620,540,750,920,770,
       610,790,830,680,770,700,840,760,780,480,880,810,710,560,860][index];
-    p.vy=Math.max(-terminalRise,Math.min(terminalFall,p.vy));
+    // Cloud City's precision descent: holding down accelerates toward a
+    // higher fall-speed cap, allowing deliberate fast-fall landings.
+    // Unlike a teleport or instant speed change, this ramps smoothly.
+    if(index===11 && p.gravity>0 && !p.on && held('down') &&
+       p.vy>0 && !(movement==='airdash' && p.power>.22)){
+      p.fastFallBoost=Math.min(145,(p.fastFallBoost||0)+310*dt);
+    }else{
+      p.fastFallBoost=Math.max(0,(p.fastFallBoost||0)-390*dt);
+    }
+    const adjustedFall=terminalFall+(index===11?(p.fastFallBoost||0):0);
+    p.vy=Math.max(-terminalRise,Math.min(adjustedFall,p.vy));
     p.y += p.vy*dt;
     if(index===11){
       const prism=landmarks.find(prop=>prop.cell===5);
