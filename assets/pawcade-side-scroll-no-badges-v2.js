@@ -4143,11 +4143,29 @@
       if(mx<x+8||mx>x+w-8)continue;
       ctx.beginPath();
       if(['circuit','gravity','orbit','hull','gear'].includes(marking)){
-        ctx.arc(mx,y-4.5,marking==='orbit'?3:2,0,Math.PI*2);
-        ctx.stroke();
-        if(marking==='circuit'||marking==='hull'){
-          ctx.moveTo(mx+4,y-4.5);ctx.lineTo(mx+12,y-4.5);ctx.stroke();
+        // Mechanical worlds each get their own silhouette instead of
+        // sharing a circular stamp with a different label.
+        if(marking==='circuit'){
+          ctx.moveTo(mx-7,y-5);ctx.lineTo(mx-2,y-5);ctx.lineTo(mx+1,y-3);
+          ctx.lineTo(mx+7,y-3);ctx.stroke();
+          ctx.beginPath();ctx.arc(mx+7,y-3,1.3,0,Math.PI*2);ctx.fill();
+        }else if(marking==='gravity'){
+          ctx.moveTo(mx-5,y-5);ctx.quadraticCurveTo(mx,y-8,mx+5,y-5);
+          ctx.moveTo(mx-3,y-3);ctx.quadraticCurveTo(mx,y-1,mx+3,y-3);
+          ctx.stroke();
+        }else if(marking==='orbit'){
+          ctx.ellipse(mx,y-4.5,6,2.1,-.2,0,Math.PI*2);ctx.stroke();
+          ctx.beginPath();ctx.arc(mx+4,y-5.5,1.3,0,Math.PI*2);ctx.fill();
+        }else if(marking==='hull'){
+          ctx.moveTo(mx-7,y-6);ctx.lineTo(mx-4,y-3);ctx.lineTo(mx+4,y-3);
+          ctx.lineTo(mx+7,y-6);ctx.stroke();
+          ctx.beginPath();ctx.arc(mx,y-4.5,1.2,0,Math.PI*2);ctx.fill();
+        }else{
+          ctx.strokeRect(mx-4,y-6,8,3);
+          ctx.moveTo(mx-6,y-4.5);ctx.lineTo(mx-4,y-4.5);
+          ctx.moveTo(mx+4,y-4.5);ctx.lineTo(mx+6,y-4.5);ctx.stroke();
         }
+      }
       }else if(['leaf','petal','coral','wood','wind','wave','cloud','snow'].includes(marking)){
         // Individually drawn silhouettes, not the same oval recolored
         // for eight otherwise unrelated game worlds.
