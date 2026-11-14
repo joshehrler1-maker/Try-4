@@ -1911,7 +1911,13 @@
           y:foe.y-50-Math.cos(t*1.6)*enemyRise+dive*enemyRise*.35};
       }
       case 'school': return {x:foe.x+wave*enemyReach,y:foe.y-33-Math.sin(t*3)*enemyRise};
-      case 'pursuit': return {x:patrolX(foe.x+chase*(enemyReach*(.55+wave*.45))),y:foe.y-enemyRise};
+      case 'pursuit': { // Celeste-inspired chase: approach, pause, retreat
+        const cycle=(t*.42)%3;
+        const advance=cycle<1 ? cycle : cycle<1.7 ? 1 :
+          Math.max(.3,1-(cycle-1.7)*.5);
+        return {x:patrolX(foe.x+chase*enemyReach*advance),
+          y:foe.y-enemyRise};
+      }
       case 'rhythm': { // Geometry Dash-inspired predictable beat timing
         const beat=Math.floor(t*1.5);
         const beatPhase=(t*1.5)%1;
