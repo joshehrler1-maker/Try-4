@@ -1928,7 +1928,7 @@
     if(index===9){ // Quarry Rescue: guarding a fixed grapple lane
       const sweep=Math.sin(t*.85);
       return {x:patrolX(foe.x+sweep*enemyReach*.5),
-        y:foe.y-Math.max(0,Math.sin(t*1.7))*enemyRise*.35};
+        y:foe.y};
     }
     if(index===12){ // Thunder Harbor: measured armored charge and recovery
       const surge=Math.max(0,Math.sin(t*1.2));
@@ -1952,7 +1952,7 @@
     if(index===18){ // Canyon Crossing: patrol at rope-bridge crossings
       const patrol=Math.sin(t*.9);
       return {x:patrolX(foe.x+patrol*enemyReach*.75),
-        y:foe.y-Math.max(0,Math.sin(t*1.8))*enemyRise*.3};
+        y:foe.y};
     }
     if(index===20){ // Neon Circuit: burst sprint then braking phase
       const sprint=Math.sin(t*1.55);
@@ -1980,12 +1980,12 @@
       const cycle=(t*.65)%2;
       const rush=cycle<.55?cycle/.55:cycle<1.1?1:Math.max(0,1-(cycle-1.1)/.9);
       return {x:patrolX(foe.x+chase*rush*enemyReach*.7),
-        y:foe.y-Math.sin(t*1.6)*enemyRise*.2};
+        y:foe.y};
     }
     if(index===21){ // Marble Temple: guarded pendulum sweeps
       const swing=Math.sin(t*.9);
       return {x:patrolX(foe.x+swing*enemyReach*.65),
-        y:foe.y-Math.max(0,Math.cos(t*.9))*enemyRise*.5};
+        y:foe.y};
     }
     if(index===24){ // Starship Cargo: hovering drone patrols
       const drift=Math.sin(t*1.25);
