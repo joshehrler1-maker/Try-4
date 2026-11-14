@@ -4076,17 +4076,25 @@
         Math.ceil((surfaceEnd-x)/cell));
       ctx.strokeStyle=palette[0];ctx.lineWidth=1.4;
       ctx.globalAlpha=.78;
+      const flowing=pattern==='ripples'||pattern==='spray'||
+        pattern==='sails'||pattern==='cloud'||pattern==='current'||pattern==='reeds';
+      const angular=pattern==='speed'||pattern==='pulse'||
+        pattern==='rails'||pattern==='polarity';
+      const organic=pattern==='grain'||pattern==='leaves'||
+        pattern==='bamboo'||pattern==='petals'||pattern==='frost';
+      const hardware=pattern==='rivets'||pattern==='bolts'||
+        pattern==='forge'||pattern==='vents'||pattern==='circuit'||pattern==='hull';
       for(let k=firstCell;k<=lastCell;k++){
         const px=x+k*cell+cell*.5;
         if(px<surfaceStart+6||px>surfaceEnd-6)continue;
         ctx.beginPath();
-        if(['ripples','spray','sails','cloud','current','reeds'].includes(pattern)){
+        if(flowing){
           ctx.moveTo(px-8,y-3);ctx.quadraticCurveTo(px,y-6,px+8,y-3);
-        }else if(['speed','pulse','rails','polarity'].includes(pattern)){
+        }else if(angular){
           ctx.moveTo(px-7,y-5);ctx.lineTo(px,y-2);ctx.lineTo(px+7,y-5);
-        }else if(['grain','leaves','bamboo','petals','frost'].includes(pattern)){
+        }else if(organic){
           ctx.moveTo(px-5,y-3);ctx.lineTo(px+4,y-5);
-        }else if(['rivets','bolts','forge','vents','circuit','hull'].includes(pattern)){
+        }else if(hardware){
           ctx.arc(px,y-4,1.5,0,Math.PI*2);
         }else{
           ctx.moveTo(px-6,y-4);ctx.lineTo(px+6,y-4);
