@@ -83,8 +83,8 @@
     catalog.before(notice);
     return;
   }
-  // Fifteen individually authored stage-1 set pieces (not collision geometry).
-  // Images are per-game: no other game requests these fifteen files.
+  // Twenty individually authored stage-1 set pieces (not collision geometry).
+  // Images are per-game: no other game requests these twenty files.
   const firstStageLandmarkPaths = [
     'assets/scenes/ember-foundry/cold-intake-beacon.svg',
     'assets/scenes/moonlit-library/atlas-lectern.svg',
@@ -100,7 +100,22 @@
     'assets/scenes/cloud-city/cloud-ferry-beacon.svg',
     'assets/scenes/thunder-harbor/breakwater-lightning-rod.svg',
     'assets/scenes/autumn-trail/feather-trail-marker.svg',
-    'assets/scenes/inverted-observatory/lower-dome-star-lens.svg'
+    'assets/scenes/inverted-observatory/lower-dome-star-lens.svg',
+    'assets/scenes/bamboo-village/bamboo-gate-lantern.svg',
+    'assets/scenes/steamworks/intake-valve-pressure-console.svg',
+    'assets/scenes/snow-village/hearth-trail-ember-marker.svg',
+    'assets/scenes/canyon-crossing/rope-bridge-winch.svg',
+    'assets/scenes/submarine-dock/research-pier-sonar-beacon.svg'
+  ];
+  const firstStageLandmarkPositions = [
+    // First 15 game props retain their established decorative placement.
+    ...Array.from({length:15}, () => [590,326-170,180,170]),
+    // Batch 4: align prop feet with the actual first-room platform/floor tops.
+    [590,62,160,170],   // Bamboo Village roots, x=570..765, y=232
+    [620,156,175,170],  // Steamworks arena, floor y=326
+    [585,130,170,170],  // Snow Village bazaar ledge, x=560..795, y=300
+    [475,156,170,170],  // Canyon Crossing traps, x=465..720, y=326
+    [490,156,170,170]   // Submarine Dock barracks, floor y=326
   ];
   const firstStageLandmark = index < firstStageLandmarkPaths.length ? new Image() : null;
   if (firstStageLandmark) firstStageLandmark.src = firstStageLandmarkPaths[index];
@@ -6893,8 +6908,11 @@
     ctx.translate(-camera,0);
     // Painted depth-plane landmark only: platform tops, hitboxes and hazard
     // positions remain governed by the per-game world collision data.
-    if (firstStageLandmark?.naturalWidth && camera < 820 && camera + width > 590) {
-      ctx.drawImage(firstStageLandmark, 590, ground - 170, 180, 170);
+    if (firstStageLandmark?.naturalWidth) {
+      const [artX,artY,artW,artH] = firstStageLandmarkPositions[index];
+      if (artX + artW >= camera && artX <= camera + width) {
+        ctx.drawImage(firstStageLandmark, artX, artY, artW, artH);
+      }
     }
     for (const wall of walls) {
       if (wall.x<camera-20 || wall.x>camera+width) continue;
