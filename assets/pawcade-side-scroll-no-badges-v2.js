@@ -3614,6 +3614,9 @@
     const interval=[90,115,130,105,112,124,120,108,88,102,132,116,106,122,118,104,110,126,116,94,100,112,108,118,96][index];
     const first=Math.max(0,Math.floor((camera-x)/interval)-1);
     const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
+    // Do not allocate a canvas state when the visible strip has no
+    // signature-art cells (common for short platforms at screen edges).
+    if(last<first)return;
     ctx.save();ctx.lineJoin='round';
     for(let n=first;n<=last;n++){
       const px=x+interval*n+interval*.48;
@@ -4038,10 +4041,9 @@
             const ventY=y+10;
             ctx.fillStyle='#261b2e';
             ctx.fillRect(ventX,ventY,cell*.38,5);
-            const heat=ctx.createLinearGradient(0,ventY,0,ventY+5);
-            heat.addColorStop(0,'#ffce81');
-            heat.addColorStop(1,'#c64d40');
-            ctx.fillStyle=heat;
+            // Reuse a solid emissive accent: a five-pixel gradient per vent
+            // adds allocations but almost no visible detail on a phone.
+            ctx.fillStyle=(stage%2===0?'#ffb76a':'#e98358');
             ctx.fillRect(ventX+2,ventY+2,cell*.38-4,1.5);
             ctx.strokeStyle='#8f6b76';ctx.lineWidth=1;
             for(let slit=0;slit<3;slit++){
