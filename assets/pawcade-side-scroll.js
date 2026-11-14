@@ -1639,6 +1639,26 @@
     ctx.fillStyle=topLight;
     ctx.fill();
     ctx.restore();
+    // Subtle moving specular highlights give polished materials a sense
+    // of volume while keeping the landing line stable and easy to read.
+    // Organic/stone surfaces stay matte; ice, metal and crystal respond.
+    const highlightType=[2,0,1,0,0,1,2,2,2,0,0,1,0,0,2,0,0,1,0,1,2,2,0,0,1][index];
+    if(highlightType && !reducedMotion){
+      const bandWidth=highlightType===1?30:18;
+      const cycle=1400+index*37;
+      const progress=((clock*(highlightType===1?38:24)+x*.08+index*59)%cycle)/cycle;
+      const hx=x-60+progress*(w+120);
+      if(hx+bandWidth>x && hx<x+w){
+        ctx.save();
+        ctx.beginPath();ctx.rect(x+2,y-topDepth,Math.max(0,w-4),topDepth);ctx.clip();
+        const gleam=ctx.createLinearGradient(hx,y,hx+bandWidth,y);
+        gleam.addColorStop(0,'rgba(255,255,255,0)');
+        gleam.addColorStop(.5,highlightType===1?'rgba(255,255,255,.19)':'rgba(255,255,255,.12)');
+        gleam.addColorStop(1,'rgba(255,255,255,0)');
+        ctx.fillStyle=gleam;ctx.fillRect(hx,y-topDepth,bandWidth,topDepth);
+        ctx.restore();
+      }
+    }
     ctx.fillStyle=rim;
     ctx.fillRect(x,y,w,3);
     // World-specific top-surface detailing makes the playable platform
