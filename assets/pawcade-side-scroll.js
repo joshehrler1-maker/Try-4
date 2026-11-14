@@ -1822,7 +1822,11 @@
     // Different encounter archetypes get distinct movement envelopes:
     // scout = narrow, sentry = measured, skirmisher = wide, raider = sharp.
     const patrolSpan=[.75,.9,1.15,1][foe.archetype??0];
-    const wave = Math.sin(t*2.1)*patrolSpan;
+    // Raiders lunge then recover, while skirmishers move on a smooth arc.
+    // This changes position and dodge timing, not merely visual effects.
+    const baseWave=Math.sin(t*2.1);
+    const wave=(foe.archetype===3 ?
+      Math.sign(baseWave)*Math.pow(Math.abs(baseWave),3) : baseWave)*patrolSpan;
     if(foe.foundryEnemy!==undefined){
       // Foundry enemies have authored hop/charge cycles; scale the entire
       // cycle rather than replacing their distinct attack motion.
