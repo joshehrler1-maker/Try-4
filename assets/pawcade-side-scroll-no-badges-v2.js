@@ -668,6 +668,19 @@
         stageWidths[stage]-signatureSpan-100,
         1510+stage%3*47));
       const signatureFits=stageWidths[stage]>=signatureSpan+320;
+      // Five original challenge beats per adventure: teach the movement,
+      // practice it, introduce a safe variation, combine, then reward.
+      // Each world gets a distinct stage rhythm, rather than a generic
+      // difficulty multiplier applied to every platformer.
+      const worldBeatOrders=[
+        [0,1,2,3,4],[0,2,1,3,4],[1,0,2,4,3],[0,1,3,2,4],[1,2,0,3,4],
+        [0,2,3,1,4],[1,0,3,2,4],[2,0,1,4,3],[0,3,1,2,4],[1,3,0,2,4],
+        [2,1,0,3,4],[0,2,1,4,3],[1,0,2,4,3],[2,0,3,1,4],[0,3,2,1,4],
+        [1,2,3,0,4],[0,1,3,4,2],[2,1,3,0,4],[1,3,2,0,4],[0,2,4,1,3],
+        [0,3,1,4,2],[1,0,4,2,3],[2,1,0,4,3],[0,2,3,4,1],[1,3,0,4,2]
+      ];
+      const beatOrder=worldBeatOrders[index];
+      const chapterBeat=beatOrder[stage%beatOrder.length];
       for(const [slot,[dx,sy,sw,kind]] of (signatureFits?signature:[]).entries()){
         const sx=signatureX+dx;
         const height=sy+((stage+slot)%3-1)*8;
