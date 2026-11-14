@@ -431,7 +431,15 @@
     }
     let libraryEnemyPlaced=false;
     let reefEnemyPlaced=false;
-    let clockEnemyPlaced=false;
+    // Clocktower rivals enter on different lanes as each zone introduces its mechanics.
+    const clockRival = index===3 ? [
+      [3,.67], // Coastal Run: upper bank after the launch spring.
+      [3,.78], // Chemical Works: far end of the upper conveyor.
+      [2,.60], // Sunken Ruins: raised route above the current.
+      [6,.72], // Pinball Hall: exit conveyor beyond the spring chain.
+      [4,.66], // Volcanic Ridge: landing beyond the last spring.
+      [4,.57], // Crystal Cavern: high shelf before the floor hazard.
+    ][stage] : null;
     const pieces = window.pawtopiaRooms[room];
     for (const [slot, [x, y, w, kind = 'floor']] of pieces.entries()) {
       platforms.push({x:start+x,y,w,kind});
@@ -512,8 +520,10 @@
           // Reserve a full body-width at each edge so foes do not spawn
           // with their feet hanging over narrow or staggered ledges.
           const edgeMargin=Math.min(38,Math.max(16,w*.2));
-          const offset=Math.max(edgeMargin,Math.min(w-edgeMargin,
-            Math.round(w*(encounter+1)/(count+1))+stagger));
+          const isClockRival=clockRival?.[0]===slot && encounter===0;
+          const targetOffset=isClockRival ? Math.round(w*clockRival[1]) :
+            Math.round(w*(encounter+1)/(count+1))+stagger;
+          const offset=Math.max(edgeMargin,Math.min(w-edgeMargin,targetOffset));
           // Deterministic encounter archetypes: different patrol rhythms
           // within each stage, without randomizing checkpoint resumes.
           // A later chapter deliberately introduces more raiders and
@@ -541,11 +551,10 @@
             foe.y=[198,154,204,124,181,148][stage];
             reefEnemyPlaced=true;
           }
-          if(index===3 && !clockEnemyPlaced && x>=250 && w>=120){
+          if(isClockRival){
             foe.clockEnemy=stage;
             foe.patrolLeft=start+x+26;
             foe.patrolRight=start+x+w-26;
-            clockEnemyPlaced=true;
           }
           // Keep staggered enemies from spawning on top of one another.
           // Compare only foes on the same walking surface; swimmers use
