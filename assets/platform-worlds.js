@@ -663,11 +663,14 @@ for(const room of window.pawtopiaRoomPlans[7].split(' ')){
   const floor=platforms.filter(([,y])=>y===326);
   const ceiling=platforms.filter(([, , ,kind])=>kind==='ceiling');
   for(const [i, ledge] of ceiling.entries()){
+    // Gravity routes need a matching takeoff and landing. Skip malformed
+    // pairs rather than crashing the entire 25-game catalog at startup.
+    if(!floor[i] || !floor[i+1]) continue;
     const [left,,width]=floor[i];
     const entry=left+width-110;
     const exit=floor[i+1][0]+110;
     ledge[0]=Math.min(ledge[0],entry);
-    ledge[2]=exit-ledge[0];
+    ledge[2]=Math.max(48,exit-ledge[0]);
   }
 }
 
