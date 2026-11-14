@@ -2821,7 +2821,6 @@
       ctx.fillStyle='#50678a';ctx.fillRect(t.x,t.y-13,t.w,13);
       ctx.fillStyle='#92e4ef';ctx.fillRect(t.x,t.y-13,t.w,2);
     }
-    const ledgeColors={drop:'#d59155',barrel:'#a76c40',pogo:'#9e76c5',ice:'#8edaf3',rail:'#d6b87f',ceiling:'#7258a8',hazard:'#e64562',floor:'#25364a',shelf:'#71648d',spring:'#579578',belt:'#a56b4b',current:'#387d9b',lift:'#547d9c'};
     for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
       if (ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
       if(ledge.switchBridge && !amberSwitch) continue;
@@ -2908,41 +2907,27 @@
         ctx.restore();
         continue;
       }
-      if (ledge.kind==='ceiling') {
-        const depth=24;
-        const rim=courseMaterials[index][2];
-        ctx.fillStyle=courseMaterials[index][1];
-        ctx.fillRect(ledge.x,ledge.y-depth,ledge.w,depth);
-        if (terrainArt.naturalWidth) {
-          const count=Math.ceil(ledge.w/142);
-          const tileWidth=ledge.w/count;
-          for(let part=0;part<count;part++){
-            atlasSprite(terrainArt,4,terrainCells.ceiling,ledge.x+(part+.5)*tileWidth,ledge.y-depth/2,tileWidth,depth);
-          }
-        }
-        ctx.fillStyle=rim;
-        ctx.fillRect(ledge.x,ledge.y-3,ledge.w,3);
+      if(ledge.kind==='ceiling'){
+        ctx.save();
+        ctx.translate(0,ledge.y*2);
+        ctx.scale(1,-1);
+        drawCoursePlatform(ledge);
+        ctx.restore();
         continue;
       }
-      const depth=ledge.kind==='floor'?65:ledge.kind==='hazard'?Math.max(16,ground-ledge.y):24;
-      const variant=stageSurfaces[index]?.[ledge.kind];
-      const stageVariant=stagePropArt.naturalWidth && variant!==undefined;
-      if(stageVariant || (terrainArt.naturalWidth && Object.hasOwn(terrainCells,ledge.kind))){
-        const image=stageVariant?stagePropArt:terrainArt;
-        const cell=stageVariant?variant:terrainCells[ledge.kind];
-        const rows=stageVariant?2:4;
-        const count=Math.max(1,Math.ceil(ledge.w/(ledge.kind==='hazard'?112:142)));
-        const tileWidth=ledge.w/count;
-        ctx.fillStyle='#090e1d75';
-        ctx.fillRect(ledge.x+3,ledge.y+7,ledge.w,depth);
-        for(let part=0;part<count;part++) {
-          atlasSprite(image,4,cell,ledge.x+(part+.5)*tileWidth,ledge.y+depth*.5,tileWidth,depth,false,rows);
-        }
-        if(ledge.kind!=='hazard' && ledge.kind!=='rail' && ledge.kind!=='ceiling') {
-          drawPlatformConstruction(ledge,depth);
-          drawLandingEdge(ledge);
-          drawDropWarning(ledge);
-        }
+      if(ledge.kind==='rail'){
+        const [,recess,rim]=courseMaterials[index];
+        ctx.fillStyle=recess;
+        ctx.fillRect(ledge.x,ledge.y,ledge.w,7);
+        ctx.fillStyle=rim;
+        ctx.fillRect(ledge.x,ledge.y,ledge.w,2);
+        continue;
+      }
+      if(ledge.kind!=='hazard'){
+        drawCoursePlatform(ledge);
+        drawPlatformAccents(ledge);
+        drawLandingEdge(ledge);
+        drawDropWarning(ledge);
         continue;
       }
       if (ledge.kind==='hazard') {
@@ -2956,19 +2941,6 @@
         }
         ctx.fill();
         continue;
-      }
-      const gradient=ctx.createLinearGradient(0,ledge.y,0,ledge.y+54);
-      gradient.addColorStop(0,ledgeColors[ledge.kind]);gradient.addColorStop(1,'#0c1220');
-      ctx.fillStyle=gradient;
-      ctx.fillRect(ledge.x,ledge.y,ledge.w,ledge.kind==='hazard'?43:ledge.kind==='floor'?65:18);
-      if(ledge.kind!=='rail' && ledge.kind!=='ceiling') {
-        drawPlatformConstruction(ledge,depth);
-        drawLandingEdge(ledge);
-        drawDropWarning(ledge);
-      }
-      if (ledge.kind==='belt' || ledge.kind==='spring' || ledge.kind==='lift') {
-        ctx.fillStyle='#ffffff4d';
-        for(let x=ledge.x+9;x<ledge.x+ledge.w-7;x+=20) ctx.fillRect(x,ledge.y+8,7,3);
       }
     }
     for(let stage=1;stage<sections;stage++){
