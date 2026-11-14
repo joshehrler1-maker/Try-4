@@ -686,10 +686,21 @@
     // handles this encounter, so no new combat controls are required.
     if(index!==7 && index!==14){
       const guardX=challengeX+290;
-      enemies.push({x:guardX,y:ground-23,offset:stage+index+31,turret:movement==='shooter'||movement==='buster'});
-      // Keep the guarded reward near the actual ground encounter rather
-      // than suspended high above a platform that may not have spawned.
-      crystals.push({x:challengeX+340,y:ground-44});
+      // A guard needs an actual solid floor beneath it; otherwise the
+      // procedural encounter may spawn over a pit or an elevated hazard.
+      const guardFloor=platforms.filter(ledge=>
+        ['floor','ice','belt','barrel','pogo','shelf'].includes(ledge.kind) &&
+        ledge.x<=guardX-18 && ledge.x+ledge.w>=guardX+18 &&
+        ledge.y>=225 && ledge.y<=ground+8
+      ).sort((a,b)=>b.y-a.y)[0];
+      if(guardFloor){
+        enemies.push({x:guardX,y:guardFloor.y-23,
+          offset:stage+index+31,
+          patrolLeft:Math.max(guardFloor.x+20,guardX-50),
+          patrolRight:Math.min(guardFloor.x+guardFloor.w-20,guardX+50),
+          turret:movement==='shooter'||movement==='buster'});
+        crystals.push({x:guardX+42,y:guardFloor.y-44});
+      }
     }
     // Each game's six chapters now carry a different collectible trail.
     // These are optional visual wayfinding rewards, not required jumps:
