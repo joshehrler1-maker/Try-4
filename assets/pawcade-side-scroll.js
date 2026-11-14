@@ -1154,12 +1154,17 @@
         ledge.y<Math.max(position.y,p.y)-6 &&
         ledge.y+17>Math.min(position.y,p.y)+6
       );
-      if ((foe.turret || enemyPattern==='turret' || index===16) &&
+      if ((foe.turret || foe.clockEnemy>=3 || enemyPattern==='turret' || index===16) &&
           clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
         const parryable=index===16 && foe.shotsFired++%3===0;
         hazards.push(enemyRound(position,direction,parryable));
+        if(foe.clockEnemy===5){
+          const highShot=enemyRound({x:position.x,y:position.y-44},direction,false);
+          hazards.push(highShot);
+        }
         foe.lastShotAt=clock;
-        const shotDelay=index===16 ? (foe.turret ? 1.35 : 2.25) : 1;
+        const shotDelay=foe.clockEnemy>=3 ? [1.65,1.35,1.15][foe.clockEnemy-3] :
+          index===16 ? (foe.turret ? 1.35 : 2.25) : 1;
         foe.shotAt=clock+cadence/enemyTempo*shotDelay;
       }
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
@@ -1585,7 +1590,7 @@
       const kind=foe.clockEnemy;
       const phase=clock*(2+kind*.16)+foe.offset;
       const wave=Math.sin(phase);
-      const travel=kind===4?chase*Math.max(0,wave)**3:wave;
+      const travel=kind>=4?chase*Math.max(0,wave)**(kind===4?3:2):wave;
       const lift=kind===3?(1+Math.cos(phase))/2:Math.max(0,wave)**2;
       return {x:patrolX(foe.x+travel*clockTravel[kind]),y:foe.y-lift*clockRise[kind]};
     }
