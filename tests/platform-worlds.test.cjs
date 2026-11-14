@@ -180,3 +180,41 @@ test('first-stage scenic art stays tied to its own stage surface, file and offli
     assert.ok(worker.includes("'" + url + "'"), 'offline game runtime mismatch: ' + url);
   }
 });
+
+test('third and fourth stage scenery is unique, cacheable, stage-scoped and platform-aligned', () => {
+  const runtime = fs.readFileSync(path.join(__dirname,'../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const worker = fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  const literal = name => {
+    const match=runtime.match(new RegExp('const '+name+'\\s*=\\s*(\\[[\\s\\S]*?\\]);'));
+    assert.ok(match, name + ' missing');
+    return vm.runInNewContext(match[1], {}, {timeout:1000});
+  };
+  const seen = new Set([...literal('firstStageLandmarkPaths'),...literal('secondStageLandmarkPaths')]);
+  for(const [chapter,ordinal] of [['third',2],['fourth',3]]) {
+    const files=literal(chapter+'StageLandmarkPaths');
+    const positions=literal(chapter+'StageLandmarkPositions');
+    assert.equal(files.length,5,chapter+' stage needs 5 separate artworks');
+    assert.equal(positions.length,5,chapter+' stage needs 5 placement tuples');
+    assert.ok(runtime.includes('stageStarts['+ordinal+'] + localX'),chapter+' stage lacks world offset');
+    assert.ok(runtime.includes('ctx.drawImage('+chapter+'StageLandmark, artX, artY, artW, artH)'),
+      chapter+' stage artwork is not drawn into the game');
+    for(let j=0;j<5;j++){
+      const i=j+20,asset=files[j],[x,y,wide,tall]=positions[j];
+      assert.ok(!seen.has(asset),'reused scenic art across stages: '+asset);
+      seen.add(asset);
+      assert.ok(asset.startsWith('assets/scenes/') && asset.endsWith('.svg'),'invalid path: '+asset);
+      assert.ok(fs.existsSync(path.join(__dirname,'..',asset)),'missing scene image: '+asset);
+      const svg=fs.readFileSync(path.join(__dirname,'..',asset),'utf8');
+      assert.ok(svg.startsWith('<svg') && svg.trimEnd().endsWith('</svg>'),'bad SVG wrapper: '+asset);
+      assert.ok(worker.includes("'" + asset + "'"),'offline asset missing: '+asset);
+      assert.ok([x,y,wide,tall].every(Number.isFinite) && wide>0 && tall>0,'bad scenery dimensions: '+asset);
+      const stageRoomName=w.pawtopiaRoomPlans[i].split(/\\s+/)[ordinal];
+      const geom=w.pawtopiaRooms[stageRoomName];
+      const mid=x+wide/2, bottom=y+tall;
+      assert.ok(geom.some(([sx,top,span,kind])=> sx<=mid && mid<sx+span && top===bottom &&
+        !['hazard','ceiling','ceilingSpikes','rail','current'].includes(kind)),
+        'scenery base does not match authored surface: '+asset);
+    }
+  }
+  assert.equal(seen.size,40,'all 40 individual game-and-stage scenic asset paths must be unique');
+});
