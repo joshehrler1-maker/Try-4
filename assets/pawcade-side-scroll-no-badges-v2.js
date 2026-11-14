@@ -3383,6 +3383,36 @@
         ctx.lineTo(x+radius*pulse,y-radius*2);
       }else if(index===9){ // Quarry Rescue: falling grit and stone dust
         ctx.rect(x-radius*.7,y-radius*.7,radius*1.4,radius*1.4);
+      }else if(index===10){ // Sunset Wind Sail: diagonal wind streaks
+        ctx.moveTo(x-radius*3,y+radius);
+        ctx.lineTo(x+radius*3,y-radius);
+        ctx.lineWidth=Math.max(.6,radius*.45);
+        ctx.strokeStyle=color;
+        ctx.stroke();
+        continue;
+      }else if(index===11){ // Cloud City: soft drifting cloud wisps
+        ctx.ellipse(x,y,radius*2.4,radius*.7,-.15,0,Math.PI*2);
+      }else if(index===12){ // Thunder Harbor: short electrical flashes
+        ctx.moveTo(x-radius,y-radius*2);
+        ctx.lineTo(x+radius*.3,y-radius*.2);
+        ctx.lineTo(x-radius*.25,y+radius*.2);
+        ctx.lineTo(x+radius,y+radius*2);
+        ctx.lineWidth=Math.max(.7,radius*.5);
+        ctx.strokeStyle=color;
+        ctx.stroke();
+        continue;
+      }else if(index===13){ // Autumn Trail: tumbling leaves
+        ctx.ellipse(x,y,radius*1.4,radius*.65,Math.sin(clock*.9+seed)*1.4,0,Math.PI*2);
+      }else if(index===14){ // Inverted Observatory: twinkling star points
+        ctx.moveTo(x,y-radius*2);
+        ctx.lineTo(x+radius*.5,y-radius*.5);
+        ctx.lineTo(x+radius*2,y);
+        ctx.lineTo(x+radius*.5,y+radius*.5);
+        ctx.lineTo(x,y+radius*2);
+        ctx.lineTo(x-radius*.5,y+radius*.5);
+        ctx.lineTo(x-radius*2,y);
+        ctx.lineTo(x-radius*.5,y-radius*.5);
+        ctx.closePath();
       }else{
         ctx.arc(x,y,radius,0,Math.PI*2);
       }
