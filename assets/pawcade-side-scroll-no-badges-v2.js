@@ -1537,7 +1537,7 @@
     if(ranged && !boss.aim && boss.nextShot-t<.3) boss.aim=Math.sign(p.x-boss.x)||-1;
     // Respect the same mobile projectile budget as ordinary enemies.
     // Delay a volley rather than flooding the screen during the finale.
-    if (ranged && t>=boss.nextShot && hazards.length>=26) {
+    if (ranged && t>=boss.nextShot && hazards.length>=25) {
       boss.nextShot=t+.35;
       boss.aim=0;
     }
@@ -1545,8 +1545,8 @@
       const aim=boss.aim || Math.sign(p.x-boss.x) || -1;
       boss.aim=0;
       hazards.push({x:boss.x+aim*44,y:boss.y+12,v:aim*(235+volleyPhase*15),life:2.6,parry:volleyPhase>0});
-      if(volleyPhase>=2) hazards.push({x:boss.x+aim*44,y:boss.y-42,v:aim*220,life:2.6});
-      if (guardian.pattern==='barrage') hazards.push({x:boss.x+aim*44,y:boss.y-55,v:aim*200,life:2.6});
+      if(volleyPhase>=2 && hazards.length<28) hazards.push({x:boss.x+aim*44,y:boss.y-42,v:aim*220,life:2.6});
+      if (guardian.pattern==='barrage' && hazards.length<28) hazards.push({x:boss.x+aim*44,y:boss.y-55,v:aim*200,life:2.6});
       boss.nextShot=t+(volleyPhase ? 1.14-volleyPhase*.18 : 1.55);
     }
     boss.warning=(['volley','sweep','barrage'].includes(guardian.pattern) && boss.nextShot-t<.3) || (guardian.pattern==='charge' && cycle>.68 && cycle<1);
