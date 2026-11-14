@@ -1777,7 +1777,10 @@
     if (foe.turret) return {x:foe.x,y:foe.y};
     const patrolX=x=>foe.patrolLeft===undefined ? x :
       Math.max(foe.patrolLeft,Math.min(foe.patrolRight,x));
-    const t = clock * (2 * enemyTempo / cadence) + foe.offset;
+    // Later chapters accelerate ordinary patrol cycles without changing
+    // each game's unique enemy motion family or the boss encounter.
+    const chapterPressure=1+Math.min(5,Math.max(0,chapter))*0.065;
+    const t = clock * (2 * enemyTempo / cadence) * chapterPressure + foe.offset;
     const chase = Math.sign(player.x-foe.x);
     const wave = Math.sin(t*2.1);
     if(foe.foundryEnemy!==undefined){
