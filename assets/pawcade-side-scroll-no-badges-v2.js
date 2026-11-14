@@ -178,6 +178,9 @@
   const stageStarts=[0];
   for(const width of stageWidths) stageStarts.push(stageStarts.at(-1)+width);
   const finish=stageStarts[sections];
+  const roundstone=index===13 && sections>2
+    ? {origin:stageStarts[2]+430,x:stageStarts[2]+430,limit:stageStarts[3]-85,radius:29,speed:0}
+    : null;
   function stageAt(x){
     let low=0,high=sections-1;
     while(low<high){
@@ -1262,7 +1265,13 @@
   const resetPlayer = (x = 100) => ({
     x,y:ground-22,air:airCapacity,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0,spin:0,dashUsed:false,chargeStart:null,climbStamina:1.8,jumpBuffer:0,coyote:0,jumpCut:false
   });
+  function resetRoundstone() {
+    if (!roundstone) return;
+    roundstone.x=roundstone.origin;
+    roundstone.speed=0;
+  }
   function reset() {
+    resetRoundstone();
     amberSwitch=false;
     reefCacheOpen=false;
     player = resetPlayer();
@@ -1872,6 +1881,7 @@
     hud();
   }
   function respawn() {
+    resetRoundstone();
     clearInput();
     particles.length=0;
     signatureEffect=null;
@@ -2382,6 +2392,16 @@
       status(chapters[stage] + ' · ' + nextBeat + (checkpointSaved ? ' · Checkpoint saved.' : ' · Could not save this checkpoint.'));
       hud();
       if(index===0 && stage<foundryStory.length-1 && showFoundryStory(stage)) return;
+    }
+    if (roundstone && chapter===2) {
+      const rock=roundstone;
+      const contact=rock.radius+17;
+      if (steer>0 && p.x>=rock.x-contact && p.x<rock.x &&
+          Math.abs(p.y-(ground-rock.radius))<32) {
+        rock.speed=Math.max(rock.speed,Math.min(210,Math.max(0,p.vx)*.85));
+      }
+      rock.x=Math.min(rock.limit,rock.x+rock.speed*dt);
+      rock.speed=rock.x===rock.limit ? 0 : Math.max(0,rock.speed-140*dt);
     }
     for (const c of crystals) {
       if (!c.taken && (!c.reefCache || reefCacheOpen) && close(p,c,24,29)) {if(c.refill){
@@ -7089,6 +7109,33 @@
       if(atlasSprite(combatArt,3,0,x,y,20,24,false,2)) return;
       ctx.strokeStyle='#ffe28a';ctx.lineWidth=3;
       ctx.beginPath();ctx.ellipse(x,y,7,10,0,0,Math.PI*2);ctx.stroke();
+    }
+    if (roundstone && roundstone.x>=camera-35 && roundstone.x<=camera+width+35) {
+      const rock=roundstone;
+      ctx.save();
+      ctx.translate(rock.x-camera,ground-rock.radius);
+      ctx.rotate((rock.x-rock.origin)/rock.radius);
+      ctx.fillStyle='#59526b';
+      ctx.strokeStyle='#d8b68a';
+      ctx.lineWidth=3;
+      ctx.beginPath();
+      for(let facet=0;facet<10;facet++){
+        const angle=facet*Math.PI/5;
+        const radius=rock.radius-(facet%3)*2;
+        const x=Math.cos(angle)*radius,y=Math.sin(angle)*radius;
+        if(facet===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-20,-8);
+      ctx.lineTo(0,-15);
+      ctx.lineTo(17,3);
+      ctx.lineTo(4,20);
+      ctx.stroke();
+      ctx.restore();
     }
     for(const ring of looseRings) drawRing(ring.x,ring.y);
     for (const c of crystals) if (!c.taken && (!c.reefCache || reefCacheOpen) && c.x>=camera && c.x<camera+width) {
