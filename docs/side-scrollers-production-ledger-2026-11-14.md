@@ -1,6 +1,27 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
 
+## Batch 11 — five first-world base enemy rigs, preserving specialist variants
+
+**New verified GitHub source:** `assets/animation/origin-world-enemy-rigs-v1.js` (original game-specific Canvas-2D procedural art). Five unique animated base enemy types are now integrated into the playable Games Room. These are **illustrated 2.5D enemy designs**, **not film-quality 3D models or finished animation clips**.
+
+| Game | Original illustrated base enemy | State-driven body motion | Preserved pre-existing art |
+| --- | --- | --- | --- |
+| 01 Ember Foundry | Cinder Tongs | planted mechanical feet, clamp actuator, recoil sparks and anticipatory lunge | Foundry stage-specific enemies, individual behaviors and action artwork |
+| 02 Moonlit Library | Atlas Warden | book-fold plates, page-blade attack and grounded deliberate stepping | Unique stage-specific library opponents and motion |
+| 03 Coral Courier | Reef Skimmer | continuous underwater tail/pectoral-fin movement and connected reef fins (no false feet) | Existing uniquely authored reef swimmers and current mechanics |
+| 04 Clocktower Relay | Pendulum Sentinel | brass-mass foot planting, articulated clock hand/hammer and real attack-cued swing | Existing stage-specific clock rivals and patterns |
+| 05 Seed Garden | Thorn Hopper | crouched seedpod compression, independent spring legs, pounce and shell-attached leaf arcs | Existing Seed Garden special motion routines where applicable |
+
+**Implementation safeguards:** `usesOriginRig(foe)` dispatches the new base models only to ordinary foe slots, leaving `foundryEnemy`, `libraryEnemy`, `reefEnemy` and `clockEnemy` special foes on their existing individually authored art. The new art follows the same game's distance-derived gait, attack anticipation, projectile-timed recoil, facing direction, and reduced-motion setting; no hitboxes, spawn locations, combat physics or level geometry changed. Visual-only post-hit defeated silhouettes fade and shrink for at most 0.42s without re-enabling physics. The existing sprite is retained as fallback if the module is unavailable. Original world-5 bonus motion accents are not double-drawn on the new body.
+
+**Source/QA:** All five bodies were run through idle, movement, attack, recoil, facing-flip and reduced-motion mocked Canvas 2D render simulations, with balanced transform stacks and finite coordinates. The new module is loaded before the main runtime, registered in the Games Room's offline cache, and selectable from the Enemy Motion Lab's **Show playable rig** button. Unit tests additionally guard original stage-specific enemy preservation. GitHub source/Android compile and GitHub Pages results require the separately recorded workflow results. Tests cannot replace a real Android landscape game playthrough.
+
+**Current state across Try #4:** 25/25 games have individually authored new **base** enemy motion rigs, in four separate art modules. Special enemy variants may still rely on older bespoke art rather than matching every new base rig. There are also 50 integrated **painted 2D scenery** images, with 112 further original scene-render slots planned across 162 stages. None of the 25 feature-film-quality 3D game overhauls or full 3D animated movies is complete. Do not claim actual live visuals, film model fidelity, FPS or Android device playability from repository-only evidence. All changes still respect the absolute $0 rule.
+
+
+
+
 ## Batches 9–10 — twenty original enemy motion families integrated (games 6–25)
 
 **Scope completed in this session:** ten new original game-specific 2.5D procedural **enemy body illustrations and state-driven motion routines**, covering games 6–15. These are visual simulations drawn with the Canvas 2D API, **not** 3D polygon models, character-sheet turnarounds, movie-quality renderer outputs, or the required full movement clip libraries. No paid APIs or services.
