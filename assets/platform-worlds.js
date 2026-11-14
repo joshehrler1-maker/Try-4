@@ -1050,3 +1050,6 @@ window.pawtopiaRooms.eggStilts = [[0,326,2200],[350,282,245],[651,236,228],[935,
 
 // Falling Rock Ravine gives the floor hazard an elevated bypass.
 window.pawtopiaRooms.eggRavine = [[0,326,485],[536,292,277],[862,253,281],[1194,280,315],[1560,326,640],[1740,250,150],[1850,286,55,"hazard"],[1940,266,135]];
+
+// Roundstone Cave's upper route crests before descending to the floor.
+window.pawtopiaRooms.eggCave = [[0,326,2200],[310,278,230],[590,234,260],[865,190,245],[1164,231,260],[1471,276,372]];
