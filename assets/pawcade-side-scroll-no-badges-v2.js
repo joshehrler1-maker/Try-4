@@ -417,7 +417,25 @@
           ledge.x<worldX+routeW+18 && ledge.x+ledge.w>worldX-18 &&
           Math.abs(ledge.y-routeY)<65);
         if(!overlaps){
-          platforms.push({x:worldX,y:routeY,w:routeW,kind:'floor',
+          // Give each world's upper path a traversal identity instead of
+          // repeating plain floors. Only use established platform kinds.
+          const upperRouteKinds=[
+            ['floor','spring','floor'],['shelf','floor','shelf'],
+            ['current','floor','current'],['belt','floor','belt'],
+            ['barrel','floor','barrel'],['lift','floor','lift'],
+            ['spring','floor','spring'],['floor','shelf','floor'],
+            ['spring','floor','spring'],['floor','lift','floor'],
+            ['floor','lift','floor'],['lift','floor','lift'],
+            ['pogo','floor','pogo'],['floor','spring','floor'],
+            ['shelf','floor','shelf'],['lift','floor','lift'],
+            ['shelf','floor','shelf'],['ice','floor','ice'],
+            ['shelf','floor','shelf'],['current','floor','current'],
+            ['belt','floor','belt'],['shelf','floor','shelf'],
+            ['pogo','floor','pogo'],['spring','floor','spring'],
+            ['shelf','floor','shelf']
+          ];
+          const upperKind=upperRouteKinds[index][(stage+route)%3];
+          platforms.push({x:worldX,y:routeY,w:routeW,kind:upperKind,
             optionalRoute:true});
           crystals.push({x:worldX+routeW*.5,y:routeY-35});
         }
