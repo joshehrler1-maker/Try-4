@@ -416,7 +416,7 @@
         const overlaps=platforms.some(ledge=>
           ledge.x<worldX+routeW+18 && ledge.x+ledge.w>worldX-18 &&
           Math.abs(ledge.y-routeY)<65);
-        if(!overlaps){
+        if(!overlaps && worldX+routeW<=start+stageWidths[stage]-55){
           // Give each world's upper path a traversal identity instead of
           // repeating plain floors. Only use established platform kinds.
           const upperRouteKinds=[
