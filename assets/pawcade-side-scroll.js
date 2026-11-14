@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>11)return;
-    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190][index];
-    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13][index]);
+    if(index<0 || index>13)return;
+    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -1850,6 +1850,46 @@
         }
         ctx.fillStyle='#e8f6ff';ctx.globalAlpha=.4;
         ctx.beginPath();ctx.ellipse(x+103,276,95,18,0,0,Math.PI*2);ctx.fill();
+        ctx.globalAlpha=1;
+      }else if(index===12){
+        // Thunder Harbor: stormproof docks, lightning rods, and wet cranes.
+        const dockY=259, mastX=x+91;
+        ctx.fillStyle='#34455c';
+        ctx.fillRect(x+23,dockY-23,155,47);
+        ctx.fillStyle='#69829b';
+        for(let plank=0;plank<5;plank++)ctx.fillRect(x+28+plank*30,dockY-22,2,46);
+        ctx.strokeStyle='#9fb9cb';ctx.lineWidth=5;
+        ctx.beginPath();ctx.moveTo(mastX,dockY-23);ctx.lineTo(mastX,94+variation*9);
+        ctx.lineTo(mastX+71,94+variation*9);ctx.stroke();
+        ctx.strokeStyle='#d2b78c';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(mastX+58,94+variation*9);ctx.lineTo(mastX+58,208);ctx.stroke();
+        ctx.fillStyle='#d4b780';ctx.fillRect(mastX+43,208,31,19);
+        ctx.fillStyle='#d4eafa';ctx.globalAlpha=.65;
+        for(let bolt=0;bolt<3;bolt++){
+          const bx=x+24+bolt*65,by=145+(bolt%2)*24;
+          ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+7,by+13);
+          ctx.lineTo(bx+2,by+13);ctx.lineTo(bx+13,by+27);ctx.stroke();
+        }
+        ctx.globalAlpha=1;
+      }else if(index===13){
+        // Autumn Trail: rolling woodland canopy and scattered golden leaves.
+        const trunk=x+103,rootY=291,top=112+variation*10;
+        ctx.fillStyle='#655044';ctx.fillRect(trunk-10,top+38,20,rootY-top-38);
+        ctx.strokeStyle='#8c634b';ctx.lineWidth=6;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(trunk,top+100);ctx.lineTo(trunk-39,top+42);
+        ctx.moveTo(trunk,top+87);ctx.lineTo(trunk+39,top+34);ctx.stroke();
+        const canopy=['#d58a49','#e7aa53','#b56a4e','#e0b56a'];
+        for(let leaf=0;leaf<7;leaf++){
+          const lx=trunk+(leaf-3)*19,ly=top+((leaf*13+variation*7)%35);
+          ctx.fillStyle=canopy[(leaf+variation)%canopy.length];
+          ctx.beginPath();ctx.arc(lx,ly,23,0,Math.PI*2);ctx.fill();
+        }
+        ctx.fillStyle='#f0c37c';ctx.globalAlpha=.8;
+        for(let leaf=0;leaf<6;leaf++){
+          const lx=x+12+leaf*35,ly=188+(leaf*19+variation*11)%82;
+          ctx.save();ctx.translate(lx,ly);ctx.rotate((leaf-2)*.38);
+          ctx.beginPath();ctx.ellipse(0,0,5,2.5,0,0,Math.PI*2);ctx.fill();ctx.restore();
+        }
         ctx.globalAlpha=1;
       }
     }
