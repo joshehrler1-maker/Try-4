@@ -3335,8 +3335,41 @@
       const x=((seed*137+clock*drift-camera*(foreground ? .72 : .36))%width+width)%width;
       const y=((seed*73+clock*rise)%height+height)%height;
       const radius=foreground?2+seed%3:1+seed%2;
-      ctx.globalAlpha=(foreground ? .18 : .34)*( .65+.35*Math.sin(clock*1.8+seed));
-      ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=(foreground ? .18 : .34)*(.65+.35*Math.sin(clock*1.8+seed));
+      // First five worlds have distinct low-cost atmospheric silhouettes:
+      // Foundry embers, Library dust, Coral bubbles, Clocktower sparks, Garden pollen.
+      // Use the existing particle budget and keep these visuals non-collidable.
+      ctx.beginPath();
+      if(index===0){ // drifting cinders rise and taper
+        const emberY=((y-clock*(foreground?10:6))%height+height)%height;
+        ctx.moveTo(x,emberY-radius*2);
+        ctx.lineTo(x+radius*.75,emberY+radius);
+        ctx.lineTo(x-radius*.75,emberY+radius);
+        ctx.closePath();
+      }else if(index===1){ // slow rectangular book dust
+        ctx.rect(x-radius*.65,y-radius*.35,radius*1.3,radius*.7);
+      }else if(index===2){ // transparent underwater bubble rings
+        ctx.arc(x,y,radius+1,0,Math.PI*2);
+        ctx.lineWidth=.8;
+        ctx.strokeStyle=color;
+        ctx.stroke();
+        continue;
+      }else if(index===3){ // tiny clockwork sparks
+        ctx.moveTo(x-radius*1.6,y);
+        ctx.lineTo(x+radius*1.6,y);
+        ctx.moveTo(x,y-radius*1.6);
+        ctx.lineTo(x,y+radius*1.6);
+        ctx.lineWidth=.8;
+        ctx.strokeStyle=color;
+        ctx.stroke();
+        continue;
+      }else if(index===4){ // drifting seed pollen
+        const sway=Math.sin(clock*.7+seed)*radius*1.5;
+        ctx.ellipse(x+sway,y,radius*.8,radius*1.6,seed*.3,0,Math.PI*2);
+      }else{
+        ctx.arc(x,y,radius,0,Math.PI*2);
+      }
+      ctx.fill();
     }
     ctx.restore();
   }
