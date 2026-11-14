@@ -1795,7 +1795,10 @@
     const t = clock * (2 * enemyTempo / cadence) * chapterPressure *
       archetypeTempo + foe.offset;
     const chase = Math.sign(player.x-foe.x);
-    const wave = Math.sin(t*2.1);
+    // Different encounter archetypes get distinct movement envelopes:
+    // scout = narrow, sentry = measured, skirmisher = wide, raider = sharp.
+    const patrolSpan=[.75,.9,1.15,1][foe.archetype??0];
+    const wave = Math.sin(t*2.1)*patrolSpan;
     if(foe.foundryEnemy!==undefined){
       // Foundry enemies have authored hop/charge cycles; scale the entire
       // cycle rather than replacing their distinct attack motion.
