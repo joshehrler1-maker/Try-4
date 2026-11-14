@@ -6245,7 +6245,8 @@
     }
     if(p.chargeStart!==null){
       const charge=Math.min(1,(clock-p.chargeStart)/fullChargeTime);
-      const x=p.x+p.facing*22;
+      const facing=(Number(held('right'))-Number(held('left')))||p.facing;
+      const x=p.x+facing*22;
       const y=p.y-7;
       const radius=6+charge*10;
       ctx.save();
@@ -7074,7 +7075,12 @@
       event.preventDefault();button.setPointerCapture(event.pointerId);mobile.add(control);
       if(!alreadyHeld) activate();
     };
-    for(const event of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(event,e=>{if(e.pointerId!==pointer)return;pointer=null;mobile.delete(control);if(control==='action')releaseAction(event==='pointerup');});
+    for(const event of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(event,e=>{
+      if(e.pointerId!==pointer) return;
+      pointer=null;
+      mobile.delete(control);
+      if(control==='action') releaseAction(event==='pointerup' && !e.defaultPrevented);
+    });
     button.onclick=event=>{if(event.detail===0 && phase==='playing' && !held(control)){activate();if(control==='action')releaseAction(true);}};
   });
   for (const image of [sprites,poster,backdrop,enemyArt,heroArt,terrainArt,baronArt,propArt,stagePropArt,combatArt,energyFxArt]) image.onload=()=>{if(phase!=='playing') draw();};
