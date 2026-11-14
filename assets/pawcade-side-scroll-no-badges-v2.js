@@ -1086,7 +1086,7 @@
     if (buffer && index===10 && player.carry && !player.on) {
       player.windRelease={x:player.x,y:player.y-44,time:clock};
       player.carry=false;player.vy=-jumpSpeed;player.jumpBuffer=0;
-      player.jumpCut=true;player.jumpAge=0;
+      player.jumpCut=false;player.jumpAge=0;
       return;
     }
     if(player.cable){player.cable=null;player.grapple=.18;player.jumpBuffer=0;return;}
@@ -1196,7 +1196,10 @@
         projectile.vy=-285;
         projectile.gravity=570;
       }
-      if(index===19 || index===24) player.shotPose={time:clock,facing:player.facing};
+      if(index===19 || index===24){
+        const facing=player.facing;
+        player.shotPose={time:clock,facing,angle:Math.atan2(projectile.vy||0,Math.abs(projectile.v))};
+      }
       if(index===13 || index===17){
         player.throwPose={time:clock,angle:Math.atan2(projectile.vy||0,projectile.v)};
       }
@@ -1310,7 +1313,7 @@
         }
         break;
       }
-      case 'swap': p.altWeapon=!p.altWeapon;status(p.altWeapon?'Spread fire equipped.':'Straight fire equipped.');break;
+      case 'swap': p.altWeapon=!p.altWeapon;status(p.altWeapon?'Spread fire equipped. Hold Up to aim high.':'Straight fire equipped. Hold Up to aim high.');break;
       case 'taunt': if(p.crystalCombo>=3){shot({v:0,radius:strength,life:.2,damage:2});p.crystalCombo=0;}break;
       case 'return': shot({v:p.facing*strength,returning:true,life:1.1,damage:2,motionTrail:'cross'});break;
     }
@@ -6679,6 +6682,7 @@
         ctx.save();
         ctx.translate(p.x,p.y-9);
         ctx.scale(p.shotPose.facing,1);
+        ctx.rotate(p.shotPose.angle);
         ctx.translate(-recoil,0);
         ctx.fillStyle=dock?'#235564':'#65463f';
         ctx.fillRect(10,-5,dock?23:19,10);
