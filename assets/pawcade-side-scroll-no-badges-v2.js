@@ -7943,10 +7943,16 @@
   function loop(now) {
     updateMusic();
     accumulator += Math.min(.075,Math.max(0,(now-last)/1000));
-    while (accumulator >= tick && phase==='playing' && !storyDialog?.open) {
+    // Cap catch-up work after a slow frame so touch input and rendering stay responsive.
+    // Drop excess backlog rather than simulating seconds of stale input in one frame.
+    let steps=0;
+    const maxSteps=5;
+    while (accumulator >= tick && steps<maxSteps && phase==='playing' && !storyDialog?.open) {
       step(tick);
       accumulator-=tick;
+      steps++;
     }
+    if (steps===maxSteps && accumulator>=tick) accumulator=0;
     last=now;
     draw();
     if(phase==='playing' && !storyDialog?.open) frame=requestAnimationFrame(loop);
