@@ -685,7 +685,8 @@
         const sx=signatureX+dx;
         const height=sy+((stage+slot)%3-1)*8+
           (chapterBeat===2?-12:chapterBeat===4?8:0);
-        const width=sw+((stage+slot)%2)*10;
+        const width=Math.max(80,sw+((stage+slot)%2)*10+
+          (chapterBeat===0?18:chapterBeat===3?-8:0));
         // Underwater worlds use current-assisted stepping routes; retain
         // the existing water physics and leave ample swim-through space.
         const swimKind=(index===2||index===19) && kind==='lift'
