@@ -305,6 +305,16 @@
   ];
   // Peak timing and counter-motion for each hero's technique.
   const techniqueTiming={
+    1:[0.19,0.34],
+    6:[0.55,0.09],
+    8:[0.12,0.08],
+    10:[0.28,0.18],
+    11:[0.39,0.1],
+    12:[0.16,0.28],
+    13:[0.4,0.27],
+    15:[0.14,0.2],
+    16:[0.17,0.32],
+    18:[0.23,0.16],
     0:[.32,.22], // Whisker's cape sweep
     2:[.45,.12], // Luna's sonar pulse
     4:[.24,.36], // Ivy's barrel launch
