@@ -2251,6 +2251,9 @@
       ctx.fillStyle='#a6d3f6';ctx.fillRect(wall.x,wall.top,3,ground-wall.top);
     }
     for(const t of tunnels) {
+      // Long levels can contain off-screen tunnels; don't issue draw calls
+      // for geometry the player cannot see.
+      if(t.x+t.w<camera-24 || t.x>camera+width+24)continue;
       ctx.fillStyle='#50678a';ctx.fillRect(t.x,t.y-13,t.w,13);
       ctx.fillStyle='#92e4ef';ctx.fillRect(t.x,t.y-13,t.w,2);
     }
