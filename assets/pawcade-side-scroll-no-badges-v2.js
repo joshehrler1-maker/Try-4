@@ -5526,8 +5526,32 @@
     for (const c of crystals) if (!c.taken && (!c.reefCache || reefCacheOpen) && c.x>=camera && c.x<camera+width) {
       if(index===3){drawRing(c.x,c.y);continue;}
       if(player.sonar && close(player,c,310,300)){ctx.strokeStyle='#9bf4ff';ctx.strokeRect(c.x-18,c.y-18,36,36);}
-      if(c.refill && atlasSprite(propArt,4,1,c.x,c.y,38,44,false,2)) continue;
-      if(c.refill){ctx.strokeStyle='#66ffe0';ctx.strokeRect(c.x-15,c.y-15,30,30);}
+      if(c.refill){
+        ctx.save();
+        ctx.translate(c.x,c.y);
+        ctx.fillStyle='#10364b';
+        ctx.strokeStyle='#bafff2';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.moveTo(0,-17);
+        ctx.lineTo(13,0);
+        ctx.lineTo(0,17);
+        ctx.lineTo(-13,0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.strokeStyle='#58f3d7';
+        ctx.beginPath();
+        ctx.moveTo(-6,1);
+        ctx.lineTo(0,-5);
+        ctx.lineTo(6,1);
+        ctx.moveTo(-6,7);
+        ctx.lineTo(0,1);
+        ctx.lineTo(6,7);
+        ctx.stroke();
+        ctx.restore();
+        continue;
+      }
       if(!sprite(15,c.x,c.y,38,38)){ctx.fillStyle='#ffd967';ctx.fillRect(c.x-5,c.y-5,10,10);}
     }
     const bashReady=index===15 && technique==='bash' && phase==='playing' && player.techCooldown<=0 ? bashTarget(player) : null;
