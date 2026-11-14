@@ -1589,31 +1589,31 @@
   }
   // Enemy tempo, horizontal reach, and vertical travel in course order.
   const enemyProfiles = [
-    [0.84, 27, 0], // 1
-    [1.12, 0, 0], // 2
-    [0.78, 72, 16], // 3
-    [1.18, 110, 0], // 4
-    [0.84, 30, 46], // 5
-    [0.82, 92, 32], // 6
-    [1.08, 19, 44], // 7
-    [1.16, 42, 0], // 8
-    [1, 27, 24], // 9
-    [1.28, 0, 0], // 10
-    [0.98, 60, 23], // 11
-    [1.16, 58, 8], // 12
-    [0.82, 79, 0], // 13
-    [0.72, 32, 39], // 14
-    [0.86, 46, 10], // 15
-    [1.14, 65, 36], // 16
-    [1.22, 23, 19], // 17
-    [1.46, 0, 0], // 18
-    [0.65, 23, 0], // 19
-    [1.23, 46, 22], // 20
-    [1.35, 69, 15], // 21
-    [0.68, 83, 0], // 22
-    [1.18, 18, 49], // 23
-    [0.64, 58, 19], // 24
-    [0.92, 0, 0], // 25
+    [0.88, 32, 0], // 1 · Foundry: readable stomping patrols
+    [1.08, 0, 0], // 2 · Library: deliberate stationary sentries
+    [0.82, 82, 20], // 3 · Coral: wider swimming schools
+    [1.22, 120, 0], // 4 · Clocktower: faster charging hazards
+    [0.9, 34, 54], // 5 · Garden: more expressive canopy hops
+    [0.86, 105, 38], // 6 · Waterfall: broad aerial swoops
+    [1.04, 22, 48], // 7 · Lantern: playful short hops
+    [1.12, 38, 0], // 8 · Polarity: measured gravity patrols
+    [1.04, 30, 24], // 9 · Stage Beat: tighter rhythmic motion
+    [1.24, 0, 0], // 10 · Quarry: stationary firing threats
+    [1.02, 68, 28], // 11 · Wind Sail: wider swoops
+    [1.2, 66, 10], // 12 · Cloud City: persistent pursuers
+    [0.86, 85, 0], // 13 · Harbor: committed charges
+    [0.76, 36, 45], // 14 · Autumn: springing woodland enemies
+    [0.9, 53, 12], // 15 · Observatory: tracking hunters
+    [1.1, 74, 42], // 16 · Bamboo: arcing forest swoops
+    [1.18, 27, 19], // 17 · Steamworks: readable dodge beats
+    [1.38, 0, 0], // 18 · Snow: deliberate frost sentries
+    [0.7, 26, 0], // 19 · Canyon: precise grounded guards
+    [1.26, 52, 25], // 20 · Submarine: coordinated swimming threats
+    [1.4, 78, 18], // 21 · Neon: aggressive sprint pursuers
+    [0.72, 88, 0], // 22 · Temple: measured rush attacks
+    [1.14, 24, 53], // 23 · Ferry: distinct springy hoppers
+    [0.68, 65, 24], // 24 · Sunflower: gentle airborne sweeps
+    [0.96, 0, 0], // 25 · Starship: fixed-position combat sentries
   ];
   const [enemyTempo, enemyReach, enemyRise] = enemyProfiles[index];
   const enemyRoundArt = {
