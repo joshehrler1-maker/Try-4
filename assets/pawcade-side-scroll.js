@@ -2702,6 +2702,22 @@
     const braking=p.on && Math.abs(p.vx)>runSpeed*.42 &&
       ((p.vx>0 && held('left')) || (p.vx<0 && held('right')));
     const gliding=power==='glide' && !p.on && held('jump') && p.vy>0;
+    if(index===5 && gliding && !reducedMotion){
+      ctx.save();
+      ctx.strokeStyle='#bdf5ff';
+      ctx.lineCap='round';
+      ctx.lineWidth=1.5;
+      for(let strand=0;strand<3;strand++){
+        const x=p.x-p.facing*(19+strand*6);
+        const y=p.y-8+strand*9;
+        ctx.globalAlpha=.64-strand*.14;
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+        ctx.quadraticCurveTo(x-p.facing*13,y+1,x-p.facing*27,y+9);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     const wallSliding=!!p.wall && !p.on && p.vy>0;
     const swimming=power==='swim' && !p.on;
     const pose=rolling ? 3 : attacking ? 2 : braking ? 0 : !p.on ? 3 :
