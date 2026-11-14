@@ -787,3 +787,18 @@ for (const [room, slot, x, y, width] of [
 ]) {
   window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
 }
+
+// Clocktower Relay stages, in Sonic 2 zone order from Emerald Hill to Mystic Cave.
+const clocktowerPlacements = {
+  coast: [[1,300,293,230],[2,590,262,490],[3,1125,204,310]],
+  chemical: [[2,335,272,330],[3,711,190,345],[4,1102,247,245]],
+  ruins: [[1,238,260,315],[2,594,199,285],[3,932,219,280],[4,1260,280,265]],
+  pinball: [[1,315,302,80],[2,501,233,135],[3,775,174,165],[4,1055,264,162]],
+  volcano: [[2,811,248,304],[3,1150,285,190],[4,1388,229,274]],
+  cavern: [[1,475,292,238],[2,785,251,260],[3,1105,291,252],[6,1880,285,56]],
+};
+for (const [room, placements] of Object.entries(clocktowerPlacements)) {
+  for (const [slot, x, y, width] of placements) {
+    window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+  }
+}
