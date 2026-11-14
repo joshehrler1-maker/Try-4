@@ -212,8 +212,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
+      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
       "motionDesign": {
         "profile": "aerial-dive",
         "attackSequence": "rise on air current, tuck wings, dive, flare",
@@ -231,7 +231,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 6,
@@ -249,8 +250,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
+      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
       "motionDesign": {
         "profile": "juggle-toss",
         "attackSequence": "gather three lanterns, alternate release, catch, reset",
@@ -268,7 +269,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 7,
@@ -286,8 +288,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
+      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
       "motionDesign": {
         "profile": "magnetic-dash",
         "attackSequence": "polarize shell, lean into pull, dash, brake",
@@ -305,7 +307,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 8,
@@ -323,8 +326,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
+      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
       "motionDesign": {
         "profile": "beat-stomp",
         "attackSequence": "sync crouch to beat, lift foot, stomp, settle",
@@ -342,7 +345,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 9,
@@ -360,8 +364,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
+      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
       "motionDesign": {
         "profile": "burrow-eruption",
         "attackSequence": "dig below ground, surface with dust, strike, descend",
@@ -379,7 +383,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 10,
