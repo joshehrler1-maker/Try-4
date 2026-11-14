@@ -1603,7 +1603,7 @@
   const clockBodies=["M-22 9L-13-12H10L24 4V14H-22Z","M-24 3L-14-15 8-18 23-7 16 12H-17Z","M-19 12V-13L0-23 20-12V12Z","M-26 0L-10-8 0-20 11-8 26 0 11 9 0 15Z","M-24 12L-18-6 -8-6 -3-22 15-16 24 12Z","M-25 8L-21-13 -10-8 0-24 12-7 23-13 26 11Z"].map(shape=>new Path2D(shape));
   const clockTravel=[34,53,23,58,31,46];
   const clockRise=[0,17,40,26,0,19];
-  function drawClockEnemy(at,foe,faceLeft){
+  function drawClockEnemy(at,foe,faceLeft,attackPose=0){
     const kind=foe.clockEnemy;
     const phase=clock*(2+kind*.16)+foe.offset;
     ctx.save();
@@ -1620,6 +1620,12 @@
     ctx.arc(0,0,4+kind,0,Math.PI*2);
     ctx.moveTo(-7-kind,0);ctx.lineTo(7+kind,0);
     ctx.stroke();
+    // Clocktower Relay: ratcheting clock hands accelerate into a strike.
+    const strike=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
+    ctx.rotate(strike*(kind%2?-1:1)*.95);
+    ctx.strokeStyle='#ffce71';ctx.lineWidth=3;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-17-kind);ctx.stroke();
+    ctx.fillStyle='#fff1bc';ctx.beginPath();ctx.arc(0,0,3.5,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }
   function foePosition(foe) {
@@ -3150,6 +3156,44 @@
     [5,15,7],[6,12,9],[3,21,5],[4,16,8],[5,20,6],
     [6,13,9],[3,18,5],[4,22,7],[5,17,8],[6,14,6]
   ];
+  // Seed Garden and Waterfall Climb have separate organic motion languages,
+  // rather than borrowing the mechanical armor or aquatic fins of other games.
+  function drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose){
+    if(index!==4 && index!==5)return;
+    const strike=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
+    const phase=reducedMotion?0:clock*(index===4?2.7:4.3)+(foe.offset||0);
+    ctx.save();ctx.translate(at.x,at.y-15);ctx.scale(faceLeft?-1:1,1);
+    ctx.lineCap='round';ctx.lineJoin='round';
+    if(index===4){
+      // Seed Garden: living leaf-blades unfurl before a pollen burst.
+      for(const side of [-1,1]){
+        const open=Math.sin(phase+side)*.18+strike*.65;
+        ctx.save();ctx.translate(side*11,-7);ctx.rotate(side*(.25+open));
+        ctx.fillStyle=side<0?'#8bdb6b':'#c6ef85';ctx.strokeStyle='#427e4d';ctx.lineWidth=1.6;
+        ctx.beginPath();ctx.moveTo(0,6);ctx.quadraticCurveTo(side*13,-14,side*6,-27);
+        ctx.quadraticCurveTo(side*24,-12,0,6);ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#f0ffb4';ctx.beginPath();ctx.moveTo(0,5);ctx.lineTo(side*7,-20);ctx.stroke();
+        ctx.restore();
+      }
+      if(strike>.05){
+        ctx.globalAlpha=strike*.75;ctx.fillStyle='#f8ec91';
+        for(let i=0;i<5;i++){const a=i*1.256+phase*.2;ctx.beginPath();
+          ctx.arc(19+Math.cos(a)*(12+strike*8),Math.sin(a)*(12+strike*8),1.7,0,Math.PI*2);ctx.fill();}
+      }
+    }else{
+      // Waterfall Climb: cascading droplets gather into a diving arc.
+      ctx.strokeStyle='#b1f7ff';ctx.lineWidth=2.5;
+      for(let i=0;i<3;i++){
+        const x=-12+i*12;const flow=Math.sin(phase+i*1.8)*5;
+        ctx.beginPath();ctx.moveTo(x,-20);ctx.quadraticCurveTo(x+flow,-5,x+flow+strike*13,14);
+        ctx.stroke();
+      }
+      ctx.fillStyle='#d7ffff';ctx.globalAlpha=.65+strike*.3;
+      for(let i=0;i<4;i++){const fall=(phase*7+i*13)%34;ctx.beginPath();
+        ctx.ellipse(-16+i*11,-18+fall,1.8,3.2,0,0,Math.PI*2);ctx.fill();}
+    }
+    ctx.restore();
+  }
   function drawEnemyArmorAccent(at,foe,faceLeft,airborne){
     if(foe.dead) return;
     const [plates,radius,depth]=enemyArmorStyles[index];
@@ -3588,12 +3632,13 @@
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing,attackPose);
       else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft,attackPose);
-      else if(foe.clockEnemy!==undefined) drawClockEnemy(at,foe,faceLeft);
+      else if(foe.clockEnemy!==undefined) drawClockEnemy(at,foe,faceLeft,attackPose);
       else if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
       else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
       ctx.restore();
+      drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
       drawEnemyArmorAccent(at,foe,faceLeft,airborne);
       drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
       drawEnemyInsignia(at,foe);
