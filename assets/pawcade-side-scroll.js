@@ -538,6 +538,16 @@
       player.jumpAge=0;
     }
   }
+  function findGrappleAnchor(p) {
+    return platforms.reduce((nearest, ledge) => {
+        if(ledge.kind!=='rail') return nearest;
+        const x=ledge.x+ledge.w/2;
+        const y=ledge.y+8;
+        const distance=Math.hypot(p.x-x,p.y-y);
+        if(p.y<=y+16 || Math.abs(p.x-x)>=230 || (nearest && distance>=nearest.distance)) return nearest;
+        return {x,y,distance};
+      },null);
+  }
   function action() {
     if (phase==='playing' && movement==='buster') {player.chargeStart ??= clock;return;}
     if (index===3) return;
@@ -569,14 +579,7 @@
       }
     }
     if (power === 'grapple') {
-      const anchor = platforms.reduce((nearest, ledge) => {
-        if(ledge.kind!=='rail') return nearest;
-        const x=ledge.x+ledge.w/2;
-        const y=ledge.y+8;
-        const distance=Math.hypot(player.x-x,player.y-y);
-        if(player.y<=y+16 || Math.abs(player.x-x)>=230 || (nearest && distance>=nearest.distance)) return nearest;
-        return {x,y,distance};
-      },null);
+      const anchor = findGrappleAnchor(player);
       if (anchor && !player.cable) {
           player.cable={x:anchor.x,y:anchor.y,length:anchor.distance};
           player.vx+=player.facing*130;
@@ -2905,6 +2908,18 @@
       ctx.restore();
     }
 
+    if(index===9 && phase==='playing' && !p.cable && p.power<=0){
+      const anchor=findGrappleAnchor(p);
+      if(anchor){
+        ctx.save();
+        ctx.strokeStyle='#ffe0a1';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.arc(anchor.x,anchor.y,8,0,Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
     if(p.cable){
       ctx.save();
       ctx.beginPath();ctx.moveTo(p.x,p.y-7);ctx.lineTo(p.cable.x,p.cable.y);
