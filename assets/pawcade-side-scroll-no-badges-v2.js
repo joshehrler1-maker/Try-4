@@ -2211,6 +2211,7 @@
     }
     // Distance-driven footfalls avoid the skating effect when movement is
     // blocked by a wall or platform. Update after collision resolution.
+    if(p.morphed) p.morphAngle=((p.morphAngle||0)+(p.x-oldX)/11)%(Math.PI*2);
     if(p.on && !p.morphed){
       const traveled=Math.min(55,Math.abs(p.x-oldX));
       p.gaitPhase=(p.gaitPhase||0)+traveled/15;
@@ -6329,7 +6330,7 @@
       ctx.restore();
       ctx.save();
       ctx.translate(p.x,p.y);
-      if(!reducedMotion) ctx.rotate((p.gaitPhase||0)*.7);
+      if(!reducedMotion) ctx.rotate(p.morphAngle||0);
       ctx.fillStyle='#392655';
       ctx.strokeStyle='#cbaaff';
       ctx.lineWidth=2;
