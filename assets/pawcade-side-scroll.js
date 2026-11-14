@@ -889,7 +889,8 @@
     const steer = movement==='beat' ? 1 : Number(held('right')) - Number(held('left'));
     const vertical = Number(held('down'))-Number(held('up') || held('jump'));
     if (steer) p.facing = steer;
-    const topSpeed = runSpeed * speedFactor;
+    const speedRun=index===20 && p.on && steer && steer*p.vx>0;
+    const topSpeed = runSpeed * speedFactor * (speedRun ? 1.32 : 1);
     const reversing = steer && Math.sign(p.vx) !== steer;
     const acceleration = (p.onIce ? handling*.28 : steer
       ? handling * (p.on ? (reversing ? 1.35 : 1) : .72)
@@ -899,9 +900,10 @@
     }
     p.wallLock=Math.max(0,(p.wallLock||0)-dt);
     const oldX=p.x;
+    const surfaceDrift=p.on ? p.surfaceDrift||0 : 0;
     p.grapple=Math.max(0,(p.grapple||0)-dt);
     if (!(power === 'dash' && p.power > .22) && !p.grapple && !p.wallLock) p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
-    p.x = Math.max(30,Math.min(finish+770,p.x+p.vx*dt));
+    p.x = Math.max(30,Math.min(finish+770,p.x+(p.vx+surfaceDrift)*dt));
     if(index===14 && !p.morphed) for(const t of tunnels) {
       if(p.y+22<t.y) continue;
       if(oldX<=t.x-14 && p.x>t.x-14){p.x=t.x-14;p.vx=0;}
@@ -920,9 +922,19 @@
     const body = p.morphed || (power === 'slide' && held('action')) ? 12 : 22;
 
     const floating = power === 'glide' && held('jump');
-    if (power==='swim') p.vy += (vertical*230-p.vy)*Math.min(1,dt*5);
+    if (power==='swim') {
+      // Swimming near a reef current pulls the hero along its channel,
+      // including while floating above the current's surface.
+      const inCurrent=index===2 && platforms.some(ledge=>ledge.kind==='current' &&
+        p.x>=ledge.x && p.x<=ledge.x+ledge.w && p.y>=ledge.y-88 && p.y<=ledge.y);
+      if(inCurrent) p.x=Math.max(30,p.x-105*dt);
+      p.vy += (vertical*230-p.vy)*Math.min(1,dt*5);
+    }
     else if (floatHasLift(p)) p.vy += (-160-p.vy)*Math.min(1,dt*5);
-    else if (floating && p.vy>0) p.vy=Math.min(72,p.vy+dt*90);
+    else if (floating && p.vy>0) {
+      const glideSpeed=index===5 ? 44 : index===23 ? 96 : 72;
+      p.vy=Math.min(glideSpeed,p.vy+dt*90);
+    }
     else if (!(movement==='airdash' && p.power>.22)) {
       const arcFactor=p.vy*p.gravity<0
         ? (held('jump') ? holdGravity : releaseGravity)
@@ -959,6 +971,7 @@
     }
     p.on = false;
     p.onIce=false;
+    p.surfaceDrift=0;
     if (((p.gravity < 0 && power!=='flip') || power==='swim') && p.y < 48) {p.y=48;p.vy=0;p.on=true;p.jumps=0;}
     let landed = false;
     for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
@@ -996,8 +1009,8 @@
         if(ledge.kind==='barrel' && held('technique')) {p.vx=p.facing*440;p.vy=-610;p.grapple=.35;p.on=false;}
         if(ledge.kind==='pogo' && (held('technique') || held('jump'))) {p.vy=-590;p.on=false;}
         if (ledge.kind === 'spring') {p.vy=-565;p.on=false;}
-        if (ledge.kind === 'belt') p.x += 75*dt;
-        if (ledge.kind === 'current') p.x -= 65*dt;
+        if (ledge.kind === 'belt') p.surfaceDrift=index===3 ? 120 : index===20 ? 95 : 75;
+        if (ledge.kind === 'current' && index!==2) p.surfaceDrift=-65;
         if (ledge.kind === 'lift' && held('jump')) {p.vy=-560;p.on=false;}
       }
     }
