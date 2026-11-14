@@ -6392,6 +6392,19 @@
         tilt=(p.ledgeGrip.left?1:-1)*.16;
         scaleX=.94;
         scaleY=1.1;
+      } else if(p.throwPose && clock-p.throwPose.time<.17){
+        const release=1-(clock-p.throwPose.time)/.17;
+        tilt=p.throwPose.facing*.22*release;
+        scaleX=1+.09*release;
+      } else if(index===10 && p.carry){
+        tilt=-p.facing*.08;
+        scaleY=1.08;
+        scaleX=.96;
+      } else if(index===15 && p.bashPose && clock-p.bashPose.time<.27){
+        const launch=1-(clock-p.bashPose.time)/.27;
+        tilt=Math.cos(p.bashPose.angle)*.23*launch;
+        scaleX=1+.12*launch;
+        scaleY=1-.07*launch;
       } else if(attacking){
         const strike=Math.sin(clock*22);
         tilt=p.facing*(.11+strike*.16);
