@@ -645,7 +645,10 @@
   function jump(buffer = true) {
     if (phase !== 'playing') return;
     if (power==='flip') {if(buffer) action();return;}
-    if (buffer) player.jumpBuffer=.11;
+    // Use the selected course's input forgiveness window on the initial
+    // button press, not only after the simulation starts counting it down.
+    if (buffer) player.jumpBuffer=[.115,.095,.11,.075,.11,.12,.13,.075,.05,.095,
+      .12,.14,.09,.115,.105,.13,.085,.11,.085,.1,.065,.085,.12,.13,.09][index];
     if (index===3 && held('down') && player.on) {player.spin=Math.min(5,player.spin+1);player.jumpBuffer=0;return;}
     if (index===10 && player.carry && !player.on) {
       player.carry=false;player.vy=-jumpSpeed;player.jumpBuffer=0;
