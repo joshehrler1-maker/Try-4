@@ -1148,14 +1148,14 @@
     const thickness=4+distance*.025;
     const centerX=x+distance*.11;
     const centerY=surface-1;
-    // Gradient coordinates must be local: the canvas is translated below.
-    // Using world coordinates here shifted the falloff away from the feet.
+    // Transform before constructing the gradient so its center follows
+    // the same local coordinate space as the flattened contact ellipse.
+    ctx.translate(centerX,centerY);
+    ctx.scale(1,thickness/spread);
     const shadow=ctx.createRadialGradient(0,0,0,0,0,spread);
     shadow.addColorStop(0,'rgba(7,9,22,'+(.43*fade).toFixed(3)+')');
     shadow.addColorStop(.52,'rgba(7,9,22,'+(.22*fade).toFixed(3)+')');
     shadow.addColorStop(1,'rgba(7,9,22,0)');
-    ctx.translate(centerX,centerY);
-    ctx.scale(1,thickness/spread);
     ctx.fillStyle=shadow;
     ctx.beginPath();
     ctx.arc(0,0,spread,0,Math.PI*2);
