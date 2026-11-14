@@ -1641,6 +1641,36 @@
     ctx.restore();
     ctx.fillStyle=rim;
     ctx.fillRect(x,y,w,3);
+    // World-specific top-surface detailing makes the playable platform
+    // visibly different from its side wall. Five material families combine
+    // with each world's palette and six chapter construction patterns.
+    // Keep accents inset so the collision edge remains visually unambiguous.
+    const materialFamily=[0,2,3,1,4,3,2,0,2,1,4,3,1,4,0,4,1,3,4,3,2,0,4,4,1][index];
+    const segment=materialFamily===1?23:materialFamily===2?17:materialFamily===3?31:27;
+    const left=Math.max(0,Math.floor((camera-x)/segment)-1);
+    const right=Math.min(Math.ceil(w/segment),Math.ceil((camera+width-x)/segment)+1);
+    ctx.save();
+    ctx.beginPath();ctx.rect(x+2,y-topDepth+1,Math.max(0,w-4),topDepth-1);ctx.clip();
+    ctx.strokeStyle=rim;ctx.fillStyle=rim;ctx.globalAlpha=.66;ctx.lineWidth=1.5;
+    for(let tile=left;tile<right;tile++){
+      const px=x+tile*segment+segment*.5;
+      if(materialFamily===0){ // polished crystal facets
+        ctx.beginPath();ctx.moveTo(px-5,y-2);ctx.lineTo(px,y-topDepth+2);
+        ctx.lineTo(px+5,y-2);ctx.stroke();
+      }else if(materialFamily===1){ // riveted metal decking
+        ctx.beginPath();ctx.arc(px,y-3,1.5,0,Math.PI*2);ctx.fill();
+        ctx.fillRect(px-7,y-topDepth+2,14,1);
+      }else if(materialFamily===2){ // carved stone tiles
+        ctx.beginPath();ctx.moveTo(px-7,y-2);ctx.lineTo(px-2,y-topDepth+2);
+        ctx.moveTo(px+5,y-2);ctx.lineTo(px+9,y-topDepth+2);ctx.stroke();
+      }else if(materialFamily===3){ // rolling water and ice ripples
+        ctx.beginPath();ctx.moveTo(px-10,y-4);ctx.quadraticCurveTo(px-5,y-topDepth+1,px,y-4);
+        ctx.quadraticCurveTo(px+5,y-1,px+10,y-4);ctx.stroke();
+      }else{ // organic leaf and wooden grain
+        ctx.beginPath();ctx.ellipse(px,y-4,6,2.1,-.3,0,Math.PI*2);ctx.stroke();
+      }
+    }
+    ctx.restore();
     ctx.fillStyle='#fff6dd';
     ctx.fillRect(x,y,Math.min(7,w),3);
     ctx.fillRect(x+Math.max(0,w-7),y,Math.min(7,w),3);
