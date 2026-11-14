@@ -309,7 +309,12 @@
       platforms.push({x:start+x,y,w,kind});
       if (['hazard','rail','ceiling'].includes(kind)) continue;
       if (x>150 || w>850) {
-        const count = Math.max(1, Math.floor(w / (room==='arena' ? 420 : 540)));
+        // Stage-specific encounter density: later chapters add one
+        // opponent only on sufficiently broad, walkable platforms.
+        // Keep early chapters sparse and avoid overcrowding narrow ledges.
+        const baseCount=Math.max(1,Math.floor(w/(room==='arena'?420:540)));
+        const extraEncounter=stage>=3 && w>=720 && slot%3===stage%3 ? 1:0;
+        const count=Math.min(5,baseCount+extraEncounter);
         for(let encounter=0;encounter<count;encounter++) {
           const offset = Math.round(w*(encounter+1)/(count+1));
           // Deterministic encounter archetypes: different patrol rhythms
