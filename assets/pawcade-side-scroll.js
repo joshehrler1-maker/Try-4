@@ -1129,12 +1129,16 @@
     const shielded=baronShielded(cycle);
     const attack=attacks.find(a=>a.life>0 && close(a,boss,49+(a.radius||0),42));
     const stomp=close(p,boss,47,52) && p.vy>70 && (oldY<boss.y-18 || p.pogo);
-    if (!shielded && !boss.grace && (attack || stomp)) {
+    const rush = close(p,boss,47,52) &&
+      ((power==='dash' && p.power>.22) ||
+       (index===2 && p.grapple>0 && (boss.x-p.x)*p.facing>=0));
+    if (!shielded && !boss.grace && (attack || stomp || rush)) {
       boss.health=Math.max(0,boss.health-(attack?.damage||1));
       boss.grace=.65;
       burst(boss.x,boss.y,'#ffd08a',boss.health?12:22);
       if (attack) attack.life=0;
       if (stomp) {p.vy=p.pogo?-510:-375;p.pogo=false;p.on=false;}
+      if(rush) p.grace=Math.max(p.grace,.35);
       status(boss.health ? 'Baron Brasswhirl · '+boss.health+' hits left.' : 'Baron Brasswhirl defeated. '+finaleExitHint);
     } else if (close(p,boss,44,42)) hit();
   }
