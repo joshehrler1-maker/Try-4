@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Snowy Seams original warmth stitch lantern"><defs><linearGradient id="surface" x1=".02" y1=".04" x2=".98" y2=".95"><stop stop-color="#fff7e7"/><stop offset=".25" stop-color="#f9f5db"/><stop offset=".69" stop-color="#a5c9ea"/><stop offset="1" stop-color="#6780a2"/></linearGradient><radialGradient id="light"><stop stop-color="#ffe4ad" stop-opacity=".8"/><stop offset=".45" stop-color="#f9f5db" stop-opacity=".27"/><stop offset="1" stop-color="#f9f5db" stop-opacity="0"/></radialGradient></defs><ellipse cx="89" cy="83" rx="72" ry="70" fill="url(#light)" opacity=".65"/>
+<path d="M39 165V39h104v126" fill="#9eb7d2" stroke="#eff9fb" stroke-width="6"/>
+<path d="M31 43q56-39 119 0l-8 17-51-20-52 20z" fill="url(#surface)" stroke="#fff8e4" stroke-width="5"/>
+<path d="M63 71h55l10 16-12 42-25 23-25-23-13-42z" fill="#587d9c" stroke="#fff1d7" stroke-width="5"/>
+<path d="M72 89q16-25 36 0l-7 37-10 10-12-10z" fill="#ffe3a3" stroke="#fff4d0" stroke-width="4"/>
+<path d="M79 106h25m-25 13h25" stroke="#f4ae98" stroke-width="4" stroke-dasharray="7 5"/>
+<path d="M26 164q25-19 50-7t51 0 31 7" stroke="#fafffb" stroke-width="9" fill="none"/>
+<circle cx="30" cy="77" r="5" fill="#efffff"/><circle cx="147" cy="99" r="4" fill="#efffff"/></svg>
