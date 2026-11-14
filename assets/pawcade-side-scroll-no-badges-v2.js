@@ -1423,7 +1423,7 @@
     reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
-    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;e.faceLeft=undefined;e._attackPose=0;e._previousDrawY=undefined;e._lastVerticalSpeed=0;e._landingPose=0;e._bodyVelocity=0;});
+    enemies.forEach(e => {e.dead = false;e._defeatAt=undefined;e._defeatX=undefined;e._defeatY=undefined;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;e.faceLeft=undefined;e._attackPose=0;e._previousDrawY=undefined;e._lastVerticalSpeed=0;e._landingPose=0;e._bodyVelocity=0;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
@@ -1641,6 +1641,20 @@
   function bashTarget(p) {
     return closestTarget(p,enemies,foePosition,foe=>!foe.dead,125,65);
   }
+  // Defeat state is visual-only: the original immediate dead flag still
+  // removes enemies from collisions, attacks, progress, and save logic.
+  // Snapshot position at impact so the short visual cannot drift after death.
+  function markFoeDefeated(foe) {
+    if(foe.dead)return;
+    const shouldAnimate=index>=20 && index<=24 && !reducedMotion;
+    const pose=shouldAnimate?foePosition(foe):null;
+    foe.dead=true;
+    if(pose){
+      foe._defeatAt=clock;
+      foe._defeatX=pose.x;
+      foe._defeatY=pose.y;
+    }
+  }
   function useTechnique() {
     if (phase!=='playing' || player.techCooldown>0) return;
     const p=player;
@@ -1668,7 +1682,7 @@
       case 'capture': {
         if(p.carry){shot({v:facing*550,damage:2});p.carry=false;break;}
         const foe=nearby(strength);
-        if(foe){foe.dead=true;p.carry=true;status(index===10?'Enemy caught. Jump in midair for a boost, or use '+techniqueName+' again to throw.':'Enemy caught. Press '+techniqueName+' again to throw.');}
+        if(foe){markFoeDefeated(foe);p.carry=true;status(index===10?'Enemy caught. Jump in midair for a boost, or use '+techniqueName+' again to throw.':'Enemy caught. Press '+techniqueName+' again to throw.');}
         break;
       }
       case 'flip': action();break;
@@ -2626,7 +2640,7 @@
       if (roundstone && chapter===2 && roundstone.speed>=35 &&
           foe.spawnChapter===2 &&
           Math.hypot(position.x-roundstone.x,position.y-(ground-roundstone.radius))<=roundstone.radius+14) {
-        foe.dead=true;
+        markFoeDefeated(foe);
         burst(position.x,position.y,'#d8b68a',8);
         playImpact();
         continue;
@@ -2634,7 +2648,7 @@
       if (Math.abs(position.x-p.x)>360 && !attacks.length) continue;
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
       if (impact) {
-        foe.dead=true;
+        markFoeDefeated(foe);
         if (index===1 && impact.blasterShot && impact.damage===1) impact.life=0;
         continue;
       }
@@ -2748,12 +2762,12 @@
       }
       if (!(foe.bashed && clock<foe.bashed.until) && close(p,position,29,34)) {
         if(index===2 && p.grapple>0 && (position.x-p.x)*p.facing>=0){
-          foe.dead=true;
+          markFoeDefeated(foe);
           if(!reducedMotion) burst(position.x,position.y,'#82ffe6',6);
           continue;
         }
         if ((p.vy>65 && oldY<position.y-17) || (power==='dash' && p.power>.22)) {
-          foe.dead=true;
+          markFoeDefeated(foe);
           if(index===12 && p.pogo && !reducedMotion){
             burst(position.x,position.y-12,'#b8eeff',8);
           }
@@ -7377,6 +7391,31 @@
       if(!sprite(15,c.x,c.y,38,38)){ctx.fillStyle='#ffd967';ctx.fillRect(c.x-5,c.y-5,10,10);}
     }
     const bashReady=index===15 && technique==='bash' && phase==='playing' && player.techCooldown<=0 ? bashTarget(player) : null;
+    // A short unique-rig defeat transition follows a confirmed kill.
+    // It never resurrects a foe's physics or damages the player. On reduced
+    // motion it is intentionally suppressed, matching user accessibility.
+    if(index>=20 && index<=24 && !reducedMotion &&
+       window.pawtopiaLateEnemyRigs?.draw){
+      for(const foe of enemies){
+        if(!foe.dead || !Number.isFinite(foe._defeatAt))continue;
+        const age=clock-foe._defeatAt;
+        if(age<0 || age>=.42)continue;
+        const x=foe._defeatX,y=foe._defeatY;
+        if(!Number.isFinite(x)||!Number.isFinite(y)||
+           x<camera-65||x>camera+width+65)continue;
+        const t=age/.42;
+        ctx.save();
+        ctx.globalAlpha=Math.pow(1-t,1.4);
+        ctx.translate(x,y+8*t);
+        ctx.rotate((foe.faceLeft?1:-1)*t*.26);
+        ctx.scale(1-t*.23,1-t*.4);
+        ctx.translate(-x,-y);
+        window.pawtopiaLateEnemyRigs.draw(ctx,index,{x,y},foe,{
+          faceLeft:foe.faceLeft,reduced:true
+        });
+        ctx.restore();
+      }
+    }
     for (const foe of enemies) if(!foe.dead && foe.x>=camera-150 && foe.x<camera+width+150) {
       const at=foePosition(foe);
       const airborne=['swoop','school'].includes(enemyPattern);
