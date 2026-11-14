@@ -2857,7 +2857,13 @@
         ctx.scale(1+compression,1-compression);
         ctx.translate(-boss.x,-pivotY-bob);
       }
-      if(!atlasSprite(guardianArt,3,guardianCells[index],boss.x,boss.y-21,138,120,false,2) && !atlasSprite(enemyArt,5,index,boss.x,boss.y,126,126) && !sprite(12,boss.x,boss.y,116,116,true)){ctx.fillStyle='#ad505c';ctx.fillRect(boss.x-34,boss.y-38,68,76);}
+      const guardianCell=guardianCells[index];
+      if(guardianCell===undefined || !atlasSprite(guardianArt,3,guardianCell,boss.x,boss.y-21,138,120,false,2)){
+        ctx.fillStyle=courseMaterials[index][1];
+        ctx.fillRect(boss.x-34,boss.y-38,68,76);
+        ctx.fillStyle=courseMaterials[index][2];
+        ctx.fillRect(boss.x-23,boss.y-22,46,6);
+      }
       ctx.restore();
       if(boss.warning){
         atlasSprite(propArt,4,6,boss.x,boss.y-78,32,34,false,2);
