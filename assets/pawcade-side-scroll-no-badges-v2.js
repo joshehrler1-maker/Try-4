@@ -566,7 +566,7 @@
     // Individually paced challenge pockets for all six chapters. These
     // supplement, rather than replace, the existing authored room geometry.
     const challengeSeed=(index*23+stage*17)%7;
-    const challengeX=start+Math.min(sectionSize-570,450+challengeSeed*36);
+    const challengeX=start+Math.max(160,Math.min(stageWidths[stage]-570,450+challengeSeed*36));
     const challengeTypes={
       momentum:['belt','belt','floor'],
       roll:['barrel','floor','barrel'],
