@@ -3812,17 +3812,18 @@
     // arrangement for each world; this is visual, not extra hit points.
     const plates=basePlates+variantPlate+(armorChapter>=3?1:0);
     ctx.save();
-    // Foundry enemies breathe, brace, and recoil as articulated armor units.
-    // The movement is visual-only: collision positions and gameplay stay fixed.
-    const foundryMotion=index===0 && !reducedMotion;
-    const motionTime=foundryMotion?performance.now()/1000:0;
-    const motionPhase=motionTime*5+(Number(foe.x)||0)*.035;
-    const groundedMotion=foundryMotion && !airborne;
-    const motionBob=groundedMotion?Math.sin(motionPhase)*1.4:0;
-    const motionLean=foundryMotion?Math.sin(motionPhase*.65)*.035:0;
+    // All 25 enemy families now receive low-cost secondary armor motion.
+    // Per-world timing keeps the motion from looking synchronized; this is
+    // purely visual, leaving collision, AI, and grounded foot positions intact.
+    const armorMotion=!reducedMotion;
+    const motionTime=armorMotion?performance.now()/1000:0;
+    const motionPhase=motionTime*(3.6+(index%5)*.24)+(Number(foe.x)||0)*.035;
+    const groundedMotion=armorMotion && !airborne;
+    const motionBob=groundedMotion?Math.sin(motionPhase)*.9:0;
+    const motionLean=armorMotion?Math.sin(motionPhase*.65)*.024:0;
     ctx.translate(at.x,at.y-17+motionBob);
     ctx.scale(faceLeft?-1:1,1);
-    if(foundryMotion)ctx.rotate(motionLean);
+    if(armorMotion)ctx.rotate(motionLean);
     ctx.lineJoin='round';
     ctx.lineWidth=1.2;
     ctx.strokeStyle=enemyCueColors[index];
