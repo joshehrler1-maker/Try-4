@@ -606,7 +606,7 @@ test('original base enemy rigs for games 1–5 preserve authored specialists and
   assert.equal(rigs.draw({},5,{x:0,y:0},{},{}),false);
 });
 
-test('first-five real WebGL mesh prototypes have unique 3D parts and safe lifecycle', () => {
+test('first-ten real WebGL mesh prototypes have unique 3D parts and safe lifecycle', () => {
   const lab=fs.readFileSync(path.join(__dirname,'../enemy-3d-prototype.html'),'utf8');
   const game=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
   const worker=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
@@ -615,19 +615,19 @@ test('first-five real WebGL mesh prototypes have unique 3D parts and safe lifecy
     '../assets/enemy-art-motion-registry.json'),'utf8'));
   assert.ok(lab.includes('<script src="assets/animation/enemy-3d-prototype-v1.js?'),
     'preview must initialize its WebGL renderer before the inline UI code');
-  assert.ok(lab.includes('not installed in the 2.5D games'),
+  assert.ok(lab.includes('Experimental low-detail models'),
     'experimental 3D models must be labeled honestly');
   assert.ok(game.includes('href="enemy-3d-prototype.html"'),
     'prototype should be discoverable from Games Room');
   for(const file of ['enemy-3d-prototype.html',
-    'assets/animation/enemy-3d-prototype-v1.js?v=3d-sprite-5c90e29']){
+    'assets/animation/enemy-3d-prototype-v1.js?v=3d-ten-79f7903']){
     assert.ok(worker.includes(file), 'new WebGL source not precached: '+file);
   }
   const ctx={window:{devicePixelRatio:2}};
   vm.runInNewContext(source,ctx,{timeout:2000});
   const art=ctx.window.SuperPawEnemy3D;
-  assert.equal(art.models.length,5);
-  assert.equal(new Set(art.models.map(m=>m.enemy)).size,5);
+  assert.equal(art.models.length,10);
+  assert.equal(new Set(art.models.map(m=>m.enemy)).size,10);
   for(const [kind,m] of Object.entries(art.meshes)){
     assert.equal(m.p.length,m.n.length,'normals must match 3D vertices: '+kind);
     assert.equal(m.p.length%3,0);
@@ -635,7 +635,7 @@ test('first-five real WebGL mesh prototypes have unique 3D parts and safe lifecy
     assert.ok(m.idx.every(i=>i>=0&&i<m.p.length/3),'invalid index in '+kind);
     assert.ok(m.p.every(Number.isFinite)&&m.n.every(Number.isFinite),'invalid mesh geometry: '+kind);
   }
-  for(let i=0;i<5;i++){
+  for(let i=0;i<10;i++){
     assert.equal(art.models[i].enemy,registry.games[i].enemyFamily);
     assert.ok(registry.games[i].implementationStatus.includes('partial'));
     for(const mode of ['idle','move','attack','hit','defeat']){
@@ -665,7 +665,7 @@ test('first-five real WebGL mesh prototypes have unique 3D parts and safe lifecy
   }});
   const canvas={clientWidth:500,width:0,height:0,getContext:()=>gl};
   const stage=art.init(canvas);
-  for(let i=0;i<5;i++)for(const mode of ['idle','move','attack','hit','defeat'])
+  for(let i=0;i<10;i++)for(const mode of ['idle','move','attack','hit','defeat'])
     assert.ok(stage.render(i,mode,1.2,.25,false).meshes>=8);
   assert.ok(drawCalls>200,'no 3D triangle mesh draw calls');
   assert.ok(buffers>=12,'four mesh types require dedicated GPU vertex/index buffers');
@@ -682,12 +682,12 @@ test('opt-in gameplay WebGL enemies preserve the original 2D fallback', () => {
   assert.ok(html.includes('id="side-3d-enemies" aria-pressed="false" hidden'));
   assert.ok(html.indexOf('src="assets/animation/enemy-3d-prototype-v1.js') <
     html.indexOf('src="assets/pawcade-side-scroll-no-badges-v2.js'));
-  assert.ok(sw.includes('enemy-3d-prototype-v1.js?v=3d-sprite-'));
-  assert.ok(sw.includes('pawcade-side-scroll-no-badges-v2.js?v=live-3d-foes-'));
-  assert.ok(runtime.includes('enemy3dAvailable=index>=0 && index<=4'));
+  assert.ok(sw.includes('enemy-3d-prototype-v1.js?v=3d-ten-'));
+  assert.ok(sw.includes('pawcade-side-scroll-no-badges-v2.js?v=live-3d-10-'));
+  assert.ok(runtime.includes('enemy3dAvailable=index>=0 && index<=9'));
   assert.ok(runtime.includes('enemy3dDraws>=2'));
   assert.ok(runtime.includes('enemy3dSlowFrames>=12'));
-  assert.ok(runtime.includes('!usesOriginRig(foe)'));
+  assert.ok(runtime.includes('!is3dPreviewFoe(foe)'));
   assert.ok(runtime.includes('else if(originWorldRig && window.pawtopiaOriginEnemyRigs.draw('));
   assert.ok(runtime.includes('finally{ctx.restore();}'));
   const sandbox={window:{devicePixelRatio:3}};
@@ -714,7 +714,7 @@ test('opt-in gameplay WebGL enemies preserve the original 2D fallback', () => {
   assert.equal(settings.alpha,true);
   assert.equal(settings.preserveDrawingBuffer,true);
   assert.equal(alpha,0);
-  for(let i=0;i<5;i++){
+  for(let i=0;i<10;i++){
     const before=drawn;
     const current=view.render(i,'move',1.5,.2,false);
     assert.equal(canvas.width,160);
