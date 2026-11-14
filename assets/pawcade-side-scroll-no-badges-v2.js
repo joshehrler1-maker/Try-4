@@ -1174,7 +1174,16 @@
     }
     if(index===11 && stage===1) landmarks.push({cell:5,x:start+1010,y:169,w:76,h:70});
     if (index===11) {
-      crystals.push({x:start+690,y:226,refill:true},{x:start+1295,y:173,refill:true});
+      // Dash refills sit in the gaps between the authored upper landings.
+      const refills = [
+        [[725,212],[1282,150]],
+        [[759,203],[1368,154]],
+        [[810,216],[1457,208]],
+        [[681,198],[1249,151]],
+        [[604,187],[1176,143]],
+        [[658,211],[1261,124]],
+      ][stage];
+      for (const [x, y] of refills) crystals.push({x:start+x,y,refill:true});
     }
     if (room==='rhythm') {
       for (let beat=0;beat<4;beat++) crystals.push({x:start+375+beat*415,y:225});
