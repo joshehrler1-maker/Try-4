@@ -451,3 +451,62 @@ test('cloud-trail rigs for games 11–15 have independent silhouettes and safe s
   assert.equal(art.draw({},15,{x:0,y:0},{},{}),false,
     'new artwork must not overwrite games 16–25');
 });
+
+test('five distinctive games 6–10 enemy rigs render safely without changing gameplay physics', () => {
+  const runtime=fs.readFileSync(path.join(__dirname,'../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const worker=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  const registry=JSON.parse(fs.readFileSync(path.join(__dirname,
+    '../assets/enemy-art-motion-registry.json'),'utf8'));
+  const pathToArt=path.join(__dirname,'../assets/animation/five-world-enemy-rigs-v1.js');
+  assert.ok(fs.existsSync(pathToArt),'original five-world enemy motion source missing');
+  const sandbox={window:{}};
+  vm.runInNewContext(fs.readFileSync(pathToArt,'utf8'),sandbox,{timeout:1000});
+  const rigs=sandbox.window.pawtopiaFiveEnemyRigs;
+  assert.equal(typeof rigs?.draw,'function');
+  assert.equal(Object.keys(rigs.families).length,5);
+  assert.equal(new Set(Object.values(rigs.families)).size,5,
+    'no duplicated enemy family in the five distinct adventures');
+  assert.ok(html.includes('src="assets/animation/five-world-enemy-rigs-v1.js?'));
+  assert.ok(html.indexOf('src="assets/animation/five-world-enemy-rigs-v1.js') <
+    html.indexOf('src="assets/pawcade-side-scroll-no-badges-v2.js'),
+    'enemy rigs must load before the playable runtime');
+  assert.ok(worker.includes("'assets/animation/five-world-enemy-rigs-v1.js?"),
+    'new five-world animated bodies must work in the offline cache');
+  assert.ok(runtime.includes('fiveWorldRig = index>=5 && index<=9'));
+  assert.ok(runtime.includes('window.pawtopiaFiveEnemyRigs.draw('));
+  assert.ok(runtime.includes('if(!fiveWorldRig) drawWorldSpecificEnemyMotion'),
+    'obsolete motion accents must not overlap the new bespoke silhouettes');
+  assert.ok(runtime.includes('window.pawtopiaFiveEnemyRigs?.draw'),
+    'visual-only defeat transition must use the same enemy body');
+  for(let i=5;i<10;i++){
+    assert.equal(rigs.families[i],registry.games[i].enemyFamily);
+    assert.match(registry.games[i].implementationStatus,/partial/i);
+    let depth=0,ops=0,fill=0;
+    const ctx=new Proxy({globalAlpha:1},{
+      get(target,prop){
+        if(Object.hasOwn(target,prop))return target[prop];
+        return(...args)=>{
+          ops++;
+          if(prop==='save')depth++;
+          if(prop==='restore')depth--;
+          if(prop==='fill')fill++;
+          assert.ok(args.every(v=>typeof v!=='number'||Number.isFinite(v)),
+            'nonfinite canvas parameter '+String(prop)+' in game '+i);
+        };
+      },set(target,k,v){target[k]=v;return true;}
+    });
+    for(const pose of [
+      {stride:0,attack:0,recoil:0,landing:0,clock:0,reduced:true},
+      {stride:1,attack:0,recoil:0,landing:0,clock:1.5,reduced:false},
+      {stride:.4,attack:.65,recoil:.2,landing:.1,clock:2.6,reduced:false},
+      {stride:0,attack:1,recoil:1,landing:.5,clock:3.9,reduced:false,faceLeft:true,hit:1}
+    ]){
+      assert.equal(rigs.draw(ctx,i,{x:200,y:285},{_gait:2.2,offset:i},pose),true);
+      assert.equal(depth,0,'unbalanced canvas transform on '+i);
+    }
+    assert.ok(fill>15 && ops>85,'body motion art incomplete for '+i);
+  }
+  assert.equal(rigs.draw({},4,{x:0,y:0},{},{}),false);
+  assert.equal(rigs.draw({},10,{x:0,y:0},{},{}),false);
+});
