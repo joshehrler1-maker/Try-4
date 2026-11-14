@@ -970,3 +970,13 @@ for (const [room, slot, x, y, width] of [
 ]) {
   window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
 }
+
+// Ember Foundry relay crossings. Let the player see each landing from
+// the previous deck, with a stable runout between the two lifts.
+Object.assign(window.pawtopiaRooms, {
+  forgeBridges: [[0,326,370],[416,282,158,'lift'],[633,241,180],
+    [870,216,148,'lift'],[1078,246,246],[1382,280,220],[1660,326,540]],
+  forgeExpansion3: [[0,326,400],[447,289,182],[685,258,156,'lift'],
+    [903,218,200],[1160,232,155,'lift'],[1377,267,222],
+    [1650,295,175],[1880,326,320]],
+});
