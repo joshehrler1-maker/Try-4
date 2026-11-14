@@ -2013,7 +2013,9 @@
         ctx.beginPath();ctx.ellipse(x+112,hullY+56,79,46,0,0,Math.PI*2);ctx.stroke();
         for(let port=0;port<3;port++){
           const px=x+62+port*49,py=hullY+52;
-          ctx.fillStyle='#9cdce5';
+          const glass=ctx.createRadialGradient(px-4,py-5,1,px,py,15);
+          glass.addColorStop(0,'#e2fbff');glass.addColorStop(.55,'#80cfdd');glass.addColorStop(1,'#315e78');
+          ctx.fillStyle=glass;
           ctx.beginPath();ctx.arc(px,py,13,0,Math.PI*2);ctx.fill();
           ctx.strokeStyle='#d4b789';ctx.lineWidth=4;
           ctx.beginPath();ctx.arc(px,py,13,0,Math.PI*2);ctx.stroke();
@@ -2065,7 +2067,7 @@
         }
         ctx.strokeStyle='#e8d7db';ctx.lineWidth=3;
         ctx.beginPath();ctx.arc(x+112,top+14,38,Math.PI,0);ctx.stroke();
-        ctx.fillStyle='#f2d5a9';ctx.globalAlpha=.55;
+        ctx.fillStyle='#f2d5a9';ctx.globalAlpha=reducedMotion?.55:(.43+.16*Math.sin(clock*1.8+n));
         ctx.beginPath();ctx.arc(x+112,top+14,9,0,Math.PI*2);ctx.fill();
         ctx.globalAlpha=1;
       }else if(index===22){
@@ -2076,7 +2078,7 @@
         ctx.fillStyle='#66594c';
         ctx.beginPath();ctx.moveTo(x+32,cabinY+8);ctx.lineTo(x+102,cabinY-24);
         ctx.lineTo(x+177,cabinY+8);ctx.closePath();ctx.fill();
-        ctx.fillStyle='#e8bc7b';ctx.globalAlpha=.82;
+        ctx.fillStyle='#e8bc7b';ctx.globalAlpha=reducedMotion?.82:(.76+.13*Math.sin(clock*2.1+n*1.7));
         ctx.fillRect(x+78,cabinY+27,23,30);ctx.fillRect(x+124,cabinY+27,23,30);
         ctx.globalAlpha=1;
         ctx.fillStyle='#7b6853';
