@@ -1635,7 +1635,7 @@
     ctx.fillRect(x-1,y-2,w+2,8);
     // A slim perspective top face makes the landing surface readable without
     // changing the platform collision geometry or obscuring the character.
-    const topDepth=Math.min(9,Math.max(3,w*.035));
+    const topDepth=Math.min(13,Math.max(4,w*.045));
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(x,y);
@@ -1644,8 +1644,8 @@
     ctx.lineTo(x+w,y);
     ctx.closePath();
     const topLight=ctx.createLinearGradient(0,y-topDepth,0,y+2);
-    topLight.addColorStop(0,'rgba(255,255,255,.36)');
-    topLight.addColorStop(1,'rgba(255,255,255,.09)');
+    topLight.addColorStop(0,rim);
+    topLight.addColorStop(1,'#252037');
     ctx.fillStyle=topLight;
     ctx.fill();
     ctx.restore();
@@ -2408,6 +2408,22 @@
           ctx.lineTo(x+ledge.w/5,36);ctx.fill();
         }
         ctx.restore();
+        continue;
+      }
+      if (ledge.kind==='ceiling') {
+        const depth=24;
+        const rim=courseMaterials[index][2];
+        ctx.fillStyle=courseMaterials[index][1];
+        ctx.fillRect(ledge.x,ledge.y-depth,ledge.w,depth);
+        if (terrainArt.naturalWidth) {
+          const count=Math.ceil(ledge.w/142);
+          const tileWidth=ledge.w/count;
+          for(let part=0;part<count;part++){
+            atlasSprite(terrainArt,4,terrainCells.ceiling,ledge.x+(part+.5)*tileWidth,ledge.y-depth/2,tileWidth,depth);
+          }
+        }
+        ctx.fillStyle=rim;
+        ctx.fillRect(ledge.x,ledge.y-3,ledge.w,3);
         continue;
       }
       const depth=ledge.kind==='floor'?65:ledge.kind==='hazard'?Math.max(16,ground-ledge.y):24;
