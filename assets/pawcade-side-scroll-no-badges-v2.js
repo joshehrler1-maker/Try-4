@@ -3978,6 +3978,14 @@
         ctx.fillRect(visibleStart,y+5,visibleEnd-visibleStart,13);
         ctx.fillStyle='rgba(255,218,154,.34)';
         ctx.fillRect(visibleStart,y+5,visibleEnd-visibleStart,2);
+        // Restrained reflected furnace light along the underside creates
+        // additional depth while keeping the 2.5D walkable top unchanged.
+        const bounce=ctx.createLinearGradient(0,y+9,0,y+17);
+        bounce.addColorStop(0,'rgba(255,158,76,0)');
+        bounce.addColorStop(.55,'rgba(255,135,64,.16)');
+        bounce.addColorStop(1,'rgba(255,94,52,0)');
+        ctx.fillStyle=bounce;
+        ctx.fillRect(visibleStart,y+9,visibleEnd-visibleStart,8);
         ctx.fillStyle='rgba(24,15,35,.55)';
         ctx.fillRect(visibleStart,y+16,visibleEnd-visibleStart,2);
         // A subtle perspective return at each visible deck end makes the
