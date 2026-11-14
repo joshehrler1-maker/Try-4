@@ -962,24 +962,47 @@
       status(boss.health ? guardian.name+' · '+boss.health+' hits left.' : guardian.name+' cleared. Reach the exit.');
     } else if (close(p,boss,44,42)) hit();
   }
+  // Keep ground enemies anchored to a real ledge and inside its safe patrol
+  // bounds. Airborne enemy patterns intentionally retain their flight paths.
+  const flyingFoes=['swoop','school'].includes(enemyPattern);
+  for(const foe of enemies){
+    if(flyingFoes) continue;
+    const supports=platforms.filter(ledge=>
+      !['hazard','rail','ceiling','ceilingSpikes','current'].includes(ledge.kind) &&
+      foe.x>=ledge.x+12 && foe.x<=ledge.x+ledge.w-12 &&
+      Math.abs((ledge.y-23)-foe.y)<28
+    ).sort((a,b)=>Math.abs(a.y-23-foe.y)-Math.abs(b.y-23-foe.y));
+    const ledge=supports[0];
+    if(ledge){
+      foe.y=ledge.y-23;
+      foe.patrolLeft=ledge.x+17;
+      foe.patrolRight=ledge.x+ledge.w-17;
+    } else if(Math.abs(foe.y-(ground-23))<35){
+      foe.y=ground-23;
+      foe.patrolLeft=Math.max(30,foe.x-48);
+      foe.patrolRight=Math.min(finish+770,foe.x+48);
+    }
+  }
   function foePosition(foe) {
     if(foe.bashed && clock<foe.bashed.until){
       const t=.48-(foe.bashed.until-clock);
       return {x:foe.bashed.x+foe.bashed.vx*t,y:foe.bashed.y+foe.bashed.vy*t};
     }
     if (foe.turret) return {x:foe.x,y:foe.y};
+    const patrolX=x=>foe.patrolLeft===undefined ? x :
+      Math.max(foe.patrolLeft,Math.min(foe.patrolRight,x));
     const t = clock * (2 / cadence) + foe.offset;
     const chase = Math.sign(player.x-foe.x);
     const wave = Math.sin(t*2.1);
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
-      case 'charge': return {x:foe.x+chase*Math.max(0,wave)*96,y:foe.y};
-      case 'hopper': return {x:foe.x+wave*24,y:foe.y-Math.max(0,Math.sin(t*3.5))*63};
+      case 'charge': return {x:patrolX(foe.x+chase*Math.max(0,wave)*96),y:foe.y};
+      case 'hopper': return {x:patrolX(foe.x+wave*24),y:foe.y-Math.max(0,Math.sin(t*3.5))*63};
       case 'swoop': return {x:foe.x+wave*78,y:foe.y-50-Math.cos(t*2.1)*42};
       case 'school': return {x:foe.x+wave*55,y:foe.y-33-Math.sin(t*3)*27};
-      case 'pursuit': return {x:foe.x+chase*(32+wave*36),y:foe.y-12};
-      case 'rhythm': return {x:foe.x+Math.round(wave)*34,y:foe.y-Math.max(0,wave)*30};
-      default: return {x:foe.x+wave*34,y:foe.y};
+      case 'pursuit': return {x:patrolX(foe.x+chase*(32+wave*36)),y:foe.y-12};
+      case 'rhythm': return {x:patrolX(foe.x+Math.round(wave)*34),y:foe.y-Math.max(0,wave)*30};
+      default: return {x:patrolX(foe.x+wave*34),y:foe.y};
     }
   }
   function atlasSprite(image,columns,cell,x,y,w,h,reverse=false,rows=columns) {
