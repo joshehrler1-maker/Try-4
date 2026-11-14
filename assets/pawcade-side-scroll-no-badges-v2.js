@@ -388,7 +388,11 @@
       const aerialRoute=[5,6,10,11,15,23].includes(index);
       const precisionRoute=[7,9,14,18,21].includes(index);
       const aquaticRoute=[2,19].includes(index);
-      const routeCount=rw>=1250?3:rw>=850?2:1;
+      // Counterpart-inspired pacing: fast runners get fewer, longer
+      // platforms; climbers and aerial adventures get denser steps.
+      const routeCount=fastRoute?(rw>=1250?2:1):
+        (aerialRoute||precisionRoute)?(rw>=1250?4:rw>=850?3:2):
+        rw>=1250?3:rw>=850?2:1;
       for(let route=0;route<routeCount;route++){
         // Speed courses use broad landing decks; aerial courses use
         // alternating stepping stones; precision courses use narrower,
