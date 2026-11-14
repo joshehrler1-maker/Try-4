@@ -7016,6 +7016,8 @@
         foe._bodyVelocity=0;
         foe._landingPose=0;
         foe.gaitWeight=0;
+        foe._footLiftWeight=0;
+        foe._chargeCompression=0;
         foe.gaitTime=clock;
       }
       const displacement=at.x-(foe._drawX??at.x);
@@ -7033,13 +7035,19 @@
       // whole crab body back toward the player for one or two frames.
       // Ignore tiny position jitter, but flip as soon as real travel resumes.
       if(foundryWalker && walking) foe._patrolFaceLeft=displacement<0;
-      const faceLeft=foundryWalker
+      let faceLeft=foundryWalker
         ? (foe._patrolFaceLeft ?? (walking ? displacement<0 : (foe.faceLeft??false)))
         : walking && !aiming ? displacement<0
         : aiming || (nearby && ['turret','charge','pursuit'].includes(enemyPattern))
           ? player.x<at.x
           : (foe.faceLeft??player.x<at.x);
-      foe.faceLeft=faceLeft;
+      // Avoid one-frame direction flips from subpixel patrol jitter. Keep
+      // attack-facing rules intact for stationary and ranged opponents.
+      const stableFacing=foundryWalker || aiming || !walking ? faceLeft :
+        (travel<.7 && foe._stableFaceLeft!==undefined ? foe._stableFaceLeft : faceLeft);
+      foe._stableFaceLeft=stableFacing;
+      faceLeft=stableFacing;
+      foe.faceLeft=stableFacing;
       foe._drawX=at.x;
       const elapsed=Math.max(0,clock-(foe.gaitTime??clock));
       foe.gaitTime=clock;
@@ -7071,9 +7079,9 @@
         (velocityTarget-(foe._bodyVelocity||0))*(1-Math.exp(-7*motionDt));
       const velocityLean=(foe._bodyVelocity||0)*(.035+sway*.65);
       // Smooth stance-to-stride lift to prevent sudden foot pops on patrol starts and stops.
-       const liftTarget=airborne?0:movingWeight;
+       const liftTarget=airborne||reducedMotion?0:movingWeight;
        foe._footLiftWeight=(foe._footLiftWeight||0)+(liftTarget-(foe._footLiftWeight||0))*(1-Math.exp(-10*motionDt));
-       const footstep=airborne?0:Math.abs(footCycle)*lift*(foe._footLiftWeight||0);
+       const footstep=airborne||reducedMotion?0:Math.abs(footCycle)*lift*(foe._footLiftWeight||0);
       // The stride's support phase compresses the torso, while idle breathing
       // fades out as the foe starts moving. Never animate a walking foe in place.
       const strideCompression=airborne?0:
