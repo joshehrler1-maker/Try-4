@@ -3256,10 +3256,19 @@
       const anchor=findGrappleAnchor(p);
       if(anchor){
         ctx.save();
+        // Preview the same anchor the Action button will attach to.
         ctx.strokeStyle='#ffe0a1';
         ctx.lineWidth=2;
+        ctx.globalAlpha=.8;
+        ctx.setLineDash([6,5]);
         ctx.beginPath();
-        ctx.arc(anchor.x,anchor.y,8,0,Math.PI*2);
+        ctx.moveTo(p.x,p.y-7);
+        ctx.lineTo(anchor.x,anchor.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.globalAlpha=1;
+        ctx.beginPath();
+        ctx.arc(anchor.x,anchor.y,10,0,Math.PI*2);
         ctx.stroke();
         ctx.restore();
       }
