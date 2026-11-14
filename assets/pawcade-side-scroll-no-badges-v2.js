@@ -3574,7 +3574,9 @@
       // no sprites, collisions, or copyrighted reference artwork are reused.
       // Each course has its own deterministic silhouette rhythm; avoid
       // identical prop positions when two worlds share a terrain family.
-      const motif=(tile*(1+index%3)+index*3)%4;
+      // JavaScript remainder is negative for negative tiles. Normalize to
+      // 0..3 so scenery entering from the left never jumps outside its tile.
+      const motif=((tile*(1+index%3)+index*3)%4+4)%4;
       const cx=x+spacing*(.24+motif*.11);
       ctx.save();
       ctx.globalAlpha=opacity*.58;
