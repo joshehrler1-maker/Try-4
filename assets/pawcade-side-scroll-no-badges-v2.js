@@ -68,7 +68,7 @@
   };
   const movementGuide = {
     buster:'Tap Fire to shoot, or hold and release to charge. Jump again while sliding against a wall to kick off.', roll:'Roll through enemies with Action. Press Jump during a roll to leap after leaving a ledge.',
-    float:index===6?'Hold Float (X on keyboard) to rise. Release it to descend.':'Hold Action to float.', beat:'You run automatically. Jump over the beat barriers and press Pulse (X on keyboard) in the gold timing zones.',
+    float:index===6?'Hold Float (X on keyboard) to rise. Release it to descend.':'Hold Action to float.', beat:'You run automatically. Jump over the beat barriers and press Pulse (X on keyboard) when the beat meter reads PULSE NOW.',
     airdash:'Press Dash in midair. Steer up or down to aim it, and jump against walls to kick off.',
     pogo:'Hold Jump while stomping to bounce higher.',
     precision:'Jump from ledge edges to clear wider gaps.',
@@ -5448,15 +5448,26 @@
         continue;
       }
       if (ledge.kind==='hazard') {
+        const rhythmBarrier=index===8;
+        if(rhythmBarrier) ctx.save();
         const count=Math.max(1,Math.round(ledge.w/16));
         const spacing=ledge.w/count;
-        ctx.fillStyle='#ff617c';
+        ctx.fillStyle=rhythmBarrier?'#ad297f':'#ff617c';
         ctx.beginPath();
         for(let i=0;i<count;i++){
           const x=ledge.x+i*spacing;
           ctx.moveTo(x,ground);ctx.lineTo(x+spacing*.5,ledge.y);ctx.lineTo(x+spacing,ground);
+          if(rhythmBarrier) ctx.closePath();
         }
         ctx.fill();
+        if(rhythmBarrier){
+          ctx.strokeStyle='#fff0ff';
+          ctx.lineWidth=2;
+          ctx.stroke();
+          ctx.fillStyle='#ff73bf';
+          ctx.fillRect(ledge.x,ground-3,ledge.w,3);
+          ctx.restore();
+        }
         continue;
       }
     }
