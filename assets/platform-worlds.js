@@ -702,3 +702,21 @@ for(const room of window.pawtopiaRoomPlans[9].split(' ')){
   const [room]=window.pawtopiaRoomPlans[index].split(' ');
   for(const [slot,x,y,w] of edits) window.pawtopiaRooms[room][slot].splice(0,3,x,y,w);
 });
+
+// Opening routes for Sunset Wind Sail through Submarine Dock.
+[
+  [[2,895,225,245],[3,1255,263,340]],
+  [[2,750,223,250],[3,1060,158,190]],
+  [[1,540,288,275],[2,875,220,310]],
+  [[1,300,275,210],[2,660,216,205],[3,1110,241,215]],
+  [[2,890,229,300],[3,1260,276,340]],
+  [[1,585,279,250],[2,895,212,270],[3,1220,156,330]],
+  null,
+  [[1,560,284,275],[2,895,240,285],[3,1230,269,345]],
+  [[1,550,284,230],[2,830,252,280],[3,1160,282,320]],
+  [[1,300,275,240],[2,650,230,310],[3,1160,250,285]]
+].forEach((edits,offset)=>{
+  if(!edits) return; // Steamworks builds its catwalks in the game engine.
+  const [room]=window.pawtopiaRoomPlans[offset+10].split(' ');
+  for(const [slot,x,y,w] of edits) window.pawtopiaRooms[room][slot].splice(0,3,x,y,w);
+});
