@@ -4131,8 +4131,12 @@
     const interval=marking==='beat'?22:marking==='speed'?36:marking==='hull'?54:46;
     const start=Math.max(0,Math.floor((camera-x)/interval)-1);
     const end=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
+    if(end>=start){
     ctx.save();
-    ctx.beginPath();ctx.rect(x+3,y-7,w-6,5);ctx.clip();
+    // Clip to the camera intersection, not the full world-space deck.
+    const markLeft=Math.max(x+3,camera-12);
+    const markRight=Math.min(x+w-3,camera+width+12);
+    ctx.beginPath();ctx.rect(markLeft,y-7,Math.max(0,markRight-markLeft),5);ctx.clip();
     ctx.strokeStyle=rim;ctx.fillStyle=rim;ctx.lineWidth=1.15;ctx.globalAlpha=.7;
     for(let n=start;n<=end;n++){
       const mx=x+n*interval+interval*.5;
@@ -4154,6 +4158,7 @@
       }
     }
     ctx.restore();
+    }
     // Angled end bevels make the platform's thickness legible while
     // remaining strictly decorative. Keep them within the existing cap.
     ctx.globalAlpha=.7;
