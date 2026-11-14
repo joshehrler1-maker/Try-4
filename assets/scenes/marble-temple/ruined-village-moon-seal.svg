@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Marble Temple Ruined Village original carved moon-seal monument"><defs><linearGradient id="metal" x1=".06" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#f7ecd8"/><stop offset=".25" stop-color="#c6b5d8"/><stop offset=".68" stop-color="#3c4169"/><stop offset="1" stop-color="#c6b5d8"/></linearGradient><linearGradient id="glass" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#fffbe4"/><stop offset=".35" stop-color="#dbdbff"/><stop offset="1" stop-color="#3c4169"/></linearGradient><radialGradient id="aura"><stop stop-color="#dbdbff" stop-opacity=".83"/><stop offset=".43" stop-color="#c6b5d8" stop-opacity=".37"/><stop offset="1" stop-color="#3c4169" stop-opacity="0"/></radialGradient></defs><ellipse cx="88" cy="78" rx="70" ry="66" fill="url(#aura)" opacity=".52"/>
+<path d="M29 157 40 136h99l12 21z" fill="#4b4f67" stroke="#ded7cc" stroke-width="4"/>
+<path d="M45 137V45l19-20h56l18 20v92z" fill="url(#metal)" stroke="#eee4d7" stroke-width="5"/>
+<path d="M59 124V49l11-10h40l12 10v75z" fill="#33395e" stroke="#cfcce9" stroke-width="3"/>
+<circle cx="90" cy="82" r="40" fill="#272b55" stroke="#f2e3c7" stroke-width="5"/>
+<circle cx="90" cy="82" r="29" fill="#767eb4" stroke="#e9e3d9" stroke-width="3"/>
+<path d="M89 57a22 22 0 1 0 21 35 25 25 0 1 1-21-35" fill="#fff8d8" stroke="#fef5e6" stroke-width="2"/>
+<path d="m84 70 4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#e5ecff"/>
+<path d="M57 116h67" stroke="#998bb8" stroke-width="4"/>
+<path d="M37 143 17 129l14-29 12 12m95 16 15-31 13 33-15 12" fill="#858098" stroke="#e5d6c7" stroke-width="3"/>
+<path d="M26 157h128" stroke="#d2c8c4" stroke-width="6"/>
+<path d="M48 39h85" stroke="#fff5dc" stroke-width="4"/></svg>
