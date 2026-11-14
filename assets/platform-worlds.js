@@ -893,3 +893,39 @@ for (const [room, slot, x, y, width] of [
 ]) {
   window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
 }
+
+// Swim corridors, rhythm cues, and ascent landings by room.
+for (const [room, slot, x, y, width] of [
+  ["coralBay",2,735,123,265],
+  ["coralChannels",2,980,228,290],
+  ["coralCaves",3,1270,147,245],
+  ["coralVents",3,1245,262,110],
+  ["coralLagoon",3,1215,164,305],
+  ["coralRidge",3,958,171,301],
+  ["course8Stage1",2,744,278,58],
+  ["course8Stage2",3,1175,265,162],
+  ["course8Stage3",3,1238,286,110],
+  ["course8Stage4",3,1290,269,170],
+  ["course8Stage5",3,1170,259,226],
+  ["course8Stage6",3,1325,286,105],
+  ["course10Stage1",2,897,234,278],
+  ["course10Stage2",3,1190,151,349],
+  ["course10Stage3",2,812,192,270],
+  ["course10Stage4",3,1130,181,310],
+  ["course10Stage5",2,766,222,344],
+  ["course10Stage6",3,1124,163,365],
+  ["observatorySurface",2,885,243,322],
+  ["observatoryBurrow",2,939,200,306],
+  ["observatoryHeat",5,1795,233,270],
+  ["observatoryWreck",2,650,211,254],
+  ["observatoryTide",3,1071,175,345],
+  ["observatoryCore",3,1070,181,326],
+  ["course15Stage1",2,876,222,290],
+  ["course15Stage2",3,1105,156,296],
+  ["course15Stage3",3,1031,166,305],
+  ["course15Stage4",2,810,211,304],
+  ["course15Stage5",2,913,229,320],
+  ["course15Stage6",3,1134,185,317],
+]) {
+  window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+}
