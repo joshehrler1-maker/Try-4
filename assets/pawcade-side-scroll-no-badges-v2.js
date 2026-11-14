@@ -3157,6 +3157,34 @@
     }
     ctx.fillStyle=rim;
     ctx.fillRect(x,y,w,3);
+    // Original Super Paw Heroes stage construction: readable, game-specific
+    // landing seams and inset panels. These decorate the rendered top only;
+    // physics, collisions, and authored platform positions stay unchanged.
+    if(w>=92 && kind!=='hazard' && kind!=='ceilingSpikes'){
+      const seamPitch=[84,68,110,76,96,105,118,64,58,94,102,78,86,112,72,120,66,98,88,70,62,92,108,114,74][index];
+      const startSeam=Math.max(1,Math.ceil((camera-x-8)/seamPitch));
+      const endSeam=Math.min(Math.floor((w-12)/seamPitch),Math.ceil((camera+width-x)/seamPitch));
+      ctx.save();
+      ctx.lineWidth=1.3;
+      ctx.strokeStyle='rgba(9,14,31,.38)';
+      ctx.fillStyle='rgba(255,242,205,.42)';
+      for(let seam=startSeam;seam<=endSeam;seam++){
+        const sx=x+seam*seamPitch;
+        // Slight perspective notches make the upper surface visibly 3D.
+        ctx.beginPath();
+        ctx.moveTo(sx-5,y-1);
+        ctx.lineTo(sx-2,y-topDepth*.58);
+        ctx.stroke();
+        if([1,3,7,8,9,14,16,19,20,24].includes(index)){
+          ctx.fillRect(sx+4,y-4,3,2); // machine fastening
+        }else if([2,5,6,13,15,22,23].includes(index)){
+          ctx.beginPath();ctx.arc(sx+5,y-4,2,0,Math.PI*2);ctx.fill();
+        }else{
+          ctx.fillRect(sx+4,y-4,5,1.5); // masonry joint
+        }
+      }
+      ctx.restore();
+    }
     if(kind==='belt' || kind==='current'){
       const direction=kind==='belt'?1:-1;
       const start=Math.max(0,Math.floor((camera-x)/28));
