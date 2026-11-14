@@ -3159,9 +3159,9 @@
   // Seed Garden and Waterfall Climb have separate organic motion languages,
   // rather than borrowing the mechanical armor or aquatic fins of other games.
   function drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose){
-    if(index!==4 && index!==5)return;
+    if(![4,5,6,7,8].includes(index))return;
     const strike=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
-    const phase=reducedMotion?0:clock*(index===4?2.7:4.3)+(foe.offset||0);
+    const phase=reducedMotion?0:clock*([2.7,4.3,3.1,5.2,3.7][index-4])+(foe.offset||0);
     ctx.save();ctx.translate(at.x,at.y-15);ctx.scale(faceLeft?-1:1,1);
     ctx.lineCap='round';ctx.lineJoin='round';
     if(index===4){
@@ -3180,6 +3180,49 @@
         for(let i=0;i<5;i++){const a=i*1.256+phase*.2;ctx.beginPath();
           ctx.arc(19+Math.cos(a)*(12+strike*8),Math.sin(a)*(12+strike*8),1.7,0,Math.PI*2);ctx.fill();}
       }
+    }else if(index===6){
+      // Lantern Trail: hanging lantern pendulums and a growing light cone.
+      const sway=reducedMotion?0:Math.sin(phase)*.23;
+      ctx.save();ctx.rotate(sway);
+      ctx.strokeStyle='#d7a85e';ctx.lineWidth=2;ctx.beginPath();
+      ctx.moveTo(0,-28);ctx.lineTo(0,-15);ctx.stroke();
+      ctx.fillStyle='#684469';ctx.strokeStyle='#ffd68b';
+      ctx.beginPath();ctx.moveTo(-9,-15);ctx.lineTo(9,-15);
+      ctx.lineTo(12,2);ctx.lineTo(0,10);ctx.lineTo(-12,2);ctx.closePath();
+      ctx.fill();ctx.stroke();
+      ctx.globalAlpha=.35+strike*.5;ctx.fillStyle='#fff0a0';
+      ctx.beginPath();ctx.moveTo(0,-11);ctx.lineTo(19+strike*22,18);
+      ctx.lineTo(-19-strike*22,18);ctx.closePath();ctx.fill();ctx.restore();
+    }else if(index===7){
+      // Magnet Junction: opposed pole arms pivot and spark at attack peak.
+      for(const side of [-1,1]){
+        ctx.save();ctx.translate(side*11,-5);
+        ctx.rotate(side*(Math.sin(phase)*.15-strike*.6));
+        ctx.strokeStyle=side<0?'#7edaff':'#ff9f98';ctx.lineWidth=5;
+        ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(side*12,-12);
+        ctx.lineTo(side*20,-12);ctx.stroke();
+        ctx.strokeStyle='#f8eaff';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(side*17,-17);ctx.lineTo(side*20,-12);
+        ctx.lineTo(side*17,-7);ctx.stroke();ctx.restore();
+      }
+      if(strike>.08){ctx.globalAlpha=strike;ctx.strokeStyle='#e4faff';
+        ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-29,-12);
+        ctx.lineTo(-13,-20);ctx.lineTo(0,-8);ctx.lineTo(14,-20);
+        ctx.lineTo(29,-12);ctx.stroke();}
+    }else if(index===8){
+      // Rhythm Run: independently beating drum plates and radial sound pulses.
+      const beat=reducedMotion?0:Math.sin(phase*2)*.14;
+      for(const side of [-1,1]){
+        ctx.save();ctx.translate(side*14,-5);
+        ctx.rotate(side*(beat+strike*.35));
+        ctx.fillStyle=side<0?'#ed8fd5':'#89d5ff';
+        ctx.strokeStyle='#fff0cf';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.ellipse(0,0,8+strike*3,12,side*.3,0,Math.PI*2);
+        ctx.fill();ctx.stroke();ctx.restore();
+      }
+      if(strike>.05){ctx.globalAlpha=strike*.6;ctx.strokeStyle='#f8b8ff';
+        ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,22+strike*18,
+        17+strike*12,0,0,Math.PI*2);ctx.stroke();}
     }else{
       // Waterfall Climb: cascading droplets gather into a diving arc.
       ctx.strokeStyle='#b1f7ff';ctx.lineWidth=2.5;
