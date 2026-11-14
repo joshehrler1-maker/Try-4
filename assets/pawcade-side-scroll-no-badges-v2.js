@@ -218,7 +218,8 @@
   byId('side-player').hidden = false;
   if (power==='swim') byId('touch-stick').setAttribute('aria-label','Drag in four directions to swim');
   byId('side-title').textContent = hero + ' · ' + name;
-  const fourWayStick = power==='swim' || movement==='airdash' || [3,9,13,15,18].includes(index);
+  const fourWayStick = power==='swim' || movement==='airdash' || [3,9,13,15,18,19].includes(index);
+  if(index===19) byId('touch-stick').setAttribute('aria-label','Move left or right. Hold up while firing to aim diagonally.');
   if(index===9) byId('touch-stick').setAttribute('aria-label','Move left or right. While attached, drag up to reel in or down to extend the cable.');
   const controlsGuide = [
     movement==='beat' ? 'Auto-run. Press Space to jump.' :
