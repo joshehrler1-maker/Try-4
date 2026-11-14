@@ -3851,9 +3851,9 @@
     ctx.beginPath();
     if(motif===0){ // foundry / volcanic: vent stacks
       ctx.rect(-14,-27,6,11);ctx.rect(8,-30,6,14);
-    }else if(motif===1){ // library / mechanical: sensor halo
-      ctx.arc(0,-24,12,Math.PI*1.1,Math.PI*1.9);
-      ctx.moveTo(0,-37);ctx.lineTo(0,-30);
+    }else if(motif===1){ // library / mechanical: attached sensor fins
+      ctx.moveTo(-10,-17);ctx.lineTo(-10,-26);ctx.lineTo(-5,-30);
+      ctx.moveTo(10,-17);ctx.lineTo(10,-26);ctx.lineTo(5,-30);
     }else if(motif===2){ // reef / wind: curved fins
       ctx.moveTo(-16,-8);ctx.quadraticCurveTo(-29,-24,-24,-33);
       ctx.moveTo(16,-8);ctx.quadraticCurveTo(29,-24,24,-33);
