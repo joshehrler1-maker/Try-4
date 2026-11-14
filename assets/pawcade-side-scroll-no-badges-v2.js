@@ -362,9 +362,11 @@
   const enemy3dToggle=byId('side-3d-enemies');
   let enemy3dRenderer=null,enemy3dCanvas=null,enemy3dDraws=0;
   let enemy3dOn=false,enemy3dAvailable=index>=0 && index<=4;
+  let enemy3dLastFrame=0,enemy3dSlowFrames=0;
   function disableEnemy3d(note){
     if(enemy3dRenderer){try{enemy3dRenderer.dispose();}catch{}}
     enemy3dRenderer=null;enemy3dCanvas=null;enemy3dOn=false;
+    enemy3dLastFrame=0;enemy3dSlowFrames=0;
     if(enemy3dToggle){
       enemy3dToggle.setAttribute('aria-pressed','false');
       enemy3dToggle.textContent='3D enemy preview: Off';
@@ -389,7 +391,7 @@
             e.preventDefault();disableEnemy3d('3D preview stopped: WebGL context lost. 2D enemies restored.');
           });
           enemy3dRenderer=window.SuperPawEnemy3D.init(sprite,{sprite:true});
-          enemy3dCanvas=sprite;enemy3dOn=true;
+          enemy3dCanvas=sprite;enemy3dOn=true;enemy3dLastFrame=0;enemy3dSlowFrames=0;
           enemy3dToggle.textContent='3D enemy preview: On';
           enemy3dToggle.setAttribute('aria-pressed','true');
           status('Experimental 3D on for up to two nearby regular enemies. Special enemies remain 2D; turn off if phone performance drops.');
@@ -411,10 +413,12 @@
         mode==='attack'?Math.max(0,clock-(foe.lastShotAt??clock)):
         mode==='hit'?.35:clock;
       enemy3dRenderer.render(index,mode,time,.26,reducedMotion);
-      ctx.save();ctx.translate(at.x,at.y-95);
-      if(faceLeft)ctx.scale(-1,1);
-      ctx.drawImage(enemy3dCanvas,-58,0,116,116);
-      ctx.restore();
+      ctx.save();
+      try{
+        ctx.translate(at.x,at.y-95);
+        if(faceLeft)ctx.scale(-1,1);
+        ctx.drawImage(enemy3dCanvas,-58,0,116,116);
+      }finally{ctx.restore();}
       enemy3dDraws++;
       return true;
     }catch(error){
@@ -7087,6 +7091,16 @@
     forgeLighting.addColorStop(1,'#ff871b7a');
   }
   function draw() {
+    // Self-protect the Android game: opt-in 3D disables itself after
+    // repeated sub-24fps frame intervals. Ignore tab resume gaps.
+    if(enemy3dOn){
+      const now=performance.now(),dt=enemy3dLastFrame?now-enemy3dLastFrame:0;
+      enemy3dLastFrame=now;
+      if(dt>42 && dt<200) enemy3dSlowFrames++;
+      else if(dt>0 && dt<=42) enemy3dSlowFrames=Math.max(0,enemy3dSlowFrames-2);
+      if(enemy3dSlowFrames>=12)
+        disableEnemy3d('3D preview automatically turned off to protect game performance. Original 2D enemies restored.');
+    }
     enemy3dDraws=0;
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
