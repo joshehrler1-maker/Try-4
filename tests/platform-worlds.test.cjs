@@ -124,7 +124,7 @@ test('first-stage scenic art stays tied to its own stage surface, file and offli
   };
   const files = literal('firstStageLandmarkPaths');
   const positions = literal('firstStageLandmarkPositions');
-  assert.equal(files.length, 20, '20 active Stage 1 scenic assets required');
+  assert.equal(files.length, 25, 'all 25 adventures require game-specific Stage 1 artwork');
   assert.equal(positions.length, files.length, 'each active art file must have a location');
   assert.equal(new Set(files).size, files.length, 'no art may be reused across games');
   assert.match(runtime, /drawImage\(firstStageLandmark, artX, artY, artW, artH\)/);
@@ -146,6 +146,35 @@ test('first-stage scenic art stays tied to its own stage surface, file and offli
       sx <= center && center < sx + span && sy === bottom &&
       !['hazard','ceiling','ceilingSpikes','rail','current'].includes(kind));
     assert.ok(grounded, w.pawtopiaCourses[i][0] + ' scene prop is not aligned to Stage 1 support');
+  }
+
+  const stage2Files = literal('secondStageLandmarkPaths');
+  const stage2Positions = literal('secondStageLandmarkPositions');
+  assert.equal(stage2Files.length, 5, 'games 21–25 need distinct second-stage art');
+  assert.equal(stage2Positions.length, 5, 'second-stage placement data must be complete');
+  assert.equal(new Set([...files,...stage2Files]).size, 30,
+    'all integrated scene artworks must have unique asset paths');
+  assert.match(runtime, /stageStarts\[1\] \+ localX/,
+    'second-stage props must use stage-local-to-world offset');
+  assert.match(runtime, /drawImage\(secondStageLandmark, artX, artY, artW, artH\)/);
+  for (let j=0; j<5; j++) {
+    const i=j+20;
+    const asset=stage2Files[j], [x,y,width,height]=stage2Positions[j];
+    assert.ok(asset.startsWith('assets/scenes/') && asset.endsWith('.svg'), 'incorrect stage2 path ' + asset);
+    assert.ok(fs.existsSync(path.join(__dirname,'..',asset)), 'missing stage2 art '+asset);
+    assert.ok(worker.includes("'" + asset + "'"), 'offline stage2 asset missing '+asset);
+    const source=fs.readFileSync(path.join(__dirname,'..',asset),'utf8');
+    assert.ok(source.startsWith('<svg') && source.trimEnd().endsWith('</svg>'),
+      'invalid SVG container for stage2 '+asset);
+    assert.ok([x,y,width,height].every(Number.isFinite) && width>0 && height>0,
+      'stage2 position or size invalid for ' + w.pawtopiaCourses[i][0]);
+    const mid=x+width/2, bottom=y+height;
+    const secondRoomName=w.pawtopiaRoomPlans[i].split(/\s+/)[1];
+    const secondRoom=w.pawtopiaRooms[secondRoomName];
+    assert.ok(secondRoom.some(([start,top,span,kind]) =>
+      start<=mid && mid<start+span && top===bottom &&
+      !['hazard','ceiling','ceilingSpikes','rail','current'].includes(kind)),
+      'second-stage prop is not grounded on its own game platform: ' + w.pawtopiaCourses[i][0]);
   }
   for (const [,url] of html.matchAll(/(?:href|src)="(assets\/[^"]+\?[^"]+)"/g)) {
     assert.ok(worker.includes("'" + url + "'"), 'offline game runtime mismatch: ' + url);
