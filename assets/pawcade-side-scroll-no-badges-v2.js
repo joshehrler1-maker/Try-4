@@ -1898,6 +1898,31 @@
       const lift=kind===3?(1+Math.cos(phase))/2:Math.max(0,wave)**2;
       return {x:patrolX(foe.x+travel*clockTravel[kind]),y:foe.y-lift*clockRise[kind]};
     }
+    // Original encounter movement tuned to each counterpart's gameplay feel.
+    // These only affect ordinary foes, after the authored special-enemy cases.
+    if(index===4){ // Seed Garden: canopy beetles leap between branches
+      const leap=Math.max(0,Math.sin(t*2.3));
+      return {x:patrolX(foe.x+wave*enemyReach*.8),y:foe.y-leap*leap*enemyRise*1.3};
+    }
+    if(index===7){ // Crystal Polarity: inverted gravity sentries
+      const polarity=Math.sin(t*.75)>0?1:-1;
+      return {x:patrolX(foe.x+wave*enemyReach*.65),
+        y:foe.y-polarity*enemyRise*.65};
+    }
+    if(index===9){ // Quarry Rescue: guarding a fixed grapple lane
+      const sweep=Math.sin(t*.85);
+      return {x:patrolX(foe.x+sweep*enemyReach*.5),
+        y:foe.y-Math.max(0,Math.sin(t*1.7))*enemyRise*.35};
+    }
+    if(index===12){ // Thunder Harbor: measured armored charge and recovery
+      const surge=Math.max(0,Math.sin(t*1.2));
+      return {x:patrolX(foe.x+chase*enemyReach*surge*surge),
+        y:foe.y};
+    }
+    if(index===13){ // Autumn Trail: fluttering pursuit above throwing arcs
+      return {x:patrolX(foe.x+wave*enemyReach*.9),
+        y:foe.y-18-Math.sin(t*2.4)*enemyRise*.6};
+    }
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
       case 'charge': return {x:patrolX(foe.x+chase*Math.max(0,wave)*enemyReach),y:foe.y};
