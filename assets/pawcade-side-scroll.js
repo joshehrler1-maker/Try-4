@@ -2213,8 +2213,8 @@
   // Original platform silhouettes for three distinct reference-inspired
   // worlds. All decorative elements remain outside the collision system.
   function drawSignaturePlatformArt(x,y,w,stage){
-    if(index>20 || w<70)return;
-    const interval=[90,115,130,105,112,124,120,108,88,102,132,116,106,122,118,104,110,126,116,94,100][index];
+    if(index>24 || w<70)return;
+    const interval=[90,115,130,105,112,124,120,108,88,102,132,116,106,122,118,104,110,126,116,94,100,112,108,118,96][index];
     const first=Math.max(0,Math.floor((camera-x)/interval)-1);
     const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
     ctx.save();ctx.lineJoin='round';
@@ -2483,6 +2483,67 @@
         ctx.fillStyle='#ffe7a2';
         for(const side of [-1,1]){
           ctx.beginPath();ctx.arc(px+side*17,y+19,3,0,Math.PI*2);ctx.fill();
+        }
+      }else if(index===21){
+        // Marble Temple: gothic stone corbels and stained-glass inlays.
+        ctx.fillStyle='#58506a';ctx.strokeStyle='#c6a7b4';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-27,y+4);ctx.lineTo(px+27,y+4);
+        ctx.lineTo(px+19,y+14);ctx.lineTo(px+12,y+14);
+        ctx.lineTo(px+8,y+27);ctx.lineTo(px-8,y+27);
+        ctx.lineTo(px-12,y+14);ctx.lineTo(px-19,y+14);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        ctx.fillStyle='#8ac6d8';ctx.beginPath();ctx.moveTo(px,y+7);
+        ctx.lineTo(px+7,y+15);ctx.lineTo(px,y+23);
+        ctx.lineTo(px-7,y+15);ctx.closePath();ctx.fill();
+        ctx.strokeStyle='#f0d49a';ctx.beginPath();
+        ctx.moveTo(px,y+7);ctx.lineTo(px,y+23);
+        ctx.moveTo(px-7,y+15);ctx.lineTo(px+7,y+15);ctx.stroke();
+      }else if(index===22){
+        // Swamp Ferry: lashed timber supports with luminous marsh reeds.
+        ctx.fillStyle='#665b46';ctx.strokeStyle='#b7a877';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(px-26,y+5);ctx.lineTo(px+26,y+5);
+        ctx.lineTo(px+18,y+23);ctx.lineTo(px-18,y+23);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#d8bb7a';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-18,y+7);ctx.lineTo(px+18,y+22);
+        ctx.moveTo(px+18,y+7);ctx.lineTo(px-18,y+22);ctx.stroke();
+        ctx.strokeStyle='#8bd9a3';ctx.lineWidth=2;
+        for(const side of [-1,1]){
+          ctx.beginPath();ctx.moveTo(px+side*23,y+22);
+          ctx.quadraticCurveTo(px+side*28,y+13,px+side*24,y+8);ctx.stroke();
+        }
+      }else if(index===23){
+        // Sunflower Flight: stitched fabric beams and dangling yarn tassels.
+        ctx.fillStyle='#c17f9f';ctx.strokeStyle='#ffe0ad';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-26,y+5);ctx.lineTo(px+26,y+5);
+        ctx.quadraticCurveTo(px+18,y+25,px,y+24);
+        ctx.quadraticCurveTo(px-18,y+25,px-26,y+5);ctx.fill();ctx.stroke();
+        ctx.setLineDash([3,4]);ctx.strokeStyle='#fff2d5';
+        ctx.beginPath();ctx.moveTo(px-19,y+10);
+        ctx.quadraticCurveTo(px,y+27,px+19,y+10);ctx.stroke();
+        ctx.setLineDash([]);
+        for(const side of [-1,1]){
+          ctx.strokeStyle='#e6c9ed';ctx.lineWidth=3;
+          ctx.beginPath();ctx.moveTo(px+side*12,y+22);
+          ctx.lineTo(px+side*12,y+31);ctx.stroke();
+          ctx.fillStyle='#f6c6e0';ctx.beginPath();
+          ctx.arc(px+side*12,y+32,3,0,Math.PI*2);ctx.fill();
+        }
+      }else if(index===24){
+        // Starship Cargo: armored cargo clamps and hazard-light rails.
+        ctx.fillStyle='#47515c';ctx.strokeStyle='#b7d0cf';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-27,y+4);ctx.lineTo(px+27,y+4);
+        ctx.lineTo(px+19,y+24);ctx.lineTo(px-19,y+24);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        ctx.fillStyle='#f3ba64';
+        for(let k=-2;k<=2;k++){
+          ctx.beginPath();ctx.moveTo(px+k*9-3,y+8);
+          ctx.lineTo(px+k*9+2,y+8);ctx.lineTo(px+k*9-2,y+17);
+          ctx.lineTo(px+k*9-7,y+17);ctx.closePath();ctx.fill();
+        }
+        ctx.fillStyle='#a9ecdf';
+        for(const side of [-1,1]){
+          ctx.beginPath();ctx.arc(px+side*20,y+20,3,0,Math.PI*2);ctx.fill();
         }
       }else{
         // Coral Courier: fan-shaped reef ledges and layered shell supports.
