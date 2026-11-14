@@ -1361,6 +1361,37 @@
       }
     }
     ctx.restore();
+    // Readable three-dimensional cap: visible upper face, bright near lip,
+    // and a dark contact seam. Restrict it to the top 8px so gameplay
+    // collision and platform dimensions remain exactly unchanged.
+    ctx.save();
+    ctx.globalAlpha=.74;
+    const cap=ctx.createLinearGradient(0,y-8,0,y+2);
+    cap.addColorStop(0,rim);
+    cap.addColorStop(.52,face);
+    cap.addColorStop(1,recess);
+    ctx.fillStyle=cap;
+    ctx.beginPath();
+    ctx.moveTo(x+5,y-8);
+    ctx.lineTo(x+w-5,y-8);
+    ctx.lineTo(x+w,y-2);
+    ctx.lineTo(x,y-2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha=.85;
+    ctx.strokeStyle=rim;
+    ctx.lineWidth=1.4;
+    ctx.beginPath();
+    ctx.moveTo(x+5,y-7);
+    ctx.lineTo(x+w-5,y-7);
+    ctx.stroke();
+    ctx.globalAlpha=.45;
+    ctx.strokeStyle=recess;
+    ctx.beginPath();
+    ctx.moveTo(x,y+1);
+    ctx.lineTo(x+w,y+1);
+    ctx.stroke();
+    ctx.restore();
   }
   // Twenty platform constructions, distributed deterministically across each
   // game's six regions. Decorations are clipped to the solid face and do not
