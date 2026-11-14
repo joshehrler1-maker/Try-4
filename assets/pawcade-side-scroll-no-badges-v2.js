@@ -1914,6 +1914,14 @@
       const lift=kind===3?(1+Math.cos(phase))/2:Math.max(0,wave)**2;
       return {x:patrolX(foe.x+travel*clockTravel[kind]),y:foe.y-lift*clockRise[kind]};
     }
+    // Ground-based ordinary enemies must not inherit decorative vertical
+    // motion. Only explicit flyers, swimmers, gravity actors, or jumpers
+    // are permitted to leave their platform's contact height.
+    if([0,3,16,19].includes(index) &&
+       foe.foundryEnemy===undefined && foe.clockEnemy===undefined &&
+       foe.reefEnemy===undefined && foe.libraryEnemy===undefined){
+      return {x:patrolX(foe.x+wave*enemyReach),y:foe.y};
+    }
     // Original encounter movement tuned to each counterpart's gameplay feel.
     // These only affect ordinary foes, after the authored special-enemy cases.
     if(index===4){ // Seed Garden: canopy beetles leap between branches
