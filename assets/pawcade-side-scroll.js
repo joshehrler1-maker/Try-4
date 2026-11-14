@@ -400,10 +400,18 @@
         const iw=82+(island===1?16:0);
         const ix=islandX+island*124;
         const iy=islandHeights[island];
-        // Avoid stacking duplicate solid platforms on the same position.
-        const overlaps=platforms.some(ledge=>
-          ledge.y===iy && ix<ledge.x+ledge.w && ix+iw>ledge.x);
-        if(!overlaps){
+        // Reject platforms that visually intersect existing terrain, block
+        // hazards, or leave an unusably narrow vertical clearance. The prior
+        // exact-Y test missed almost every near-overlap.
+        const islandClear=platforms.every(ledge=>{
+          const horizontalOverlap=ix<ledge.x+ledge.w+12 && ix+iw+12>ledge.x;
+          if(!horizontalOverlap)return true;
+          const verticalDistance=Math.abs(iy-ledge.y);
+          if(['hazard','ceilingSpikes','ceiling','rail'].includes(ledge.kind))
+            return verticalDistance>=58;
+          return verticalDistance>=52;
+        });
+        if(islandClear){
           platforms.push({x:ix,y:iy,w:iw,kind:islandKindsForGame[(island+stage)%3]});
         }
       }
