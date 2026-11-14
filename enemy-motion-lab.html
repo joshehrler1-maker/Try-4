@@ -4,11 +4,12 @@
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#08132c;color:#f4f6ff;font:16px/1.5 system-ui,sans-serif}main{max-width:950px;margin:auto;padding:20px}a{color:#8feaff}h1{margin-bottom:4px}.note{color:#cbd9f7}label{display:block;margin:15px 0}select,button{font:inherit;padding:10px;border:1px solid #9ab5eb;border-radius:9px;background:#20365c;color:white}canvas{display:block;width:100%;height:auto;border:2px solid #688fd0;border-radius:18px;background:#14233f}#info{min-height:5em}.controls{display:flex;gap:10px;flex-wrap:wrap}button:focus-visible,select:focus-visible{outline:3px solid #ffe27e}footer{margin-top:25px;color:#b9c8e6}
 </style></head><body><main><a href="pawcade-side-scroll.html">← Back to games</a><h1>Enemy Motion Lab</h1>
-<p class="note">Original animated vector concept prototypes for 25 games. Twenty separate <strong>procedural 2.5D enemy rigs</strong> for games 6–25 are now connected to their playable builds; choose <strong>Show playable rig</strong> to preview the actual vector bodies installed in games 6–25. Games 1–5 retain concept previews here. These are <strong>not</strong> final 3D models, films, or completed motion libraries.</p>
+<p class="note">Original animated vector concept prototypes for 25 games. Twenty-five individually authored <strong>procedural 2.5D base enemy rigs</strong> can now be previewed; choose <strong>Show playable rig</strong>. For games 1–5, stage-specific specialist enemy art remains separate from these base designs. These are <strong>not</strong> final 3D models, films, or completed motion libraries.</p>
 <label for="game">Choose a game</label><select id="game"></select>
 <canvas id="scene" width="800" height="400" role="img" aria-label="Animated enemy concept on a platform"></canvas>
 <div class="controls"><button id="render-mode" type="button" aria-pressed="false">Show playable rig</button><button id="idle">Idle</button><button id="move">Move</button><button id="attack">Attack</button><button id="hit">Hit</button><button id="defeat">Defeat</button><button id="pause" aria-pressed="false">Pause animation</button><label for="speed">Playback speed <output id="speed-value">1.0×</output></label><input id="speed" type="range" min="0.25" max="1.5" step="0.05" value="1"></div>
 <p id="info" aria-live="polite"></p><footer>Motion prototype: anticipation → attack → recovery; reduced-motion preference supported. No paid services.</footer></main>
+<script src="assets/animation/origin-world-enemy-rigs-v1.js?v=origin-rigs-6e49e50"></script>
 <script src="assets/animation/five-world-enemy-rigs-v1.js?v=five-rigs-a1c28cd"></script>
 <script src="assets/animation/cloud-trail-enemy-rigs-v1.js?v=cloud-rigs-c646b96"></script>
 <script src="assets/animation/mid-world-enemy-rigs-v1.js?v=mid-rigs-6bc18e4"></script>
@@ -22,7 +23,8 @@ for(const item of registry.games){const option=document.createElement('option');
 const palettes=[['#ff9a4d','#743529'],['#c6a6ff','#413466'],['#67f5e0','#246e8d'],['#eac978','#5b4d3b'],['#a6e868','#34694a'],['#a5edff','#396d9c'],['#ffcd69','#85446b'],['#f5a9ff','#543d9c'],['#ff85a6','#61346a'],['#d3d8e6','#596477'],['#a3f5ec','#39748d'],['#e7f4ff','#647caa'],['#ffde73','#386b98'],['#e8b36e','#685b32'],['#b3b4ff','#383f86'],['#b0ef83','#487d4b'],['#ff9e69','#805b4c'],['#d8f4ff','#6799bc'],['#e8bd84','#8c6945'],['#8ae6eb','#37618a'],['#ff79e3','#4942a5'],['#e8e2d6','#8b7792'],['#b6ed88','#506b58'],['#f8df70','#9e7435'],['#9ad8ff','#485f95']];
 let mode='idle',started=performance.now(),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,paused=false,pausedAt=0,speed=1,showPlayable=false;
 const rigToggle=document.querySelector('#render-mode');
-const actualRig=index=>index>=5&&index<=9?window.pawtopiaFiveEnemyRigs:
+const actualRig=index=>index>=0&&index<=4?window.pawtopiaOriginEnemyRigs:
+  index>=5&&index<=9?window.pawtopiaFiveEnemyRigs:
   index>=10&&index<=14?window.pawtopiaCloudEnemyRigs:
   index>=15&&index<=19?window.pawtopiaMidEnemyRigs:
   index>=20&&index<=24?window.pawtopiaLateEnemyRigs:null;
