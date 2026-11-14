@@ -1506,7 +1506,7 @@
   const libraryEnemyArt=[["#9af1ff","#284576","M-25 11H22L17-8 7-8 4-21H-12L-16-8H-23Z","M-18 13h35m-29-18h17m6 4h11",36,0],["#ecf7ff","#365986","M-25 1L-15-15 -6-9 4-24 10-9 24-9 22 10 -7 16Z","M-17 2l11-6m10-7 9 9m-5 8h14",0,46],["#ddc7ff","#524283","M-28-6L-14-15 -2-8 7-19 17-12 29-3 12 1 3 13 -9 9Z","M-23-5l14 5 6 10m11-20 9 5",36,27],["#ffe495","#664835","M-20 14V-3L-11-10 -11-22 8-22 14-10 20-9 25 4 15 14Z","M-11-3h22m-17-13h12m8 9h11",0,0],["#f9a78e","#76394c","M-27 5L-22-10 -15-10 -7-19 5-16 10-8 25-6 27 9 -22 15Z","M-22 10h40m-26-19 11 3m12 0h10",54,0],["#b7ffda","#24646b","M-25 2Q-20-19-5-16L3-24 12-15Q29-11 24 7L12 14 -14 13Z","M-18 4q10 7 28 3m-14-20h13m4 6 8 4",30,20]].map(([light,dark,body,details,reach,rise])=>({
     light,dark,body:new Path2D(body),details:new Path2D(details),reach,rise
   }));
-  function drawLibraryEnemy(at,foe,faceLeft,firing){
+  function drawLibraryEnemy(at,foe,faceLeft,firing,attackPose=0){
     const kind=foe.libraryEnemy;
     const design=libraryEnemyArt[kind];
     const phase=clock*2.5+foe.offset;
@@ -1533,11 +1533,27 @@
     ctx.lineWidth=2;
     ctx.lineCap='round';
     ctx.stroke(design.details);
+    // Moonlit Library: hinged illuminated pages and a closing book strike.
+    const fold=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
+    const pageWave=reducedMotion?0:Math.sin(phase*2)*.12;
+    for(const side of [-1,1]){
+      ctx.save();ctx.translate(side*12,-9);
+      ctx.rotate(side*(.3+pageWave-fold*.8));
+      const paper=ctx.createLinearGradient(0,-13,side*19,6);
+      paper.addColorStop(0,'#f5f0ff');paper.addColorStop(1,design.dark);
+      ctx.fillStyle=paper;ctx.strokeStyle=design.light;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(0,-9);ctx.quadraticCurveTo(side*14,-16,side*22,-7);
+      ctx.lineTo(side*21,8);ctx.quadraticCurveTo(side*10,2,0,8);
+      ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.strokeStyle='#fdf2c6';ctx.lineWidth=.8;
+      for(let row=-3;row<=4;row+=3){ctx.beginPath();ctx.moveTo(side*7,row);ctx.lineTo(side*16,row+1);ctx.stroke();}
+      ctx.restore();
+    }
     ctx.restore();
   }
   const reefBodies=["M-26 0Q-8-23 18-10L26 0 15 8Q-9 15-26 0Z","M-21 6Q-17-20 1-21Q23-18 21 6L12 10 4 6-4 11-12 6Z","M-27 0L-8-9 0-24 10-8 28 0 10 6 0 16-10 7Z","M-25 7L-18-8-9-7-6-19 2-10 12-18 15-7 25 0 14 11Z","M-28-4Q-12-15 3-8Q22-17 27-1Q20 12 4 7Q-14 13-28-4Z","M-23 9Q-27-6-9-13L1-11 8-24 13-13 22-12 28 3 10 13Z"].map(shape=>new Path2D(shape));
   const reefMotion=[[54,18,2],[19,28,1.7],[75,26,1.4],[35,12,2.8],[64,17,2.4],[43,37,1.3]];
-  function drawReefEnemy(at,foe,faceLeft){
+  function drawReefEnemy(at,foe,faceLeft,attackPose=0){
     const kind=foe.reefEnemy;
     const phase=clock*reefMotion[kind][2]+foe.offset;
     ctx.save();
@@ -1563,6 +1579,25 @@
     ctx.fillStyle=shade;ctx.fill(reefBodies[kind]);
     ctx.fillStyle='#fff2cf';ctx.beginPath();
     ctx.ellipse(kind===1?4:12,kind===2?0:-4,3,2.5,0,0,Math.PI*2);ctx.fill();
+    // Coral Courier: flexible fin strokes and a forward water-jet attack.
+    const thrust=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
+    const finBeat=reducedMotion?0:Math.sin(phase*2.4)*7;
+    ctx.fillStyle=['#f5b78b','#c7b5f2','#85e4e5','#f6df98','#b3e6a6','#f6acc8'][kind];
+    ctx.strokeStyle='#e7ffff';ctx.lineWidth=1.3;
+    for(const side of [-1,1]){
+      ctx.beginPath();ctx.moveTo(side*7,4);
+      ctx.quadraticCurveTo(side*(20+thrust*7),13+finBeat,side*(26+thrust*9),17);
+      ctx.quadraticCurveTo(side*12,11,side*7,4);ctx.fill();ctx.stroke();
+    }
+    if(thrust>.03){
+      ctx.save();ctx.globalAlpha=thrust*.7;ctx.strokeStyle='#bdfbff';ctx.lineWidth=2;
+      for(let jet=0;jet<3;jet++){
+        ctx.beginPath();ctx.moveTo(-26-jet*5,-7+jet*6);
+        ctx.quadraticCurveTo(-35-jet*6,-9+jet*6,-46-jet*7,-7+jet*6);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     ctx.restore();
   }
   const clockBodies=["M-22 9L-13-12H10L24 4V14H-22Z","M-24 3L-14-15 8-18 23-7 16 12H-17Z","M-19 12V-13L0-23 20-12V12Z","M-26 0L-10-8 0-20 11-8 26 0 11 9 0 15Z","M-24 12L-18-6 -8-6 -3-22 15-16 24 12Z","M-25 8L-21-13 -10-8 0-24 12-7 23-13 26 11Z"].map(shape=>new Path2D(shape));
@@ -3551,8 +3586,8 @@
         (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
-      else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing);
-      else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft);
+      else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing,attackPose);
+      else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft,attackPose);
       else if(foe.clockEnemy!==undefined) drawClockEnemy(at,foe,faceLeft);
       else if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
       else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
