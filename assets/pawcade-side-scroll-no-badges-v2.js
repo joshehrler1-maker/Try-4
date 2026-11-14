@@ -1178,7 +1178,13 @@
       const arcFactor=p.vy*p.gravity<0
         ? (held('jump') ? holdGravity : releaseGravity)
         : fallGravity;
-      p.vy+=dt*(movement==='precision'?1210:1050)*gravityFactor*arcFactor*p.gravity;
+      // Cloud City: precision-platformer apex hang time, inspired by
+      // Celeste's reduced gravity near the peak while Jump is held.
+      // Keep the existing gravity system in every other adventure.
+      const apexAssist=index===11 && held('jump') &&
+        Math.abs(p.vy)<jumpSpeed*.16 ? .58 : 1;
+      p.vy+=dt*(movement==='precision'?1210:1050)*gravityFactor*
+        arcFactor*apexAssist*p.gravity;
     }
     // Terminal speeds are tuned by gameplay family. Keep high-speed
     // descents readable and collision-safe on the fixed 60 Hz step.
