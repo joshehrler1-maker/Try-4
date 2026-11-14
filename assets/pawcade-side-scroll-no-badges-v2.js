@@ -361,7 +361,7 @@
   // dependent on GPU preview success. Max two visible 3D draws per frame.
   const enemy3dToggle=byId('side-3d-enemies');
   let enemy3dRenderer=null,enemy3dCanvas=null,enemy3dDraws=0;
-  let enemy3dOn=false,enemy3dAvailable=index>=0 && index<=4;
+  let enemy3dOn=false,enemy3dAvailable=index>=0 && index<=9;
   let enemy3dLastFrame=0,enemy3dSlowFrames=0;
   function disableEnemy3d(note){
     if(enemy3dRenderer){try{enemy3dRenderer.dispose();}catch{}}
@@ -402,9 +402,14 @@
     }
   }
   window.addEventListener('pagehide',()=>disableEnemy3d());
+  function is3dPreviewFoe(foe){
+    // Original stage-specialist art is sacrosanct in the first four games.
+    // Games 6–10 each have a different new standalone 3D prototype family.
+    return index<=4 ? usesOriginRig(foe) : index>=5 && index<=9;
+  }
   function drawEnemy3d(at,foe,faceLeft,attackPose,recoil,movingWeight){
     if(!enemy3dOn||!enemy3dRenderer||enemy3dDraws>=2||
-       !usesOriginRig(foe))return false;
+       !is3dPreviewFoe(foe))return false;
     try{
       const mode=foe.bashed && clock<foe.bashed.until?'hit':
         attackPose>.19||recoil>.15?'attack':
