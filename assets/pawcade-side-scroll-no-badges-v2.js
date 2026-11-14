@@ -338,7 +338,7 @@
           // underlying level geometry or pushing foes off a platform.
           // Speed courses need more room to accelerate; combat courses
           // can use tighter encounter spacing without changing platforms.
-          const spacing=fastCourse?18:combatCourse?6:8;
+          const spacing=worldEncounterMargins[index];
           const stagger=((index*11+stage*7+slot*3)%5-2)*spacing;
           // Reserve a full body-width at each edge so foes do not spawn
           // with their feet hanging over narrow or staggered ledges.
