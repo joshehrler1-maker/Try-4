@@ -1303,6 +1303,7 @@
       hud();
       return;
     }
+    player.ledgeGrip=null;
     player.health--;
     player.grace = 1.25;
     if (player.health <= 0) {respawn();return true;}
@@ -1369,7 +1370,6 @@
     if(p.ledgeGrip){
       if(held('up')) climbFromLedge(p);
       else if(held('down')) p.ledgeGrip=null;
-      else return;
     }
     // Precision platformers allow forgiving edge jumps; momentum and
     // action games retain more committed takeoff timing.
@@ -1673,6 +1673,12 @@
     p.onIce=false;
     p.surfaceDrift=0;
     if (((p.gravity < 0 && power!=='flip') || power==='swim') && p.y < 48) {p.y=48;p.vy=0;p.on=true;p.jumps=0;}
+    if(p.ledgeGrip){
+      const {edge,left}=p.ledgeGrip;
+      p.x=left?edge.x-12:edge.x+edge.w+12;
+      p.y=edge.y+19;
+      p.vx=p.vy=0;
+    }
     let landed = false;
     for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
       if(ledge.switchBridge && !amberSwitch) continue;
@@ -1688,7 +1694,7 @@
         }
         continue;
       }
-      if (ledge.kind==='rail' || (ledge.dropAt!==undefined && clock>=ledge.dropAt)) continue;
+      if (p.ledgeGrip || ledge.kind==='rail' || (ledge.dropAt!==undefined && clock>=ledge.dropAt)) continue;
       if (ledge.kind==='ceiling') {
         if (p.gravity<0 && p.vy<=0 && oldY-body>=ledge.y && p.y-body<=ledge.y) {
           p.y=ledge.y+body;p.vy=0;p.on=true;p.jumps=0;p.dashUsed=false;p.jumpCut=false;
