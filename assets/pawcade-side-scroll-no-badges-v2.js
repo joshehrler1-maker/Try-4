@@ -4055,12 +4055,20 @@
         ctx.restore();
       }
     }
-    const motif=(index*7+stage*3)%5;
-    const pitch=motif===0?38:motif===1?48:motif===2?57:motif===3?43:65;
-    const first=Math.ceil((Math.max(x,camera-15)-x)/pitch);
+    // Twenty-five authored surface identities. Vary the spacing by
+    // chapter, but keep the primary material language consistent within
+    // each game rather than cycling through unrelated motifs every stage.
+    const courseMotifs=[1,0,3,2,1,3,2,0,1,2,3,0,2,3,0,2,1,3,0,1,1,0,2,3,1];
+    const motif=courseMotifs[index];
+    const pitch=[38,48,57,43,65][motif]+(stage%3)*4;
+    const first=Math.max(0,Math.ceil((Math.max(x,camera-15)-x)/pitch));
     const last=Math.min(Math.floor(w/pitch),Math.ceil((camera+width-x)/pitch));
+    if(last>=first){
     ctx.save();
-    ctx.beginPath();ctx.rect(x,y-8,w,15);ctx.clip();
+    ctx.beginPath();
+    const clipStart=Math.max(x,camera-20);
+    const clipEnd=Math.min(x+w,camera+width+20);
+    ctx.rect(clipStart,y-8,Math.max(0,clipEnd-clipStart),15);ctx.clip();
     ctx.strokeStyle=rim;ctx.fillStyle=face;ctx.lineWidth=1.4;
     for(let k=first;k<=last;k++){
       const px=x+k*pitch+pitch*.38;
@@ -4079,6 +4087,7 @@
       }
     }
     ctx.restore();
+    }
     drawSignaturePlatformArt(x,y,w,stage);
     // Readable three-dimensional cap: visible upper face, bright near lip,
     // and a dark contact seam. Restrict it to the top 8px so gameplay
