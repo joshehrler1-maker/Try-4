@@ -35,10 +35,15 @@ const models=Object.freeze([
 {game:'Moonlit Library',enemy:'Atlas Warden',main:'#6a699c',light:'#ddd3c7',dark:'#4c507f'},
 {game:'Coral Courier',enemy:'Reef Skimmer',main:'#399d9e',light:'#90dfc6',dark:'#357b94'},
 {game:'Clocktower Relay',enemy:'Pendulum Sentinel',main:'#99774b',light:'#e6cd96',dark:'#594d66'},
-{game:'Seed Garden',enemy:'Thorn Hopper',main:'#6b9b61',light:'#bada86',dark:'#466d4c'}
+{game:'Seed Garden',enemy:'Thorn Hopper',main:'#6b9b61',light:'#bada86',dark:'#466d4c'},
+{game:'Waterfall Climb',enemy:'Mist Glider',main:'#4b9cb8',light:'#a9e8e7',dark:'#326f9a'},
+{game:'Lantern Festival',enemy:'Lantern Juggler',main:'#ac628e',light:'#f1bb83',dark:'#654c88'},
+{game:'Crystal Polarity',enemy:'Flux Beetle',main:'#697ab6',light:'#a9ddf4',dark:'#454f9a'},
+{game:'Stage Beat',enemy:'Bass Bouncer',main:'#6d477f',light:'#edb2dc',dark:'#473d77'},
+{game:'Quarry Rescue',enemy:'Slate Burrower',main:'#8f8888',light:'#d5c4a1',dark:'#5c6077'}
 ]);
 function build(index,mode='idle',t=0,reduced=false){
-if(!Number.isInteger(index)||index<0||index>4)throw Error('Unknown 3D enemy');
+if(!Number.isInteger(index)||index<0||index>9)throw Error('Unknown 3D enemy');
 t=reduced?0:Math.max(0,t);const m=models[index],out=[];
 const moving=mode==='move'&&!reduced,attacking=mode==='attack'&&!reduced;
 const step=moving?Math.sin(t*6):0,strike=attacking?.5+.5*Math.sin(t*5):0;
@@ -88,7 +93,7 @@ P('box',.06,.12+bob,.73,.23,.05,.032,m.dark,strike*.15);
 P('rod',.88,.19+bob,0,.11,.65,.11,m.light,-.5-strike*.8);
 P('box',1.33,-.31+bob+strike*.22,0,.33,.22,.26,m.dark,-strike*.7);
 P('rod',-.76,.62+bob,0,.1,.35,.11,m.light,.25);
-}else{
+}else if(index===4){
 const jump=moving?Math.abs(step)*.2:0,y=bob+jump-strike*.11;
 for(const side of [-1,1]){const lift=Math.max(0,side*step)*.18;P('rod',side*.47,-.65+y+lift,0,.16,.49,.17,m.dark,side*.13);P('orb',side*.56,-1.13+y+lift,.1,.31,.16,.31,m.light);}
 P('orb',0,-.02+y,0,.88,.68,.59,m.main);
@@ -97,6 +102,81 @@ P('orb',.26,.49+y,.56,.13,.13,.075,'#fff5df');
 P('spike',-.71,.62+y,-.09,.28,.77,.16,m.light,-.49-strike*.4);
 P('spike',.62,.67+y,-.11,.27,.71,.16,m.main,.42+strike*.4);
 for(let k=0;k<3;k++)P('spike',-.49+k*.45,.75+y,0,.1,.26,.11,m.dark,(k-1)*.15);
+}else if(index===5){
+ // Mist Glider: aquatic airfoil creature with no artificial walking feet.
+ const y=.17+Math.sin(t*2.8)*.15,flap=Math.sin(t*5)*.24;
+ P('orb',0,y,0,.71,.57,.55,m.main);
+ P('orb',.26,y+.11,.42,.36,.35,.33,m.light);
+ P('orb',.29,y+.19,.74,.1,.1,.06,'#f9f4dd');
+ for(const side of [-1,1]){
+  P('orb',side*.93,y+.13,0,.73,.14,.46,m.light,side*(.23+flap-strike*.25));
+  P('spike',side*1.38,y-.2,-.13,.2,.45,.24,m.main,side*.42);
+  P('rod',side*.36,y-.69,.06,.095,.43,.1,m.dark,side*.12);
+ }
+ P('spike',-.54,y+.62,-.15,.28,.47,.19,m.light,-.22);
+}else if(index===6){
+ // Lantern Juggler: hinged silk sleeves and three physical hanging lights.
+ const y=bob+(moving?Math.abs(step)*.21:0);
+ for(const side of [-1,1]){
+  const lift=Math.max(0,side*step)*.18;
+  P('rod',side*.36,-.69+y+lift,0,.13,.35,.13,m.dark,side*.14);
+  P('orb',side*.42,-1.08+y+lift,.14,.25,.15,.24,m.light);
+ }
+ P('rod',0,.12+y,0,.66,.87,.49,m.main);
+ P('orb',0,1.1+y,.02,.41,.39,.37,m.main);
+ P('orb',.12,1.18+y,.32,.11,.1,.07,'#f9edcf');
+ for(const side of [-1,1]){
+  P('box',side*.88,.32+y,.06,.45,.13,.26,m.light,side*(.18+strike*.43));
+ }
+ for(let j=0;j<3;j++){
+  const swing=moving?Math.sin(t*3.2+j)*.18:0;
+  const px=(j-1)*.56+swing;
+  P('rod',px,1.62+y+(j%2)*.12,.09,.03,.31,.03,m.dark,swing);
+  P('orb',px,1.29+y+(j%2)*.12,.09,.21,.29,.21,j===1?'#fff1a9':m.light);
+ }
+}else if(index===7){
+ // Flux Beetle: four independent magnetic legs and opposed shield plates.
+ for(const side of [-1,1])for(let j=0;j<2;j++){
+  const phase=Math.sin(t*7+side*2+j*Math.PI),lift=moving?Math.max(0,phase)*.17:0;
+  P('rod',side*(.65+j*.29),-.6+lift,j===0?.3:-.27,.1,.44,.11,m.dark,side*.23);
+  P('orb',side*(.75+j*.3),-1.07+lift,j===0?.36:-.31,.14,.1,.18,m.light);
+ }
+ P('orb',0,-.02+bob,0,.88,.59,.63,m.main);
+ P('orb',.46,.32+bob,.18,.45,.4,.42,m.dark);
+ P('orb',.64,.4+bob,.52,.13,.12,.1,m.light);
+ P('spike',-.3,.62+bob,.15,.24,.55,.17,m.light,-.3-strike*.2);
+ P('box',-.06,-.04+bob,.63,.61,.1,.08,m.dark);
+ P('rod',.95,.04+bob,.12,.14,.37,.13,m.light,-.8-strike*.38);
+ P('orb',1.14+strike*.22,-.14+bob,.14,.17,.19,.2,'#b4ffee');
+}else if(index===8){
+ // Bass Bouncer: a deep acoustic drum body, distinct grounded stomp pads.
+ const y=bob-strike*.16;
+ for(const side of [-1,1]){
+  const lift=moving?Math.max(0,side*step)*.15:0;
+  P('rod',side*.42,-.7+lift,0,.15,.34,.15,m.dark);
+  P('box',side*.52,-1.09+lift,.12,.36,.12,.33,m.light);
+ }
+ P('rod',0,.08+y,0,.85,.88,.58,m.main);
+ P('orb',0,.15+y,.57,.65,.67,.13,m.light);
+ P('orb',0,.15+y,.68,.43,.46,.07,m.dark);
+ P('orb',0,.15+y,.76,.25,.29,.052,m.main);
+ P('orb',0,.16+y,.82,.1,.14,.045,m.light);
+ for(const side of [-1,1]){
+  P('rod',side*.9,.24+y,.05,.12,.55,.12,m.dark,side*(.16+strike*.67));
+  P('orb',side*1.12,-.18+y-strike*.25,.13,.24,.19,.2,m.light);
+ }
+}else{
+ // Slate Burrower: stationary slate turret with articulated twin rock drills.
+ P('box',0,-.98,0,1.04,.23,.75,m.dark);
+ for(let j=0;j<4;j++)P('box',0,-.52+j*.4,0,1.03-j*.06,.22,.62-j*.055,
+   j%2?m.main:m.light,(j%2?.04:-.03));
+ P('orb',0,1.12,0,.54,.43,.48,m.dark);
+ P('orb',.15,1.15,.44,.13,.13,.085,'#f2ecd3');
+ for(const side of [-1,1]){
+  P('rod',side*1.08,-.05,.12,.21,.61,.18,m.dark,side*(.5+strike*.4));
+  P('spike',side*1.52,-.02-strike*.18,.15,.26,.51,.23,m.light,side*(.6+strike*.35));
+  P('spike',side*1.79,-.19,.11,.17,.32,.15,m.dark,side*.63);
+ }
 }
 return {game:m.game,enemy:m.enemy,parts:out,hit,fall};
 }
