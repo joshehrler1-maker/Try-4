@@ -568,9 +568,9 @@
       }
       if(x>0) {
         // Keep pickup order stable for existing checkpoint saves.
+        const ceilingHazard=kind==='ceilingSpikes';
         const overhead=kind==='ceiling' || kind==='rail';
-        const danger=kind==='hazard' || kind==='ceilingSpikes';
-        const pickupHeight=overhead ? y+35 : danger ? y-52 : y-35;
+        const pickupHeight=ceilingHazard ? y+52 : overhead ? y+35 : kind==='hazard' ? y-52 : y-35;
         crystals.push({x:start+x+w*.58,y:pickupHeight});
       }
     }
