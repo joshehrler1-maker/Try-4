@@ -277,3 +277,37 @@ test('five late-game enemy rigs render distinct simulation-driven poses safely',
   assert.equal(rig.draw({},19,{x:0,y:0},{},{}),false,
     'outside game 21–25 must keep its existing enemy art');
 });
+
+test('defeated late-world enemies retain only a short visual after their hitboxes vanish', () => {
+  const runtime=fs.readFileSync(path.join(__dirname,
+    '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const helper=runtime.match(/  function markFoeDefeated\(foe\) \{[\s\S]*?\n  \}/)?.[0];
+  assert.ok(helper,'missing visual-only defeat helper');
+  const registry=JSON.parse(fs.readFileSync(path.join(__dirname,
+    '../assets/enemy-art-motion-registry.json'),'utf8'));
+  for(let game=20;game<25;game++){
+    const enemyFamily=registry.games[game];
+    assert.match(enemyFamily.implementationStatus,/partial/i,
+      'do not label incomplete 3D enemy clips finished');
+    const context={index:game,reducedMotion:false,clock:12.25,
+      foePosition:foe=>({x:foe.x+11,y:foe.y+5}),foe:{x:200,y:275,dead:false}};
+    vm.runInNewContext(helper+'\nmarkFoeDefeated(foe);',context,{timeout:1000});
+    assert.equal(context.foe.dead,true,'defeated enemy must lose hitbox immediately');
+    assert.equal(context.foe._defeatAt,12.25);
+    assert.equal(context.foe._defeatX,211);
+    assert.equal(context.foe._defeatY,280);
+    assert.match(runtime,/age>=\.42/,'defeat visuals must expire');
+  }
+  const contexts=[
+    {index:19,reducedMotion:false,clock:10,foePosition:()=>({x:1,y:2}),foe:{dead:false}},
+    {index:21,reducedMotion:true,clock:10,foePosition:()=>({x:1,y:2}),foe:{dead:false}}
+  ];
+  for(const context of contexts){
+    vm.runInNewContext(helper+'\nmarkFoeDefeated(foe);',context,{timeout:1000});
+    assert.equal(context.foe.dead,true);
+    assert.equal(context.foe._defeatAt,undefined,
+      'other games and reduced-motion players must not get late death animation');
+  }
+  assert.ok(runtime.includes('e._defeatAt=undefined'),
+    'restart must reset defeated enemy visual state');
+});
