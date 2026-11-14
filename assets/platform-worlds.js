@@ -670,3 +670,16 @@ for(const room of window.pawtopiaRoomPlans[7].split(' ')){
     ledge[2]=exit-ledge[0];
   }
 }
+
+// Quarry Rescue anchors follow its individual crossings and elevated approaches.
+const quarryCrossingRails = [[[440,120,96],[810,108,100],[1225,95,90],[1690,125,100]],
+  [[625,116,110],[1180,92,132]],
+  [[445,125,120],[795,108,110],[1205,90,120],[1590,107,140]],
+  [[490,122,105],[780,106,105],[1130,86,105],[1510,100,105],[1880,126,100]],
+  [[625,111,105],[1090,88,120]],
+  [[425,129,100],[775,108,116],[1210,83,111],[1635,112,117]]];
+window.pawtopiaRoomPlans[9].split(' ').forEach((room,stage)=>{
+  for(const [x,y,w] of quarryCrossingRails[stage]){
+    window.pawtopiaRooms[room].push([x,y,w,'rail']);
+  }
+});
