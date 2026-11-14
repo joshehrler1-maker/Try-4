@@ -5983,6 +5983,18 @@
       ctx.stroke();
       ctx.restore();
     }
+    if(index===1 && (p.chargeStart!==null || p.power>.13)){
+      ctx.save();
+      ctx.translate(p.x,p.y-7);
+      ctx.scale(p.facing,1);
+      ctx.fillStyle='#392851';
+      ctx.fillRect(13,-6,18,12);
+      ctx.fillStyle='#95ddff';
+      ctx.fillRect(19,-4,12,3);
+      ctx.fillStyle='#e3f9ff';
+      ctx.fillRect(28,-6,3,12);
+      ctx.restore();
+    }
     if(p.chargeStart!==null){
       const charge=Math.min(1,(clock-p.chargeStart)/fullChargeTime);
       const x=p.x+p.facing*22;
@@ -6311,6 +6323,19 @@
         ctx.beginPath();ctx.moveTo(fx-12,fy+27);ctx.lineTo(fx,fy+40);
         ctx.lineTo(fx+12,fy+27);ctx.stroke();
       }
+      ctx.restore();
+    }
+    if(index===22 && p.pogo && p.vy>0){
+      ctx.save();
+      ctx.translate(p.x+p.facing*12,p.y+5);
+      ctx.strokeStyle='#ffd485';
+      ctx.lineWidth=3;
+      ctx.beginPath();
+      ctx.moveTo(-7,0);
+      ctx.lineTo(0,0);
+      ctx.lineTo(0,25);
+      ctx.lineTo(5,25);
+      ctx.stroke();
       ctx.restore();
     }
     if(index===12 && p.pogo && p.vy>0){
