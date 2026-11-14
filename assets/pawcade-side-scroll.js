@@ -1710,7 +1710,11 @@
       for(let i=1;i<=3;i++) ctx.fillRect(p.x-p.facing*(22+i*12),p.y-9+i*4,12,2);
     }
     const light=['Luna','Ivy','Frost','Melody','Spark'].includes(hero);
-    const pose=!p.on?3:Math.abs(p.vx)>15?1+Math.floor(clock*10)%2:0;
+    const attacking=p.power>.22 && power!=='dash';
+    const rolling=(index===3 && (p.spin>0 || p.power>.22)) || (movement==='roll' && p.grapple>0);
+    const rushing=p.grapple>0 || (power==='dash' && p.power>.22);
+    const pose=rolling ? 3 : attacking ? 2 : !p.on ? 3 :
+      Math.abs(p.vx)>15 ? 1+Math.floor(clock*(7+Math.min(9,Math.abs(p.vx)/75)))%2 : 0;
     const cell = power==='slide' && held('action') ? 13 :
       light && !p.on && (power==='double' || power==='vine') ? 14 : (light?4:0)+pose;
     const squash=reducedMotion ? 0 : (p.landingPose||0)*1.05;
@@ -1734,6 +1738,47 @@
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
     }
     ctx.restore();
+    // Move-specific silhouette and effects overlay the existing approved
+    // character art; the promotional concept sheet is not a sprite atlas.
+    if(!reducedMotion && (rolling || rushing || attacking || p.pogo || p.cable || p.morphed)){
+      ctx.save();
+      const fx=p.x,fy=p.y-7;
+      ctx.lineCap='round';
+      if(rolling){
+        ctx.strokeStyle=index===3?'#ffe19b':'#9ff7cb';
+        ctx.lineWidth=3;
+        for(let arc=0;arc<3;arc++){
+          ctx.beginPath();
+          ctx.arc(fx,fy,19+arc*5,clock*12+arc*2,clock*12+arc*2+1.9);
+          ctx.stroke();
+        }
+      } else if(rushing){
+        ctx.strokeStyle=movement==='airdash'?'#b8a5ff':'#9feeff';
+        ctx.lineWidth=3;
+        for(let streak=0;streak<4;streak++){
+          const yy=fy-15+streak*10;
+          ctx.beginPath();
+          ctx.moveTo(fx-p.facing*(19+streak*8),yy);
+          ctx.lineTo(fx-p.facing*(45+streak*10),yy+2);
+          ctx.stroke();
+        }
+      } else if(attacking){
+        const color=movement==='buster'||movement==='shooter'?'#8fdcff':
+          movement==='whip'?'#cba0ff':'#ffe09a';
+        ctx.strokeStyle=color;ctx.lineWidth=4;
+        ctx.beginPath();
+        ctx.arc(fx+p.facing*14,fy,23,-1.1,1.1,p.facing<0);
+        ctx.stroke();
+        ctx.fillStyle=color;
+        ctx.beginPath();ctx.arc(fx+p.facing*28,fy-2,4,0,Math.PI*2);ctx.fill();
+      }
+      if(p.pogo && p.vy>0){
+        ctx.strokeStyle='#fff1b3';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(fx-12,fy+27);ctx.lineTo(fx,fy+40);
+        ctx.lineTo(fx+12,fy+27);ctx.stroke();
+      }
+      ctx.restore();
+    }
     drawAtmosphere(true);
     if(chapterReveal>0 && phase==='playing') {
       ctx.save();
