@@ -736,3 +736,17 @@ for(const room of window.pawtopiaRoomPlans[9].split(' ')){
   const [room]=window.pawtopiaRoomPlans[20+offset].split(' ');
   for(const [slot,x,y,w] of edits) window.pawtopiaRooms[room][slot].splice(0,3,x,y,w);
 });
+
+// Cloud City chapter routes follow the separate Celeste chapter traversal patterns.
+const cloudCityChapterPlacements = {
+  cloudDream: [[2,785,219,164],[3,1045,174,275],[4,1410,215,335]],
+  cloudResort: [[1,565,276,215],[2,842,237,230],[3,1130,270,290]],
+  cloudRidge: [[2,715,224,220],[3,1000,179,205],[4,1288,222,274]],
+  cloudMirror: [[2,640,210,245],[3,955,155,192],[4,1208,218,276]],
+  cloudReflection: [[2,684,233,225],[3,976,191,252],[4,1294,150,234],[5,1592,197,258]],
+};
+for (const [room, placements] of Object.entries(cloudCityChapterPlacements)) {
+  for (const [slot, x, y, width] of placements) {
+    window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+  }
+}
