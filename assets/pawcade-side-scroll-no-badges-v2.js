@@ -5502,6 +5502,31 @@
         continue;
       }
       if (ledge.kind==='hazard') {
+        if(index===18){
+          const {x,y,w}=ledge;
+          const teeth=Math.max(1,Math.round(w/14));
+          const step=w/teeth;
+          ctx.fillStyle='#684434';
+          ctx.fillRect(x,ground-5,w,5);
+          for(let tooth=0;tooth<teeth;tooth++){
+            const base=x+tooth*step;
+            ctx.fillStyle='#e1d7c0';
+            ctx.beginPath();
+            ctx.moveTo(base,ground-4);
+            ctx.lineTo(base+step*.5,y);
+            ctx.lineTo(base+step,ground-4);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle='#8a747a';
+            ctx.beginPath();
+            ctx.moveTo(base+step*.5,y);
+            ctx.lineTo(base+step,ground-4);
+            ctx.lineTo(base+step*.53,ground-4);
+            ctx.closePath();
+            ctx.fill();
+          }
+          continue;
+        }
         const rhythmBarrier=index===8;
         if(rhythmBarrier) ctx.save();
         const count=Math.max(1,Math.round(ledge.w/16));
