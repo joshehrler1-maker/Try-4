@@ -1647,6 +1647,7 @@
   function markFoeDefeated(foe) {
     if(foe.dead)return;
     const shouldAnimate=!reducedMotion && (
+      index>=5 && index<=9 && typeof window.pawtopiaFiveEnemyRigs?.draw === 'function' ||
       index>=10 && index<=14 && typeof window.pawtopiaCloudEnemyRigs?.draw === 'function' ||
       index>=15 && index<=19 && typeof window.pawtopiaMidEnemyRigs?.draw === 'function' ||
       index>=20 && index<=24 && typeof window.pawtopiaLateEnemyRigs?.draw === 'function'
@@ -7398,7 +7399,8 @@
     // A short unique-rig defeat transition follows a confirmed kill.
     // It never resurrects a foe's physics or damages the player. On reduced
     // motion it is intentionally suppressed, matching user accessibility.
-    const dyingEnemyArt = index>=10 && index<=14 ? window.pawtopiaCloudEnemyRigs
+    const dyingEnemyArt = index>=5 && index<=9 ? window.pawtopiaFiveEnemyRigs
+      : index>=10 && index<=14 ? window.pawtopiaCloudEnemyRigs
       : index>=15 && index<=19 ? window.pawtopiaMidEnemyRigs
       : index>=20 && index<=24 ? window.pawtopiaLateEnemyRigs : null;
     if(!reducedMotion && typeof dyingEnemyArt?.draw === 'function'){
@@ -7652,15 +7654,26 @@
       // silhouettes in the playable canvas, not the generic enemy atlas.
       // If the free optional rig module fails to load, keep the old sprite
       // and articulated limbs so gameplay never depends on this art upgrade.
+      const fiveWorldRig = index>=5 && index<=9 &&
+        typeof window.pawtopiaFiveEnemyRigs?.draw === 'function';
       const cloudWorldRig = index>=10 && index<=14 &&
         typeof window.pawtopiaCloudEnemyRigs?.draw === 'function';
       const midWorldRig = index>=15 && index<=19 &&
         typeof window.pawtopiaMidEnemyRigs?.draw === 'function';
       const lateWorldRig = index>=20 && index<=24 &&
         typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
-      if(!cloudWorldRig && !midWorldRig && !lateWorldRig)
+      if(!fiveWorldRig && !cloudWorldRig && !midWorldRig && !lateWorldRig)
         drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
-      if(cloudWorldRig && window.pawtopiaCloudEnemyRigs.draw(
+      if(fiveWorldRig && window.pawtopiaFiveEnemyRigs.draw(
+        ctx,index,at,foe,{
+          faceLeft,stride:movingWeight,attack:attackPose,
+          recoil,landing:landingPose,clock,reduced:reducedMotion,
+          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
+        })) {
+        // Five distinct environments have five separate animated bodies.
+        // The shot timing, world positions and hitboxes remain authoritative.
+      }
+      else if(cloudWorldRig && window.pawtopiaCloudEnemyRigs.draw(
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
           recoil,landing:landingPose,clock,reduced:reducedMotion,
@@ -7695,7 +7708,10 @@
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
       ctx.restore();
-      drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
+      // New original silhouettes include their own mechanical, cloth,
+      // mist and sound accents; avoid drawing the obsolete extra limbs
+      // over them, but retain the original fallback when scripts are absent.
+      if(!fiveWorldRig) drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
       // No detached armor outlines or U-shaped halo above enemies.
       // Render the enemy's own sprite and grounded motion effects only.
       drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
