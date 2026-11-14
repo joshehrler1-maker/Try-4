@@ -723,8 +723,10 @@
           (chapterBeat===0?18:chapterBeat===3?-8:0));
         // Underwater worlds use current-assisted stepping routes; retain
         // the existing water physics and leave ample swim-through space.
-        const swimKind=(index===2||index===19) && kind==='lift'
-          ? 'current':kind;
+        const selectedKind=worldMechanicPalettes[index][
+          (chapterBeat+slot)%worldMechanicPalettes[index].length];
+        const swimKind=(index===2||index===19) && selectedKind==='lift'
+          ? 'current':selectedKind;
         // Do not append a ledge past the chapter's right boundary.
         if(sx+width>start+stageWidths[stage]-75) continue;
         if(addOptionalLanding(sx,height,width,swimKind) && slot===1)
