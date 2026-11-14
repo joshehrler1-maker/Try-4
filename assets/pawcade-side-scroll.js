@@ -2331,7 +2331,26 @@
     }
     if (boss.health && camera+width>finish) {
       castShadow(boss.x,boss.y+38,36);
+      // Keep the boss anchored to its feet while giving each world's guardian
+      // a distinct, restrained weight and anticipation cycle.
+      ctx.save();
+      if(!reducedMotion){
+        const families=['heavy','swift','float','mechanical','heavy'];
+        const family=families[index%families.length];
+        const tempo=family==='heavy'?1.7:family==='swift'?3.1:family==='float'?2.0:2.5;
+        const phase=clock*tempo+index*.63;
+        const warning=boss.warning?1:0;
+        const lean=(family==='mechanical'?.012:.023)*Math.sin(phase)+(warning?.045:0);
+        const bob=family==='float'?Math.sin(phase)*2.2:Math.abs(Math.sin(phase))*(family==='heavy'?.55:1.1);
+        const compression=warning?.045:family==='heavy'?.012:.023;
+        const pivotY=boss.y+39;
+        ctx.translate(boss.x,pivotY);
+        ctx.rotate(lean);
+        ctx.scale(1+compression,1-compression);
+        ctx.translate(-boss.x,-pivotY-bob);
+      }
       if(!atlasSprite(guardianArt,3,guardianCells[index],boss.x,boss.y-21,138,120,false,2) && !atlasSprite(enemyArt,5,index,boss.x,boss.y,126,126) && !sprite(12,boss.x,boss.y,116,116,true)){ctx.fillStyle='#ad505c';ctx.fillRect(boss.x-34,boss.y-38,68,76);}
+      ctx.restore();
       if(boss.warning){
         atlasSprite(propArt,4,6,boss.x,boss.y-78,32,34,false,2);
         ctx.save();
