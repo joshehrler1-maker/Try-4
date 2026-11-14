@@ -656,3 +656,17 @@ for(const [offset,[title,feature,platforms]] of foundryExpansion.entries()){
   window.pawtopiaChapters[0].push(title);
   window.pawtopiaSetPieces[0]+=' '+feature;
 }
+
+// Make the opposite landing surface available at each gravity crossing.
+for(const room of window.pawtopiaRoomPlans[7].split(' ')){
+  const platforms=window.pawtopiaRooms[room];
+  const floor=platforms.filter(([,y])=>y===326);
+  const ceiling=platforms.filter(([, , ,kind])=>kind==='ceiling');
+  for(const [i, ledge] of ceiling.entries()){
+    const [left,,width]=floor[i];
+    const entry=left+width-110;
+    const exit=floor[i+1][0]+110;
+    ledge[0]=Math.min(ledge[0],entry);
+    ledge[2]=exit-ledge[0];
+  }
+}
