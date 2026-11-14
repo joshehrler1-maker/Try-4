@@ -1598,8 +1598,11 @@
       foe.y=ground-23;
       // The fallback ground is continuous, but never patrol past a stage
       // boundary or off the playable course into the exit buffer.
-      foe.patrolLeft=Math.max(30,foe.x-48);
-      foe.patrolRight=Math.max(foe.patrolLeft,Math.min(finish,foe.x+48));
+      const chapterStart=stageStarts[foe.spawnChapter] ?? 30;
+      const chapterEnd=foe.spawnChapter!==undefined ?
+        chapterStart+(stageWidths[foe.spawnChapter] ?? finish) : finish;
+      foe.patrolLeft=Math.min(foe.x,Math.max(chapterStart+18,foe.x-48));
+      foe.patrolRight=Math.max(foe.x,Math.min(chapterEnd-18,finish,foe.x+48));
     }
   }
   // Enemy tempo, horizontal reach, and vertical travel in course order.
