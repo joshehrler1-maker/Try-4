@@ -513,7 +513,7 @@
     reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
-    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.shotsFired=0;e.bashed=null;});
+    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
@@ -2964,16 +2964,20 @@
       // large position changes so teleports and respawns never spin the gait.
       const travel=foe._drawX===undefined?0:Math.abs(at.x-foe._drawX);
       foe._drawX=at.x;
-      if(travel>90)foe._gait=0;
-      else foe._gait=(foe._gait||0)+Math.min(24,travel)/12;
-      const moving=travel>.15 && travel<90;
-      const footstep=reducedMotion||airborne||!moving?0:Math.abs(Math.sin(foe._gait))*2.2;
-      const enemyLean=reducedMotion?0:(moving?Math.sin(foe._gait)*.045:Math.sin(clock*2+foe.offset)*.012);
-      // Travel-based animation gives each enemy type a distinct cadence and
-      // grounded compression without changing physics or hitboxes.
-      const gaitRate=[.8,1.15,.95,1.35,1.05][index%5];
-      const footCycle=Math.sin((foe._gait||0)*gaitRate);
-      const movingWeight=reducedMotion||!moving?0:Math.min(1,travel/4);
+      const elapsed=Math.max(0,clock-(foe.gaitTime??clock));
+      foe.gaitTime=clock;
+      const speed=elapsed>0 && travel<90 ? travel/elapsed : 0;
+      if(travel>=90)foe._gait=0;
+      else foe._gait=(foe._gait||0)+travel/12;
+      if(elapsed>0){
+        const target=Math.min(1,speed/115);
+        foe.gaitWeight=(foe.gaitWeight||0)+(target-(foe.gaitWeight||0))*(1-Math.exp(-14*elapsed));
+      }
+      const movingWeight=reducedMotion||travel>=90?0:foe.gaitWeight||0;
+      const footCycle=Math.sin((foe._gait||0)*[.8,1.15,.95,1.35,1.05][index%5]);
+      const footstep=airborne?0:Math.abs(footCycle)*2.2*movingWeight;
+      const enemyLean=reducedMotion?0:footCycle*.045*movingWeight+
+        Math.sin(clock*2+foe.offset)*.012*(1-movingWeight);
       const anticipation=!reducedMotion && enemyPattern==='charge' && nearby && !airborne;
       const bodyStretch=movingWeight*(.018+.012*(index%3))*footCycle;
       const chargeCompression=anticipation?.07:0;
@@ -3343,31 +3347,12 @@
     const heroSize=index===0?107:81;
     const heroLift=(heroSize-81)/2;
     const running=p.on && Math.abs(p.vx)>45 && !rolling && !rushing && !attacking && !braking;
-    // Blend the existing two running poses continuously instead of snapping
-    // abruptly between them. The cadence follows real movement speed.
-    const stridePhase=p.gaitPhase||0;
-    const blend=reducedMotion?0:(.5-.5*Math.cos(stridePhase))*.7*(p.gaitWeight||0);
-    const drawHeroPose=(nextPose,alpha)=>{
-      ctx.save();
-      ctx.globalAlpha*=alpha;
-      const drawn=rosterIndex>=0
-        ? atlasSprite(heroArt,8,rosterIndex*4+nextPose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4)
-        : sprite((light?4:0)+nextPose,p.x,p.y-15-heroLift,heroSize,heroSize,p.facing<0);
-      ctx.restore();
-      return drawn;
-    };
-    let heroDrawn=false;
-    if(running){
-      // Weighted crossfade: total opacity stays at 1, preventing the
-      // doubled/ghosted silhouette caused by painting two opaque frames.
-      const secondary=blend;
-      heroDrawn=drawHeroPose(1,1-secondary);
-      if(heroDrawn && secondary>.03)drawHeroPose(2,secondary);
-    } else if(rosterIndex>=0){
-      heroDrawn=atlasSprite(heroArt,8,rosterIndex*4+pose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4);
-    } else {
-      heroDrawn=sprite(cell,p.x,p.y-15-heroLift,heroSize,heroSize,p.facing<0);
-    }
+    // Draw one opaque pose so the hero keeps a clear silhouette in motion.
+    const strideFrame=!reducedMotion && Math.cos(p.gaitPhase||0)<0 ? 2 : 1;
+    const visiblePose=running ? strideFrame : pose;
+    const heroDrawn=rosterIndex>=0
+      ? atlasSprite(heroArt,8,rosterIndex*4+visiblePose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4)
+      : sprite((light?4:0)+visiblePose,p.x,p.y-15-heroLift,heroSize,heroSize,p.facing<0);
     if(!heroDrawn && poster.naturalWidth) {
       const sw=poster.naturalWidth/2;
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
