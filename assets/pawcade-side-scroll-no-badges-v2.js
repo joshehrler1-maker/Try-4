@@ -2467,6 +2467,14 @@
     for (const foe of enemies) {
       if (foe.dead) continue;
       const position = foePosition(foe);
+      if (roundstone && chapter===2 && roundstone.speed>=35 &&
+          foe.spawnChapter===2 &&
+          Math.hypot(position.x-roundstone.x,position.y-(ground-roundstone.radius))<=roundstone.radius+14) {
+        foe.dead=true;
+        burst(position.x,position.y,'#d8b68a',8);
+        playImpact();
+        continue;
+      }
       if (Math.abs(position.x-p.x)>360 && !attacks.length) continue;
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
       if (impact) {
