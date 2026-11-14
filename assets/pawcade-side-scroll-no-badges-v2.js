@@ -1103,17 +1103,17 @@
       }else if(index===18){
         // Canyon Crossing: grounded, committed parkour movement with
         // low aerial authority, complementing the ledge-grab mechanic.
-        const canyonGrip=p.on?(reversing?1.4:1.08):(steer?.62:.42);
+        const canyonGrip=p.on?(reversing?1.5:1.05):(steer?.55:.36);
         p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*canyonGrip);
       }else if(index===19){
         // Submarine Dock: decisive run-and-gun positioning and quick
         // stops on deck; swimming remains governed by the swim system.
-        const dockGrip=p.on?(steer?1.38:1.6):(reversing?.86:.96);
+        const dockGrip=p.on?(steer?1.5:1.75):(reversing?.78:.9);
         p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*dockGrip);
       }else if(index===20){
         // Neon Circuit: preserve sprint momentum and fast direction
         // recovery for chaining high-speed obstacle routes.
-        const neonGrip=p.on?(reversing?1.12:.88):(steer?.68:.4);
+        const neonGrip=p.on?(reversing?1.3:.82):(steer?.6:.32);
         p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*neonGrip);
       }else if(index===21){
         // Marble Temple: deliberate classic action-platforming steps,
