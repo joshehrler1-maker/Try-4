@@ -2098,6 +2098,56 @@
     ctx.restore();
   }
   // Small deterministic stage-specific surface accents. Draw-only; no collision changes.
+  // Original platform silhouettes for three distinct reference-inspired
+  // worlds. All decorative elements remain outside the collision system.
+  function drawSignaturePlatformArt(x,y,w,stage){
+    if(index>2 || w<70)return;
+    const interval=index===0?90:index===1?115:130;
+    const first=Math.max(0,Math.floor((camera-x)/interval)-1);
+    const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
+    ctx.save();ctx.lineJoin='round';
+    for(let n=first;n<=last;n++){
+      const px=x+interval*n+interval*.48;
+      if(px>x+w-15||px<x+14)continue;
+      if(index===0){
+        // Ember Foundry: heat-shield rivets, hanging furnace braces.
+        ctx.fillStyle='#4b2b36';ctx.strokeStyle='#e7a86a';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-16,y+4);ctx.lineTo(px+16,y+4);
+        ctx.lineTo(px+10,y+22);ctx.lineTo(px-10,y+22);
+        ctx.closePath();ctx.fill();ctx.stroke();
+        ctx.fillStyle='#ffd68c';
+        for(const dx of [-9,9]){ctx.beginPath();ctx.arc(px+dx,y+10,2.5,0,Math.PI*2);ctx.fill();}
+        ctx.strokeStyle='#f47f4f';ctx.beginPath();ctx.moveTo(px-6,y+17);
+        ctx.lineTo(px,y+12+stage%3);ctx.lineTo(px+6,y+17);ctx.stroke();
+      }else if(index===1){
+        // Moonlit Library: gilded book spines under carved shelf brackets.
+        const palette=['#634b87','#376783','#8c5268','#546c64'];
+        for(let k=0;k<4;k++){
+          ctx.fillStyle=palette[(n+k+stage)%palette.length];
+          ctx.fillRect(px-24+k*12,y+3,10,21-(k%2)*4);
+          ctx.strokeStyle='#e5c48a';ctx.lineWidth=1;
+          ctx.strokeRect(px-24+k*12,y+3,10,21-(k%2)*4);
+          ctx.fillStyle='#ffe4aa';ctx.fillRect(px-21+k*12,y+7,4,2);
+        }
+        ctx.strokeStyle='#e6cf9d';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(px-30,y+3);ctx.lineTo(px+30,y+3);ctx.stroke();
+      }else{
+        // Coral Courier: fan-shaped reef ledges and layered shell supports.
+        ctx.fillStyle='#3c8794';ctx.strokeStyle='#a7e9d9';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-23,y+4);
+        ctx.quadraticCurveTo(px-22,y+26,px,y+30);
+        ctx.quadraticCurveTo(px+22,y+26,px+23,y+4);
+        ctx.closePath();ctx.fill();ctx.stroke();
+        for(let k=-2;k<=2;k++){
+          ctx.beginPath();ctx.moveTo(px,y+27);
+          ctx.lineTo(px+k*9,y+7);ctx.stroke();
+        }
+        ctx.fillStyle='#ffd6a4';ctx.beginPath();
+        ctx.arc(px,y+8,3,0,Math.PI*2);ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
   function drawPlatformAccents({x,y,w,kind}) {
     if(w<34 || kind==='hazard' || kind==='ceilingSpikes') return;
     const stage=Math.min(sections-1,Math.max(0,stageAt(x)));
@@ -2126,6 +2176,7 @@
       }
     }
     ctx.restore();
+    drawSignaturePlatformArt(x,y,w,stage);
     // Readable three-dimensional cap: visible upper face, bright near lip,
     // and a dark contact seam. Restrict it to the top 8px so gameplay
     // collision and platform dimensions remain exactly unchanged.
