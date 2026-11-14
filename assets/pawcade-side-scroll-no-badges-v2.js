@@ -639,6 +639,19 @@
       platforms.push({x:middle,y:326-rise,w:span,kind:'floor'});
       platforms.push({x:middle+span+gap,y:326,w:remaining-2*(span+gap),kind:'floor'});
       platforms.push({x:middle,y:220-stage%3*10,w:Math.min(span,105),kind:'floor'});
+      // Distinct optional upper landing in the wide Foundry exit section.
+      // Keep it short, reachable from the existing high deck, and clear of
+      // the lower combat corridor; every chapter gets its own rhythm.
+      if(span>=205 && stage%3!==2){
+        const upperWidth=Math.min(92,Math.max(68,span*.34));
+        const upperX=middle+span-upperWidth-22;
+        const upperY=220-stage%3*10+(stage%2?19:-16);
+        if(upperY>=140 && upperX>middle+112){
+          platforms.push({x:upperX,y:upperY,w:upperWidth,kind:'floor',
+            optionalRoute:true});
+          crystals.push({x:upperX+upperWidth*.5,y:upperY-35});
+        }
+      }
       crystals.push({x:middle+span*.3,y:286-rise});
       enemies.push({x:middle+span*.7,y:303-rise,offset:stage+8,
         foundryEnemy:stage<18?stage:undefined, patrolLeft:middle+12, patrolRight:middle+span-12});
