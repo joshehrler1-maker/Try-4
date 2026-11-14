@@ -6401,6 +6401,17 @@
         tilt=(p.ledgeGrip.left?1:-1)*.16;
         scaleX=.94;
         scaleY=1.1;
+      } else if(index===16 && clock-(p.parryFlash?.time??-Infinity)<.2){
+        const lift=1-(clock-p.parryFlash.time)/.2;
+        tilt=-p.facing*.18*lift;
+        scaleX=1-.08*lift;
+        scaleY=1+.13*lift;
+      } else if(index===0 && clock-(p.stompImpact?.time??-Infinity)<.24){
+        const rebound=(clock-p.stompImpact.time)/.24;
+        const compression=Math.max(0,1-rebound*5);
+        const extension=Math.sin(Math.PI*rebound)*rebound;
+        scaleX=1+.14*compression-.09*extension;
+        scaleY=1-.13*compression+.18*extension;
       } else if(p.throwPose && clock-p.throwPose.time<.17){
         const release=1-(clock-p.throwPose.time)/.17;
         tilt=p.throwPose.facing*.22*release;
