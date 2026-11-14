@@ -1037,3 +1037,7 @@ for (const [room, slot, x, y, width] of [
 ]) {
   window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
 }
+
+// Seed Garden rigging routes climb before returning to deck level.
+window.pawtopiaRooms.seedRigging = [[0,326,365],[405,280,210],[657,233,201],[898,185,192,"barrel"],[1132,137,240],[1415,198,222],[1680,258,220],[1940,326,260]];
+window.pawtopiaRooms.seedTopsail = [[0,326,330],[377,287,165,"spring"],[590,237,183],[819,195,188,"spring"],[1052,142,202],[1297,106,225],[1568,182,200],[1812,251,160],[2017,326,183]];
