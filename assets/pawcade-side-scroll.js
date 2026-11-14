@@ -3941,8 +3941,10 @@
     // shoulder counter-swing, folding fins, wheel cadence, antenna sway,
     // or suspended stabilizers. The accent never moves the hitbox.
     if(!airborne){
-      const gait=Number.isFinite(footCycle)?footCycle:(foe._gait||0);
-      const swing=Math.sin(gait)*stride;
+      // footCycle is already a normalized sine wave from the draw loop;
+      // applying sin() again flattened its extremes and weakened contact.
+      const gait=Number.isFinite(footCycle)?footCycle:Math.sin(foe._gait||0);
+      const swing=Math.max(-1,Math.min(1,gait))*stride;
       const brace=firing?1:0;
       ctx.globalAlpha=.36+stride*.28+brace*.12;
       ctx.lineWidth=2;
