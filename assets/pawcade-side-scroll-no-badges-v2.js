@@ -1126,6 +1126,11 @@
       const speed = movement==='whip' ? 240 : power==='throw' ? 700 : 400;
       const life = movement==='whip' ? .24 : movement==='beat' && onBeat ? .72 : power==='throw' ? .8 : .36;
       const projectile={x:player.x,y:player.y,v:player.facing*speed,life};
+      if(index===21 && movement==='whip'){
+        projectile.whip=true;
+        projectile.originX=player.x;
+        projectile.originY=player.y;
+      }
       if(index===13 && power==='throw') projectile.motionTrail='lob';
       if(index===13 && power==='throw' && held('up')){
         projectile.v=player.facing*460;
@@ -5815,6 +5820,19 @@
       ctx.restore();
     }
     for (const a of attacks) {
+      if(index===21 && a.whip){
+        ctx.save();
+        ctx.lineWidth=3;
+        ctx.strokeStyle='#e4be8f';
+        ctx.beginPath();
+        ctx.moveTo(a.originX,a.originY);
+        ctx.quadraticCurveTo((a.originX+a.x)/2,a.y-12,a.x,a.y);
+        ctx.stroke();
+        ctx.fillStyle='#fff0cb';
+        ctx.fillRect(a.x-3,a.y-2,6,4);
+        ctx.restore();
+        continue;
+      }
       const radius=a.radius||9;
       if(index===13 && a.motionTrail==='lob'){
         ctx.save();
@@ -5946,9 +5964,12 @@
     }
     if(p.cable){
       ctx.save();
-      ctx.beginPath();ctx.moveTo(p.x,p.y-7);ctx.lineTo(p.cable.x,p.cable.y);
+      const handX=p.x+(index===9 ? p.facing*11 : 0);
+      const handY=p.y-(index===9 ? 17 : 7);
+      ctx.beginPath();ctx.moveTo(handX,handY);ctx.lineTo(p.cable.x,p.cable.y);
       ctx.lineWidth=5;ctx.strokeStyle='#101827';ctx.stroke();
       ctx.lineWidth=2;ctx.strokeStyle='#b4e9ff';ctx.stroke();
+      if(index===9){ctx.fillStyle='#ffcc71';ctx.fillRect(handX-5,handY-4,10,8);}
       ctx.restore();
     }
     if(index===2 && p.air<airCapacity){
