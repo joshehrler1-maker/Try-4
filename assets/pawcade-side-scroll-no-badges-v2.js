@@ -5377,6 +5377,40 @@
         ctx.fillStyle='#aab7c6';ctx.fillRect(ledge.x,ledge.y,ledge.w,4);
         continue;
       }
+      if(index===7 && (ledge.kind==='hazard' || ledge.kind==='ceilingSpikes')){
+        // Use the same crystal silhouette on both gravity surfaces.
+        const ceiling = ledge.kind==='ceilingSpikes';
+        const base = ceiling ? 32 : ground;
+        const height = Math.abs(ledge.y-base);
+        const count = Math.max(1, Math.round(ledge.w/17));
+        const spacing = ledge.w/count;
+        ctx.save();
+        ctx.translate(ledge.x,base);
+        ctx.scale(1,ceiling ? 1 : -1);
+        ctx.fillStyle='#451a58';
+        ctx.fillRect(0,0,ledge.w,5);
+        ctx.strokeStyle='#ffe4f5';
+        ctx.lineWidth=1.2;
+        for(let tooth=0;tooth<count;tooth++){
+          const x=tooth*spacing;
+          ctx.beginPath();
+          ctx.moveTo(x,0);
+          ctx.lineTo(x+spacing*.5,height);
+          ctx.lineTo(x+spacing,0);
+          ctx.closePath();
+          ctx.fillStyle='#cf376f';
+          ctx.fill();
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x,0);
+          ctx.lineTo(x+spacing*.5,height);
+          ctx.lineTo(x+spacing*.48,0);
+          ctx.fillStyle='#ff9bd0';
+          ctx.fill();
+        }
+        ctx.restore();
+        continue;
+      }
       if(ledge.kind==='ceilingSpikes'){
         ctx.save();
         ctx.translate(ledge.x,ledge.y);
