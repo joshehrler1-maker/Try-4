@@ -4570,7 +4570,9 @@
     // Clamp the animation speed when the simulation skips frames. This
     // protects Android browsers from a huge limb snap after tab switching.
     const gaitBlend=Math.min(1,Math.max(0,stride||0));
+    // Separate stance and swing phases so planted feet do not lift together.
     const swing=reducedMotion?0:Math.sin(phase)*gaitBlend;
+    const gaitContact=reducedMotion?0:Math.cos(phase)*gaitBlend;
     const reach=reducedMotion?0:attackPose;
     // Individual game families get different windup and recoil timing.
     // Keep the pose attached to the existing foe sprite, not a floating cue.
@@ -4634,8 +4636,8 @@
         (!airborne && Math.max(0,-side*swing)>.25?legSwing*.2:0);
       // Plant the support foot while the opposite paw lifts; preserve a
       // steady contact point rather than making both feet skate together.
-      const support=Math.max(0,side*swing);
-      const footY=at.y+18-(airborne?7+Math.max(0,flightCycle)*3:support*5*kneeScale);
+      const support=Math.max(0,side*gaitContact);
+      const footY=at.y+18-(airborne?7+Math.max(0,flightCycle)*3:support*5*poseKnee);
       ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
       ctx.beginPath();ctx.moveTo(hip,at.y-6);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
       ctx.strokeStyle=armor;ctx.lineWidth=radius;
