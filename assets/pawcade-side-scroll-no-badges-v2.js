@@ -3117,7 +3117,8 @@
     }
     if(index===3 && foe.clockEnemy===undefined){ // Clocktower Relay: accelerating patrol arcs
       const burst=Math.sin(t*1.4);
-      return {x:patrolX(foe.x+Math.sign(burst)*Math.abs(burst)**.6*enemyReach),y:foe.y};
+      const paced=burst*.7+burst**3*.3;
+      return {x:patrolX(foe.x+paced*enemyReach),y:foe.y};
     }
     // Ground-based ordinary enemies must not inherit decorative vertical
     // motion. Only explicit flyers, swimmers, gravity actors, or jumpers
@@ -3160,7 +3161,8 @@
     }
     if(index===14){ // Inverted Observatory: alternating gravity orbit
       const gravity=Math.sin(t*.95);
-      return {x:patrolX(foe.x+Math.cos(t*1.2)*enemyReach*.6),
+      const orbit=Math.cos(t*1.2);
+      return {x:patrolX(foe.x+(orbit*.8+orbit**3*.2)*enemyReach*.6),
         y:foe.y-gravity*enemyRise*.9};
     }
     if(index===17){ // Snow Village: short icy slides with recovery
@@ -3239,7 +3241,8 @@
     }
     if(index===10){ // Sunset Wind Sail: enemies ride updrafts
       const gust=Math.sin(t*.85);
-      return {x:patrolX(foe.x+gust*enemyReach*.8),
+      const drift=gust*.8+gust**3*.2;
+      return {x:patrolX(foe.x+drift*enemyReach*.8),
         y:foe.y-22-(.5+.5*Math.sin(t*1.7))*enemyRise};
     }
     if(index===15){ // Bamboo Village: ambush, then retreat
@@ -3254,7 +3257,8 @@
     }
     if(index===21){ // Marble Temple: guarded pendulum sweeps
       const swing=Math.sin(t*.9);
-      return {x:patrolX(foe.x+swing*enemyReach*.65),
+      const pendulum=swing*.85+swing**3*.15;
+      return {x:patrolX(foe.x+pendulum*enemyReach*.65),
         y:foe.y};
     }
     if(index===24){ // Starship Cargo: grounded deck guards; turrets remain stationary above
@@ -3272,7 +3276,8 @@
       }
       case 'hopper': { // Distinct jumping arcs with a grounded landing phase
         const hop=Math.max(0,Math.sin(t*3.5));
-        return {x:patrolX(foe.x+wave*enemyReach),y:foe.y-hop*hop*enemyRise};
+        const arc=hop*hop*(3-2*hop);
+        return {x:patrolX(foe.x+wave*enemyReach),y:foe.y-arc*enemyRise};
       }
       case 'swoop': { // Rayman / Klonoa / Ori: readable aerial swoops
         // The dive is steepest at the center of the flight arc, with a
