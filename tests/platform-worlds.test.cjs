@@ -510,3 +510,27 @@ test('five distinctive games 6–10 enemy rigs render safely without changing ga
   assert.equal(rigs.draw({},4,{x:0,y:0},{},{}),false);
   assert.equal(rigs.draw({},10,{x:0,y:0},{},{}),false);
 });
+
+test('enemy motion lab previews real gameplay rigs without mislabeling them 3D', () => {
+  const lab=fs.readFileSync(path.join(__dirname,'../enemy-motion-lab.html'),'utf8');
+  const game=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  assert.match(lab,/id="render-mode"/,'lab must offer the real rendered rig option');
+  assert.match(lab,/Show playable rig/);
+  assert.match(lab,/not<\/strong> final 3D models|not<\/strong> final 3D/i,
+    'concept preview must not call vector rigs film-level 3D');
+  for(const moduleName of [
+    'five-world-enemy-rigs-v1.js',
+    'cloud-trail-enemy-rigs-v1.js',
+    'mid-world-enemy-rigs-v1.js',
+    'late-world-enemy-rigs-v1.js'
+  ]){
+    const pattern='src="assets/animation/'+moduleName+'?';
+    assert.ok(game.includes(pattern),'playable games do not load '+moduleName);
+    assert.ok(lab.includes(pattern),'preview is not using live game rig '+moduleName);
+  }
+  const inline=lab.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(inline,'missing lab interface script');
+  assert.doesNotThrow(()=>new Function(inline),'lab script must parse');
+  assert.match(inline,/rig\.draw\(ctx,index,/,
+    'preview must draw the same registered enemy body as gameplay');
+});
