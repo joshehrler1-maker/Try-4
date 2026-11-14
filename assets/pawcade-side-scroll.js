@@ -614,6 +614,9 @@
       x:player.x,y:player.y,v:player.facing*(charged?850:680),life:.85,radius:charged?22:8,damage:charged?2:1,blasterShot:true
     });
   }
+  function bashTarget(p) {
+    return enemies.find(foe=>!foe.dead && close(p,foePosition(foe),125,65));
+  }
   function useTechnique() {
     if (phase!=='playing' || player.techCooldown>0) return;
     const p=player;
@@ -657,7 +660,7 @@
         break;
       }
       case 'bash': {
-        const target=nearby(125);
+        const target=bashTarget(p);
         if(!target) break;
         const dx=Number(held('right'))-Number(held('left'));
         const dy=Number(held('down'))-Number(held('up'));
@@ -2826,6 +2829,7 @@
       if(c.refill){ctx.strokeStyle='#66ffe0';ctx.strokeRect(c.x-15,c.y-15,30,30);}
       if(!sprite(15,c.x,c.y,38,38)){ctx.fillStyle='#ffd967';ctx.fillRect(c.x-5,c.y-5,10,10);}
     }
+    const bashReady=index===15 && technique==='bash' && phase==='playing' && player.techCooldown<=0 ? bashTarget(player) : null;
     for (const foe of enemies) if(!foe.dead && foe.x>=camera-150 && foe.x<camera+width+150) {
       const at=foePosition(foe);
       const airborne=['swoop','school'].includes(enemyPattern);
@@ -2868,6 +2872,15 @@
       }
       ctx.restore();
       drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing);
+      if(foe===bashReady){
+        ctx.save();
+        ctx.strokeStyle='#a8ffd9';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.arc(at.x,at.y-12,37,0,Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
     if (boss.health && camera+width>finish) {
       castShadow(boss.x,boss.y+38,36);
