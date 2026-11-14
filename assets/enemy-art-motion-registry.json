@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
-  "status": "design-registry-not-integrated",
-  "note": "Original Super Paw Heroes enemy art/motion briefs. No rendered assets, 3D rigs or animations are implied by this file.",
+  "schemaVersion": 2,
+  "status": "individual-motion-design-specifications-not-integrated",
+  "note": "25 distinct original enemy animation briefs, not finished art, 3D rigs, verified counterpart comparisons or deployed gameplay. Implement and validate individually.",
   "rules": {
     "oneUniqueFamilyPerGame": true,
     "baronFinalBoss": true,
@@ -28,7 +28,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "grounded-clamp",
+        "attackSequence": "plant rear foot, compress shoulders, close jaws, recoil",
+        "locomotion": "two planted steps before lunge",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 1,
@@ -47,7 +65,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "guard-sweep",
+        "attackSequence": "brace spine, unfold page armor, sweep, refold",
+        "locomotion": "short patrol with deliberate turns",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 2,
@@ -66,7 +102,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "swim-spiral",
+        "attackSequence": "bank fins, coil torso, spiral, glide out",
+        "locomotion": "continuous underwater buoyancy",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 3,
@@ -85,7 +139,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "pendulum-arc",
+        "attackSequence": "wind up against swing, release at beat, damp oscillation",
+        "locomotion": "clock-timed patrol",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 4,
@@ -104,7 +176,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "spring-pounce",
+        "attackSequence": "squat, load hind legs, leap, absorb landing",
+        "locomotion": "short hops with planted landings",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 5,
@@ -123,7 +213,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "aerial-dive",
+        "attackSequence": "rise on air current, tuck wings, dive, flare",
+        "locomotion": "smooth air-current arcs",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 6,
@@ -142,7 +250,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "juggle-toss",
+        "attackSequence": "gather three lanterns, alternate release, catch, reset",
+        "locomotion": "rhythmic lateral footwork",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 7,
@@ -161,7 +287,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "magnetic-dash",
+        "attackSequence": "polarize shell, lean into pull, dash, brake",
+        "locomotion": "attraction-aware traction",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 8,
@@ -180,7 +324,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "beat-stomp",
+        "attackSequence": "sync crouch to beat, lift foot, stomp, settle",
+        "locomotion": "beat-synced bounces",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 9,
@@ -199,7 +361,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "burrow-eruption",
+        "attackSequence": "dig below ground, surface with dust, strike, descend",
+        "locomotion": "grounded digging arcs",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 10,
@@ -218,7 +398,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "wind-dive",
+        "attackSequence": "tilt sail, ride gust, dive across lane, recover",
+        "locomotion": "gust-driven glide",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 11,
@@ -237,7 +435,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "hover-slam",
+        "attackSequence": "hover charge, descend, cushion rebound, regain altitude",
+        "locomotion": "stable hover with drift",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 12,
@@ -256,7 +472,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "electric-discharge",
+        "attackSequence": "charge coils, orient ray, discharge, vent",
+        "locomotion": "electric glide with arcs",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 13,
@@ -275,7 +509,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "ambush-swipe",
+        "attackSequence": "hide in foliage, uncoil, swipe, withdraw",
+        "locomotion": "low stealth creeping",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 14,
@@ -294,7 +546,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "gravity-pulse",
+        "attackSequence": "orbit center, reverse lean, pulse, stabilize",
+        "locomotion": "gravity-dependent orbit",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 15,
@@ -313,7 +583,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "vault-strike",
+        "attackSequence": "plant pole, vault, extend strike, land",
+        "locomotion": "pole-assisted strides",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 16,
@@ -332,7 +620,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "piston-jab",
+        "attackSequence": "pressurize chamber, extend piston, retract, vent",
+        "locomotion": "mechanical step cycles",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 17,
@@ -351,7 +657,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "frost-cone",
+        "attackSequence": "inhale cold, lean forward, exhale cone, thaw",
+        "locomotion": "controlled icy slide and brake",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 18,
@@ -370,7 +694,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "dash-feint",
+        "attackSequence": "stutter-step, feint, burst, skid stop",
+        "locomotion": "traction-limited sprint",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 19,
@@ -389,7 +731,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "sonar-bolt",
+        "attackSequence": "scan cone, lock target, emit bolt, cool down",
+        "locomotion": "underwater fin propulsion",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 20,
@@ -408,7 +768,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "blink-strike",
+        "attackSequence": "telegraph glitch, disappear, reappear, strike, settle",
+        "locomotion": "brief intentional teleport only",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 21,
@@ -427,7 +805,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "rolling-crush",
+        "attackSequence": "brace stone segments, curl, roll, uncoil",
+        "locomotion": "mass-driven rolling inertia",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 22,
@@ -446,7 +842,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "lure-burst",
+        "attackSequence": "pulse lure, attract, inflate, burst, deflate",
+        "locomotion": "buoyant swamp bob",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 23,
@@ -465,7 +879,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "swoop-spiral",
+        "attackSequence": "flutter, spiral downward, sweep, climb",
+        "locomotion": "airborne flutter",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     },
     {
       "gameIndex": 24,
@@ -484,7 +916,25 @@
         "defeat"
       ],
       "artStatus": "needs-original-art",
-      "implementationStatus": "pending"
+      "implementationStatus": "pending",
+      "motionDesign": {
+        "profile": "grapple-snap",
+        "attackSequence": "unfold crate disguise, extend grapple, snap, retract",
+        "locomotion": "weighted cargo shuffle",
+        "transitionRules": [
+          "anticipation blends from current locomotion velocity",
+          "contact uses continuous body trajectory",
+          "recovery returns to locomotion without pose snapping",
+          "ground contacts obey terrain except intentionally airborne or burrowing designs"
+        ],
+        "validation": [
+          "review the correct counterpart gameplay before implementation",
+          "check silhouette and attack readability",
+          "test at 0.25x and 1x speed",
+          "verify no sliding or floating on intended ground contacts",
+          "verify Android landscape frame pacing"
+        ]
+      }
     }
   ]
 }
