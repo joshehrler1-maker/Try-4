@@ -964,7 +964,12 @@
       ];
       const beatOrder=worldBeatOrders[index];
       const chapterBeat=beatOrder[stage%beatOrder.length];
+      // Only build contiguous optional sequences. A blocked landing must
+      // not leave a disconnected upper ledge or a stranded reward.
+      let signatureConnected=true;
+      let signaturePrevious=null;
       for(const [slot,[dx,sy,sw,kind]] of (signatureFits?signature:[]).entries()){
+        if(!signatureConnected)break;
         const sx=signatureX+dx;
         const height=sy+((stage+slot)%3-1)*8+
           (chapterBeat===2?-12:chapterBeat===4?8:0);
@@ -977,8 +982,26 @@
         const swimKind=(index===2||index===19) && selectedKind==='lift'
           ? 'current':selectedKind;
         // Do not append a ledge past the chapter's right boundary.
-        if(sx+width>start+stageWidths[stage]-75) continue;
+        if(sx+width>start+stageWidths[stage]-75){
+          signatureConnected=false;
+          break;
+        }
+        // Keep successive optional landings close enough for ordinary
+        // jumps. Current-assisted swimming stages are exempt from the
+        // vertical jump restriction because they use swim physics.
+        if(signaturePrevious){
+          const horizontalGap=Math.max(0,sx-
+            (signaturePrevious.x+signaturePrevious.w));
+          const verticalRise=signaturePrevious.y-height;
+          const swimming=index===2||index===19;
+          if(horizontalGap>(swimming?155:115)||
+             (!swimming && verticalRise>95)){
+            signatureConnected=false;
+            break;
+          }
+        }
         if(addOptionalLanding(sx,height,width,swimKind)){
+          signaturePrevious={x:sx,y:height,w:width};
           // Exploration-focused worlds place optional rewards on alternate
           // landings; speed worlds mark the center of a flowing route.
           const exploration=[2,4,6,13,15,17,22,23].includes(index);
@@ -986,6 +1009,8 @@
           const rewardSlot=exploration?2:speed?0:1;
           if(slot===rewardSlot)
             crystals.push({x:sx+width/2,y:height-37});
+        }else{
+          signatureConnected=false;
         }
       }
     }
