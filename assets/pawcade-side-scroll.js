@@ -976,6 +976,22 @@
         // and slightly constrained airborne reversals for wall-jump control.
         const combatHandling=p.on?1.22:(reversing?.68:.88);
         p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*combatHandling);
+      }else if(index===2){
+        // Coral Courier: underwater movement carries momentum; direction
+        // changes and releasing the stick do not stop swimming instantly.
+        const swimmingTraction=steer?(reversing?2.5:3.6):1.35;
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*swimmingTraction*controlFactor);
+      }else if(index===4){
+        // Seed Garden: brisk canopy traversal with a committed rolling burst.
+        const rolling=movement==='roll' && p.power>.22;
+        const target=rolling ? p.facing*Math.max(topSpeed,topSpeed*1.24) : steer*topSpeed;
+        const grip=rolling?2.5:(p.on?1.2:.8);
+        p.vx+=(target-p.vx)*Math.min(1,dt*acceleration*grip);
+      }else if(index===11){
+        // Cloud City: immediate precision starts and high-air-control
+        // reversals for short, technical platform sequences.
+        const precisionGrip=p.on?1.65:(reversing?1.3:1.42);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*precisionGrip);
       }else{
         p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
       }
