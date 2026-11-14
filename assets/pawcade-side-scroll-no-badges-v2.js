@@ -865,6 +865,7 @@
     const stageWidthOffsets=[0,-6,10,-4];
     let cx=challengeX;
     let previousLandingPlaced=false;
+    let previousLanding=null;
     for(let part=0;part<3;part++){
       const gapAdjustment=part===0?0:
         stageGapOffsets[(chapterVariant+part)%4];
@@ -873,12 +874,22 @@
         profile.rises[part]+stageHeightOffsets[(chapterVariant+part)%4]);
       const cw=Math.max(70,profile.widths[part]+
         stageWidthOffsets[(chapterVariant+part)%4]+(part===1?12:0));
-      // Do not strand later optional platforms when the preceding landing
-      // was rejected by a collision or stage-boundary check.
-      if(!clearLane && (part===0||previousLandingPlaced)){
+      // Check actual clear-air distance, not merely the distance between
+      // platform origins. A landing rejected earlier invalidates the rest
+      // of this optional route, preventing floating reward chains.
+      const swimming=index===2||index===19;
+      const gap=previousLanding?
+        Math.max(0,cx-(previousLanding.x+previousLanding.w)):0;
+      const rise=previousLanding?previousLanding.y-cy:0;
+      const reachable=!previousLanding||
+        (gap<=(swimming?155:115) && (swimming||rise<=95));
+      if(!clearLane && (part===0||previousLandingPlaced) && reachable){
         const placed=addOptionalLanding(cx,cy,cw,challengeKinds[part]);
         previousLandingPlaced=placed;
-        if(placed && part===1) crystals.push({x:cx+cw/2,y:cy-45});
+        if(placed){
+          previousLanding={x:cx,y:cy,w:cw};
+          if(part===1) crystals.push({x:cx+cw/2,y:cy-45});
+        }
       }else{
         previousLandingPlaced=false;
       }
