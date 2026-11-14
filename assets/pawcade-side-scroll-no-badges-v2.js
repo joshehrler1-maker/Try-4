@@ -1249,6 +1249,7 @@
       audio ??= new Audio();
       sound=!sound;
       if(sound) audio.resume().catch(()=>{});
+      else stopMusic();
       soundButton.setAttribute('aria-pressed',String(sound));
       soundButton.textContent=sound?'Sound on':'Sound off';
       playCue(440,660);
@@ -1290,6 +1291,67 @@
       if(ratio===harmonic) tone.onended=()=>volume.disconnect();
     }
   }
+  // BPM, tonic (MIDI), melody offsets. A dash marks a rest.
+  const musicScores=[
+    [124,55,'0 4 7 12 7 4 2 -'],[138,52,'0 0 7 3 10 7 5 -'],
+    [72,48,'0 - 7 - 10 14 - 12'],[154,57,'0 7 12 9 5 4 2 7'],
+    [108,50,'0 7 3 7 10 - 5 3'],[112,53,'0 4 9 7 12 9 - 7'],
+    [116,60,'0 4 7 11 12 - 7 4'],[132,51,'0 12 3 15 7 19 5 17'],
+    [142,54,'0 0 7 7 12 10 5 3'],[92,45,'0 - 7 3 0 - 10 5'],
+    [96,55,'0 2 7 - 9 12 7 -'],[104,56,'0 - 4 7 11 - 14 12'],
+    [126,49,'0 7 10 12 10 5 3 7'],[114,58,'0 4 2 7 9 7 4 -'],
+    [88,47,'0 - 1 7 8 - 5 3'],[84,52,'0 7 12 - 14 11 9 -'],
+    [146,55,'0 4 7 9 10 9 7 4'],[128,50,'0 1 4 7 8 7 4 1'],
+    [98,46,'0 - 3 7 6 5 - 3'],[152,48,'0 0 3 7 0 10 7 5'],
+    [160,53,'0 4 7 10 12 7 9 3'],[122,47,'0 7 12 15 14 12 10 7'],
+    [118,57,'0 4 7 - 9 7 2 4'],[90,59,'0 2 4 - 7 9 7 -'],
+    [136,46,'0 7 3 0 10 7 5 3']
+  ];
+  const [musicTempo,musicRoot,musicPattern]=musicScores[index];
+  const musicNotes=musicPattern.split(' ');
+  const musicInterval=30/musicTempo;
+  let musicBus, nextMusicAt=0, musicStep=0;
+
+  function stopMusic() {
+    if(!musicBus) return;
+    musicBus.disconnect();
+    musicBus=null;
+    nextMusicAt=0;
+  }
+
+  function musicNote(note,at,length,level,type) {
+    const voice=audio.createOscillator(), gain=audio.createGain();
+    voice.type=type;
+    voice.frequency.value=440*2**((note-69)/12);
+    gain.gain.setValueAtTime(.0001,at);
+    gain.gain.exponentialRampToValueAtTime(level,at+.014);
+    gain.gain.exponentialRampToValueAtTime(.0001,at+length);
+    voice.connect(gain);
+    gain.connect(musicBus);
+    voice.onended=()=>gain.disconnect();
+    voice.start(at);
+    voice.stop(at+length);
+  }
+
+  function updateMusic() {
+    if(!sound || audio?.state!=='running' || phase!=='playing' || storyDialog?.open) return;
+    const now=audio.currentTime;
+    if(!musicBus){
+      musicBus=audio.createGain();
+      musicBus.gain.value=.55;
+      musicBus.connect(audio.destination);
+    }
+    if(nextMusicAt<now) nextMusicAt=now+.02;
+    while(nextMusicAt<now+.09){
+      const chordShift=[0,5,3,7][Math.floor(musicStep/8)%4];
+      const note=musicNotes[musicStep%8];
+      if(note!=='-') musicNote(musicRoot+chordShift+Number(note),nextMusicAt,musicInterval*.86,.025,soundProfiles[index][0]);
+      if(musicStep%4===0) musicNote(musicRoot+chordShift-12,nextMusicAt,musicInterval*2.6,.032,'triangle');
+      if(musicStep%4===2) musicNote(musicRoot+chordShift+7,nextMusicAt,musicInterval*1.2,.012,'sine');
+      musicStep++;
+      nextMusicAt+=musicInterval;
+    }
+  }
   const resetActionPointers=[];
   function clearInput() {
     keys.clear();
@@ -1304,6 +1366,7 @@
   function togglePause() {
     if (phase==='playing') {
       phase='paused';
+      stopMusic();
       cancelAnimationFrame(frame);
       clearInput();
       pauseButton.textContent='Resume';
@@ -6030,11 +6093,13 @@
     storyDialog.children[0].textContent=title;
     storyDialog.children[1].textContent=line;
     storyDialog.children[2].textContent=scene===6?'Close':'Continue';
+    stopMusic();
     storyDialog.showModal();
     playFoundryShot(scene);
     return true;
   }
   function loop(now) {
+    updateMusic();
     accumulator += Math.min(.075,Math.max(0,(now-last)/1000));
     while (accumulator >= tick && phase==='playing' && !storyDialog?.open) {
       step(tick);
@@ -6043,9 +6108,11 @@
     last=now;
     draw();
     if(phase==='playing' && !storyDialog?.open) frame=requestAnimationFrame(loop);
-    if(phase==='won') {clearInput();pauseButton.disabled=true;playCue(440,880,.3);if(index===0)showFoundryStory(6);}
+    if(phase==='won') {stopMusic();clearInput();pauseButton.disabled=true;playCue(440,880,.3);if(index===0)showFoundryStory(6);}
   }
   function startRun(saved) {
+    stopMusic();
+    musicStep=0;
     cancelAnimationFrame(frame);
     clearInput();
     reset();
