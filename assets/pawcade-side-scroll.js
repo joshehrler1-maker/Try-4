@@ -759,6 +759,15 @@
   }
   function respawn() {
     for(const ledge of platforms) if(ledge.kind==='drop') ledge.dropAt=undefined;
+    if(index===11){
+      const start=chapter*sectionSize;
+      for(const crystal of crystals){
+        if(crystal.refill && crystal.taken && crystal.x>=start && crystal.x<start+sectionSize){
+          crystal.taken=false;
+          taken--;
+        }
+      }
+    }
     player = resetPlayer(escape ? finish+635 : chapter * sectionSize + 100);
     if (escape) escape=95;
     player.grace = 1.1;
