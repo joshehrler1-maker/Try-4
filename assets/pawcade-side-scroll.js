@@ -1634,8 +1634,15 @@
       const firing=(foe.turret || enemyPattern==='turret' || index===16) &&
         nearby && Math.abs(player.y-at.y)<105 && foe.shotAt>clock;
       const motion=reducedMotion?0:Math.sin(clock*(airborne?9:6)+foe.offset);
-      const footstep=reducedMotion||airborne?0:Math.abs(Math.sin(clock*8+foe.offset))*1.5;
-      const enemyLean=reducedMotion?0:Math.sin(clock*5+foe.offset)*.025;
+      // Enemy gait follows visible world travel, not elapsed time. Reset on
+      // large position changes so teleports and respawns never spin the gait.
+      const travel=foe._drawX===undefined?0:Math.abs(at.x-foe._drawX);
+      foe._drawX=at.x;
+      if(travel>90)foe._gait=0;
+      else foe._gait=(foe._gait||0)+Math.min(24,travel)/12;
+      const moving=travel>.15 && travel<90;
+      const footstep=reducedMotion||airborne||!moving?0:Math.abs(Math.sin(foe._gait))*2.2;
+      const enemyLean=reducedMotion?0:(moving?Math.sin(foe._gait)*.045:Math.sin(clock*2+foe.offset)*.012);
       ctx.save();
       // A distinct animation state for patrolling, hopping, flying and firing.
       ctx.translate(at.x,at.y+19);
