@@ -630,6 +630,48 @@
       if(!clearLane && addOptionalLanding(cx,cy,cw,challengeKinds[part]) &&
          part===1) crystals.push({x:cx+cw/2,y:cy-45});
     }
+    // Individually authored traversal signatures, one per adventure.
+    // These are optional, collision-tested ledges; the authored main route
+    // remains intact. Chapter rotation varies the sequence without copying
+    // counterpart maps or using the same layout across different games.
+    const signatureRoutes=[
+      [[0,286,150,'floor'],[185,242,92,'spring'],[315,216,130,'floor']],
+      [[0,278,164,'shelf'],[202,218,102,'lift'],[352,258,150,'shelf']],
+      [[0,235,210,'current'],[252,266,180,'current'],[475,223,125,'floor']],
+      [[0,285,260,'belt'],[295,245,125,'spring'],[465,278,230,'belt']],
+      [[0,281,146,'barrel'],[178,242,118,'floor'],[337,206,140,'barrel']],
+      [[0,284,125,'floor'],[169,229,115,'lift'],[330,183,115,'floor']],
+      [[0,283,122,'spring'],[167,249,142,'floor'],[353,210,112,'spring']],
+      [[0,274,105,'floor'],[150,220,88,'shelf'],[283,268,105,'floor']],
+      [[0,284,155,'floor'],[195,249,120,'spring'],[355,284,155,'floor']],
+      [[0,285,145,'floor'],[192,215,105,'rail'],[355,184,128,'lift']],
+      [[0,280,162,'floor'],[208,232,128,'lift'],[386,202,150,'floor']],
+      [[0,280,105,'lift'],[155,221,105,'floor'],[310,171,105,'lift']],
+      [[0,283,134,'pogo'],[185,243,150,'floor'],[380,215,135,'pogo']],
+      [[0,281,130,'floor'],[175,243,110,'spring'],[325,211,140,'shelf']],
+      [[0,275,138,'shelf'],[192,224,120,'floor'],[359,184,140,'shelf']],
+      [[0,283,140,'lift'],[180,239,110,'spring'],[342,195,140,'lift']],
+      [[0,279,200,'shelf'],[238,246,155,'belt'],[431,281,170,'shelf']],
+      [[0,285,155,'ice'],[198,249,118,'shelf'],[356,215,160,'ice']],
+      [[0,284,104,'shelf'],[157,244,92,'floor'],[309,205,100,'shelf']],
+      [[0,244,188,'current'],[229,264,150,'lift'],[418,220,168,'current']],
+      [[0,283,250,'belt'],[288,244,135,'spring'],[468,283,240,'belt']],
+      [[0,283,128,'shelf'],[173,242,115,'floor'],[337,206,125,'shelf']],
+      [[0,283,130,'pogo'],[176,249,110,'spring'],[334,221,130,'pogo']],
+      [[0,283,125,'spring'],[166,237,115,'lift'],[321,205,125,'spring']],
+      [[0,283,180,'shelf'],[224,239,155,'lift'],[422,273,185,'shelf']]
+    ];
+    if(!clearLane && index!==2 && index!==19){
+      const signature=signatureRoutes[index];
+      const signatureX=start+Math.min(sectionSize-860,1510+stage%3*47);
+      for(const [slot,[dx,sy,sw,kind]] of signature.entries()){
+        const sx=signatureX+dx;
+        const height=sy+((stage+slot)%3-1)*8;
+        const width=sw+((stage+slot)%2)*10;
+        if(addOptionalLanding(sx,height,width,kind) && slot===1)
+          crystals.push({x:sx+width/2,y:height-37});
+      }
+    }
     // A guarded optional reward on the alternate route. Existing enemy AI
     // handles this encounter, so no new combat controls are required.
     if(index!==7 && index!==14){
