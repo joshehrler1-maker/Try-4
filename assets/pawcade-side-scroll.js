@@ -1087,6 +1087,7 @@
     if(cycle<2) return -100+(cycle-1)*245;
     return 145-(cycle-2)/1.2*245;
   }
+  const baronShielded = cycle => guardian.pattern==='charge' && cycle>=1 && cycle<2;
   function updateGuardian(dt,p,oldY) {
     boss.time+=dt;
     const t=boss.time;
@@ -1125,7 +1126,7 @@
       boss.nextShot=t+(volleyPhase ? 1.14-volleyPhase*.18 : 1.55);
     }
     boss.warning=(['volley','sweep','barrage'].includes(guardian.pattern) && boss.nextShot-t<.3) || (guardian.pattern==='charge' && cycle>.68 && cycle<1);
-    const shielded=guardian.pattern==='charge' && cycle>=1 && cycle<2;
+    const shielded=baronShielded(cycle);
     const attack=attacks.find(a=>a.life>0 && close(a,boss,49+(a.radius||0),42));
     const stomp=close(p,boss,47,52) && p.vy>70 && (oldY<boss.y-18 || p.pogo);
     if (!shielded && !boss.grace && (attack || stomp)) {
@@ -2893,6 +2894,16 @@
       }
       ctx.fillStyle='#15142c';ctx.fillRect(boss.x-38,boss.y-57,76,10);
       ctx.fillStyle='#f77c8b';
+      if(baronShielded(boss.time%3.2)){
+        ctx.save();
+        ctx.font='bold 11px system-ui';
+        ctx.textAlign='center';
+        ctx.fillStyle='#21152a';
+        ctx.fillRect(boss.x-36,boss.y-91,72,18);
+        ctx.fillStyle='#ffe199';
+        ctx.fillText('GUARDED',boss.x,boss.y-78);
+        ctx.restore();
+      }
       for(let heart=0;heart<boss.health;heart++) ctx.fillRect(boss.x-35+heart*14,boss.y-54,11,4);
     }
     const exitLocked=Boolean(boss.health) || (finale==='crystals' && taken<3);
