@@ -55,3 +55,29 @@ test('movement and technique tuning is finite across all 25 games',()=>{
     assert.ok(String(technique[0]).trim() && String(technique[1]).trim(),'missing technique for '+i);
   }
 });
+
+
+test('all 25 counterpart references and enemy patterns are explicitly defined', () => {
+  const references = w.pawtopiaStyles.map(row => row[0]);
+  assert.equal(new Set(references).size, count, 'each adventure needs its own reference');
+  for (let i = 0; i < count; i++) {
+    const style = w.pawtopiaStyles[i];
+    assert.ok(style.length >= 3, 'missing reference or enemy behavior in game ' + i);
+    assert.ok(String(style[1]).trim(), 'missing movement style in game ' + i);
+    assert.ok(String(style[2]).trim(), 'missing enemy pattern in game ' + i);
+  }
+});
+
+test('enemy encounter caps progress safely across all 25 worlds', () => {
+  const runtime = fs.readFileSync(path.join(__dirname, '../assets/pawcade-side-scroll-no-badges-v2.js'), 'utf8');
+  const match = runtime.match(/const worldEncounterCaps\s*=\s*(\[[\s\S]*?\]);/);
+  assert.ok(match, 'missing world-specific enemy encounter budgets');
+  const caps = vm.runInNewContext(match[1], {}, {timeout:1000});
+  assert.equal(caps.length, count, 'enemy encounter budgets must cover all 25 games');
+  for (let i = 0; i < count; i++) {
+    const stages = caps[i];
+    assert.equal(stages.length, 6, 'expected six stage budgets for ' + w.pawtopiaCourses[i][0]);
+    assert.ok(stages.every(n => Number.isInteger(n) && n >= 0 && n <= 8), 'unsafe encounter count in game ' + i);
+    assert.ok(stages.every((n, j) => j === 0 || n >= stages[j-1]), 'enemy pressure must not decline in game ' + i);
+  }
+});
