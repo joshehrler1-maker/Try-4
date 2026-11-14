@@ -1133,6 +1133,7 @@
     if (phase==='playing' && movement==='buster') {player.chargeStart ??= clock;return;}
     if (index===3) return;
     if (index===2 && phase==='playing' && player.power<=0) {
+      player.facing=(Number(held('right'))-Number(held('left')))||player.facing;
       player.vx=player.facing*530;player.grapple=.25;player.power=.4;
       player.grace=Math.max(player.grace,.25);
       return;
@@ -1177,11 +1178,12 @@
       const onBeat = isOnBeat(clock % beatPeriod);
       const speed = movement==='whip' ? 240 : power==='throw' ? 700 : 400;
       const life = movement==='whip' ? .24 : movement==='beat' && onBeat ? .72 : power==='throw' ? .8 : .36;
-      const projectile={x:player.x,y:player.y,v:player.facing*speed,life};
+      const aim=Number(held('right'))-Number(held('left'));
+      const facing=aim||player.facing;
+      const projectile={x:player.x,y:player.y,v:facing*speed,life};
       if(index===8) projectile.accent=onBeat;
       if(index===19 && held('up')){
-        const aim=Number(held('right'))-Number(held('left'));
-        projectile.v=(aim||player.facing)*speed*.7;
+        projectile.v=facing*speed*.7;
         projectile.vy=-speed*.7;
       }
       if(index===21 && movement==='whip'){
@@ -1191,12 +1193,12 @@
       }
       if(index===13 && power==='throw') projectile.motionTrail='lob';
       if(index===17 && power==='throw'){
-        projectile.v=player.facing*490;
+        projectile.v=facing*490;
         projectile.vy=-140;
         projectile.gravity=380;
       }
       if(index===13 && power==='throw' && held('up')){
-        projectile.v=player.facing*460;
+        projectile.v=facing*460;
         projectile.vy=-285;
         projectile.gravity=570;
       }
@@ -1205,7 +1207,7 @@
         player.shotPose={time:clock,facing,angle:Math.atan2(projectile.vy||0,Math.abs(projectile.v))};
       }
       if(index===13 || index===17){
-        player.throwPose={time:clock,facing:player.facing,angle:Math.atan2(projectile.vy||0,Math.abs(projectile.v))};
+        player.throwPose={time:clock,facing,angle:Math.atan2(projectile.vy||0,Math.abs(projectile.v))};
       }
       attacks.push(projectile);
       playCue(470,180,.085);
