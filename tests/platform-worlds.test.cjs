@@ -234,8 +234,8 @@ test('five late-game enemy rigs render distinct simulation-driven poses safely',
   assert.equal(new Set(Object.values(rig.families)).size,5,'each enemy must have a distinct family');
   assert.ok(html.includes('assets/animation/late-world-enemy-rigs-v1.js?'),
     'motion rig script is not loaded in playable game HTML');
-  assert.ok(html.indexOf('late-world-enemy-rigs-v1.js') <
-            html.indexOf('pawcade-side-scroll-no-badges-v2.js'),
+  assert.ok(html.indexOf('src="assets/animation/late-world-enemy-rigs-v1.js') <
+            html.indexOf('src="assets/pawcade-side-scroll-no-badges-v2.js'),
             'enemy rigs must be loaded before main gameplay');
   assert.ok(worker.includes("'assets/animation/late-world-enemy-rigs-v1.js?"),
     'enemy rigs need offline cache');
