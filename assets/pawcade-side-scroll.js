@@ -325,7 +325,8 @@
       platforms.push({x:middle+span+gap,y:326,w:remaining-2*(span+gap),kind:'floor'});
       platforms.push({x:middle,y:220-stage%3*10,w:Math.min(span,105),kind:'floor'});
       crystals.push({x:middle+span*.3,y:286-rise});
-      enemies.push({x:middle+span*.7,y:303-rise,offset:stage+8});
+      enemies.push({x:middle+span*.7,y:303-rise,offset:stage+8,
+        foundryEnemy:stage<3?stage:undefined, patrolLeft:middle+12, patrolRight:middle+span-12});
     }
     const feature=setPieces[stage];
     const anchor=start+1050;
@@ -1357,6 +1358,37 @@
     ctx.fillRect(0,-10,8,5);
     ctx.restore();
   }
+  function drawFoundryEnemy(at,kind,faceLeft,offset) {
+    const colors=[['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851']][kind];
+    ctx.save();
+    ctx.translate(at.x,at.y);
+    if(faceLeft) ctx.scale(-1,1);
+    const phase=reducedMotion?0:clock*13+offset;
+    for(let i=0;i<4;i++){
+      const x=-13+i*8;
+      ctx.fillStyle='#38212a';
+      ctx.beginPath();
+      ctx.ellipse(x,15+Math.sin(phase+i*Math.PI)*2,6,6,0,0,Math.PI*2);
+      ctx.fill();
+    }
+    const shell=ctx.createRadialGradient(-8,-11,2,0,0,23);
+    shell.addColorStop(0,colors[0]);shell.addColorStop(1,colors[1]);
+    ctx.fillStyle=shell;
+    ctx.beginPath();
+    if(kind===0){
+      ctx.ellipse(-3,2,20,14,0,0,Math.PI*2);
+    }else if(kind===1){
+      ctx.moveTo(-18,11);ctx.quadraticCurveTo(-22,-11,-7,-19);
+      ctx.quadraticCurveTo(5,-26,15,-8);ctx.lineTo(20,11);
+    }else{
+      ctx.moveTo(-22,12);ctx.lineTo(-15,-9);ctx.lineTo(0,-17);
+      ctx.lineTo(19,-8);ctx.lineTo(23,12);
+    }
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle='#362632';ctx.fillRect(5,-5,13,8);
+    ctx.fillStyle='#fff2c4';ctx.fillRect(13,-4,3,5);
+    ctx.restore();
+  }
   function foePosition(foe) {
     if(foe.bashed && clock<foe.bashed.until){
       const t=.48-(foe.bashed.until-clock);
@@ -1368,6 +1400,13 @@
     const t = clock * (2 * enemyTempo / cadence) + foe.offset;
     const chase = Math.sign(player.x-foe.x);
     const wave = Math.sin(t*2.1);
+    if(foe.foundryEnemy!==undefined){
+      const cycle=(clock+foe.offset)%2.4;
+      const hop=Math.max(0,1-Math.abs(cycle-1.65)/.42);
+      const surge=Math.sin(Math.PI*Math.min(1,Math.max(0,(cycle-.65)/1.35)));
+      const shift=foe.foundryEnemy===1?0:foe.foundryEnemy===2?chase*surge**2*46:wave*24;
+      return {x:patrolX(foe.x+shift),y:foe.y-(foe.foundryEnemy===1?hop*(2-hop)*49:0)};
+    }
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
       case 'charge': return {x:patrolX(foe.x+chase*Math.max(0,wave)*enemyReach),y:foe.y};
@@ -3105,7 +3144,8 @@
       ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression,
         (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression);
       ctx.translate(-at.x,-at.y-19-footstep);
-      if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
+      if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset);
+      else if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
       else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
