@@ -58,7 +58,7 @@
   const descriptions = {
     stomp:index===0?'Land on enemies to bounce. Hold Jump for a higher rebound.':'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim. Charge into enemies from the front. Surface or visit a bubbling vent for air',
     dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
-    throw:'Press Action to throw a crystal', flip:index===7?'Press Flip (X or Space on keyboard) while on the floor or ceiling to reverse gravity':'Press Action to reverse gravity',
+    throw:index===13?'Throw a crystal with Action. Hold the joystick up or use W/Up to arc the throw':'Press Action to throw a crystal', flip:index===7?'Press Flip (X or Space on keyboard) while on the floor or ceiling to reverse gravity':'Press Action to reverse gravity',
     pulse:'Press Action to release a shockwave', grapple:'Press Action below an overhead rail to attach. Steer to swing, then press Release Cable to let go',
     double:'Jump again in midair', shield:'Hold Action to deflect hazards',
     photo:'Press Action to stun enemies with a flash', bubble:'Hold Action to float'
@@ -595,7 +595,13 @@
       const onBeat = isOnBeat(clock % beatPeriod);
       const speed = movement==='whip' ? 240 : power==='throw' ? 700 : 400;
       const life = movement==='whip' ? .24 : movement==='beat' && onBeat ? .72 : power==='throw' ? .8 : .36;
-      attacks.push({x:player.x,y:player.y,v:player.facing*speed,life});
+      const projectile={x:player.x,y:player.y,v:player.facing*speed,life};
+      if(index===13 && power==='throw' && held('up')){
+        projectile.v=player.facing*460;
+        projectile.vy=-285;
+        projectile.gravity=570;
+      }
+      attacks.push(projectile);
       if(player.altWeapon) for(const vy of [-105,105]) attacks.push({x:player.x,y:player.y,v:player.facing*speed,vy,life});
     }
   }
@@ -3495,7 +3501,7 @@
   byId('side-start').onclick=()=>startRun(null);
   resumeButton.hidden=!readCheckpoint();
   resumeButton.onclick=()=>{const saved=readCheckpoint();if(saved)startRun(saved);};
-  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||index===15?'up':'jump',KeyW:power==='swim'||movement==='airdash'||index===15?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
+  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||index===13||index===15?'up':'jump',KeyW:power==='swim'||movement==='airdash'||index===13||index===15?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
   addEventListener('keydown',event=>{
     if(storyDialog?.open) return;
     if(event.code==='KeyP' && !event.repeat && (phase==='playing'||phase==='paused')) {event.preventDefault();togglePause();return;}
@@ -3517,7 +3523,7 @@
   const resetStick=bindTouchJoystick(byId('touch-stick'),direction=>{
     for (const axis of ['left','right','up','down']) mobile.delete(axis);
     if(direction) for(const axis of direction.split(' ')) mobile.add(axis);
-  },{horizontal:power!=='swim' && index!==3 && movement!=='airdash' && index!==15,diagonal:power==='swim'||movement==='airdash'||index===15||index===3});
+  },{horizontal:power!=='swim' && index!==3 && index!==13 && movement!=='airdash' && index!==15,diagonal:power==='swim'||movement==='airdash'||index===13||index===15||index===3});
   document.querySelectorAll('[data-control]').forEach(button=>{
     const control=button.dataset.control;
     const activate=()=>{if(control==='jump')jump();else if(control==='technique')useTechnique();else action();};
