@@ -4358,6 +4358,33 @@
     'pulse','cable','sail','cloud','anvil','branch','orbit','bamboo',
     'pipe','icicle','stone','bubble','rail','column','reed','stem','hull'
   ];
+  const counterpartPlatformTrim = [
+    new Path2D('M-9 3H9M-9-2H9M-4-2V3M4-6V-2'), // forge block courses
+    new Path2D('M-10 4L-5-4H0L5 4H10M-2 4L2-4'), // highway expansion joints
+    new Path2D('M-10 3Q-7-5-3 1T4 0T10-2'), // reef channels
+    new Path2D('M-10 4Q-2 4 3-4H10M-5 4Q0 4 5 0'), // speedway bank ribs
+    new Path2D('M-9 4V-4M9 4V-4M-9-3L9 3M-9 3L9-3'), // ship deck lashings
+    new Path2D('M-9 4Q-5-4 0-4M-5 4Q0-4 5-4M0 4Q5-4 10-4'), // waterfall spray fans
+    new Path2D('M-10-4Q-5 6 0-4Q5 6 10-4M0-4V4'), // parade float hems
+    new Path2D('M-10-4H-4V4H2V-4H10M5 4H9'), // gravity rail contacts
+    new Path2D('M-10 4L-6-3-2 4M1 4L5-4 9 4'), // rhythm hazard spacing ticks
+    new Path2D('M-10 4H10M-10 4L-5-4 0 4 5-4 10 4'), // grapple girder webs
+    new Path2D('M-10 1Q-5-4 1-2H8M-7 4H6Q10 4 10 1'), // wind lift vents
+    new Path2D('M-10-4H10M-7-4V1L-3 4M7-4V1L3 4'), // hanging ledge straps
+    new Path2D('M-10-4H10L6 4H-6ZM-4 0H4'), // pogo armor plates
+    new Path2D('M-10 4L-8-2-5 2-2-4 1 2 4-3 7 1 10-2'), // hillside turf cuts
+    new Path2D('M-10 4V-1L-7-4H7L10-1V4M0-4V4'), // observatory bulkhead locks
+    new Path2D('M-10 3Q-2-1 9-3M-3 1L-6-4M4-2L2 4'), // branch root forks
+    new Path2D('M-10 4V-4H10V4ZM-6-3V3M0-3V3M6-3V3'), // boiler catwalk grates
+    new Path2D('M-10-4Q-7 4-3 4T3-4Q6 4 10 4'), // rooftop fabric folds
+    new Path2D('M-10 4H-5V1H0V-2H5V-4H10'), // stepped bridge joints
+    new Path2D('M-10 4L-7-3H7L10 4M-4 4V0H4V4'), // dock pressure seams
+    new Path2D('M-10-4L-5 0-10 4M-3-4L2 0-3 4M4-4L9 0 4 4'), // sprint arrows
+    new Path2D('M-10 4V1Q-5-8 0 1V4M0 4V1Q5-8 10 1V4'), // chapel arch masonry
+    new Path2D('M-10 4H10M-8-4H8L-6-1H6L-4 2H4'), // pogo ferry spring coils
+    new Path2D('M-10 1L-7-2M-5 2L-2-1M0 2L3-1M5 2L8-1'), // stitched flower decks
+    new Path2D('M-10 0L-6-4-2 0-6 4ZM2 0L6-4 10 0 6 4Z'), // cargo deck tie-downs
+  ];
   function drawPlatformAccents({x,y,w,kind}) {
     if(w<34 || kind==='hazard' || kind==='ceilingSpikes') return;
     // Camera-cull detail work before creating gradients, clipping paths,
@@ -4572,38 +4599,22 @@
         ctx.restore();
       }
     }
-    // Twenty-five authored surface identities. Vary the spacing by
-    // chapter, but keep the primary material language consistent within
-    // each game rather than cycling through unrelated motifs every stage.
-    const courseMotifs=[1,0,3,2,1,3,2,0,1,2,3,0,2,3,0,2,1,3,0,1,1,0,2,3,1];
-    const motif=courseMotifs[index];
-    const pitch=[38,48,57,43,65][motif]+(stage%3)*4;
-    const first=Math.max(0,Math.ceil((Math.max(x,camera-15)-x)/pitch));
-    const last=Math.min(Math.floor(w/pitch),Math.ceil((camera+width-x)/pitch));
-    if(last>=first){
-    ctx.save();
-    ctx.beginPath();
-    const clipStart=Math.max(x,camera-20);
-    const clipEnd=Math.min(x+w,camera+width+20);
-    ctx.rect(clipStart,y-8,Math.max(0,clipEnd-clipStart),15);ctx.clip();
-    ctx.strokeStyle=rim;ctx.fillStyle=face;ctx.lineWidth=1.4;
-    for(let k=first;k<=last;k++){
-      const px=x+k*pitch+pitch*.38;
-      if(px>x+w-9) continue;
-      const seed=(k*13+index*17+stage*29)%7;
-      if(motif===0){ // carved stone blocks
-        ctx.globalAlpha=.48;ctx.strokeRect(px,y-4,14,5);
-      } else if(motif===1){ // metal rivets
-        ctx.globalAlpha=.68;ctx.beginPath();ctx.arc(px,y-1,1.8,0,Math.PI*2);ctx.fill();
-      } else if(motif===2){ // crystal seams
-        ctx.globalAlpha=.55;ctx.beginPath();ctx.moveTo(px,y-5);ctx.lineTo(px+4,y-2);ctx.lineTo(px,y+1);ctx.stroke();
-      } else if(motif===3){ // leaf/wood grain
-        ctx.globalAlpha=.5;ctx.beginPath();ctx.ellipse(px,y-2,5,1.8,-.25,0,Math.PI*2);ctx.stroke();
-      } else { // alternating inset tile caps
-        ctx.globalAlpha=.45;ctx.fillRect(px,y-3,7+seed,2);
+    const pitch=46+(index*7+stage*5)%19;
+    const first=Math.max(0,Math.ceil((camera-20-x)/pitch));
+    const last=Math.min(Math.floor((w-24)/pitch),Math.floor((camera+width+20-x)/pitch));
+    if(first<=last){
+      ctx.save();
+      ctx.strokeStyle=rim;
+      ctx.lineWidth=1.25;
+      ctx.globalAlpha=.66;
+      for(let cell=first;cell<=last;cell++){
+        ctx.save();
+        ctx.translate(x+12+cell*pitch,y+8);
+        ctx.scale(1+((cell+stage+Math.floor(x/16))%4)*.08,1);
+        ctx.stroke(counterpartPlatformTrim[index]);
+        ctx.restore();
       }
-    }
-    ctx.restore();
+      ctx.restore();
     }
     drawSignaturePlatformArt(x,y,w,stage);
     // Readable three-dimensional cap: visible upper face, bright near lip,
