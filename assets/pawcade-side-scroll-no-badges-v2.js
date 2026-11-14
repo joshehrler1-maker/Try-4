@@ -1377,6 +1377,24 @@
     }
   }
 
+  function playPickup() {
+    if(!sound || audio?.state!=='running' || audio.currentTime<nextCueAt) return;
+    playCue(570,760,.09);
+    musicNote(musicRoot+19,audio.currentTime+.053,.14,.025,'sine',masterGain);
+  }
+
+  function playImpact() {
+    if(!sound || audio?.state!=='running' || audio.currentTime<nextCueAt) return;
+    playCue(135,48,.17);
+    musicNote(43,audio.currentTime,.075,.022,'triangle',masterGain);
+  }
+
+  function playSpring() {
+    if(!sound || audio?.state!=='running' || audio.currentTime<nextCueAt) return;
+    playCue(160,570,.17);
+    musicNote(musicRoot+12,audio.currentTime+.075,.13,.022,'triangle',masterGain);
+  }
+
   function updateMusic() {
     if(!sound || document.hidden || audio?.state!=='running' || phase!=='playing' || storyDialog?.open) return;
     const now=audio.currentTime;
@@ -1449,7 +1467,7 @@
   }
   function hit() {
     if (player.grace > 0 || (power === 'shield' && held('action'))) return;
-    playCue(210,85,.18);
+    playImpact();
     burst(player.x,player.y,'#ff8e8e',10);
     if(index===3 && rings){
       for(let i=0;i<Math.min(rings,16);i++){
@@ -1879,7 +1897,7 @@
         p.onIce=p.on && ledge.kind==='ice';
         if(p.on && ledge.kind==='barrel' && held('technique')) {p.vx=p.facing*440;p.vy=-610;p.grapple=.35;p.on=false;}
         if(p.on && ledge.kind==='pogo' && (held('technique') || held('jump'))) {p.vy=-590;p.on=false;}
-        if (ledge.kind === 'spring') {p.vy=-565;p.on=false;playCue(160,570,.17);}
+        if (ledge.kind === 'spring') {p.vy=-565;p.on=false;playSpring();}
         if (p.on && ledge.kind === 'belt') p.surfaceDrift=index===3 ? 120 : index===20 ? 95 : 75;
         if (p.on && ledge.kind === 'current' && index!==2) p.surfaceDrift=-65;
         if (p.on && ledge.kind === 'lift' && held('jump')) {p.vy=-560;p.on=false;}
@@ -1916,7 +1934,7 @@
       if(index===0 && stage<foundryStory.length-1 && showFoundryStory(stage)) return;
     }
     for (const c of crystals) {
-      if (!c.taken && (!c.reefCache || reefCacheOpen) && close(p,c,24,29)) {if(c.refill){p.dashUsed=false;p.power=0;}c.taken=true;burst(c.x,c.y,c.refill?'#82ffe6':'#ffdb80',9);playCue(650,980);taken++;if(index===3)rings++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
+      if (!c.taken && (!c.reefCache || reefCacheOpen) && close(p,c,24,29)) {if(c.refill){p.dashUsed=false;p.power=0;}c.taken=true;burst(c.x,c.y,c.refill?'#82ffe6':'#ffdb80',9);playPickup();taken++;if(index===3)rings++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
     }
     for(let i=looseRings.length-1;i>=0;i--){
       const ring=looseRings[i];
@@ -1938,7 +1956,7 @@
       }
       if(ring.age>3.2) looseRings.splice(i,1);
       else if(ring.age>.45 && close(p,ring,21,25)){
-        looseRings.splice(i,1);rings++;playCue(650,980);hud();
+        looseRings.splice(i,1);rings++;playPickup();hud();
       }
     }
     for (const attack of attacks) {
