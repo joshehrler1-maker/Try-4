@@ -145,7 +145,7 @@
     [1.01,.9,1.16,1.08]
   ];
   const [jumpFactor,holdGravity,releaseGravity,fallGravity]=jumpProfiles[index];
-  const sections = 6;
+  const sections = chapters.length;
   const sectionSize = index===0 || index===16 ? 3020 : 2200;
   const finish = sections * sectionSize;
   const finale = ['guardian','sprint','switch','crystals','summit'][goalType];
@@ -271,7 +271,7 @@
       platforms.push({x:start+2170,y:326,w:300,kind:'floor'});
       platforms.push({x:start+2525,y:326,w:270,kind:'floor'});
       platforms.push({x:start+2840,y:326,w:180,kind:'floor'});
-      platforms.push({x:start+2500+stage*30,y:245-stage%3*18,w:105,kind:'floor'});
+      platforms.push({x:start+2500+stage%6*30,y:245-stage%3*18,w:105,kind:'floor'});
       crystals.push({x:start+2570,y:212-stage%3*18});
       enemies.push({x:start+2660,y:303,offset:stage+8});
     }
@@ -992,7 +992,7 @@
       chapter=stage;
       syncControllerArt(chapter);
       chapterReveal=2;
-      if(index===0)showFoundryStory(stage);
+      if(index===0 && stage<foundryStory.length-1)showFoundryStory(stage);
       saveCheckpoint();
       const nextBeat=stage===sections-1 ? ending : (stage%2===0 ? epilogue : prologue);
       status(chapters[stage] + ' · ' + nextBeat + ' · Checkpoint saved.');
