@@ -65,7 +65,7 @@
   };
   const movementGuide = {
     buster:'Tap Fire to shoot, or hold and release to charge. Jump again while sliding against a wall to kick off.', roll:'Roll through enemies with Action.',
-    float:'Hold Action to float.', beat:'You run automatically. Jump over the beat barriers and use Action to pulse.',
+    float:index===6?'Hold Float (X on keyboard) to rise. Release it to descend.':'Hold Action to float.', beat:'You run automatically. Jump over the beat barriers and use Action to pulse.',
     airdash:'Press Dash in midair. Steer up or down to aim it, and jump against walls to kick off.',
     pogo:'Hold Jump while stomping to bounce higher.',
     precision:'Jump from ledge edges to clear wider gaps.',
@@ -168,6 +168,7 @@
   const techniqueButton = document.querySelector('[data-control=technique]');
   if (techniqueButton) techniqueButton.textContent = techniqueName;
   if(index===2) powerButton.textContent='Charge';
+  if(index===6 && power==='bubble') powerButton.textContent='Float';
   powerButton.hidden = power === 'stomp' || power === 'double' || (power === 'swim' && index!==2) || power === 'glide';
   byId('side-player').hidden = false;
   if (power==='swim') byId('touch-stick').setAttribute('aria-label','Drag in four directions to swim');
@@ -2716,6 +2717,16 @@
         ctx.quadraticCurveTo(x-p.facing*13,y+1,x-p.facing*27,y+9);
         ctx.stroke();
       }
+      ctx.restore();
+    }
+    if(index===6 && power==='bubble' && !p.on && held('action')){
+      ctx.save();
+      ctx.strokeStyle='#ffda94';
+      ctx.lineWidth=1.4;
+      ctx.globalAlpha=.75;
+      ctx.beginPath();
+      ctx.ellipse(p.x,p.y+17,19,6,0,0,Math.PI*2);
+      ctx.stroke();
       ctx.restore();
     }
     const wallSliding=!!p.wall && !p.on && p.vy>0;
