@@ -148,7 +148,7 @@
   const sections = chapters.length;
   const sectionSize = index===0 || index===16 ? 3020 : 2200;
   // Steamworks alternates compact shooting galleries with longer factory runs.
-  const stageWidths=index===16 ? [3020,3270,3020,3460,3220,3020] : Array(sections).fill(sectionSize);
+  const stageWidths=index===0 && sections===18 ? [3170,2390,3300,3110,3075,2520,3420,3160,3310,3100,3030,3500,3205,3140,2980,3310,3680,3250] : index===16 ? [3020,3270,3020,3460,3220,3020] : Array(sections).fill(sectionSize);
   const stageStarts=[0];
   for(const width of stageWidths) stageStarts.push(stageStarts.at(-1)+width);
   const finish=stageStarts[sections];
@@ -315,12 +315,17 @@
       if(x>0) crystals.push({x:start+x+w*.58,y:y-35});
     }
     if(index===0){
-      platforms.push({x:start+2170,y:326,w:300,kind:'floor'});
-      platforms.push({x:start+2525,y:326,w:270,kind:'floor'});
-      platforms.push({x:start+2840,y:326,w:180,kind:'floor'});
-      platforms.push({x:start+2500+stage%6*30,y:245-stage%3*18,w:105,kind:'floor'});
-      crystals.push({x:start+2570,y:212-stage%3*18});
-      enemies.push({x:start+2660,y:303,offset:stage+8});
+      const remaining=stageWidths[stage]-2170;
+      const gap=stage%3===0?52:64;
+      const span=Math.floor((remaining-2*gap)/3);
+      const rise=[36,0,54,46,25,0,55,42,55,18,38,52,53,45,39,30,55,48][stage] ?? 36;
+      const middle=start+2170+span+gap;
+      platforms.push({x:start+2170,y:326,w:span,kind:'floor'});
+      platforms.push({x:middle,y:326-rise,w:span,kind:'floor'});
+      platforms.push({x:middle+span+gap,y:326,w:remaining-2*(span+gap),kind:'floor'});
+      platforms.push({x:middle,y:220-stage%3*10,w:Math.min(span,105),kind:'floor'});
+      crystals.push({x:middle+span*.3,y:286-rise});
+      enemies.push({x:middle+span*.7,y:303-rise,offset:stage+8});
     }
     const feature=setPieces[stage];
     const anchor=start+1050;
