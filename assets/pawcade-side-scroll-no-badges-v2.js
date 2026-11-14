@@ -986,7 +986,10 @@
     platforms.push({x:wall.x-160,y:wall.top+62,w:145,kind:'floor'});
     platforms.push({x:wall.x+24,y:wall.top+49,w:106,kind:'floor'});
   }
-  const tunnels = index===14 ? plan.map((room,stage)=>({x:stageStarts[stage]+480,w:130,y:ground-33})) : [];
+  const observatoryTunnelWidths = [86, 114, 158, 104, 172, 126];
+  const tunnels = index===14 ? plan.map((_,stage)=>({
+    x:stageStarts[stage]+480,w:observatoryTunnelWidths[stage],y:ground-33
+  })) : [];
   const resetPlayer = (x = 100) => ({
     x,y:ground-22,air:airCapacity,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0,spin:0,dashUsed:false,chargeStart:null,climbStamina:1.8,jumpBuffer:0,coyote:0,jumpCut:false
   });
@@ -5311,8 +5314,19 @@
       // Long levels can contain off-screen tunnels; don't issue draw calls
       // for geometry the player cannot see.
       if(t.x+t.w<camera-24 || t.x>camera+width+24)continue;
-      ctx.fillStyle='#50678a';ctx.fillRect(t.x,t.y-13,t.w,13);
-      ctx.fillStyle='#92e4ef';ctx.fillRect(t.x,t.y-13,t.w,2);
+      ctx.fillStyle='#26334d';
+      ctx.fillRect(t.x,t.y,t.w,ground-t.y);
+      ctx.fillStyle='#526d91';
+      ctx.fillRect(t.x,t.y-13,t.w,13);
+      ctx.fillStyle='#a0e8f1';
+      ctx.fillRect(t.x,t.y-2,t.w,2);
+      for(let inset=12;inset<t.w-8;inset+=24){
+        ctx.fillStyle='#354a68';
+        ctx.fillRect(t.x+inset,t.y-11,13,6);
+      }
+      ctx.fillStyle='#ffc478';
+      ctx.fillRect(t.x,t.y-12,4,10);
+      ctx.fillRect(t.x+t.w-4,t.y-12,4,10);
     }
     for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
       if (ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
