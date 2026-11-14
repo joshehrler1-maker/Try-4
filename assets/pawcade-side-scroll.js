@@ -3410,10 +3410,15 @@
         foe.gaitWeight=(foe.gaitWeight||0)+(target-(foe.gaitWeight||0))*(1-Math.exp(-14*elapsed));
       }
       const movingWeight=reducedMotion||travel>=90?0:foe.gaitWeight||0;
-      const footCycle=Math.sin((foe._gait||0)*[.8,1.15,.95,1.35,1.05][index%5]);
-      const footstep=airborne?0:Math.abs(footCycle)*2.2*movingWeight;
-      const enemyLean=reducedMotion?0:footCycle*.045*movingWeight+
-        Math.sin(clock*2+foe.offset)*.012*(1-movingWeight);
+      // Twenty-five authored movement profiles: individual cadence, foot lift,
+      // body lean, idle breathing and gait phase per adventure.
+      const cadence=[.82,1.04,.94,1.27,.76,1.12,.88,1.31,1.08,.71,1.18,.9,1.34,.79,1.02,.86,1.25,.73,1.14,.97,1.42,.84,1.06,1.2,.92][index];
+      const lift=[2.4,1.2,2.8,1.5,3.4,2.1,1.8,2.5,3.2,1.1,2.9,1.7,2.4,3.1,1.5,2.6,1.3,2.8,3.5,1.6,2.2,1.9,3,2.7,1.4][index];
+      const sway=[.038,.021,.045,.016,.06,.03,.025,.018,.048,.014,.04,.022,.027,.052,.019,.041,.017,.033,.055,.02,.023,.029,.05,.044,.018][index];
+      const footCycle=Math.sin((foe._gait||0)*cadence+(foe.offset||0)*.12);
+      const footstep=airborne?0:Math.abs(footCycle)*lift*movingWeight;
+      const enemyLean=reducedMotion?0:footCycle*sway*movingWeight+
+        Math.sin(clock*(1.6+index%4*.23)+foe.offset)*.012*(1-movingWeight);
       const anticipation=!reducedMotion && enemyPattern==='charge' && nearby && !airborne;
       const bodyStretch=movingWeight*(.018+.012*(index%3))*footCycle;
       const chargeCompression=anticipation?.07:0;
@@ -3433,7 +3438,8 @@
       const verticalSpeed=previousY===undefined||blendDt<=0?0:
         Math.max(-650,Math.min(650,(at.y-previousY)/Math.max(.008,blendDt)));
       foe._previousDrawY=at.y;
-      const touchingDown=!airborne && verticalSpeed>55 && (foe._lastVerticalSpeed||0)<verticalSpeed;
+      const touchingDown=!airborne && verticalSpeed>55 &&
+        (foe._lastVerticalSpeed||0)<=0;
       foe._lastVerticalSpeed=verticalSpeed;
       if(touchingDown) foe._landingPose=Math.max(foe._landingPose||0,Math.min(.085,verticalSpeed/4800));
       foe._landingPose=(foe._landingPose||0)*Math.exp(-9*blendDt);
