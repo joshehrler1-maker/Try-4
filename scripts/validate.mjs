@@ -62,6 +62,10 @@ ok((await request(scope+'index.html')).live, 'Online navigation must use network
 offline = true;
 ok((await request(scope+'index.html')).file === 'index.html', 'Offline navigation must use cached page');
 ok((await request(scope+'pawcade-side-scroll.html?game=24')).file === 'pawcade-side-scroll.html', 'Every Pawcade game must open offline');
+const sideScrollPage = read('pawcade-side-scroll.html');
+for (const [, asset] of sideScrollPage.matchAll(/(?:href|src)="(assets\/[^"]+\?[^"]+)"/g)) {
+ ok((await request(scope+asset))?.file === asset, 'Offline Pawcade must serve ' + asset);
+}
 ok(await request(scope+'pawcade-side-scroll.html?game=25') === undefined, 'Unknown game routes must not use the offline game page');
 ok(await request(scope+'operations-center.html') === undefined, 'Do not cache owner preparation tools');
 ok(await request(scope+'index.html?private=1') === undefined,'Do not cache query-bearing requests');

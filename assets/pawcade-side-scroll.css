@@ -184,3 +184,31 @@ a{color:#ffdb99}h1,h2{font-family:Georgia,serif;color:#ffe7b5}
   background-image:none!important;
   background:linear-gradient(110deg,#14264e 0%,#312052 55%,#142c50 100%)!important;
 }
+
+/* Reserve space for both thumbs and the HUD in tablet fullscreen. */
+#side-player.game-fullscreen-expanded{position:fixed}
+@media (min-width:600px) and (min-height:540px){
+  #side-player[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded){
+    display:grid;
+    grid-template-rows:auto auto auto auto auto minmax(0,1fr) auto auto;
+    gap:.25rem;
+    overflow:auto;
+  }
+  #side-player[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) :is(#side-rules,#side-status){
+    margin:.25rem 0;
+  }
+  #side-player[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) #side-canvas{
+    width:100%;height:100%;min-height:0;max-height:none;object-fit:contain;
+  }
+  #side-player[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .side-controls{
+    min-height:112px;justify-content:space-between;
+  }
+  #side-player[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .side-controls .touch-joystick{
+    width:96px;height:96px;flex-basis:96px;
+  }
+  #side-player[data-fullscreen-game]:is(:fullscreen,.game-fullscreen-expanded) .side-controls button{
+    min-height:56px;
+  }
+}
+
+#side-player .side-controls button[hidden]{display:none}

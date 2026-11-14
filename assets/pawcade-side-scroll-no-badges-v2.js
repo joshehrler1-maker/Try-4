@@ -180,7 +180,6 @@
   const ground = 326;
   const status = message => { byId('side-status').textContent = message; };
   const powerButton = document.querySelector('[data-control="action"]');
-  if (index===3) powerButton.style.display='none';
   if (movement==='buster') powerButton.textContent='Fire';
   if (movement==='airdash') powerButton.textContent='Dash';
   const techniqueButton = document.querySelector('[data-control=technique]');
@@ -189,13 +188,16 @@
   if(index===2) powerButton.textContent='Charge';
   if(index===7 && power==='flip') powerButton.textContent='Flip';
   if(index===6 && power==='bubble') powerButton.textContent='Float';
-  powerButton.hidden = power === 'stomp' || power === 'double' || (power === 'swim' && index!==2) || power === 'glide';
+  powerButton.hidden = index===3 || power === 'stomp' || power === 'double' || (power === 'swim' && index!==2) || power === 'glide';
   byId('side-player').hidden = false;
   if (power==='swim') byId('touch-stick').setAttribute('aria-label','Drag in four directions to swim');
   byId('side-title').textContent = hero + ' · ' + name;
+  const fourWayStick = power==='swim' || movement==='airdash' || [3,9,13,15].includes(index);
+  if(index===9) byId('touch-stick').setAttribute('aria-label','Move left or right. While attached, drag up to reel in or down to extend the cable.');
   const controlsGuide = [
     movement==='beat' ? 'Auto-run. Press Space to jump.' :
       power==='swim' ? 'Keyboard: W/A/S/D or arrow keys to swim.' :
+      index===9 ? 'Keyboard: A/D to move, Space to jump, and W/S or Up/Down to adjust the attached cable.' :
       index===3 ? 'Keyboard: A/D or Left/Right to run. Hold S or Down and tap Space to charge your spin dash.' :
       movement==='airdash' ? 'Keyboard: A/D or Left/Right to move, Space to jump, W/S or Up/Down to aim your dash.' :
       'Keyboard: A/D or Left/Right to move, Space for '+(power==='flip'?'Flip':'Jump')+'.',
@@ -227,18 +229,20 @@
       const data=JSON.parse(localStorage.getItem(saveKey));
       if (!data || !Number.isInteger(data.stage) || data.stage<1 || data.stage>=sections ||
           !Array.isArray(data.crystals) || !Array.isArray(data.enemies)) return null;
+      if (![data.crystals, data.enemies].every(list => list.every(id => Number.isSafeInteger(id) && id >= 0))) return null;
       return data;
     } catch {return null;}
   }
   function saveCheckpoint() {
     try {
       localStorage.setItem(saveKey,JSON.stringify({
-        stage:chapter,amberSwitch,reefCacheOpen,
+        stage:chapter,amberSwitch,reefCacheOpen,rings,
         crystals:crystals.flatMap((c,i)=>c.taken?[i]:[]),
         enemies:enemies.flatMap((e,i)=>e.dead?[i]:[])
       }));
-    } catch { /* The game remains playable without storage. */ }
-    resumeButton.hidden=!readCheckpoint();
+    } catch { return false; }
+    resumeButton.hidden=false;
+    return true;
   }
   const plan = window.pawtopiaRoomPlans[index].split(' ');
   const setPieces = window.pawtopiaSetPieces[index].split(' ');
@@ -760,7 +764,7 @@
         ['floor','shelf','floor','shelf','shelf'],
         ['current','floor','lift','current','current'],
         ['belt','spring','floor','belt','spring'],
-        ['shelf','floor','shelf','floor','floor'],
+        ['shelf','floor','shelf','shelf','floor'],
         ['pogo','floor','spring','pogo','pogo'],
         ['spring','floor','lift','spring','spring'],
         ['shelf','belt','lift','floor','shelf']
@@ -921,6 +925,7 @@
     }
   }
   platforms.push({x:finish,y:ground,w:850,kind:'floor'});
+  if(power==='flip') platforms.push({x:finish,y:32,w:850,kind:'ceiling'});
   const returnFloor={x:0,y:ground,w:finish,kind:'floor'};
   if (finale === 'summit') {
     for (let i=0;i<4;i++) platforms.push({x:finish+310+i*110,y:ground-38-i*31,w:119,kind:'lift'});
@@ -1142,7 +1147,7 @@
         if(target && !p.on){
           target.life=0;
           p.vy=-470;
-          p.grace=.35;
+          p.grace=Math.max(p.grace,.35);
           if(!reducedMotion) burst(target.x,target.y,'#ff86dc',10);
         }
         break;
@@ -1207,7 +1212,7 @@
       canvas.focus({preventScroll:true});
       accumulator=0;
       last=performance.now();
-      frame=requestAnimationFrame(loop);
+      if (!storyDialog?.open) frame=requestAnimationFrame(loop);
     }
   }
   pauseButton.onclick=togglePause;
@@ -1245,6 +1250,7 @@
     hud();
   }
   function respawn() {
+    clearInput();
     for(const ledge of platforms) if(ledge.kind==='drop') ledge.dropAt=undefined;
     if(index===11){
       const start=stageStarts[chapter];
@@ -1263,7 +1269,7 @@
     looseRings.length=0;
     rings=0;
     camera=Math.max(0,Math.min(finish+70,player.x-238));
-    status('Back at the stage checkpoint.');
+    status(escape ? 'Back at the reset switch. Race to the entrance!' : 'Back at the stage checkpoint.');
     hud();
   }
   const close = (a,b,x,y) => Math.abs(a.x-b.x)<x && Math.abs(a.y-b.y)<y;
@@ -1302,8 +1308,8 @@
       // gentler in floaty and momentum-based adventures.
       const releaseScale=[.43,.48,.62,.65,.5,.6,.58,.42,.72,.52,
         .64,.36,.58,.54,.5,.55,.55,.5,.6,.62,.68,.55,.52,.62,.58][index];
-      if (p.vy < -jumpSpeed*releaseScale)
-        p.vy=-jumpSpeed*releaseScale;
+      if (p.vy*p.gravity < -jumpSpeed*releaseScale)
+        p.vy=-jumpSpeed*releaseScale*p.gravity;
       p.jumpCut=false;
     }
     p.techCooldown=Math.max(0,(p.techCooldown||0)-dt);
@@ -1584,7 +1590,7 @@
       if (ledge.kind==='rail' || (ledge.dropAt!==undefined && clock>=ledge.dropAt)) continue;
       if (ledge.kind==='ceiling') {
         if (p.gravity<0 && p.vy<=0 && oldY-body>=ledge.y && p.y-body<=ledge.y) {
-          p.y=ledge.y+body;p.vy=0;p.on=true;
+          p.y=ledge.y+body;p.vy=0;p.on=true;p.jumps=0;p.dashUsed=false;p.jumpCut=false;
         }
         continue;
       }
@@ -1596,22 +1602,23 @@
         p.y = ledge.y-body;p.vy = 0;p.on = true;p.jumps = 0;p.dashUsed=false;
         // Consume the buffered jump on the landing tick instead of
         // requiring the player to wait until the next simulation frame.
-        if(p.jumpBuffer>0 && !p.pogo) jump(false);
-        if(p.pogo){p.vy=-410;p.pogo=false;p.on=false;}
         p.jumpCut=false;
+        if (ledge.kind==='spring') p.jumpBuffer=0;
+        else if(p.jumpBuffer>0 && !p.pogo) jump(false);
+        if(p.pogo){p.vy=-410;p.pogo=false;p.on=false;}
         landed = true;
         if(ledge.kind==='drop') ledge.dropAt ??= clock+.38;
-        p.onIce=ledge.kind==='ice';
-        if(ledge.kind==='barrel' && held('technique')) {p.vx=p.facing*440;p.vy=-610;p.grapple=.35;p.on=false;}
-        if(ledge.kind==='pogo' && (held('technique') || held('jump'))) {p.vy=-590;p.on=false;}
+        p.onIce=p.on && ledge.kind==='ice';
+        if(p.on && ledge.kind==='barrel' && held('technique')) {p.vx=p.facing*440;p.vy=-610;p.grapple=.35;p.on=false;}
+        if(p.on && ledge.kind==='pogo' && (held('technique') || held('jump'))) {p.vy=-590;p.on=false;}
         if (ledge.kind === 'spring') {p.vy=-565;p.on=false;}
-        if (ledge.kind === 'belt') p.surfaceDrift=index===3 ? 120 : index===20 ? 95 : 75;
-        if (ledge.kind === 'current' && index!==2) p.surfaceDrift=-65;
-        if (ledge.kind === 'lift' && held('jump')) {p.vy=-560;p.on=false;}
+        if (p.on && ledge.kind === 'belt') p.surfaceDrift=index===3 ? 120 : index===20 ? 95 : 75;
+        if (p.on && ledge.kind === 'current' && index!==2) p.surfaceDrift=-65;
+        if (p.on && ledge.kind === 'lift' && held('jump')) {p.vy=-560;p.on=false;}
       }
     }
     if (power==='bubble' && p.y<48) {p.y=48;p.vy=0;}
-    if (p.y > height+65) {respawn();return;}
+    if (p.y > height+65 || (p.gravity<0 && p.y < -65)) {respawn();return;}
     if(index===2){
       const previous=Math.ceil(p.air);
       const breathing=p.y<=67 || landmarks.some(vent=>vent.cell===7 && close(p,vent,41,60));
@@ -1626,18 +1633,18 @@
       status('Amber switch activated. The upper bridge is open.');
     }
     const stage = stageAt(p.x);
-    if (oldY <= height && p.x>=finish && p.x-p.vx*dt<finish) {
+    if (oldY <= height && p.x>=finish && oldX<finish) {
       status(boss.health ? 'Baron Brasswhirl · '+guardian.hint : finaleExitHint);
     }
     if (stage > chapter && (p.on || (power==='swim' && p.x>=stageStarts[stage]+100))) {
       chapter=stage;
       syncControllerArt(chapter);
       chapterReveal=2;
-      if(index===0 && stage<foundryStory.length-1)showFoundryStory(stage);
-      saveCheckpoint();
+      const checkpointSaved=saveCheckpoint();
       const nextBeat=stage===sections-1 ? ending : (stage%2===0 ? epilogue : prologue);
-      status(chapters[stage] + ' · ' + nextBeat + ' · Checkpoint saved.');
+      status(chapters[stage] + ' · ' + nextBeat + (checkpointSaved ? ' · Checkpoint saved.' : ' · Could not save this checkpoint.'));
       hud();
+      if(index===0 && stage<foundryStory.length-1){showFoundryStory(stage);return;}
     }
     for (const c of crystals) {
       if (!c.taken && (!c.reefCache || reefCacheOpen) && close(p,c,24,29)) {if(c.refill){p.dashUsed=false;p.power=0;}c.taken=true;burst(c.x,c.y,c.refill?'#82ffe6':'#ffdb80',9);playCue(650,980);taken++;if(index===3)rings++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
@@ -1682,22 +1689,31 @@
     hazards = hazards.filter(shot=>shot.life>0 &&
       shot.x>camera-240 && shot.x<camera+width+240);
     for (const foe of enemies) {
-      if (foe.dead || Math.abs(foe.x-p.x)>360) continue;
+      if (foe.dead) continue;
       const position = foePosition(foe);
+      if (Math.abs(position.x-p.x)>360 && !attacks.length) continue;
+      const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
+      if (impact) {
+        foe.dead=true;
+        if (index===1 && impact.blasterShot && impact.damage===1) impact.life=0;
+        continue;
+      }
+      if (Math.abs(position.x-p.x)>360) continue;
       // Fire from the visible enemy position, not its original spawn point.
       // Do not shoot through walls or across different vertical lanes.
       const inLane=Math.abs(p.y-position.y)<105;
       const inRange=Math.abs(p.x-position.x)<320;
       const direction=Math.sign(p.x-position.x);
-      const shotBlocked=platforms.some(ledge=>
+      const canFire=(foe.turret || foe.clockEnemy>=3 || enemyPattern==='turret' || index===16) &&
+        clock>=foe.shotAt && inLane && inRange && direction;
+      const shotBlocked=canFire && platforms.some(ledge=>
         ['floor','shelf','ceiling'].includes(ledge.kind) &&
         ledge.x<Math.max(position.x,p.x) &&
         ledge.x+ledge.w>Math.min(position.x,p.x) &&
         ledge.y<Math.max(position.y,p.y)-6 &&
         ledge.y+17>Math.min(position.y,p.y)+6
       );
-      if ((foe.turret || foe.clockEnemy>=3 || enemyPattern==='turret' || index===16) &&
-          clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
+      if (canFire && !shotBlocked) {
         // Count all enemy shots consistently; the Steamworks parry cycle
         // continues to mark every third shot as parryable.
         // Only advance the firing cycle when an actual shot is emitted.
@@ -1760,12 +1776,7 @@
           attackRhythm*courseFirePace/rangedPressure;
         } // end available-projectile-budget branch
       }
-      const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
-      if(impact){
-        foe.dead=true;
-        if(index===1 && impact.blasterShot && impact.damage===1) impact.life=0;
-      }
-      if (!foe.dead && !(foe.bashed && clock<foe.bashed.until) && close(p,position,29,34)) {
+      if (!(foe.bashed && clock<foe.bashed.until) && close(p,position,29,34)) {
         if(index===2 && p.grapple>0 && (position.x-p.x)*p.facing>=0){
           foe.dead=true;
           if(!reducedMotion) burst(position.x,position.y,'#82ffe6',6);
@@ -1893,31 +1904,33 @@
   // Keep ground enemies anchored to a real ledge and inside its safe patrol
   // bounds. Airborne enemy patterns intentionally retain their flight paths.
   const flyingFoes=['swoop','school'].includes(enemyPattern);
+  const solidSupports=platforms.filter(ledge=>
+    !['hazard','rail','ceiling','ceilingSpikes','current','drop','spring','lift','pogo'].includes(ledge.kind) &&
+    ledge.w>=42
+  );
   for(const foe of enemies){
+    foe.spawnChapter ??= stageAt(foe.x);
     // Authored swimmers and flying enemies keep their intended airborne paths.
     if(flyingFoes || foe.reefEnemy!==undefined ||
        (foe.foundryEnemy!==undefined && [3,7,8,11,14].includes(foe.foundryEnemy))) continue;
-    const supports=platforms.filter(ledge=>
-      !['hazard','rail','ceiling','ceilingSpikes','current','drop','spring','lift','pogo'].includes(ledge.kind) &&
-      ledge.w>=42 &&
-      foe.x>=ledge.x+12 && foe.x<=ledge.x+ledge.w-12 &&
-      Math.abs((ledge.y-23)-foe.y)<28
-    ).sort((a,b)=>Math.abs(a.y-23-foe.y)-Math.abs(b.y-23-foe.y));
-    const ledge=supports[0];
+    let ledge=solidSupports.filter(surface=>
+      foe.x>=surface.x+12 && foe.x<=surface.x+surface.w-12 &&
+      Math.abs(surface.y-23-foe.y)<28
+    ).sort((a,b)=>Math.abs(a.y-23-foe.y)-Math.abs(b.y-23-foe.y))[0];
+    const start=stageStarts[foe.spawnChapter];
+    const end=start+stageWidths[foe.spawnChapter];
+    const spawnOn=surface=>Math.max(surface.x+17,Math.min(surface.x+surface.w-17,foe.x));
+    if(!ledge){
+      ledge=solidSupports.filter(surface=>spawnOn(surface)>=start+100 && spawnOn(surface)<end)
+        .sort((a,b)=>
+          Math.hypot(spawnOn(a)-foe.x,a.y-23-foe.y)-
+          Math.hypot(spawnOn(b)-foe.x,b.y-23-foe.y))[0];
+    }
     if(ledge){
+      foe.x=spawnOn(ledge);
       foe.y=ledge.y-23;
-      const safeInset=Math.min(17,ledge.w/4);
-      foe.patrolLeft=ledge.x+safeInset;
-      foe.patrolRight=ledge.x+ledge.w-safeInset;
-    } else if(Math.abs(foe.y-(ground-23))<35){
-      foe.y=ground-23;
-      // The fallback ground is continuous, but never patrol past a stage
-      // boundary or off the playable course into the exit buffer.
-      const chapterStart=stageStarts[foe.spawnChapter] ?? 30;
-      const chapterEnd=foe.spawnChapter!==undefined ?
-        chapterStart+(stageWidths[foe.spawnChapter] ?? finish) : finish;
-      foe.patrolLeft=Math.min(foe.x,Math.max(chapterStart+18,foe.x-48));
-      foe.patrolRight=Math.max(foe.x,Math.min(chapterEnd-18,finish,foe.x+48));
+      foe.patrolLeft=ledge.x+17;
+      foe.patrolRight=ledge.x+ledge.w-17;
     }
   }
   // Enemy tempo, horizontal reach, and vertical travel in course order.
@@ -2243,10 +2256,11 @@
       const t=.48-(foe.bashed.until-clock);
       return {x:foe.bashed.x+foe.bashed.vx*t,y:foe.bashed.y+foe.bashed.vy*t};
     }
+    const homeDifficulty=Math.min(5,foe.spawnChapter ?? stageAt(foe.x));
     if(foe.reefEnemy!==undefined){
       const [reach,rise,tempo]=reefMotion[foe.reefEnemy];
       // Reef swimmers gain tempo as the courier reaches deeper chapters.
-      const reefPressure=1+Math.min(5,Math.max(0,chapter))*.045;
+      const reefPressure=1+homeDifficulty*.045;
       const phase=clock*tempo*reefPressure+foe.offset;
       return {x:foe.x+Math.sin(phase)*reach,y:foe.y+Math.cos(phase*(foe.reefEnemy%2?2:1))*rise};
     }
@@ -2255,7 +2269,7 @@
       Math.max(foe.patrolLeft,Math.min(foe.patrolRight,x));
     // Later chapters accelerate ordinary patrol cycles without changing
     // each game's unique enemy motion family or the boss encounter.
-    const chapterPressure=1+Math.min(5,Math.max(0,chapter))*0.065;
+    const chapterPressure=1+homeDifficulty*0.065;
     // Each archetype changes actual movement timing, not just its colors.
     // Unique authored foundry/library/reef/clock motion remains prioritized.
     const archetypeTempo=[1,.82,1.18,1.06][foe.archetype??0];
@@ -2273,7 +2287,7 @@
     if(foe.foundryEnemy!==undefined){
       // Foundry enemies have authored hop/charge cycles; scale the entire
       // cycle rather than replacing their distinct attack motion.
-      const foundryPressure=1+Math.min(5,Math.max(0,chapter))*.05;
+      const foundryPressure=1+homeDifficulty*.05;
       const cycle=(clock*foundryPressure+foe.offset)%2.4;
       const hop=Math.max(0,1-Math.abs(cycle-1.65)/.42);
       const surge=Math.sin(Math.PI*Math.min(1,Math.max(0,(cycle-.65)/1.35)));
@@ -4669,7 +4683,7 @@
     const waterWorld=[2,19].includes(index);
     const aerialWorld=[5,6,10,15,23].includes(index);
     const combatWorld=[0,4,12,16,21,24].includes(index);
-    const chapterWeight=1+Math.min(5,Math.max(0,chapter))*.045;
+    const chapterWeight=1+Math.min(5,foe.spawnChapter)*.045;
     const poseStride=strideScale*movementRig[0]*chapterRigScale*enemyStrideVariant*(speedWorld?1.22:waterWorld?.55:1);
     const poseArm=armScale*movementRig[1]*(combatWorld?1.22:waterWorld?1.4:1);
     const poseKnee=kneeScale*(aerialWorld?.55:1);
@@ -5716,6 +5730,7 @@
         clearInput();
         canvas.focus({preventScroll:true});
         if(phase==='playing'){
+          accumulator=0;
           last=performance.now();
           frame=requestAnimationFrame(loop);
         }
@@ -5737,7 +5752,7 @@
     last=now;
     draw();
     if(phase==='playing' && !storyDialog?.open) frame=requestAnimationFrame(loop);
-    if(phase==='won') {pauseButton.disabled=true;playCue(440,880,.3);if(index===0)showFoundryStory(6);}
+    if(phase==='won') {clearInput();pauseButton.disabled=true;playCue(440,880,.3);if(index===0)showFoundryStory(6);}
   }
   function startRun(saved) {
     cancelAnimationFrame(frame);
@@ -5746,6 +5761,7 @@
     syncControllerArt(0);
     if (saved) {
       chapter=saved.stage;
+      if(index===3 && Number.isSafeInteger(saved.rings) && saved.rings>=0) rings=saved.rings;
       syncControllerArt(chapter);
       amberSwitch=saved.amberSwitch===true;
       reefCacheOpen=saved.reefCacheOpen===true;
@@ -5770,7 +5786,7 @@
   byId('side-start').onclick=()=>startRun(null);
   resumeButton.hidden=!readCheckpoint();
   resumeButton.onclick=()=>{const saved=readCheckpoint();if(saved)startRun(saved);};
-  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||index===13||index===15?'up':'jump',KeyW:power==='swim'||movement==='airdash'||index===13||index===15?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
+  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||[9,13,15].includes(index)?'up':'jump',KeyW:power==='swim'||movement==='airdash'||[9,13,15].includes(index)?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
   addEventListener('keydown',event=>{
     if(storyDialog?.open) return;
     if(event.code==='KeyP' && !event.repeat && (phase==='playing'||phase==='paused')) {event.preventDefault();togglePause();return;}
@@ -5787,12 +5803,17 @@
       if(control==='technique') useTechnique();
     }
   });
-  addEventListener('keyup',event=>{const control=codes[event.code];pressedCodes.delete(event.code);if(!Array.from(pressedCodes).some(code=>codes[code]===control)) keys.delete(control);if(control==='action')releaseAction(true);});
+  addEventListener('keyup',event=>{
+    if (!pressedCodes.delete(event.code)) return;
+    const control=codes[event.code];
+    if (!Array.from(pressedCodes).some(code=>codes[code]===control)) keys.delete(control);
+    if (control==='action') releaseAction(true);
+  });
   addEventListener('blur',clearInput);
   const resetStick=bindTouchJoystick(byId('touch-stick'),direction=>{
     for (const axis of ['left','right','up','down']) mobile.delete(axis);
     if(direction) for(const axis of direction.split(' ')) mobile.add(axis);
-  },{horizontal:power!=='swim' && index!==3 && index!==13 && movement!=='airdash' && index!==15,diagonal:power==='swim'||movement==='airdash'||index===13||index===15||index===3});
+  },{horizontal:!fourWayStick,diagonal:fourWayStick});
   document.querySelectorAll('[data-control]').forEach(button=>{
     const control=button.dataset.control;
     const activate=()=>{if(control==='jump')jump();else if(control==='technique')useTechnique();else action();};
@@ -5803,7 +5824,7 @@
       if(previous!==null && button.hasPointerCapture(previous)) button.releasePointerCapture(previous);
     });
     button.onpointerdown=event=>{
-      if(pointer!==null || phase!=='playing') return;
+      if(pointer!==null || phase!=='playing' || event.button!==0) return;
       pointer=event.pointerId;
       event.preventDefault();button.setPointerCapture(event.pointerId);mobile.add(control);activate();
     };
