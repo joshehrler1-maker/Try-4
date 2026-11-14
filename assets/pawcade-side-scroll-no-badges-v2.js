@@ -228,6 +228,8 @@
   const crystals = [];
   const landmarks=[];
   let player, boss, phase, camera, frame, last, clock, chapter, taken, attacks, hazards, escape;
+  let escapeRetries = 0;
+  let escapeCrystals = 0;
   // Color, silhouette, reach and duration for each adventure's signature move.
   const signatureEffects=[
     ['#ffbe69','arc',82,.32], // Cape sweep
@@ -998,6 +1000,8 @@
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
     escape = null;
+    escapeRetries = 0;
+    escapeCrystals = 0;
     particles.length=0;
     signatureEffect=null;
     landingEffect=null;
@@ -1500,7 +1504,10 @@
       }
     }
     player = resetPlayer(escape ? finish+635 : stageStarts[chapter] + 100);
-    if (escape) escape=95;
+    if (escape) {
+      escapeRetries++;
+      escape=95;
+    }
     player.grace = 1.1;
     attacks = [];
     hazards = [];
@@ -1539,7 +1546,14 @@
     if (escape) {
       escape-=dt;
       if (escape<=0) {escape=95;respawn();return;}
-      if (player.x<115) {phase='won';status(ending+'!');return;}
+      if (player.x<115) {
+        const rank = escapeRetries === 0 && escape >= 55 && escapeCrystals >= 3 ? 'S' :
+          escapeRetries === 0 && escape >= 40 ? 'A' : escape >= 25 ? 'B' : 'C';
+        phase='won';
+        status(ending+'! · Rank '+rank+' · '+escapeCrystals+' crystals at reset · '+
+          Math.ceil(escape)+'s left · '+escapeRetries+' retries');
+        return;
+      }
       if (Math.floor(escape)!==Math.floor(escape+dt)) status('Escape back to the entrance · '+Math.ceil(escape)+'s');
     }
     const p = player;
@@ -2106,8 +2120,9 @@
       if (p.x>exitX-20 && exitReady) {
         if (index===20 && escape===null) {
           escape=95;
+          escapeCrystals=taken;
           playCue(700,185,.25);
-          status('Reset triggered. Race back to the entrance!');
+          status('Reset triggered. Race back to the entrance! Finish with 55s left, 3 crystals at reset, and no retries for S rank.');
         } else if (index!==20) {phase='won';status(ending+'!');}
       }
     }
