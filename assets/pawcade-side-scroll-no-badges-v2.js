@@ -648,7 +648,13 @@
         const upperWidth=Math.min(92,Math.max(68,span*.34));
         const upperX=middle+span-upperWidth-22;
         const upperY=220-stage%3*10+(stage%2?19:-16);
-        if(upperY>=140 && upperX>middle+112){
+        // Do not place optional platforms through authored platforms,
+        // ceilings or moving obstacles. The clear gap also prevents
+        // overlapping decorative surfaces from obscuring a landing.
+        const upperClear=platforms.every(p=>
+          p.x>=upperX+upperWidth+12 || p.x+p.w<=upperX-12 ||
+          Math.abs(p.y-upperY)>=32);
+        if(upperY>=140 && upperX>middle+112 && upperClear){
           platforms.push({x:upperX,y:upperY,w:upperWidth,kind:'floor',
             optionalRoute:true});
           crystals.push({x:upperX+upperWidth*.5,y:upperY-35});
