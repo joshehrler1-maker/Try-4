@@ -6006,6 +6006,15 @@
       const motion=reducedMotion?0:Math.sin(clock*(airborne?9:6)+foe.offset);
       // Enemy gait follows visible world travel, not elapsed time. Reset on
       // large position changes so teleports and respawns never spin the gait.
+      if(clock-(foe.gaitTime??clock)>.15){
+        foe._drawX=at.x;
+        foe._previousDrawY=at.y;
+        foe._lastVerticalSpeed=0;
+        foe._bodyVelocity=0;
+        foe._landingPose=0;
+        foe.gaitWeight=0;
+        foe.gaitTime=clock;
+      }
       const displacement=at.x-(foe._drawX??at.x);
       const travel=Math.abs(displacement);
       const faceLeft=foe.turret || firing || (nearby && ['turret','charge','pursuit'].includes(enemyPattern))
