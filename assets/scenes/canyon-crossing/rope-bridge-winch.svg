@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Rope Bridge — original canyon drawbridge winch"><defs><linearGradient id="bamboo" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e9c38b"/><stop offset=".27" stop-color="#855a49"/><stop offset=".65" stop-color="#1c2b3e"/><stop offset="1" stop-color="#855a49"/></linearGradient><linearGradient id="lantern" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#fff9d6"/><stop offset=".48" stop-color="#ecd6b0"/><stop offset="1" stop-color="#ba7d4e"/></linearGradient><radialGradient id="aura"><stop stop-color="#e9c38b" stop-opacity=".9"/><stop offset=".44" stop-color="#ecd6b0" stop-opacity=".33"/><stop offset="1" stop-color="#e9c38b" stop-opacity="0"/></radialGradient></defs><ellipse cx="90" cy="98" rx="70" ry="59" fill="url(#aura)" opacity=".2"/>
+<path d="M37 156V32h30v124M117 156V32h29v124" fill="url(#bamboo)" stroke="#513e35" stroke-width="5"/>
+<path d="M26 31h130" stroke="#d8ba88" stroke-width="10"/>
+<path d="M44 31V11m91 20V11" stroke="#d6bd8d" stroke-width="7"/>
+<path d="M46 48 90 76l43-28" fill="none" stroke="#e8c99d" stroke-width="5"/>
+<circle cx="91" cy="97" r="34" fill="#504c4b" stroke="#b4a28a" stroke-width="6"/>
+<circle cx="91" cy="97" r="22" fill="#9f7960" stroke="#edd5a2" stroke-width="5"/>
+<path d="M91 76v42M70 97h42M75 81l32 32M107 81l-32 32" stroke="#e6c68f" stroke-width="5"/>
+<circle cx="91" cy="97" r="8" fill="#f4dfa7"/>
+<path d="M91 130v20m-21 0h44" stroke="#d2aa79" stroke-width="6"/>
+<path d="M16 158h148" stroke="#7d564a" stroke-width="10"/>
+<path d="M16 137l21-12m106-8 21 18" stroke="#e5ceae" stroke-width="5"/></svg>
