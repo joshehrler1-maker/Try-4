@@ -1996,7 +1996,7 @@
       p.y=edge.y+19;
       p.vx=p.vy=0;
     }
-    let landed = false;
+    let landingSurface=null;
     for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
       if(ledge.switchBridge && !amberSwitch) continue;
       if (p.x < ledge.x-8 || p.x > ledge.x+ledge.w+8) continue;
@@ -2021,45 +2021,50 @@
       if (ledge.kind === 'shelf' && p.y+body > ledge.y+20 && p.y-body < ledge.y+20 && p.vy < 0) {
         p.y=ledge.y+20+body;p.vy=0;
       }
-      if (!landed && p.vy >= 0 && oldY+body <= ledge.y && p.y+body >= ledge.y) {
-        if(!wasGrounded && p.vy>190) {
-          p.landingPose=.13;
-          landingEffect={x:p.x,y:ledge.y,at:clock,speed:p.vy,kind:ledge.kind};
-        }
-        p.y = ledge.y-body;p.vy = 0;p.on = true;p.jumps = 0;p.dashUsed=false;
-        // Consume the buffered jump on the landing tick instead of
-        // requiring the player to wait until the next simulation frame.
-        p.jumpCut=false;
-        const barrelLaunch=!p.pogo && ledge.kind==='barrel' && held('technique');
-        const pogoLaunch=!p.pogo && ledge.kind==='pogo' && (held('technique') || held('jump'));
-        const liftLaunch=!p.pogo && ledge.kind==='lift' && held('jump');
-        const springLaunch=ledge.kind==='spring';
-        if (springLaunch || p.pogo || barrelLaunch || pogoLaunch || liftLaunch) {
-          if (barrelLaunch) {
-            p.vx=p.facing*440;
-            p.grapple=.35;
-          }
-          if (springLaunch) {
-            p.vy=-565;
-            playSpring();
-          } else if (p.pogo) {
-            p.vy=index===22 && held('technique') ? -530 : -410;
-          } else {
-            p.vy=barrelLaunch ? -610 : pogoLaunch ? -590 : -560;
-          }
-          p.pogo=false;
-          p.on=false;
-          p.jumpBuffer=0;
-          p.coyote=0;
-        } else if (p.jumpBuffer>0) {
-          jump(false);
-        }
-        landed = true;
-        if(ledge.kind==='drop') ledge.dropAt ??= clock+.38;
-        p.onIce=p.on && ledge.kind==='ice';
-        if (p.on && ledge.kind === 'belt') p.surfaceDrift=index===3 ? 120 : index===20 ? 95 : 75;
-        if (p.on && ledge.kind === 'current' && index!==2) p.surfaceDrift=-65;
+      if (p.vy>=0 && oldY+body<=ledge.y && p.y+body>=ledge.y &&
+          (!landingSurface || ledge.y<landingSurface.y ||
+           (ledge.y===landingSurface.y && landingSurface.kind==='floor' && ledge.kind!=='floor'))){
+        landingSurface=ledge;
       }
+    }
+    if(landingSurface){
+      const ledge=landingSurface;
+      if(!wasGrounded && p.vy>190) {
+        p.landingPose=.13;
+        landingEffect={x:p.x,y:ledge.y,at:clock,speed:p.vy,kind:ledge.kind};
+      }
+      p.y = ledge.y-body;p.vy = 0;p.on = true;p.jumps = 0;p.dashUsed=false;
+      // Consume the buffered jump on the landing tick instead of
+      // requiring the player to wait until the next simulation frame.
+      p.jumpCut=false;
+      const barrelLaunch=!p.pogo && ledge.kind==='barrel' && held('technique');
+      const pogoLaunch=!p.pogo && ledge.kind==='pogo' && (held('technique') || held('jump'));
+      const liftLaunch=!p.pogo && ledge.kind==='lift' && held('jump');
+      const springLaunch=ledge.kind==='spring';
+      if (springLaunch || p.pogo || barrelLaunch || pogoLaunch || liftLaunch) {
+        if (barrelLaunch) {
+          p.vx=p.facing*440;
+          p.grapple=.35;
+        }
+        if (springLaunch) {
+          p.vy=-565;
+          playSpring();
+        } else if (p.pogo) {
+          p.vy=index===22 && held('technique') ? -530 : -410;
+        } else {
+          p.vy=barrelLaunch ? -610 : pogoLaunch ? -590 : -560;
+        }
+        p.pogo=false;
+        p.on=false;
+        p.jumpBuffer=0;
+        p.coyote=0;
+      } else if (p.jumpBuffer>0) {
+        jump(false);
+      }
+      if(ledge.kind==='drop') ledge.dropAt ??= clock+.38;
+      p.onIce=p.on && ledge.kind==='ice';
+      if (p.on && ledge.kind === 'belt') p.surfaceDrift=index===3 ? 120 : index===20 ? 95 : 75;
+      if (p.on && ledge.kind === 'current' && index!==2) p.surfaceDrift=-65;
     }
     if (power==='bubble' && p.y<48) {p.y=48;p.vy=0;}
     if (p.y > height+65 || (p.gravity<0 && p.y < -65)) {respawn();return;}
