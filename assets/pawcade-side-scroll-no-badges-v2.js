@@ -7036,13 +7036,14 @@
        event.target?.closest?.('input,select,textarea,[contenteditable]')) return;
     if(event.code==='KeyP' && !event.repeat && (phase==='playing'||phase==='paused')) {event.preventDefault();togglePause();return;}
     const control=codes[event.code];
-    if(!control || phase!=='playing' || event.target?.closest?.('button,a')) return;
+    if(!control || phase!=='playing') return;
+    if(event.code==='Space' && event.target?.closest?.('button,a')) return;
     event.preventDefault();
-    if(event.repeat && !pressedCodes.has(event.code)) return;
+    if(event.repeat || pressedCodes.has(event.code)) return;
     const alreadyHeld=held(control);
     pressedCodes.add(event.code);
     keys.add(control);
-    if(!alreadyHeld && !event.repeat) {
+    if(!alreadyHeld) {
       if(control==='jump') jump();
       if(control==='action') action();
       if(control==='technique') useTechnique();
@@ -7071,8 +7072,10 @@
     button.onpointerdown=event=>{
       if(pointer!==null || phase!=='playing' || event.button!==0) return;
       const alreadyHeld=held(control);
+      try {button.setPointerCapture(event.pointerId);} catch {return;}
       pointer=event.pointerId;
-      event.preventDefault();button.setPointerCapture(event.pointerId);mobile.add(control);
+      event.preventDefault();
+      mobile.add(control);
       if(!alreadyHeld) activate();
     };
     for(const event of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(event,e=>{
