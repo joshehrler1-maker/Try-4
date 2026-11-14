@@ -4165,7 +4165,6 @@
           ctx.moveTo(mx-6,y-4.5);ctx.lineTo(mx-4,y-4.5);
           ctx.moveTo(mx+4,y-4.5);ctx.lineTo(mx+6,y-4.5);ctx.stroke();
         }
-      }
       }else if(['leaf','petal','coral','wood','wind','wave','cloud','snow'].includes(marking)){
         // Individually drawn silhouettes, not the same oval recolored
         // for eight otherwise unrelated game worlds.
