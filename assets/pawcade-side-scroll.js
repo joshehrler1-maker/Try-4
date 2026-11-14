@@ -1628,6 +1628,14 @@
     }
     ctx.restore();
   }
+  function drawDropWarning({x,y,w,dropAt}) {
+    if(dropAt===undefined) return;
+    const remaining=Math.max(0,Math.min(1,(dropAt-clock)/.38));
+    ctx.fillStyle='#211521';
+    ctx.fillRect(x,y-6,w,3);
+    ctx.fillStyle='#ffc17f';
+    ctx.fillRect(x,y-6,w*(reducedMotion?1:remaining),3);
+  }
   function drawLandingEdge({x,y,w}) {
     const rim=courseMaterials[index][2];
     // Two tones keep the landing line visible against both bright and dark scenery.
@@ -2393,10 +2401,6 @@
         ctx.fillStyle='#aab7c6';ctx.fillRect(ledge.x,ledge.y,ledge.w,4);
         continue;
       }
-      if(ledge.dropAt!==undefined && !reducedMotion) {
-        ctx.fillStyle='#ffc17f';
-        ctx.fillRect(ledge.x,ledge.y-2,ledge.w*Math.max(0,(ledge.dropAt-clock)/.38),2);
-      }
       if(ledge.kind==='ceilingSpikes'){
         ctx.save();
         ctx.translate(ledge.x,ledge.y);
@@ -2442,7 +2446,8 @@
         }
         if(ledge.kind!=='hazard' && ledge.kind!=='rail' && ledge.kind!=='ceiling') {
           drawPlatformConstruction(ledge,depth);
-          if(ledge.dropAt===undefined) drawLandingEdge(ledge);
+          drawLandingEdge(ledge);
+          drawDropWarning(ledge);
         }
         continue;
       }
@@ -2464,7 +2469,8 @@
       ctx.fillRect(ledge.x,ledge.y,ledge.w,ledge.kind==='hazard'?43:ledge.kind==='floor'?65:18);
       if(ledge.kind!=='rail' && ledge.kind!=='ceiling') {
         drawPlatformConstruction(ledge,depth);
-        if(ledge.dropAt===undefined) drawLandingEdge(ledge);
+        drawLandingEdge(ledge);
+        drawDropWarning(ledge);
       }
       if (ledge.kind==='belt' || ledge.kind==='spring' || ledge.kind==='lift') {
         ctx.fillStyle='#ffffff4d';
