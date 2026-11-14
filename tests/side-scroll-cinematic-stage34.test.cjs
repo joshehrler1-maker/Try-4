@@ -99,7 +99,7 @@ for (const scene of scenes) {
   assert(!/<script\\b|<foreignObject\\b|<image\\b|<filter\\b|(?:xlink:)?href=/i.test(data),'No active/remote/heavy SVG elements');
   assert(src.includes("'"+scene.path+"'"),scene.path+' linked into renderer');
   assert(sw.includes("'"+scene.path+"'"),scene.path+' cached for offline');
-  assert(src.includes('['+scene.x+', '+scene.y+', '+scene.w+', '+scene.h+']'),'Placement missing '+scene.path);
+  assert(src.includes("'"+scene.path+"', "+scene.x+", "+scene.y+", "+scene.w+", "+scene.h+"]"),'Placement missing '+scene.path);
 }
 assert(src.includes('stage:offset + 2'),'Use stages 3/4 only');
 assert(src.includes('stageStarts[slot.stage] + slot.x'),'Stage-local offsets');
