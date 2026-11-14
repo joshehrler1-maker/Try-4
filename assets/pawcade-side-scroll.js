@@ -1082,6 +1082,12 @@
         // committed airborne jumps under enemy fire.
         const cargoGrip=p.on?(steer?1.35:1.5):(reversing?.6:.82);
         p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*cargoGrip);
+      }else if(index===5){
+        // Waterfall Climb: responsive ground movement paired with
+        // gentle aerial corrections for gliding between icy ledges.
+        // Ice friction and glide gravity remain in their own systems.
+        const waterfallGrip=p.onIce?.72:(p.on?1.18:(held('jump')?.62:.92));
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*waterfallGrip);
       }else{
         p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
       }
