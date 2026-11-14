@@ -490,7 +490,7 @@
     amberSwitch=false;
     reefCacheOpen=false;
     player = resetPlayer();
-    boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:3,grace:0,time:0,nextShot:1};
+    boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
     enemies.forEach(e => {e.dead = false;e.shotAt=0;e.bashed=null;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
