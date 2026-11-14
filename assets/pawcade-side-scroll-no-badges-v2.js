@@ -174,7 +174,7 @@
   const sections = chapters.length;
   const sectionSize = index===0 || index===16 ? 3020 : 2200;
   // Steamworks alternates compact shooting galleries with longer factory runs.
-  const stageWidths=index===0 && sections===18 ? [3170,2390,3300,3110,3075,2520,3420,3160,3310,3100,3030,3500,3205,3140,2980,3310,3680,3250] : index===16 ? [3020,3270,3020,3460,3220,3020] : Array(sections).fill(sectionSize);
+  const stageWidths=index===0 && sections===18 ? [3170,2390,3300,3110,3075,2520,3420,3160,3310,3100,3030,3500,3205,3140,2980,3310,3680,3250] : index===16 ? [3020,3270,3020,3460,3220,3020] : index===1 && sections===6 ? [2200,2200,2200,2200,3750,2200] : Array(sections).fill(sectionSize);
   const stageStarts=[0];
   for(const width of stageWidths) stageStarts.push(stageStarts.at(-1)+width);
   const finish=stageStarts[sections];
@@ -440,7 +440,14 @@
       [4,.66], // Volcanic Ridge: landing beyond the last spring.
       [4,.57], // Crystal Cavern: high shelf before the floor hazard.
     ][stage] : null;
-    const pieces = window.pawtopiaRooms[room];
+    const pieces = index===1 && room==='minecart' && stageWidths[stage]===3750
+      ? [
+          [0,326,3750],[248,278,381,'belt'],[683,233,297,'belt'],
+          [1031,270,265],[1348,244,315,'belt'],[1717,285,305,'belt'],
+          [2081,265,310],[2448,226,272,'belt'],[2774,253,290,'belt'],
+          [3118,213,260],[3430,275,217,'belt'],
+        ]
+      : window.pawtopiaRooms[room];
     for (const [slot, [x, y, w, kind = 'floor']] of pieces.entries()) {
       platforms.push({x:start+x,y,w,kind});
       // Decorative, dangerous, temporary and overhead surfaces are not
