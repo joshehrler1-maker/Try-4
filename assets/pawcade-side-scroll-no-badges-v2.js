@@ -1138,7 +1138,9 @@
     }
     if (movement==='airdash' && player.dashUsed) return;
     if (phase !== 'playing' || player.power > 0 || (movement==='airdash' && player.on)) return;
-    if (index===7 && power==='flip' && !player.on) return;
+    if (power==='flip' && !player.on) return;
+    const anchor=power==='grapple' && !player.cable ? findGrappleAnchor(player) : null;
+    if(power==='grapple' && !anchor) return;
     player.power = movement==='buster' || movement==='shooter' ? .24 : .48;
     if (power === 'dash') {
       player.vx = player.facing * (movement==='roll'?460:660);
@@ -1162,13 +1164,10 @@
         burst(player.x,player.y+17,'#a7f08b',8);
       }
     }
-    if (power === 'grapple') {
-      const anchor = findGrappleAnchor(player);
-      if (anchor && !player.cable) {
+    if (anchor) {
           player.cable={x:anchor.x,y:anchor.y,length:anchor.distance,maxLength:Math.max(240,anchor.distance)};
           player.vx+=player.facing*130;
           playCue(180,620,.14);
-      }
     }
     if (power === 'throw' || power === 'pulse' || power === 'photo') {
       const onBeat = isOnBeat(clock % beatPeriod);
@@ -1324,6 +1323,8 @@
         if(edge){
           const left=p.x<=edge.x;
           p.ledgeGrip={edge,left};
+          p.coyote=0;
+          p.jumpCut=false;
           p.x=left?edge.x-12:edge.x+edge.w+12;
           p.y=edge.y+19;
           p.vx=p.vy=0;
