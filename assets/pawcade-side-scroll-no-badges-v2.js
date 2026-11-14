@@ -3626,9 +3626,23 @@
         }
       }else{
         // Mountain, castle and canyon courses: distant carved ridges.
-        ctx.moveTo(cx-28,baseline-12);
-        ctx.lineTo(cx-7,top+44);ctx.lineTo(cx+5,top+55);
-        ctx.lineTo(cx+19,top+30);ctx.lineTo(cx+34,baseline-12);
+        // Distinct rocky silhouettes: staggered canyon strata, pointed
+        // mountain ridges, and castle-like escarpments share no one stamp.
+        const ridge=22+(index%4)*5;
+        if(index%3===0){
+          ctx.moveTo(cx-ridge,baseline-12);
+          ctx.lineTo(cx-8,top+44);ctx.lineTo(cx+3,top+55);
+          ctx.lineTo(cx+ridge-8,top+30);ctx.lineTo(cx+ridge,baseline-12);
+        }else if(index%3===1){
+          ctx.moveTo(cx-ridge,baseline-12);
+          ctx.lineTo(cx-6,top+27);ctx.lineTo(cx,top+44);
+          ctx.lineTo(cx+9,top+18);ctx.lineTo(cx+ridge,baseline-12);
+        }else{
+          ctx.moveTo(cx-ridge,baseline-12);
+          ctx.lineTo(cx-ridge+7,top+47);ctx.lineTo(cx+1,top+47);
+          ctx.lineTo(cx+1,top+26);ctx.lineTo(cx+ridge-7,top+26);
+          ctx.lineTo(cx+ridge,baseline-12);
+        }
       }
       ctx.stroke();
       ctx.restore();
