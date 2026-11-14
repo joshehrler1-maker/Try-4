@@ -2094,10 +2094,12 @@
       case 'rhythm': { // Geometry Dash-inspired predictable beat timing
         const beat=Math.floor(t*1.5);
         const beatPhase=(t*1.5)%1;
-        const bounce=Math.sin(beatPhase*Math.PI);
+        // A brief planted beat makes the next jump readable on touchscreens.
+        const jumpPhase=Math.max(0,(beatPhase-.18)/.82);
+        const bounce=Math.sin(jumpPhase*Math.PI);
         const direction=beat%2===0?1:-1;
         return {x:patrolX(foe.x+direction*enemyReach*.72),
-          y:foe.y-Math.max(0,bounce)*enemyRise};
+          y:foe.y-Math.max(0,bounce)**2*enemyRise};
       }
       default: return {x:patrolX(foe.x+wave*enemyReach),y:foe.y};
     }
