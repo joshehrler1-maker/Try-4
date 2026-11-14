@@ -2298,6 +2298,7 @@
           if(index===12 && p.pogo && !reducedMotion){
             burst(position.x,position.y-12,'#b8eeff',8);
           }
+          if((index===12 || index===22) && p.pogo) p.pogoRebound=clock;
           if(index===0) p.stompImpact={x:p.x,y:p.y+22,time:clock};
           p.vy=p.pogo || (movement==='pogo' && held('jump')) ? -560 :
             index===0 && held('jump') ? -440 : -320;
@@ -6397,6 +6398,10 @@
         tilt=p.facing*.06;
         scaleX=.91;
         scaleY=1.16;
+      } else if(clock-(p.pogoRebound??-Infinity)<.18){
+        const rebound=Math.max(0,1-(clock-p.pogoRebound)/.18);
+        scaleX=1+.13*rebound;
+        scaleY=1-.16*rebound;
       } else if(index===18 && p.ledgeGrip){
         tilt=(p.ledgeGrip.left?1:-1)*.16;
         scaleX=.94;
