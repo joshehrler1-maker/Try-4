@@ -1997,6 +1997,7 @@
       p.vx=p.vy=0;
     }
     let landingSurface=null;
+    let upperContact=null;
     for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
       if(ledge.switchBridge && !amberSwitch) continue;
       if (p.x < ledge.x-8 || p.x > ledge.x+ledge.w+8) continue;
@@ -2012,19 +2013,30 @@
         continue;
       }
       if (p.ledgeGrip || ledge.kind==='rail' || (ledge.dropAt!==undefined && clock>=ledge.dropAt)) continue;
-      if (ledge.kind==='ceiling') {
-        if (p.gravity<0 && p.vy<=0 && oldY-body>=ledge.y && p.y-body<=ledge.y) {
-          p.y=ledge.y+body;p.vy=0;p.on=true;p.jumps=0;p.dashUsed=false;p.jumpCut=false;
+      const ceiling=ledge.kind==='ceiling';
+      if(ceiling || ledge.kind==='shelf'){
+        const underside=ledge.y+(ceiling?0:20);
+        if((!ceiling || p.gravity<0) && p.vy<0 &&
+           oldY-body>=underside && p.y-body<=underside &&
+           (!upperContact || underside>upperContact.y)){
+          upperContact={y:underside,ceiling};
         }
-        continue;
-      }
-      if (ledge.kind === 'shelf' && p.y+body > ledge.y+20 && p.y-body < ledge.y+20 && p.vy < 0) {
-        p.y=ledge.y+20+body;p.vy=0;
+        if(ceiling) continue;
       }
       if (p.vy>=0 && oldY+body<=ledge.y && p.y+body>=ledge.y &&
           (!landingSurface || ledge.y<landingSurface.y ||
            (ledge.y===landingSurface.y && landingSurface.kind==='floor' && ledge.kind!=='floor'))){
         landingSurface=ledge;
+      }
+    }
+    if(upperContact){
+      p.y=upperContact.y+body;
+      p.vy=0;
+      p.jumpCut=false;
+      if(upperContact.ceiling){
+        p.on=true;
+        p.jumps=0;
+        p.dashUsed=false;
       }
     }
     if(landingSurface){
