@@ -4187,6 +4187,58 @@
       }
       ctx.restore();
     }
+    // World-specific supporting structures are painted beneath solid
+    // optional ledges. They are decorative only and never affect collision.
+    // Different worlds use distinct silhouettes instead of generic posts.
+    if(kind!=='floor' && kind!=='hazard' && kind!=='ceiling' &&
+       kind!=='ceilingSpikes' && w>=80){
+      const visibleStart=Math.max(x,camera-20);
+      const visibleEnd=Math.min(x+w,camera+width+20);
+      const span=visibleEnd-visibleStart;
+      if(span>0){
+        const supportFamily=[
+          'bracket','arch','coral','girder','root','mist','lantern','crystal',
+          'pulse','cable','sail','cloud','anvil','branch','orbit','bamboo',
+          'pipe','icicle','stone','bubble','rail','column','reed','stem','hull'
+        ][index];
+        const shade=platformTopPalettes[index][1];
+        ctx.save();ctx.strokeStyle=shade;ctx.fillStyle=shade;
+        ctx.lineWidth=3;ctx.globalAlpha=.68;
+        const step=supportFamily==='coral'||supportFamily==='root'||
+          supportFamily==='branch'||supportFamily==='reed'?68:92;
+        const first=Math.max(0,Math.floor((visibleStart-x)/step));
+        const last=Math.min(Math.ceil(w/step),Math.ceil((visibleEnd-x)/step));
+        for(let n=first;n<=last;n++){
+          const px=x+n*step+step*.5;
+          if(px<visibleStart+8||px>visibleEnd-8)continue;
+          ctx.beginPath();
+          if(supportFamily==='arch'||supportFamily==='cloud'||
+             supportFamily==='column'||supportFamily==='stone'){
+            ctx.moveTo(px-17,y+6);ctx.quadraticCurveTo(px,y+30,px+17,y+6);
+          }else if(supportFamily==='root'||supportFamily==='branch'||
+                   supportFamily==='bamboo'||supportFamily==='reed'||
+                   supportFamily==='stem'){
+            ctx.moveTo(px,y+6);ctx.lineTo(px,y+23);
+            ctx.moveTo(px,y+16);ctx.lineTo(px-12,y+9);
+            ctx.moveTo(px,y+18);ctx.lineTo(px+11,y+10);
+          }else if(supportFamily==='coral'||supportFamily==='mist'||
+                   supportFamily==='bubble'||supportFamily==='icicle'){
+            ctx.moveTo(px-12,y+7);ctx.quadraticCurveTo(px-8,y+25,px,y+18);
+            ctx.quadraticCurveTo(px+9,y+28,px+12,y+7);
+          }else if(supportFamily==='cable'||supportFamily==='sail'||
+                   supportFamily==='rail'||supportFamily==='hull'){
+            ctx.moveTo(px-18,y+7);ctx.lineTo(px,y+23);
+            ctx.lineTo(px+18,y+7);
+          }else{
+            ctx.moveTo(px-13,y+7);ctx.lineTo(px,y+21);
+            ctx.lineTo(px+13,y+7);
+            ctx.moveTo(px-8,y+12);ctx.lineTo(px+8,y+12);
+          }
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
     // Ember Foundry: individual chapter-authored metalwork. Render
     // thickness below the walking surface, so the gameplay edge stays
     // readable and the platform never looks like a flat floating stripe.
