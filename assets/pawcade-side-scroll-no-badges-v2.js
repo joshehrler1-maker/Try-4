@@ -2006,9 +2006,10 @@
       return {x:patrolX(foe.x+chase*enemyReach*surge*surge),
         y:foe.y};
     }
-    if(index===13){ // Autumn Trail: fluttering pursuit above throwing arcs
+    if(index===13){ // Autumn Trail: springing woodland enemies land between hops
+      const hop=Math.max(0,Math.sin(t*2.4));
       return {x:patrolX(foe.x+wave*enemyReach*.9),
-        y:foe.y-18-Math.sin(t*2.4)*enemyRise*.6};
+        y:foe.y-hop*hop*enemyRise};
     }
     if(index===14){ // Inverted Observatory: alternating gravity orbit
       const gravity=Math.sin(t*.95);
@@ -2037,10 +2038,10 @@
     }
     // More course-specific enemy traversal, inspired by each game's
     // pacing rather than copying any counterpart's character or map.
-    if(index===6){ // Lantern Festival: floating lantern guardians
-      const bob=Math.sin(t*1.4);
+    if(index===6){ // Lantern Festival: grounded hoppers return to their platforms
+      const hop=Math.max(0,Math.sin(t*1.4));
       return {x:patrolX(foe.x+Math.sin(t*.9)*enemyReach*.6),
-        y:foe.y-16-bob*enemyRise*.75};
+        y:foe.y-hop*hop*enemyRise};
     }
     if(index===10){ // Sunset Wind Sail: enemies ride updrafts
       const gust=Math.sin(t*.85);
@@ -2058,10 +2059,9 @@
       return {x:patrolX(foe.x+swing*enemyReach*.65),
         y:foe.y};
     }
-    if(index===24){ // Starship Cargo: hovering drone patrols
+    if(index===24){ // Starship Cargo: grounded deck guards; turrets remain stationary above
       const drift=Math.sin(t*1.25);
-      return {x:patrolX(foe.x+drift*enemyReach*.7),
-        y:foe.y-22-Math.cos(t*2.5)*enemyRise*.55};
+      return {x:patrolX(foe.x+drift*enemyReach*.7),y:foe.y};
     }
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
