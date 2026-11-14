@@ -1647,6 +1647,7 @@
   function markFoeDefeated(foe) {
     if(foe.dead)return;
     const shouldAnimate=!reducedMotion && (
+      index>=10 && index<=14 && typeof window.pawtopiaCloudEnemyRigs?.draw === 'function' ||
       index>=15 && index<=19 && typeof window.pawtopiaMidEnemyRigs?.draw === 'function' ||
       index>=20 && index<=24 && typeof window.pawtopiaLateEnemyRigs?.draw === 'function'
     );
@@ -7397,8 +7398,8 @@
     // A short unique-rig defeat transition follows a confirmed kill.
     // It never resurrects a foe's physics or damages the player. On reduced
     // motion it is intentionally suppressed, matching user accessibility.
-    const dyingEnemyArt = index>=15 && index<=19
-      ? window.pawtopiaMidEnemyRigs
+    const dyingEnemyArt = index>=10 && index<=14 ? window.pawtopiaCloudEnemyRigs
+      : index>=15 && index<=19 ? window.pawtopiaMidEnemyRigs
       : index>=20 && index<=24 ? window.pawtopiaLateEnemyRigs : null;
     if(!reducedMotion && typeof dyingEnemyArt?.draw === 'function'){
       for(const foe of enemies){
@@ -7651,13 +7652,24 @@
       // silhouettes in the playable canvas, not the generic enemy atlas.
       // If the free optional rig module fails to load, keep the old sprite
       // and articulated limbs so gameplay never depends on this art upgrade.
+      const cloudWorldRig = index>=10 && index<=14 &&
+        typeof window.pawtopiaCloudEnemyRigs?.draw === 'function';
       const midWorldRig = index>=15 && index<=19 &&
         typeof window.pawtopiaMidEnemyRigs?.draw === 'function';
       const lateWorldRig = index>=20 && index<=24 &&
         typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
-      if(!midWorldRig && !lateWorldRig)
+      if(!cloudWorldRig && !midWorldRig && !lateWorldRig)
         drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
-      if(midWorldRig && window.pawtopiaMidEnemyRigs.draw(
+      if(cloudWorldRig && window.pawtopiaCloudEnemyRigs.draw(
+        ctx,index,at,foe,{
+          faceLeft,stride:movingWeight,attack:attackPose,
+          recoil,landing:landingPose,clock,reduced:reducedMotion,
+          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
+        })) {
+        // Five separate silhouettes. Motion follows this enemy's world
+        // gait, strike, landing and attack simulation, not a looped GIF.
+      }
+      else if(midWorldRig && window.pawtopiaMidEnemyRigs.draw(
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
           recoil,landing:landingPose,clock,reduced:reducedMotion,
