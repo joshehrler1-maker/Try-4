@@ -6232,7 +6232,10 @@
     const phase=(foe._gait||0)*(0.8+(index%5)*.11);
     // Clamp the animation speed when the simulation skips frames. This
     // protects Android browsers from a huge limb snap after tab switching.
-    const gaitBlend=Math.min(1,Math.max(0,stride||0));
+    // Plant the feet during a strike, then blend back into the world-specific
+    // walking cycle. Attack animation stays visual-only and preserves hitboxes.
+    const attackPlant=Math.min(.72,Math.max(0,attackPose||0)*.6);
+    const gaitBlend=Math.min(1,Math.max(0,stride||0))*(1-attackPlant);
     // Animation pose stays stable when paused or reduced motion is enabled.
     const animTime=reducedMotion?0:clock;
     // Separate stance and swing phases so planted feet do not lift together.
@@ -6321,6 +6324,8 @@
       const progress=inSwing?(cycle-.60)/.40:cycle/.60;
       const ease=progress*progress*(3-2*progress);
       const footTravel=inSwing?(-1+2*ease):(1-2*ease);
+      // A continuous sine swing arc keeps both ends of each airborne step
+      // at ground height; per-game knee scales preserve distinct silhouettes.
       const footLift=inSwing?Math.sin(Math.PI*progress)*5.5*poseKnee*gaitBlend:0;
       const legSwing=airborne?flightCycle*(aerialWorld?7:5):
         footTravel*9*poseStride*chapterWeight*gaitBlend;
