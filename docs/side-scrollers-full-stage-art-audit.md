@@ -1,5 +1,7 @@
 # Super Paw Heroes — Complete 25-game stage scene-art audit
 
+**Current additions after the original snapshot (Nov 14, 2026):** Subsequent verified-source commits placed original stage 2 art for games 1–5 (5 SVGs), stage 3/4 art for games 1–5 (10 SVGs), and stage 2/3 art for games 6–10 (10 SVGs). The baseline table below is intentionally kept as the original audit; these 25 previously missing slots now have distinct SVG paths wired into game code. These are still 2.5D scenic illustrations, not feature-film-quality 3D models. Actual phone rendering is unverified.
+
 **Source audit, November 14, 2026.** Built from the current `assets/platform-worlds.js` stage definitions, `assets/pawcade-side-scroll-no-badges-v2.js` stage widths and installed art placements. This is **not** visual playback, a counterpart-frame-copy check or completed 3D motion-picture production.
 
 **162 total gameplay stages surveyed. 50 scenes have a newly integrated original SVG painted scenery prop. 112 other stages have a proposed missing stage-specific 3D render slot.** All proposed placements are supported on existing platform tops in source geometry, but have **no files yet** and **no runtime integration**. The proposed WebP paths are placeholders in this planning document, not downloadable assets. Existing shared scenery atlases may already depict portions of those stages; do not confuse missing new individual art with an empty level.

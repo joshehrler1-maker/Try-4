@@ -273,6 +273,36 @@
         return {stage:offset + 2, image, x, y, w, h};
       })
     : [];
+  // Film-look, game-specific depth-plane set pieces for Adventures 6–10.
+  // All placements are stage-local; draw-only assets may not affect collisions.
+  const middleStageSetpieces = [
+    [
+      ['assets/scenes/waterfall-climb/stage-02-castle-banquet-lifts.svg', 1, 654, 61, 150, 135],
+      ['assets/scenes/waterfall-climb/stage-03-ocean-laboratory-current.svg', 2, 729, 73, 150, 135]
+    ],
+    [
+      ['assets/scenes/lantern-festival/stage-02-footrace-ridge-speed.svg', 1, 752, 83, 150, 135],
+      ['assets/scenes/lantern-festival/stage-03-cavern-treasure-blocks.svg', 2, 639, 58, 150, 135]
+    ],
+    [
+      ['assets/scenes/crystal-polarity/stage-02-laboratory-shaft-ceiling.svg', 1, 694, 191, 150, 135],
+      ['assets/scenes/crystal-polarity/stage-03-warp-grid-bridge.svg', 2, 764, 191, 150, 135]
+    ],
+    [
+      ['assets/scenes/stage-beat/stage-02-backbeat-blocks-steps.svg', 1, 1185, 130, 142, 135],
+      ['assets/scenes/stage-beat/stage-03-polarity-pulse-spikes.svg', 2, 24, 191, 150, 135]
+    ],
+    [
+      ['assets/scenes/quarry-rescue/stage-02-industrial-base-turrets.svg', 1, 434, 117, 150, 135],
+      ['assets/scenes/quarry-rescue/stage-03-canopy-wires-cable.svg', 2, 554, 141, 150, 135]
+    ]
+  ];
+  const middleStageArt = index >= 5 && index <= 9
+    ? middleStageSetpieces[index - 5].map(([url, stage, x, y, w, h]) => {
+        const image = new Image(); image.src = url;
+        return {stage, image, x, y, w, h};
+      })
+    : [];
   const earlySecondStage = index < 5 ? new Image() : null;
   if (earlySecondStage) earlySecondStage.src = earlySecondStagePaths[index];
   const secondStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
@@ -7194,6 +7224,14 @@
     // Opt-in 3D enemy meshes never change this 2.5D fixed-plane stage art.
     // Individual stage 3/4 depth-painted landmarks. Do not alter player or foe collision.
     for (const slot of earlyFilmStageArt) {
+      if (sections <= slot.stage || !slot.image.naturalWidth) continue;
+      const artX = stageStarts[slot.stage] + slot.x;
+      if (artX + slot.w >= camera && artX <= camera + width) {
+        ctx.drawImage(slot.image, artX, slot.y, slot.w, slot.h);
+      }
+    }
+    // Five fully independent adventures, two decorative stage-specific props each.
+    for (const slot of middleStageArt) {
       if (sections <= slot.stage || !slot.image.naturalWidth) continue;
       const artX = stageStarts[slot.stage] + slot.x;
       if (artX + slot.w >= camera && artX <= camera + width) {

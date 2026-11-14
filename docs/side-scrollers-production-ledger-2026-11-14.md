@@ -1,5 +1,20 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
+## Batch 16 — stages 2 & 3 for games 6–10
+
+**Integrated 10 original stage-specific cinematic-depth SVG setpieces** in the playable 2.5D runtime, continuing the artwork rollout without reusing designs between counterparts or changing game mechanics. Each game loads only its own two illustrated assets. Images are camera culled and stage-offset correctly; there are no added hitboxes, platform surfaces or enemy AI changes. These remain painted, dimensional *concept-quality assets*, not full rendered film scenes, final 3D character rigs or verified Android footage.
+
+| Game | Stage 2 (local position, drawing footprint) | Stage 3 (local position, drawing footprint) |
+|---|---|---|
+| Waterfall Climb | Castle Banquet water elevator (654,61,150×135) | Ocean Laboratory tide console (729,73,150×135) |
+| Lantern Festival | Footrace Ridge ribbon wind-marker (752,83,150×135) | Cavern Treasure crystalline chest (639,58,150×135) |
+| Crystal Polarity | Laboratory Shaft magnetic coils (694,191,150×135) | Warp Grid prismatic gate (764,191,150×135) |
+| Stage Beat | Backbeat Blocks rhythm-step column (1185,130,142×135) | Polarity Pulse bass oscillator (24,191,150×135) |
+| Quarry Rescue | Industrial Base mining press (434,117,150×135) | Canopy Wires grappling pulley (554,141,150×135) |
+
+**Testing:** A new zero-dependency regression checks existence/size, animation-safe SVG primitives, per-game path uniqueness, exact stage-local placement, stage-only canvas drawing, offline cache inclusion and parity of resource versions. CI and GitHub Pages deployment status must be inspected after the commit. No film-level visual approval or physical Android FPS has been established.
+
+
 ## Batch 15 — scene art installed for stages 3 and 4 of games 1–5
 
 **Goal:** Move the 2.5D Games Room closer to the approved feature-film-*look* while keeping side-scrolling mechanics. This batch creates ten different, hand-authored perspective-lit SVG landmarks (one for each of stages 3 and 4 of each of the first five adventures). They have unique silhouettes and palettes, separate scene paths, and are positioned over existing verified platforms only. These are **illustrated, 3D-looking depth-plane props**, not real modeled feature-film 3D, rigged enemies, cinematic film renders or whole-scene 3D environments.

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="135" viewBox="0 0 150 135" role="img" aria-label="Industrial Base – heavy counterweighted hydraulic drill compressor">
+<defs><linearGradient id="stone" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f3e0a7"/><stop offset=".3" stop-color="#a79c83"/><stop offset=".65" stop-color="#57616f"/><stop offset="1" stop-color="#26354b"/></linearGradient><linearGradient id="copper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff2b9"/><stop offset=".38" stop-color="#c6a05b"/><stop offset="1" stop-color="#67516c"/></linearGradient><radialGradient id="spark"><stop stop-color="#fffbdb"/><stop offset=".27" stop-color="#ffc97b"/><stop offset="1" stop-color="#f2a34d" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="75" cy="127" rx="66" ry="6" fill="#293646" opacity=".44"/>
+<path d="m10 118 25-13h83l21 12-23 12H30Z" fill="url(#stone)" stroke="#333b4d" stroke-width="2"/>
+<path d="M18 106V48l16-13 18 7v64m43 0V43l21-8 16 13v58" fill="url(#stone)" stroke="#4d5368" stroke-width="3"/>
+<path d="M34 35V19h83v16M44 19V7h63v12" fill="none" stroke="#c0b79e" stroke-width="6"/>
+<path d="M51 43h45v14H51z" fill="url(#copper)" stroke="#6b5e66" stroke-width="2"/>
+<path d="M60 56v42m27-42v42" stroke="#343c50" stroke-width="9"/>
+<path d="M60 56v42m27-42v42" stroke="#d8bc86" stroke-width="2"/>
+<path d="m65 98 16 0 7 12-15 12-14-12Z" fill="url(#stone)" stroke="#66586a" stroke-width="2"/>
+<circle cx="74" cy="81" r="39" fill="url(#spark)" opacity=".45"/>
+<path d="M51 91h45" stroke="#ffe1a0" stroke-width="4"/>
+<path d="M33 61h20m45 0h25" stroke="#d3c49e" stroke-width="5"/>
+<circle cx="39" cy="80" r="7" fill="#515d64" stroke="#e8d2a6" stroke-width="2"/>
+<circle cx="113" cy="80" r="7" fill="#515d64" stroke="#e8d2a6" stroke-width="2"/>
+<path d="M15 100q17-7 25 0m72 0q16-9 25 0" fill="none" stroke="#d7bd8d" stroke-width="2" opacity=".8"/>
+<circle cx="17" cy="25" r="3" fill="#ffeebf"/><circle cx="135" cy="17" r="3" fill="#fff0c4"/></svg>
