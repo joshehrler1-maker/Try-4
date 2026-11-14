@@ -2620,6 +2620,17 @@
       ctx.lineWidth=2;ctx.strokeStyle='#b4e9ff';ctx.stroke();
       ctx.restore();
     }
+    if(index===2 && p.air<airCapacity){
+      const meterX=p.x-18;
+      const meterY=p.y<52 ? p.y+28 : p.y-42;
+      const airFraction=p.air/airCapacity;
+      ctx.fillStyle='#101e35';
+      ctx.fillRect(meterX-2,meterY-2,40,9);
+      ctx.fillStyle='#3f5871';
+      ctx.fillRect(meterX,meterY,36,5);
+      ctx.fillStyle=p.air<=5 ? '#ffbc76' : '#8deafa';
+      ctx.fillRect(meterX,meterY,36*airFraction,5);
+    }
     if(index===3 && p.spin){
       const meterX=p.x-24;
       const meterY=p.y-55;
