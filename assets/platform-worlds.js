@@ -1053,3 +1053,7 @@ window.pawtopiaRooms.eggRavine = [[0,326,485],[536,292,277],[862,253,281],[1194,
 
 // Roundstone Cave's upper route crests before descending to the floor.
 window.pawtopiaRooms.eggCave = [[0,326,2200],[310,278,230],[590,234,260],[865,190,245],[1164,231,260],[1471,276,372]];
+
+// Autumn Trail: introduce raised targets in the meadow and tighten the fort staircase.
+window.pawtopiaRooms.eggMeadow = [[0,326,2200],[282,284,232],[578,247,261],[900,221,246],[1200,259,279],[1540,232,263],[1863,278,237]];
+window.pawtopiaRooms.eggFort = [[0,326,2200],[378,274,224],[662,235,231],[950,196,231],[1241,242,254],[1550,211,226],[1830,260,232]];
