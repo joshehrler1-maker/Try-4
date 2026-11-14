@@ -324,6 +324,12 @@
         const worldEncounterMargins=[
           22,15,26,34,18,24,20,12,32,18,23,19,16,21,14,25,13,18,11,16,36,14,20,23,17
         ];
+        // Individual minimum reaction distances before each encounter.
+        // Long acceleration corridors need more breathing room than
+        // deliberate combat, precision and exploration passages.
+        const worldReactionDistances=[
+          140,125,160,220,145,165,145,180,230,160,180,210,150,155,170,165,145,150,195,175,240,160,155,190,175
+        ];
         const fastCourse=[3,7,8,11,20,23].includes(index);
         const combatCourse=[1,12,16,19,21,24].includes(index);
         const extraEncounter=stage>=3 && w>=720 &&
