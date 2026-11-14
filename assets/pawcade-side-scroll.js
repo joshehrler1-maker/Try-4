@@ -2101,8 +2101,8 @@
   // Original platform silhouettes for three distinct reference-inspired
   // worlds. All decorative elements remain outside the collision system.
   function drawSignaturePlatformArt(x,y,w,stage){
-    if(index>5 || w<70)return;
-    const interval=[90,115,130,105,112,124][index];
+    if(index>8 || w<70)return;
+    const interval=[90,115,130,105,112,124,120,108,88][index];
     const first=Math.max(0,Math.floor((camera-x)/interval)-1);
     const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
     ctx.save();ctx.lineJoin='round';
@@ -2173,6 +2173,44 @@
         ctx.strokeStyle='#f1ffff';ctx.lineWidth=2;
         ctx.beginPath();ctx.moveTo(px-10,y+6);ctx.lineTo(px-8,y+23);
         ctx.moveTo(px+6,y+5);ctx.lineTo(px+3,y+19);ctx.stroke();
+      }else if(index===6){
+        // Lantern Festival: parade pennants and suspended lantern fixtures.
+        ctx.strokeStyle='#d9b67c';ctx.lineWidth=2.5;
+        ctx.beginPath();ctx.moveTo(px-28,y+3);ctx.lineTo(px+28,y+3);ctx.stroke();
+        for(const side of [-1,1]){
+          const lx=px+side*18;
+          ctx.beginPath();ctx.moveTo(lx,y+3);ctx.lineTo(lx,y+12);ctx.stroke();
+          ctx.fillStyle=side<0?'#ed849f':'#ffc96e';
+          ctx.beginPath();ctx.moveTo(lx-7,y+12);ctx.lineTo(lx+7,y+12);
+          ctx.lineTo(lx+9,y+23);ctx.lineTo(lx,y+28);
+          ctx.lineTo(lx-9,y+23);ctx.closePath();ctx.fill();
+          ctx.fillStyle='#fff0bd';ctx.fillRect(lx-2,y+16,4,6);
+        }
+      }else if(index===7){
+        // Crystal Polarity: opposing crystal poles and magnetic rail braces.
+        ctx.fillStyle='#303d6c';ctx.strokeStyle='#c7b7f5';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-25,y+3);ctx.lineTo(px+25,y+3);
+        ctx.lineTo(px+17,y+22);ctx.lineTo(px-17,y+22);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        for(const side of [-1,1]){
+          ctx.fillStyle=side<0?'#8ce9ff':'#f7a3e5';
+          ctx.beginPath();ctx.moveTo(px+side*14,y+6);
+          ctx.lineTo(px+side*22,y+12);
+          ctx.lineTo(px+side*14,y+22);
+          ctx.lineTo(px+side*7,y+12);ctx.closePath();ctx.fill();
+        }
+      }else if(index===8){
+        // Stage Beat: independent equalizer towers and beat marker rails.
+        const pulse=reducedMotion?0:Math.sin(clock*5+n)*3;
+        ctx.fillStyle='#2c285e';ctx.strokeStyle='#bfa6ff';ctx.lineWidth=2;
+        ctx.fillRect(px-27,y+3,54,24);ctx.strokeRect(px-27,y+3,54,24);
+        for(let k=0;k<5;k++){
+          const h=7+((k*7+n*3+stage*5)%13)+pulse;
+          ctx.fillStyle=k%2?'#ff8cd6':'#77e7ff';
+          ctx.fillRect(px-21+k*10,y+25-h,6,h);
+        }
+        ctx.strokeStyle='#fff1b3';ctx.beginPath();
+        ctx.moveTo(px-26,y+4);ctx.lineTo(px+26,y+4);ctx.stroke();
       }else{
         // Coral Courier: fan-shaped reef ledges and layered shell supports.
         ctx.fillStyle='#3c8794';ctx.strokeStyle='#a7e9d9';ctx.lineWidth=2;
