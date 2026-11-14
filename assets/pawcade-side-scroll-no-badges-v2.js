@@ -7201,14 +7201,25 @@
         ?Math.max(0,Math.sin(clock*6+foe.offset))*.028:0;
       const quarryBrace=index===9 && firing && !reducedMotion
         ?attackPose*.035:0;
+      // Games 11–15: separate motion cues bound to each game's own mechanics.
+      const windBank=index===10 && enemyPattern==='swoop' && !reducedMotion
+        ?Math.max(-.06,Math.min(.06,verticalSpeed/6500)):0;
+      const cloudPursuit=index===11 && enemyPattern==='pursuit' && !reducedMotion
+        ?Math.max(-.04,Math.min(.04,(foe._bodyVelocity||0)*.04)):0;
+      const thunderCharge=index===12 && enemyPattern==='charge' && !reducedMotion
+        ?attackPose*.035:0;
+      const autumnHop=index===13 && enemyPattern==='hopper' && !reducedMotion
+        ?Math.max(0,Math.min(1,-verticalSpeed/340))*.04:0;
+      const observatoryFlip=index===14 && !reducedMotion
+        ?Math.max(-.055,Math.min(.055,verticalSpeed/5200)):0;
       ctx.save();
       // A distinct animation state for patrolling, hopping, flying and firing.
       ctx.translate(at.x,at.y+19);
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
-      else ctx.rotate(enemyLean+attackTilt+verticalLean+polarityTurn);
-      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5-seedAscent*.5+seedDescent+stagePulse+quarryBrace-waterfallDive*.4,
-        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression+seedAscent-seedDescent+waterfallDive+lanternFloat-stagePulse-quarryBrace);
+      else ctx.rotate(enemyLean+attackTilt+verticalLean+polarityTurn+windBank+cloudPursuit+observatoryFlip);
+      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5-seedAscent*.5+seedDescent+stagePulse+quarryBrace-waterfallDive*.4+thunderCharge-autumnHop*.4,
+        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression+seedAscent-seedDescent+waterfallDive+lanternFloat-stagePulse-quarryBrace-thunderCharge+autumnHop);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(!reducedMotion){
         const flex=airborne ? motion*.2 : footCycle*movingWeight*.22;
