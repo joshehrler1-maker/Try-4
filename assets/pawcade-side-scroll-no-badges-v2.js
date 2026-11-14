@@ -3938,6 +3938,33 @@
     if(w<34 || kind==='hazard' || kind==='ceilingSpikes') return;
     const stage=Math.min(sections-1,Math.max(0,stageAt(x)));
     const [face,recess,rim]=courseMaterials[index];
+    // Ember Foundry: individual chapter-authored metalwork. Render
+    // thickness below the walking surface, so the gameplay edge stays
+    // readable and the platform never looks like a flat floating stripe.
+    if(index===0 && kind==='floor'){
+      const visibleStart=Math.max(x,camera-20);
+      const visibleEnd=Math.min(x+w,camera+width+20);
+      if(visibleEnd>visibleStart){
+        const chapterStyle=stage%4;
+        const cell=[48,62,54,72][chapterStyle];
+        ctx.save();
+        ctx.fillStyle=['#54354b','#4c3543','#473e51','#59404a'][chapterStyle];
+        ctx.fillRect(visibleStart,y+5,visibleEnd-visibleStart,13);
+        ctx.strokeStyle='#ffbf73';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(visibleStart,y+5);ctx.lineTo(visibleEnd,y+5);ctx.stroke();
+        for(let k=Math.floor((visibleStart-x)/cell);k<=Math.ceil((visibleEnd-x)/cell);k++){
+          const px=x+k*cell;
+          if(px<visibleStart-8||px>visibleEnd+8)continue;
+          ctx.strokeStyle=chapterStyle%2?'#b58b70':'#a97465';
+          ctx.lineWidth=1.5;
+          ctx.beginPath();ctx.moveTo(px+4,y+9);
+          ctx.lineTo(px+cell*.48,y+15);ctx.lineTo(px+cell-4,y+9);ctx.stroke();
+          ctx.fillStyle='#ffcb81';ctx.beginPath();
+          ctx.arc(px+5,y+7,2,0,Math.PI*2);ctx.arc(px+cell-5,y+7,2,0,Math.PI*2);ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
     const motif=(index*7+stage*3)%5;
     const pitch=motif===0?38:motif===1?48:motif===2?57:motif===3?43:65;
     const first=Math.ceil((Math.max(x,camera-15)-x)/pitch);
