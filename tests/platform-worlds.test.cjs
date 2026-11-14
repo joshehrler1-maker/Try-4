@@ -181,7 +181,7 @@ test('first-stage scenic art stays tied to its own stage surface, file and offli
   }
 });
 
-test('third and fourth stage scenery is unique, cacheable, stage-scoped and platform-aligned', () => {
+test('third through sixth stage scenery is unique, cacheable, stage-scoped and platform-aligned', () => {
   const runtime = fs.readFileSync(path.join(__dirname,'../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
   const worker = fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
   const literal = name => {
@@ -190,7 +190,7 @@ test('third and fourth stage scenery is unique, cacheable, stage-scoped and plat
     return vm.runInNewContext(match[1], {}, {timeout:1000});
   };
   const seen = new Set([...literal('firstStageLandmarkPaths'),...literal('secondStageLandmarkPaths')]);
-  for(const [chapter,ordinal] of [['third',2],['fourth',3]]) {
+  for(const [chapter,ordinal] of [['third',2],['fourth',3],['fifth',4],['sixth',5]]) {
     const files=literal(chapter+'StageLandmarkPaths');
     const positions=literal(chapter+'StageLandmarkPositions');
     assert.equal(files.length,5,chapter+' stage needs 5 separate artworks');
@@ -216,5 +216,5 @@ test('third and fourth stage scenery is unique, cacheable, stage-scoped and plat
         'scenery base does not match authored surface: '+asset);
     }
   }
-  assert.equal(seen.size,40,'all 40 individual game-and-stage scenic asset paths must be unique');
+  assert.equal(seen.size,50,'all 50 individual game-and-stage scenic asset paths must be unique');
 });
