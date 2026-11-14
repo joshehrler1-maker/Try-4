@@ -6160,7 +6160,14 @@
       // Foundry crabs must face their walking direction even when attacking.
       // Their old target-facing override could make moving crabs moonwalk.
       const foundryWalker=index===0 && foe.foundryEnemy!==undefined;
-      const faceLeft=walking && (foundryWalker || !aiming) ? displacement<0
+      // Grounded Foundry patrols have a persistent travel heading. At the
+      // turning point their displacement is near zero, so do not snap the
+      // whole crab body back toward the player for one or two frames.
+      // Ignore tiny position jitter, but flip as soon as real travel resumes.
+      if(foundryWalker && walking) foe._patrolFaceLeft=displacement<0;
+      const faceLeft=foundryWalker
+        ? (foe._patrolFaceLeft ?? (walking ? displacement<0 : (foe.faceLeft??false)))
+        : walking && !aiming ? displacement<0
         : aiming || (nearby && ['turret','charge','pursuit'].includes(enemyPattern))
           ? player.x<at.x
           : (foe.faceLeft??player.x<at.x);
