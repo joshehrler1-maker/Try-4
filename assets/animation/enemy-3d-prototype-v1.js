@@ -131,7 +131,7 @@ gl.bindBuffer(gl.ARRAY_BUFFER,g.n);gl.enableVertexAttribArray(loc.n);gl.vertexAt
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,g.idx);gl.drawElements(gl.TRIANGLES,g.count,gl.UNSIGNED_SHORT,0);
 };
 function render(index,mode='idle',time=0,angle=-.3,reduced=false){
-const sizeX=clamp(Math.round((canvas.clientWidth||800)*Math.min(2,root.devicePixelRatio||1)),1,1200);
+const sizeX=Math.max(1,Math.min(1200,Math.round((canvas.clientWidth||800)*Math.min(2,root.devicePixelRatio||1))));
 const sizeY=Math.round(sizeX*.6);
 if(canvas.width!==sizeX||canvas.height!==sizeY){canvas.width=sizeX;canvas.height=sizeY;}
 gl.viewport(0,0,sizeX,sizeY);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
