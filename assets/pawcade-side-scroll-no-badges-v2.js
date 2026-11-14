@@ -342,6 +342,7 @@
           // Waterfall–Quarry: unique reaction spacing for this group.
           // Sunset–Observatory: unique reaction spacing for this group.
           // Bamboo–Submarine: unique reaction spacing for this group.
+          // Neon–Starship: unique reaction spacing for this group.
           const stagger=((index*11+stage*7+slot*3)%5-2)*spacing;
           // Reserve a full body-width at each edge so foes do not spawn
           // with their feet hanging over narrow or staggered ledges.
