@@ -4569,6 +4569,11 @@
     const phase=(foe._gait||0)*(0.8+(index%5)*.11);
     const swing=reducedMotion?0:Math.sin(phase)*Math.min(1,stride);
     const reach=reducedMotion?0:attackPose;
+    // Individual game families get different windup and recoil timing.
+    // Keep the pose attached to the existing foe sprite, not a floating cue.
+    const attackRhythm=[1.0,.75,1.3,1.2,.85,1.1,.7,1.4,1.25,.9,1.15,.8,
+      1.35,.95,1.05,.65,1.3,1.1,.8,1.25,.95,1.4,.75,1.15,1.05][index];
+    const strikePhase=Math.min(1,reach*attackRhythm);
     // Each counterpart-inspired adventure gets its own animation silhouette:
     // stride length, arm follow-through, knee bend and body mass. These are
     // original Super Paw Heroes motions, not copied reference-game assets.
@@ -4625,8 +4630,8 @@
       // alternate strikes, swimmers paddle, and flying foes bank their arms.
       const shooterWorld=[4,11,12,13,16,21,24].includes(index);
       const rushWorld=[0,3,8,15,20].includes(index);
-      const strike=shooterWorld?reach*(side===dir?1:.55):
-        rushWorld?reach*(side===dir?1:.25):reach;
+      const strike=shooterWorld?strikePhase*(side===dir?1:.55):
+        rushWorld?strikePhase*(side===dir?1:.25):strikePhase;
       const armSwing=airborne?Math.sin(clock*6+side)*7:
         waterWorld?Math.sin(clock*3.6+side*Math.PI)*6*poseArm:
         -side*swing*8*poseArm*chapterWeight;
