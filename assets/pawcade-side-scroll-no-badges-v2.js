@@ -6041,6 +6041,78 @@
     }
     ctx.stroke();
     ctx.restore();
+    // Counterpart-inspired encounter silhouettes for the remaining 20 worlds.
+    // Each profile is original Pawtopia geometry; enemy behavior and hitboxes
+    // remain governed by their existing course-specific gameplay rules.
+    if(index>=5){
+      const profile=index-5;
+      ctx.save();
+      ctx.strokeStyle=enemyCueColors[index];
+      ctx.lineWidth=1.4;
+      ctx.beginPath();
+      if(profile===0){ // Waterfall: icy swept wings
+        ctx.moveTo(-18,-12);ctx.lineTo(-30,-23);ctx.lineTo(-22,-35);
+        ctx.moveTo(18,-12);ctx.lineTo(30,-23);ctx.lineTo(22,-35);
+      }else if(profile===1){ // Lantern: parade tassels
+        ctx.moveTo(-15,-29);ctx.lineTo(-20,-40);ctx.lineTo(-24,-35);
+        ctx.moveTo(15,-29);ctx.lineTo(20,-40);ctx.lineTo(24,-35);
+      }else if(profile===2){ // Polarity: opposing crystal antennae
+        ctx.moveTo(-15,-26);ctx.lineTo(-25,-38);ctx.lineTo(-19,-45);
+        ctx.moveTo(15,-26);ctx.lineTo(25,-38);ctx.lineTo(19,-45);
+      }else if(profile===3){ // Stage Beat: equalizer fins
+        for(let n=0;n<4;n++){const xx=-18+n*12;ctx.moveTo(xx,-27);ctx.lineTo(xx,-34-(n%2)*8);}
+      }else if(profile===4){ // Quarry: heavy drill shoulders
+        ctx.moveTo(-18,-12);ctx.lineTo(-30,-18);ctx.lineTo(-25,-25);
+        ctx.moveTo(18,-12);ctx.lineTo(30,-18);ctx.lineTo(25,-25);
+      }else if(profile===5){ // Sunset: swept glider fins
+        ctx.moveTo(-15,-16);ctx.quadraticCurveTo(-35,-33,-38,-18);
+        ctx.moveTo(15,-16);ctx.quadraticCurveTo(35,-33,38,-18);
+      }else if(profile===6){ // Cloud: light winglets
+        ctx.moveTo(-17,-13);ctx.quadraticCurveTo(-29,-26,-33,-12);
+        ctx.moveTo(17,-13);ctx.quadraticCurveTo(29,-26,33,-12);
+      }else if(profile===7){ // Thunder: lightning prongs
+        ctx.moveTo(-15,-29);ctx.lineTo(-23,-36);ctx.lineTo(-17,-40);
+        ctx.moveTo(15,-29);ctx.lineTo(23,-36);ctx.lineTo(17,-40);
+      }else if(profile===8){ // Autumn: leaf-blade crests
+        ctx.moveTo(-16,-25);ctx.quadraticCurveTo(-33,-36,-21,-43);
+        ctx.moveTo(16,-25);ctx.quadraticCurveTo(33,-36,21,-43);
+      }else if(profile===9){ // Observatory: mirrored sensor arms
+        ctx.moveTo(-13,-28);ctx.lineTo(-23,-39);ctx.lineTo(-30,-39);
+        ctx.moveTo(13,-28);ctx.lineTo(23,-39);ctx.lineTo(30,-39);
+      }else if(profile===10){ // Bamboo: tall segmented stems
+        ctx.moveTo(-15,-22);ctx.lineTo(-15,-43);ctx.moveTo(-20,-35);ctx.lineTo(-10,-35);
+        ctx.moveTo(15,-22);ctx.lineTo(15,-43);ctx.moveTo(10,-35);ctx.lineTo(20,-35);
+      }else if(profile===11){ // Steamworks: valve handles
+        ctx.moveTo(-13,-27);ctx.lineTo(-13,-40);ctx.lineTo(-21,-40);
+        ctx.moveTo(13,-27);ctx.lineTo(13,-40);ctx.lineTo(21,-40);
+      }else if(profile===12){ // Snow: icicle spurs
+        ctx.moveTo(-19,-22);ctx.lineTo(-25,-38);ctx.lineTo(-14,-31);
+        ctx.moveTo(19,-22);ctx.lineTo(25,-38);ctx.lineTo(14,-31);
+      }else if(profile===13){ // Canyon: rope-hook shoulders
+        ctx.moveTo(-18,-10);ctx.lineTo(-30,-15);ctx.quadraticCurveTo(-35,-23,-28,-27);
+        ctx.moveTo(18,-10);ctx.lineTo(30,-15);ctx.quadraticCurveTo(35,-23,28,-27);
+      }else if(profile===14){ // Submarine: sonar stalks
+        ctx.moveTo(-14,-26);ctx.lineTo(-18,-40);ctx.lineTo(-26,-40);
+        ctx.moveTo(14,-26);ctx.lineTo(18,-40);ctx.lineTo(26,-40);
+      }else if(profile===15){ // Neon: pixel-stepped horns
+        ctx.moveTo(-16,-26);ctx.lineTo(-23,-26);ctx.lineTo(-23,-39);ctx.lineTo(-29,-39);
+        ctx.moveTo(16,-26);ctx.lineTo(23,-26);ctx.lineTo(23,-39);ctx.lineTo(29,-39);
+      }else if(profile===16){ // Marble: temple-column crests
+        ctx.moveTo(-19,-30);ctx.lineTo(-19,-40);ctx.lineTo(-11,-40);
+        ctx.moveTo(19,-30);ctx.lineTo(19,-40);ctx.lineTo(11,-40);
+      }else if(profile===17){ // Swamp: reed-like feelers
+        ctx.moveTo(-13,-27);ctx.quadraticCurveTo(-29,-39,-25,-45);
+        ctx.moveTo(13,-27);ctx.quadraticCurveTo(29,-39,25,-45);
+      }else if(profile===18){ // Sunflower: petal-like wings
+        ctx.moveTo(-17,-19);ctx.quadraticCurveTo(-35,-40,-31,-19);
+        ctx.moveTo(17,-19);ctx.quadraticCurveTo(35,-40,31,-19);
+      }else if(profile===19){ // Starship: angular thruster fins
+        ctx.moveTo(-17,-9);ctx.lineTo(-32,-15);ctx.lineTo(-26,-30);
+        ctx.moveTo(17,-9);ctx.lineTo(32,-15);ctx.lineTo(26,-30);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
     // Deterministic stage emblems: enemy units gain a different etched
     // geometric crest in every chapter of their own course.
     const rank=foe.spawnChapter??chapter;
