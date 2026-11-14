@@ -3440,6 +3440,31 @@
         ctx.strokeStyle=color;
         ctx.stroke();
         continue;
+      }else if(index===20){ // Neon Circuit: electric pixel trails
+        ctx.rect(x-radius,y-radius,radius*2,radius*2);
+        ctx.rect(x+radius*2,y-radius*.4,radius*.8,radius*.8);
+      }else if(index===21){ // Marble Temple: floating stone motes
+        ctx.moveTo(x-radius,y-radius*.5);
+        ctx.lineTo(x+radius*.6,y-radius);
+        ctx.lineTo(x+radius,y+radius*.5);
+        ctx.lineTo(x-radius*.5,y+radius);
+        ctx.closePath();
+      }else if(index===22){ // Swamp Ferry: pulsing fireflies
+        const glow=1+.45*Math.sin(clock*2.2+seed);
+        ctx.arc(x,y,radius*glow,0,Math.PI*2);
+      }else if(index===23){ // Sunflower Flight: drifting flower pollen
+        const driftX=Math.sin(clock*.8+seed)*radius*2;
+        ctx.ellipse(x+driftX,y,radius*.7,radius*1.2,seed*.4,0,Math.PI*2);
+      }else if(index===24){ // Starship Cargo: tiny drifting starlight
+        ctx.moveTo(x,y-radius*1.8);
+        ctx.lineTo(x+radius*.4,y-radius*.4);
+        ctx.lineTo(x+radius*1.8,y);
+        ctx.lineTo(x+radius*.4,y+radius*.4);
+        ctx.lineTo(x,y+radius*1.8);
+        ctx.lineTo(x-radius*.4,y+radius*.4);
+        ctx.lineTo(x-radius*1.8,y);
+        ctx.lineTo(x-radius*.4,y-radius*.4);
+        ctx.closePath();
       }else{
         ctx.arc(x,y,radius,0,Math.PI*2);
       }
