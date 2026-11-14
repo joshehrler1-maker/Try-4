@@ -1673,6 +1673,7 @@
   }
   function respawn() {
     clearInput();
+    particles.length=0;
     signatureEffect=null;
     landingEffect=null;
     for(const ledge of platforms) if(ledge.kind==='drop') ledge.dropAt=undefined;
@@ -2347,6 +2348,7 @@
           p.vy=p.pogo || (movement==='pogo' && held('jump')) ? -560 :
             index===0 && held('jump') ? -440 : -320;
           p.pogo=false;p.on=false;
+          p.jumpBuffer=0;
           p.jumpCut=false;
           p.coyote=0;
         } else if (hit()) return;
@@ -2466,6 +2468,7 @@
       if (stomp) {
         if((index===12 || index===22) && p.pogo) p.pogoRebound=clock;
         p.vy=p.pogo?-510:-375;
+        p.jumpBuffer=0;
         p.pogo=false;
         p.on=false;
         p.jumpCut=false;
