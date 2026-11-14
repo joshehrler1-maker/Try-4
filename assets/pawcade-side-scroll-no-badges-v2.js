@@ -703,11 +703,11 @@
         ['ice','floor','shelf','ice','ice'],
         ['floor','shelf','floor','shelf','shelf'],
         ['current','floor','lift','current','current'],
-        ['belt','spring','belt','spring','belt'],
-        ['shelf','floor','shelf','floor','shelf'],
-        ['pogo','spring','pogo','floor','pogo'],
-        ['spring','lift','spring','floor','spring'],
-        ['shelf','lift','shelf','belt','shelf']
+        ['belt','spring','floor','belt','spring'],
+        ['shelf','floor','shelf','floor','floor'],
+        ['pogo','floor','spring','pogo','pogo'],
+        ['spring','floor','lift','spring','spring'],
+        ['shelf','belt','lift','floor','shelf']
       ];
       const beatOrder=worldBeatOrders[index];
       // World mechanics palette batch 1.
