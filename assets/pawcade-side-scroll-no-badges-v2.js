@@ -3381,6 +3381,25 @@
     surface.addColorStop(1,recess);
     ctx.fillStyle=surface;
     ctx.fill();
+    if(index===0){
+      ctx.save();
+      ctx.clip();
+      const left=Math.max(x,camera);
+      const right=Math.min(x+w,camera+width);
+      ctx.fillStyle='#382237';
+      ctx.fillRect(left,y+20,right-left,11);
+      ctx.fillStyle='#a65d30';
+      ctx.fillRect(left,y+21,right-left,7);
+      ctx.fillStyle='#f3aa66';
+      ctx.fillRect(left,y+21,right-left,1);
+      ctx.beginPath();
+      for(let rivet=x+12+Math.max(0,Math.floor((left-x)/32))*32;rivet<right-5;rivet+=32){
+        ctx.moveTo(rivet+2,y+25);
+        ctx.arc(rivet,y+25,2,0,Math.PI*2);
+      }
+      ctx.fill();
+      ctx.restore();
+    }
     ctx.save();
     ctx.clip();
     ctx.strokeStyle=rim;
