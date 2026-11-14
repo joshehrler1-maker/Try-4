@@ -1008,7 +1008,7 @@
     attacks = [];
     hazards = [];
     phase = 'ready';
-    status(opening + '. Gameplay reference: ' + reference + '.');
+    status(resetStick ? opening + '. Gameplay reference: ' + reference + '.' : 'The touch joystick could not load. Refresh to retry.');
     hud();
     draw();
   }
@@ -6066,7 +6066,7 @@
     if (control==='action') releaseAction(true);
   });
   addEventListener('blur',clearInput);
-  const resetStick=bindTouchJoystick(byId('touch-stick'),direction=>{
+  const resetStick=window.bindTouchJoystick?.(byId('touch-stick'),direction=>{
     for (const axis of ['left','right','up','down']) mobile.delete(axis);
     if(direction) for(const axis of direction.split(' ')) mobile.add(axis);
   },{horizontal:!fourWayStick,diagonal:fourWayStick});

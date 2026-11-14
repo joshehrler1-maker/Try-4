@@ -11,7 +11,9 @@ window.bindTouchJoystick = function (base, onChange, options = {}) {
     if (next && options.repeat) timer = setInterval(() => onChange(next), options.repeat);
   }
   function reset() {
+    const previous = pointer;
     pointer = null;
+    if (previous !== null && base.hasPointerCapture?.(previous)) base.releasePointerCapture(previous);
     knob.style.transform = '';
     change('');
   }
