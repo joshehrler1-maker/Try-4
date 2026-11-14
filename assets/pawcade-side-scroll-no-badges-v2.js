@@ -355,6 +355,73 @@
   const exitX = finish+720;
   const ground = 326;
   const status = message => { byId('side-status').textContent = message; };
+  // Experimental in-game 3D: only ordinary enemies of games 1–5.
+  // Actual offscreen lit WebGL triangle meshes; explicit player opt-in.
+  // The 2D game, physics, collision, enemies and touch controls are NEVER
+  // dependent on GPU preview success. Max two visible 3D draws per frame.
+  const enemy3dToggle=byId('side-3d-enemies');
+  let enemy3dRenderer=null,enemy3dCanvas=null,enemy3dDraws=0;
+  let enemy3dOn=false,enemy3dAvailable=index>=0 && index<=4;
+  function disableEnemy3d(note){
+    if(enemy3dRenderer){try{enemy3dRenderer.dispose();}catch{}}
+    enemy3dRenderer=null;enemy3dCanvas=null;enemy3dOn=false;
+    if(enemy3dToggle){
+      enemy3dToggle.setAttribute('aria-pressed','false');
+      enemy3dToggle.textContent='3D enemy preview: Off';
+    }
+    if(note) status(note);
+  }
+  if(enemy3dToggle){
+    enemy3dToggle.hidden=!enemy3dAvailable;
+    if(enemy3dAvailable){
+      enemy3dToggle.title='Opt-in low-detail 3D mesh preview; up to two regular enemies at a time. Other enemies keep their original 2D art.';
+      enemy3dToggle.addEventListener('click',()=>{
+        if(enemy3dOn){disableEnemy3d('3D preview off: original 2D enemies restored.');return;}
+        if(!window.SuperPawEnemy3D?.init){
+          enemy3dToggle.disabled=true;
+          status('Experimental 3D module unavailable. The normal 2D game works.');
+          return;
+        }
+        try{
+          const sprite=document.createElement('canvas');
+          sprite.width=160;sprite.height=160;
+          sprite.addEventListener('webglcontextlost',e=>{
+            e.preventDefault();disableEnemy3d('3D preview stopped: WebGL context lost. 2D enemies restored.');
+          });
+          enemy3dRenderer=window.SuperPawEnemy3D.init(sprite,{sprite:true});
+          enemy3dCanvas=sprite;enemy3dOn=true;
+          enemy3dToggle.textContent='3D enemy preview: On';
+          enemy3dToggle.setAttribute('aria-pressed','true');
+          status('Experimental 3D on for up to two nearby regular enemies. Special enemies remain 2D; turn off if phone performance drops.');
+        }catch(error){
+          disableEnemy3d('3D enemy preview unsupported on this device; original 2D artwork remains playable.');
+        }
+      });
+    }
+  }
+  window.addEventListener('pagehide',()=>disableEnemy3d());
+  function drawEnemy3d(at,foe,faceLeft,attackPose,recoil,movingWeight){
+    if(!enemy3dOn||!enemy3dRenderer||enemy3dDraws>=2||
+       !usesOriginRig(foe))return false;
+    try{
+      const mode=foe.bashed && clock<foe.bashed.until?'hit':
+        attackPose>.19||recoil>.15?'attack':
+        movingWeight>.23?'move':'idle';
+      const time=mode==='move'?Math.abs(foe._gait||0)/1.1:
+        mode==='attack'?Math.max(0,clock-(foe.lastShotAt??clock)):
+        mode==='hit'?.35:clock;
+      enemy3dRenderer.render(index,mode,time,.26,reducedMotion);
+      ctx.save();ctx.translate(at.x,at.y-95);
+      if(faceLeft)ctx.scale(-1,1);
+      ctx.drawImage(enemy3dCanvas,-58,0,116,116);
+      ctx.restore();
+      enemy3dDraws++;
+      return true;
+    }catch(error){
+      disableEnemy3d('3D rendering failed; original illustrated enemies restored.');
+      return false;
+    }
+  }
   const powerButton = document.querySelector('[data-control="action"]');
   if (movement==='buster') powerButton.textContent='Fire';
   if (movement==='airdash') powerButton.textContent='Dash';
@@ -7020,6 +7087,7 @@
     forgeLighting.addColorStop(1,'#ff871b7a');
   }
   function draw() {
+    enemy3dDraws=0;
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
     if (backdrop.naturalWidth) {
@@ -7679,7 +7747,10 @@
         typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
       if(!originWorldRig && !fiveWorldRig && !cloudWorldRig && !midWorldRig && !lateWorldRig)
         drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
-      if(originWorldRig && window.pawtopiaOriginEnemyRigs.draw(
+      if(drawEnemy3d(at,foe,faceLeft,attackPose,recoil,movingWeight)) {
+        // Transparent 3D mesh composited at the original enemy position.
+      }
+      else if(originWorldRig && window.pawtopiaOriginEnemyRigs.draw(
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
           recoil,landing:landingPose,clock,reduced:reducedMotion,
@@ -7735,7 +7806,7 @@
       // New original silhouettes include their own mechanical, cloth,
       // mist and sound accents; avoid drawing the obsolete extra limbs
       // over them, but retain the original fallback when scripts are absent.
-      if(!originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
+      if(!enemy3dOn && !originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
       // No detached armor outlines or U-shaped halo above enemies.
       // Render the enemy's own sprite and grounded motion effects only.
       drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
