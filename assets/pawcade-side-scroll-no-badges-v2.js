@@ -6240,7 +6240,15 @@
     const defensiveAttack=[1,7,9,14,17,22].includes(index);
     const rushingAttack=[0,3,8,15,20].includes(index);
     const swimmingAttack=[2,19].includes(index);
-    const plantStrength=swimmingAttack?.12:defensiveAttack?.85:rushingAttack?.38:.6;
+    // Authored separately for all 25 adventures, from Foundry clamp-lunges
+    // to Starship grapple snaps. Each value controls the amount of planted
+    // stance during an attack, without changing gameplay collision or damage.
+    const worldAttackPlant=[
+      .32,.88,.10,.43,.57,.18,.28,.82,.35,.91,
+      .22,.66,.50,.73,.84,.38,.76,.86,.31,.12,
+      .26,.90,.78,.19,.58
+    ];
+    const plantStrength=worldAttackPlant[index]??(swimmingAttack?.12:defensiveAttack?.85:rushingAttack?.38:.6);
     const attackPlant=Math.min(.85,Math.max(0,attackPose||0)*plantStrength);
     const gaitBlend=Math.min(1,Math.max(0,stride||0))*(1-attackPlant);
     // Smooth attack-driven gait suppression across consecutive rendered frames.
