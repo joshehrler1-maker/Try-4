@@ -208,8 +208,9 @@ test('third through sixth stage scenery is unique, cacheable, stage-scoped and p
       assert.ok(svg.startsWith('<svg') && svg.trimEnd().endsWith('</svg>'),'bad SVG wrapper: '+asset);
       assert.ok(worker.includes("'" + asset + "'"),'offline asset missing: '+asset);
       assert.ok([x,y,wide,tall].every(Number.isFinite) && wide>0 && tall>0,'bad scenery dimensions: '+asset);
-      const stageRoomName=w.pawtopiaRoomPlans[i].split(/\\s+/)[ordinal];
+      const stageRoomName=w.pawtopiaRoomPlans[i].trim().split(' ')[ordinal];
       const geom=w.pawtopiaRooms[stageRoomName];
+      assert.ok(geom, 'missing stage room: '+stageRoomName);
       const mid=x+wide/2, bottom=y+tall;
       assert.ok(geom.some(([sx,top,span,kind])=> sx<=mid && mid<sx+span && top===bottom &&
         !['hazard','ceiling','ceilingSpikes','rail','current'].includes(kind)),
