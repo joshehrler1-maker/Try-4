@@ -6390,7 +6390,11 @@
       } else if(wallSliding){
         tilt=-p.facing*.14;scaleX=.93;
       } else if(swimming){
-        tilt=Math.sin(clock*8)*.1;scaleX=1.08;scaleY=.94;
+        const charge=index===2 ? Math.max(0,Math.min(1,p.power/.4)) : 0;
+        const swimPitch=Math.atan2(p.vy,Math.max(120,Math.abs(p.vx)));
+        tilt=p.facing*swimPitch*.28+Math.sin(clock*8)*.1*(1-charge);
+        scaleX=1.08+.12*charge;
+        scaleY=.94-.07*charge;
       } else if(rushing){
         tilt=movement==='airdash'
           ? p.facing*Math.atan2(p.vy,Math.abs(p.vx))*.34
