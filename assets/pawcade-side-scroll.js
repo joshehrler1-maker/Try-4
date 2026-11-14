@@ -992,6 +992,21 @@
         // reversals for short, technical platform sequences.
         const precisionGrip=p.on?1.65:(reversing?1.3:1.42);
         p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*precisionGrip);
+      }else if(index===6){
+        // Lantern Festival: float-friendly, gentle aerial turns while
+        // preserving the separate inhale and launch abilities.
+        const floatGrip=p.on?1.06:(reversing?.82:1.08);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*floatGrip);
+      }else if(index===7){
+        // Crystal Polarity: deliberate gravity-puzzle steering, with
+        // predictable reversals on both floors and ceilings.
+        const gravityGrip=steer?(reversing?1.35:1.16):1.32;
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*gravityGrip);
+      }else if(index===8){
+        // Stage Beat: continuous forward motion with tightly bounded
+        // velocity changes to preserve rhythmic obstacle timing.
+        const beatTarget=Math.max(topSpeed*.85,topSpeed);
+        p.vx+=(beatTarget-p.vx)*Math.min(1,dt*acceleration*1.35);
       }else{
         p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
       }
