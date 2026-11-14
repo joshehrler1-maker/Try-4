@@ -3190,8 +3190,8 @@
       // Pure rounding teleports enemies between positions, producing visible
       // stutter and sudden collision jumps on high-refresh mobile screens.
       const flowingStep=Math.sin(beat);
-      const markedStep=Math.round(flowingStep*3)/3;
-      const step=flowingStep*.72+markedStep*.28;
+      // Cubic shaping emphasizes each musical landing while staying smooth.
+      const step=flowingStep*.72+flowingStep**3*.28;
       const pulse=Math.max(0,Math.sin(beat*2));
       return {x:patrolX(foe.x+step*enemyReach*.65),
         y:foe.y-pulse*pulse*enemyRise*.55};
