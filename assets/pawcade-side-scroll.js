@@ -3058,6 +3058,57 @@
   // Game-specific visual insignias: rendered in the existing enemy pass, without
   // changing hitboxes, physics, damage, spawn tables, or the canonical sprite art.
   const enemyInsignias=['clamp','book','wave','clock','seed','mist','lantern','magnet','beat','quarry','wind','cloud','bolt','leaf','orbit','bamboo','steam','snow','canyon','sonar','neon','marble','bog','flower','cargo'];
+  // Secondary motion accents are tied to each enemy's actual gait and combat
+  // state. They never change hitboxes or interfere with touch controls.
+  function drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft){
+    if(reducedMotion || foe.dead) return;
+    const family=index%5, phase=clock*(2.1+index%4*.33)+foe.offset;
+    const stride=Math.min(1,Math.max(0,movingWeight||0));
+    const direction=faceLeft?-1:1;
+    ctx.save();ctx.translate(at.x,at.y);
+    ctx.globalAlpha=.25+stride*.26;
+    ctx.lineCap='round';
+    ctx.strokeStyle=enemyCueColors[index];
+    ctx.fillStyle=enemyCueColors[index];
+    ctx.lineWidth=1.7;
+    if(airborne){
+      // Wingbeats, propeller trails and air displacement for aerial threats.
+      for(let n=0;n<3;n++){
+        const side=direction*(23+n*8);
+        ctx.beginPath();ctx.moveTo(-side,-28+n*9);
+        ctx.quadraticCurveTo(-side-direction*11,-33+n*9+Math.sin(phase+n)*4,
+          -side-direction*(19+n*3),-28+n*9);ctx.stroke();
+      }
+    }else if(firing){
+      // Attack follow-through: bright, short-lived recoil arcs.
+      for(let n=0;n<2;n++){
+        ctx.beginPath();ctx.arc(direction*22,-13,11+n*7,
+          -.9+Math.sin(phase)*.15,.9+Math.sin(phase)*.15);ctx.stroke();
+      }
+    }else if(stride>.12){
+      // Contact marks follow the actual distance-based gait.
+      const offset=Math.sin(foe._gait||0)*5;
+      for(let n=0;n<2;n++){
+        ctx.beginPath();
+        ctx.ellipse(-direction*(9+n*9),16+Math.abs(offset)*.2,
+          4+stride*4,1.2,0,0,Math.PI*2);ctx.fill();
+      }
+    }
+    // Distinct secondary motion families: flicker, sweep, orbit, pulse, sparkle.
+    if(family===0){
+      ctx.beginPath();ctx.moveTo(-8,-38);ctx.quadraticCurveTo(-15+Math.sin(phase)*4,-48,-4,-54);ctx.stroke();
+    }else if(family===1){
+      ctx.beginPath();ctx.moveTo(-20,-30);ctx.quadraticCurveTo(0,-43+Math.sin(phase)*5,20,-30);ctx.stroke();
+    }else if(family===2){
+      ctx.beginPath();ctx.ellipse(0,-26,24,6+Math.sin(phase)*2,0,0,Math.PI*2);ctx.stroke();
+    }else if(family===3){
+      ctx.beginPath();ctx.arc(0,-26,19+Math.sin(phase)*2,Math.PI*1.12,Math.PI*1.88);ctx.stroke();
+    }else{
+      for(let n=0;n<3;n++){const a=phase+n*2.094;ctx.beginPath();
+        ctx.arc(Math.cos(a)*22,-27+Math.sin(a)*14,1.5,0,Math.PI*2);ctx.fill();}
+    }
+    ctx.restore();
+  }
   function drawEnemyInsignia(at,foe){
     if(foe.dead) return;
     const theme=enemyInsignias[index];
@@ -3384,6 +3435,7 @@
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
       ctx.restore();
+      drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
       drawEnemyInsignia(at,foe);
       drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing);
       if(foe===bashReady){
