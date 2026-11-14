@@ -6080,7 +6080,7 @@
   const resetStick=window.bindTouchJoystick?.(byId('touch-stick'),direction=>{
     for (const axis of ['left','right','up','down']) mobile.delete(axis);
     if(direction) for(const axis of direction.split(' ')) mobile.add(axis);
-  },{horizontal:!fourWayStick,diagonal:fourWayStick});
+  },{horizontal:!fourWayStick,diagonal:fourWayStick,deadZone:5,cacheBounds:true});
   document.querySelectorAll('[data-control]').forEach(button=>{
     const control=button.dataset.control;
     const activate=()=>{if(control==='jump')jump();else if(control==='technique')useTechnique();else action();};

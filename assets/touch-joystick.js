@@ -3,6 +3,8 @@ window.bindTouchJoystick = function (base, onChange, options = {}) {
   let pointer = null;
   let direction = '';
   let timer;
+  const deadZone = options.deadZone ?? 11;
+  let bounds;
   function change(next) {
     if (next === direction) return;
     direction = next;
@@ -19,22 +21,23 @@ window.bindTouchJoystick = function (base, onChange, options = {}) {
   }
   function move(event) {
     if (event.pointerId !== pointer) return;
-    const box = base.getBoundingClientRect();
+    const box = options.cacheBounds ? bounds : base.getBoundingClientRect();
     const x = options.vertical ? 0 : event.clientX - box.left - box.width / 2;
     const y = options.horizontal ? 0 : event.clientY - box.top - box.height / 2;
     const distance = Math.hypot(x, y);
     const scale = Math.min(1, box.width * .27 / (distance || 1));
     knob.style.transform = 'translate(' + x * scale + 'px,' + y * scale + 'px)';
-    if(options.diagonal && distance>=11 && Math.min(Math.abs(x),Math.abs(y))>=distance*.38){
+    if(options.diagonal && distance>=deadZone && Math.min(Math.abs(x),Math.abs(y))>=distance*.38){
       change((x<0?'left':'right')+' '+(y<0?'up':'down'));
       return;
     }
-    change(distance < 11 ? '' : Math.abs(x) > Math.abs(y) ? (x < 0 ? 'left' : 'right') : (y < 0 ? 'up' : 'down'));
+    change(distance < deadZone ? '' : Math.abs(x) > Math.abs(y) ? (x < 0 ? 'left' : 'right') : (y < 0 ? 'up' : 'down'));
   }
   base.addEventListener('pointerdown', event => {
     if (pointer !== null || event.button !== 0) return;
     event.preventDefault();
     pointer = event.pointerId;
+    if (options.cacheBounds) bounds = base.getBoundingClientRect();
     base.setPointerCapture(pointer);
     move(event);
   });
@@ -43,6 +46,7 @@ window.bindTouchJoystick = function (base, onChange, options = {}) {
     base.addEventListener(type, event => { if (event.pointerId === pointer) reset(); });
   }
   addEventListener('blur', reset);
+  if (options.cacheBounds) addEventListener('resize', reset);
   return reset;
 };
 
