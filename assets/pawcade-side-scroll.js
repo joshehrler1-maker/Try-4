@@ -3936,6 +3936,41 @@
     ctx.strokeStyle=enemyCueColors[index];
     ctx.fillStyle=enemyCueColors[index];
     ctx.lineWidth=1.7;
+    // Every world receives motion keyed to the actual travel cycle rather
+    // than a free-running bob. Each family has a different articulation:
+    // shoulder counter-swing, folding fins, wheel cadence, antenna sway,
+    // or suspended stabilizers. The accent never moves the hitbox.
+    if(!airborne){
+      const gait=Number.isFinite(footCycle)?footCycle:(foe._gait||0);
+      const swing=Math.sin(gait)*stride;
+      const brace=firing?1:0;
+      ctx.globalAlpha=.36+stride*.28+brace*.12;
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      if(family===0){
+        ctx.moveTo(-15,-20);ctx.quadraticCurveTo(-21-swing*5,-29,-24-swing*8,-17);
+        ctx.moveTo(15,-20);ctx.quadraticCurveTo(21+swing*5,-29,24+swing*8,-17);
+      }else if(family===1){
+        ctx.moveTo(-16,-21);ctx.quadraticCurveTo(-23,-29-swing*5,-29,-20);
+        ctx.moveTo(16,-21);ctx.quadraticCurveTo(23,-29+swing*5,29,-20);
+      }else if(family===2){
+        ctx.arc(-18,-8,5+stride*2,0,Math.PI*2);
+        ctx.moveTo(18,-8);ctx.arc(18,-8,5+stride*2,0,Math.PI*2);
+      }else if(family===3){
+        ctx.moveTo(-11,-25);ctx.lineTo(-13-swing*4,-35);
+        ctx.moveTo(11,-25);ctx.lineTo(13+swing*4,-35);
+      }else{
+        ctx.moveTo(-20,-14);ctx.quadraticCurveTo(-29,-20-swing*4,-34,-12);
+        ctx.moveTo(20,-14);ctx.quadraticCurveTo(29,-20+swing*4,34,-12);
+      }
+      ctx.stroke();
+      // A readable pre-strike brace uses the same animation layer for all
+      // enemy types but remains synchronized to their own attack decision.
+      if(brace){
+        ctx.beginPath();ctx.moveTo(-12,-2);ctx.lineTo(-18,0);
+        ctx.moveTo(12,-2);ctx.lineTo(18,0);ctx.stroke();
+      }
+    }
     if(airborne){
       // Wingbeats, propeller trails and air displacement for aerial threats.
       for(let n=0;n<3;n++){
