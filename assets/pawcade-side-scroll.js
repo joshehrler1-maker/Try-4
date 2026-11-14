@@ -4348,7 +4348,8 @@
       }
       ctx.restore();
       drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
-      drawEnemyArmorAccent(at,foe,faceLeft,airborne);
+      // No detached armor outlines or U-shaped halo above enemies.
+      // Render the enemy's own sprite and grounded motion effects only.
       drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
       // Keep the space above enemies clear: no floating rank badges,
       // insignias, arrows or attack symbols. Enemy art and motion remain.
