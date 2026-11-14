@@ -60,5 +60,14 @@ for (const [cue, game] of isolatedCues) {
   assert(src.includes(cue + (cue === 'seedLeap' ? '?' : '')) || src.includes('+' + cue),
     'Animation cue ' + cue + ' is never used');
 }
+// Mobile pause/resume safety: stale animation samples must reset velocity
+// and landing state rather than extrapolating from suspended-frame timing.
+assert(src.includes('const motionDt=stableMotionSample?Math.min(.05,elapsed):0;'),
+  'Stale horizontal samples must not advance animation springs');
+assert(src.includes('foe._bodyVelocity=stableMotionSample'),
+  'Stale horizontal samples must clear visual body velocity');
+assert(src.includes('foe._lastVerticalSpeed=stableVerticalSample?verticalSpeed:0;'),
+  'Stale vertical samples must clear landing velocity');
+console.log('PASS: mobile enemy animation resume guards');
 console.log('PASS: 21 individual enemy motion cues remain scoped to their own games');
 console.log('PASS: 25 distinct platform routes, palettes, beats and bounds');
