@@ -1087,10 +1087,18 @@
     if (buffer && index===10 && player.carry && !player.on) {
       player.windRelease={x:player.x,y:player.y-44,time:clock};
       player.carry=false;player.vy=-jumpSpeed;player.jumpBuffer=0;
+      player.coyote=0;
       player.jumpCut=false;player.jumpAge=0;
       return;
     }
-    if(player.cable){player.cable=null;player.grapple=.18;player.jumpBuffer=0;return;}
+    if(player.cable){
+      player.cable=null;
+      player.grapple=.18;
+      player.jumpBuffer=0;
+      player.coyote=0;
+      player.jumpCut=false;
+      return;
+    }
     if (wallMoves && player.wall && !player.on) {
       player.jumpAge=0;
       player.vy=-jumpSpeed;
@@ -1287,9 +1295,17 @@
       }
       case 'flip': action();break;
       case 'retry': respawn();activated=true;break;
-      case 'release': if(p.cable){p.cable=null;p.grapple=.18;}break;
+      case 'release':
+        if(p.cable){
+          p.cable=null;
+          p.grapple=.18;
+          p.jumpBuffer=0;
+          p.coyote=0;
+          p.jumpCut=false;
+        }
+        break;
       case 'climb': break; // Held climb is resolved against the wall each tick.
-      case 'drop': if(!p.on){p.vy=strength;p.pogo=true;p.coyote=0;p.jumpBuffer=0;p.jumpCut=false;}break;
+      case 'drop': if(!p.on && !p.pogo){p.vy=strength;p.pogo=true;p.coyote=0;p.jumpBuffer=0;p.jumpCut=false;}break;
       case 'lob':
         shot({v:facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2,motionTrail:'lob'});
         if(index===13) p.throwPose={time:clock,facing,angle:Math.atan2(-260,strength)};
@@ -1302,6 +1318,7 @@
         }
         if(p.on) p.y+=p.morphed?-10:10;
         p.morphed=!p.morphed;
+        if(p.morphed) p.morphAngle=0;
         break;
       }
       case 'bash': {
@@ -2157,8 +2174,11 @@
         }
       }
       if(attack.returning && attack.life<.55){
-        attack.v=Math.sign(p.x-attack.x)*420;
-        attack.vy=Math.max(-320,Math.min(320,(p.y-attack.y)*8));
+        const dx=p.x-attack.x;
+        const dy=p.y-attack.y;
+        const distance=Math.hypot(dx,dy)||1;
+        attack.v=dx*Math.min(420/distance,8);
+        attack.vy=dy*Math.min(420/distance,8);
         if(close(p,attack,16,18)){attack.life=0;continue;}
       }
       attack.x+=attack.v*dt;
