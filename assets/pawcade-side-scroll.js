@@ -648,7 +648,10 @@
       case 'lob': shot({v:p.facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2});break;
       case 'morph': {
         const nextBody=p.morphed?22:12;
-        if(nextBody===22 && tunnels.some(t=>p.x>t.x-12 && p.x<t.x+t.w+12)) break;
+        if(nextBody===22 && tunnels.some(t=>p.x>t.x-12 && p.x<t.x+t.w+12)){
+          if(index===14) status('Stay morphed until Shadow clears the tunnel.');
+          break;
+        }
         if(p.on) p.y+=p.morphed?-10:10;
         p.morphed=!p.morphed;
         break;
