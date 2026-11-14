@@ -5814,6 +5814,31 @@
       ctx.fillStyle='#ffe9a9';ctx.beginPath();ctx.arc(a.x,a.y,a.radius||9,0,Math.PI*2);ctx.fill();
     }
     for(const shot of hazards) {
+      if(index===16 && shot.parry){
+        ctx.save();
+        ctx.translate(shot.x,shot.y);
+        ctx.fillStyle='#ff78d3';
+        ctx.strokeStyle='#592245';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.arc(0,0,11,0,Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.strokeStyle='#fff4fc';
+        ctx.beginPath();
+        ctx.moveTo(0,-7);
+        ctx.lineTo(2,-2);
+        ctx.lineTo(7,0);
+        ctx.lineTo(2,2);
+        ctx.lineTo(0,7);
+        ctx.lineTo(-2,2);
+        ctx.lineTo(-7,0);
+        ctx.lineTo(-2,-2);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+        continue;
+      }
       if(shot.parry && atlasSprite(combatArt,3,2,shot.x,shot.y,21,21,false,2)) continue;
       ctx.save();
       ctx.translate(shot.x,shot.y);
