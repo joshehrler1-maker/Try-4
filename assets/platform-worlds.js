@@ -1064,3 +1064,8 @@ window.pawtopiaRooms.course12Stage3 = [[0,326,410],[470,288,192,"pogo"],[716,249
 // Thunder Harbor: a staged mechanical ascent and upper airship crossing.
 window.pawtopiaRooms.course12Stage4 = [[0,326,505],[558,280,201,"belt"],[816,238,190,"lift"],[1060,192,245],[1363,224,220],[1637,270,217,"belt"],[1906,326,294]];
 window.pawtopiaRooms.course12Stage5 = [[0,326,2200],[370,269,249],[675,228,228],[959,247,243],[1260,286,88,"hazard"],[1258,211,170],[1482,250,228],[1766,278,285]];
+
+// Thunder Harbor: teach the rebound, then reuse it across currents and the final climb.
+window.pawtopiaRooms.course12Stage1 = [[0,326,510],[550,295,246,"pogo"],[850,253,304],[1209,271,300],[1560,326,640]];
+window.pawtopiaRooms.course12Stage2 = [[0,326,2200],[328,275,244,"current"],[626,242,174,"pogo"],[850,208,250],[1156,246,229,"current"],[1439,216,183,"pogo"],[1676,192,339]];
+window.pawtopiaRooms.course12Stage6 = [[0,326,430],[482,285,235,"pogo"],[771,241,240],[1066,202,215,"pogo"],[1334,166,227],[1616,235,229],[1900,326,300]];
