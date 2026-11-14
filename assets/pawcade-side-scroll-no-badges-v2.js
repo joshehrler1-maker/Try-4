@@ -495,9 +495,12 @@
     // Keep supplemental landings clear of authored terrain and hazards.
     const addOptionalLanding = (x,y,w,kind) => {
       const clear=platforms.every(ledge =>
-        x+w+10<=ledge.x || x>=ledge.x+ledge.w+10 || Math.abs(y-ledge.y)>=48
+        x+w+12<=ledge.x || x>=ledge.x+ledge.w+12 ||
+        Math.abs(y-ledge.y)>=64
       );
-      if(clear) platforms.push({x,y,w,kind});
+      if(!clear) return false;
+      platforms.push({x,y,w,kind});
+      return true;
     };
     const clearLane=[7,8,14,18,20].includes(index);
     if(index!==7 && index!==14) {
@@ -527,10 +530,15 @@
       const courseRoute=optionalRoutes[index];
       for(let branch=0;branch<3;branch++){
         const [x,y,bw]=courseRoute?.[branch] ?? [1330+branch*155,230,92];
-        const bx=start+x+(stage%3)*12;
-        const by=y+(stage%2)*5;
-        if(!clearLane) addOptionalLanding(bx,by,bw,route[branch]);
-        crystals.push({x:bx+bw/2,y:by-35});
+        // Vary the branch profile by chapter, while preserving each
+        // adventure's distinct traversal mechanic and authored baseline.
+        const branchWidth=Math.max(68,bw+((stage+branch)%3-1)*14);
+        const bx=start+x+(stage%3)*12+(branch===1?stage%2*18:0);
+        const by=y+(stage%2)*5+((stage+branch)%3-1)*10;
+        // Only reward reachable, actually placed bonus platforms. Previous
+        // logic could leave a crystal floating where placement was rejected.
+        if(!clearLane && addOptionalLanding(bx,by,branchWidth,route[branch]))
+          crystals.push({x:bx+branchWidth/2,y:by-35});
       }
     }
     // Individually paced challenge pockets for all six chapters. These
