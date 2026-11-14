@@ -1340,7 +1340,7 @@
         // Late-stage raiders introduce a readable high/low lane choice.
         // Keep existing Clocktower double-shot behavior separate.
         if(foe.archetype===3 && (foe.spawnChapter??chapter)>=3 &&
-           foe.clockEnemy!==5 && hazards.length<20){
+           foe.clockEnemy!==5 && hazards.length<16){
           const upperShot=enemyRound({x:position.x,y:position.y-34},direction,false);
           upperShot.v*=.82;
           upperShot.life=1.5;
