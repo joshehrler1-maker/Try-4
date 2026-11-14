@@ -1698,6 +1698,33 @@
     new Path2D('M-14-7H14L11 7H-11Z'),
     new Path2D('M0-9L15-5V5L0 9-15 5V-5Z'),
   ];
+  const platformEndProfiles = [
+    new Path2D('M0 0H14L9 8H0Z'),
+    new Path2D('M0 0H14V4H9V9H0Z'),
+    new Path2D('M0 0H14Q12 9 0 9Z'),
+    new Path2D('M0 0H14L11 4H6L4 9H0Z'),
+    new Path2D('M0 0H14Q8 8 0 9Z'),
+    new Path2D('M0 0H14L10 3L7 9H0Z'),
+    new Path2D('M0 0H14L10 5L12 8H0Z'),
+    new Path2D('M0 0H14L7 9H0Z'),
+    new Path2D('M0 0H14V3H10V6H5V9H0Z'),
+    new Path2D('M0 0H14L12 5L8 9H0Z'),
+    new Path2D('M0 0H14L12 2L5 9H0Z'),
+    new Path2D('M0 0H14Q13 5 8 5Q6 9 0 8Z'),
+    new Path2D('M0 0H14V5L8 9H0Z'),
+    new Path2D('M0 0H14L9 4Q5 9 0 8Z'),
+    new Path2D('M0 0H14L8 4L10 9H0Z'),
+    new Path2D('M0 0H14L12 3H9L7 9H0Z'),
+    new Path2D('M0 0H14V5H11V9H0Z'),
+    new Path2D('M0 0H14L10 5L5 4L3 9H0Z'),
+    new Path2D('M0 0H14L11 4L10 7L5 6L3 9H0Z'),
+    new Path2D('M0 0H14Q14 6 8 9H0Z'),
+    new Path2D('M0 0H14V2H8V7H3V9H0Z'),
+    new Path2D('M0 0H14V3H11V6H7V9H0Z'),
+    new Path2D('M0 0H14Q8 3 6 8L0 9Z'),
+    new Path2D('M0 0H14L10 7L7 5L4 9H0Z'),
+    new Path2D('M0 0H14L11 3V7L8 9H0Z'),
+  ];
   function drawLandingEdge({x,y,w,kind}) {
     const rim=courseMaterials[index][2];
     // Two tones keep the landing line visible against both bright and dark scenery.
@@ -1830,6 +1857,21 @@
     ctx.fillStyle='#fff6dd';
     ctx.fillRect(x,y,Math.min(7,w),3);
     ctx.fillRect(x+Math.max(0,w-7),y,Math.min(7,w),3);
+    if(kind==='floor' && w>=28){
+      ctx.save();
+      ctx.fillStyle=rim;
+      ctx.globalAlpha=.82;
+      for(const direction of [1,-1]){
+        const edge=direction===1?x:x+w;
+        if(edge<camera-14 || edge>camera+width+14) continue;
+        ctx.save();
+        ctx.translate(edge,y+3);
+        ctx.scale(direction,1);
+        ctx.fill(platformEndProfiles[index]);
+        ctx.restore();
+      }
+      ctx.restore();
+    }
     drawPlatformAccents({x,y,w,kind:'landing'});
   }
   // Individually authored environmental silhouettes for the first two games.
