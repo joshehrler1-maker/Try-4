@@ -1180,7 +1180,8 @@
       const projectile={x:player.x,y:player.y,v:player.facing*speed,life};
       if(index===8) projectile.accent=onBeat;
       if(index===19 && held('up')){
-        projectile.v*=.7;
+        const aim=Number(held('right'))-Number(held('left'));
+        projectile.v=(aim||player.facing)*speed*.7;
         projectile.vy=-speed*.7;
       }
       if(index===21 && movement==='whip'){
@@ -1200,7 +1201,7 @@
         projectile.gravity=570;
       }
       if(index===19 || index===24){
-        const facing=player.facing;
+        const facing=Math.sign(projectile.v)||player.facing;
         player.shotPose={time:clock,facing,angle:Math.atan2(projectile.vy||0,Math.abs(projectile.v))};
       }
       if(index===13 || index===17){
