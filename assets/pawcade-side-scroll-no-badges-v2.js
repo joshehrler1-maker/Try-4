@@ -192,7 +192,7 @@
   byId('side-player').hidden = false;
   if (power==='swim') byId('touch-stick').setAttribute('aria-label','Drag in four directions to swim');
   byId('side-title').textContent = hero + ' · ' + name;
-  const fourWayStick = power==='swim' || movement==='airdash' || [3,9,13,15].includes(index);
+  const fourWayStick = power==='swim' || movement==='airdash' || [3,9,13,15,18].includes(index);
   if(index===9) byId('touch-stick').setAttribute('aria-label','Move left or right. While attached, drag up to reel in or down to extend the cable.');
   const controlsGuide = [
     movement==='beat' ? 'Auto-run. Press Space to jump.' :
@@ -202,7 +202,8 @@
       movement==='airdash' ? 'Keyboard: A/D or Left/Right to move, Space to jump, W/S or Up/Down to aim your dash.' :
       'Keyboard: A/D or Left/Right to move, Space for '+(power==='flip'?'Flip':'Jump')+'.',
     powerButton.hidden || index===3 ? '' : powerButton.textContent+' uses X.',
-    index===11 ? 'Hold Climb (C) against a wall and steer up or down. Landing restores stamina.' :
+    index===18 ? 'Grab a ledge while airborne. Press Up or Jump to climb, or Down to drop.' :
+      index===11 ? 'Hold Climb (C) against a wall and steer up or down. Landing restores stamina.' :
       index===16 ? 'Press Jump again near a pink shot while airborne to parry. The Parry button also works.' :
       techniqueButton && !techniqueButton.hidden ? techniqueName+' uses C.' : '',
     'On touch, use the joystick and the labeled buttons.'
@@ -1007,6 +1008,7 @@
   function jump(buffer = true) {
     if (phase !== 'playing') return;
     if (power==='flip') {if(buffer) action();return;}
+    if (player.ledgeGrip) {climbFromLedge(player);return;}
     if (buffer && index===16 && !player.on && hazards.some(h=>h.parry && h.life>0 && close(player,h,55,55))) {
       if (player.techCooldown<=0) useTechnique();
       return;
@@ -1193,8 +1195,20 @@
         break;
       }
       case 'grab': {
-        const edge=platforms.find(l=>l.kind==='floor' && Math.min(Math.abs(l.x-p.x),Math.abs(l.x+l.w-p.x))<31 && p.y>l.y && p.y<l.y+48);
-        if(edge && !p.on){p.y=edge.y-22;p.x=Math.max(edge.x+10,Math.min(p.x,edge.x+edge.w-10));p.vy=0;}
+        if(p.on || p.ledgeGrip) break;
+        const edge=platforms.find(l=>
+          ['floor','shelf'].includes(l.kind) && (!l.switchBridge || amberSwitch) &&
+          p.y>l.y && p.y<l.y+48 &&
+          ((p.x<=l.x && l.x-p.x<31) || (p.x>=l.x+l.w && p.x-l.x-l.w<31))
+        );
+        if(edge){
+          const left=p.x<=edge.x;
+          p.ledgeGrip={edge,left};
+          p.x=left?edge.x-12:edge.x+edge.w+12;
+          p.y=edge.y+19;
+          p.vx=p.vy=0;
+          p.jumpBuffer=0;
+        }
         break;
       }
       case 'swap': p.altWeapon=!p.altWeapon;status(p.altWeapon?'Spread fire equipped.':'Straight fire equipped.');break;
@@ -1326,6 +1340,15 @@
     const right = Math.max(fromX, toX);
     return walls.some(wall => y >= wall.top && left <= wall.x+20 && right >= wall.x);
   }
+  function climbFromLedge(p) {
+    const {edge,left}=p.ledgeGrip;
+    p.x=left?edge.x+13:edge.x+edge.w-13;
+    p.y=edge.y-22;
+    p.vx=p.vy=0;
+    p.on=true;
+    p.jumps=0;
+    p.ledgeGrip=null;
+  }
   function step(dt) {
     clock += dt;
     chapterReveal=Math.max(0,chapterReveal-dt);
@@ -1342,6 +1365,11 @@
       if (Math.floor(escape)!==Math.floor(escape+dt)) status('Escape back to the entrance · '+Math.ceil(escape)+'s');
     }
     const p = player;
+    if(p.ledgeGrip){
+      if(held('up')) climbFromLedge(p);
+      else if(held('down')) p.ledgeGrip=null;
+      else return;
+    }
     // Precision platformers allow forgiving edge jumps; momentum and
     // action games retain more committed takeoff timing.
     const edgeGrace=[.095,.085,.11,.075,.095,.11,.115,.065,.045,.085,
@@ -1383,14 +1411,21 @@
     const acceleration = (p.onIce ? handling*.28 : steer
       ? handling * (p.on ? (reversing ? 1.35 : 1) : .72)
       : Math.max(1.6,handling*(p.on ? .95 : .45))) * controlFactor * (p.on ? 1 : airFactor);
-    if (index===3 && p.spin && !held('down')) {
-      p.vx=p.facing*(520+p.spin*50);p.power=.65;p.spin=0;
+    if (index===3 && p.spin) {
+      if (!p.on) p.spin=0;
+      else if (held('down')) p.vx=0;
+      else {
+        p.vx=p.facing*(520+p.spin*50);
+        p.power=.65;
+        p.grapple=.18;
+        p.spin=0;
+      }
     }
     p.wallLock=Math.max(0,(p.wallLock||0)-dt);
     const oldX=p.x;
     const surfaceDrift=p.on ? p.surfaceDrift||0 : 0;
     p.grapple=Math.max(0,(p.grapple||0)-dt);
-    if (!(power === 'dash' && p.power > .22) && !p.grapple && !p.wallLock) {
+    if (!(power === 'dash' && p.power > .22) && !p.grapple && !p.wallLock && !(index===3 && p.spin)) {
       if(index===3){
         // Clocktower Relay's Sonic-inspired identity: momentum is earned,
         // braking is deliberate, and airborne steering has less authority.
@@ -5981,7 +6016,7 @@
   byId('side-start').onclick=()=>startRun(null);
   resumeButton.hidden=!readCheckpoint();
   resumeButton.onclick=()=>{const saved=readCheckpoint();if(saved)startRun(saved);};
-  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||[9,13,15].includes(index)?'up':'jump',KeyW:power==='swim'||movement==='airdash'||[9,13,15].includes(index)?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
+  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||[9,13,15,18].includes(index)?'up':'jump',KeyW:power==='swim'||movement==='airdash'||[9,13,15,18].includes(index)?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
   addEventListener('keydown',event=>{
     if(storyDialog?.open) return;
     if(event.code==='KeyP' && !event.repeat && (phase==='playing'||phase==='paused')) {event.preventDefault();togglePause();return;}
