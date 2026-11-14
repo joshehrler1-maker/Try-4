@@ -383,3 +383,71 @@ test('five mid-world enemy rigs preserve game-specific silhouettes and safe rend
   assert.equal(art.draw({},20,{x:0,y:0},{},{}),false,
     'other adventure enemies must retain their own designs');
 });
+
+test('cloud-trail rigs for games 11–15 have independent silhouettes and safe stage-aware motion', () => {
+  const artPath=path.join(__dirname,'../assets/animation/cloud-trail-enemy-rigs-v1.js');
+  const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const runtime=fs.readFileSync(path.join(__dirname,
+    '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const worker=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  const registry=JSON.parse(fs.readFileSync(path.join(__dirname,
+    '../assets/enemy-art-motion-registry.json'),'utf8'));
+  assert.ok(fs.existsSync(artPath),'missing original rig art');
+  const sandbox={window:{}};
+  vm.runInNewContext(fs.readFileSync(artPath,'utf8'),sandbox,
+    {filename:'cloud-trail-enemy-rigs-v1.js',timeout:1000});
+  const art=sandbox.window.pawtopiaCloudEnemyRigs;
+  assert.equal(typeof art?.draw,'function');
+  assert.equal(Object.keys(art.families).length,5);
+  assert.equal(new Set(Object.values(art.families)).size,5,
+    'the five games cannot reuse the same enemy body design');
+  assert.ok(html.includes('src="assets/animation/cloud-trail-enemy-rigs-v1.js?'));
+  assert.ok(html.indexOf('src="assets/animation/cloud-trail-enemy-rigs-v1.js') <
+    html.indexOf('src="assets/pawcade-side-scroll-no-badges-v2.js'),
+    'enemy body module must load before gameplay runtime');
+  assert.ok(worker.includes("'assets/animation/cloud-trail-enemy-rigs-v1.js?"),
+    'new enemy motion module should work offline');
+  assert.ok(runtime.includes('cloudWorldRig = index>=10 && index<=14'),
+    'individual artwork must be bound only to games 11–15');
+  assert.ok(runtime.includes('window.pawtopiaCloudEnemyRigs.draw('),
+    'gameplay draw must use original enemy artwork');
+  assert.ok(runtime.includes('window.pawtopiaCloudEnemyRigs?.draw'),
+    'defeat must use original enemy art for visual-only fade');
+  for(let index=10;index<15;index++){
+    assert.equal(art.families[index],registry.games[index].enemyFamily);
+    assert.match(registry.games[index].implementationStatus,/partial/i,
+      'the art must not be recorded as fully 3D and film-quality');
+    let saveDepth=0, drawCalls=0, fillCalls=0;
+    const ctx=new Proxy({globalAlpha:1},{
+      get(target,method){
+        if(Object.hasOwn(target,method))return target[method];
+        return(...args)=>{
+          drawCalls++;
+          if(method==='save')saveDepth++;
+          if(method==='restore')saveDepth--;
+          if(method==='fill')fillCalls++;
+          assert.ok(args.every(x=>typeof x!=='number'||Number.isFinite(x)),
+            'bad coordinate in game '+index+' method '+String(method));
+        };
+      },
+      set(target,key,value){target[key]=value;return true;}
+    });
+    const isAirborne=index===10;
+    for(const pose of [
+      {stride:0,attack:0,recoil:0,landing:0,clock:0,reduced:true,airborne:isAirborne},
+      {stride:1,attack:0,recoil:0,landing:0,clock:1.7,reduced:false,airborne:isAirborne},
+      {stride:.45,attack:.65,recoil:.25,landing:.15,clock:2.2,reduced:false,airborne:isAirborne},
+      {stride:0,attack:1,recoil:1,landing:.6,clock:3.6,reduced:false,airborne:isAirborne,faceLeft:true,hit:1}
+    ]){
+      assert.equal(art.draw(ctx,index,{x:250,y:286},
+        {_gait:2.4,offset:index+.5},pose),true);
+      assert.equal(saveDepth,0,'canvas state leaked in game '+index);
+    }
+    assert.ok(drawCalls>70 && fillCalls>15,
+      'body part animation too sparse for game '+index);
+  }
+  assert.equal(art.draw({},9,{x:0,y:0},{},{}),false,
+    'other games must keep their own body silhouettes');
+  assert.equal(art.draw({},15,{x:0,y:0},{},{}),false,
+    'new artwork must not overwrite games 16–25');
+});
