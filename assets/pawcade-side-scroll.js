@@ -2801,6 +2801,27 @@
       if (ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
       if(ledge.switchBridge && !amberSwitch) continue;
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
+      const foundryStage=index===0 ? Math.floor(ledge.x/sectionSize) : -1;
+      if((foundryStage===6 || foundryStage===7) && ['floor','lift'].includes(ledge.kind)){
+        const {x,y,w,kind}=ledge;
+        const floodgate=foundryStage===7;
+        const depth=y>=ground?height-y:23;
+        ctx.fillStyle=floodgate?'#28515c':'#673b35';
+        ctx.fillRect(x,y,w,depth);
+        ctx.fillStyle=floodgate?'#85c9bf':'#e9a065';
+        ctx.fillRect(x,y,w,5);
+        const spacing=floodgate?42:31;
+        const first=Math.max(0,Math.floor((camera-x)/spacing))*spacing+10;
+        for(let offset=first;offset<w-12 && x+offset<camera+width+spacing;offset+=spacing){
+          ctx.fillStyle=floodgate?'#376975':'#442b30';
+          ctx.fillRect(x+offset,y+8,floodgate?18:9,Math.min(13,depth-8));
+          ctx.fillStyle=floodgate?'#b8d9b9':'#f5bf7d';
+          ctx.fillRect(x+offset+3,y+11,3,3);
+          if(kind==='lift') ctx.fillRect(x+offset,y+18,13,3);
+        }
+        drawLandingEdge(ledge);
+        continue;
+      }
       if(ledge.steamDeck!==undefined){
         const {x,y,w,steamDeck}=ledge;
         const [top,body,trim]=[
