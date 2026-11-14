@@ -105,5 +105,6 @@ assert(src.includes('stage:offset + 2'),'Use stages 3/4 only');
 assert(src.includes('stageStarts[slot.stage] + slot.x'),'Stage-local offsets');
 assert(src.includes('if (sections <= slot.stage || !slot.image.naturalWidth) continue;'),'Avoid drawing unloaded images');
 assert(!src.includes('slot.image.getImageData'),'No new expensive pixel readback');
-assert(html.includes('v=live-3d-10-cinematic-34-20261114') && sw.includes('v=live-3d-10-cinematic-34-20261114'),'Version parity');
+const buildVersion = html.match(/pawcade-side-scroll-no-badges-v2\\.js\\?v=([^\"]+)/)?.[1];
+assert(buildVersion && sw.includes('pawcade-side-scroll-no-badges-v2.js?v='+buildVersion),'Version parity');
 console.log('PASS: 10 original non-interactive scenic assets integrated across stages 3/4, games 1-5');
