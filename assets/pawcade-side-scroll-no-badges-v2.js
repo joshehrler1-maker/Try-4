@@ -2948,8 +2948,11 @@
     ctx.lineCap='round';
     ctx.stroke(design.details);
     // Moonlit Library: hinged illuminated pages and a closing book strike.
-    const fold=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
-    const pageWave=reducedMotion?0:Math.sin(phase*2)*.12;
+    // Library-only: different atlas sentries fold their pages at different
+    // angles and rhythms; never apply this paper mechanic to other games.
+    const pageFoldScale=[.72,1.05,.88,1.2,.63,1.12][kind]??1;
+    const fold=reducedMotion?0:Math.max(0,Math.min(1,attackPose))*pageFoldScale;
+    const pageWave=reducedMotion?0:Math.sin(phase*(1.7+kind*.16))*(.08+kind*.012);
     for(const side of [-1,1]){
       ctx.save();ctx.translate(side*12,-9);
       ctx.rotate(side*(.3+pageWave-fold*.8));
@@ -2994,8 +2997,12 @@
     ctx.fillStyle='#fff2cf';ctx.beginPath();
     ctx.ellipse(kind===1?4:12,kind===2?0:-4,3,2.5,0,0,Math.PI*2);ctx.fill();
     // Coral Courier: flexible fin strokes and a forward water-jet attack.
+    // Reef-only: swimming fins use separate stroke frequencies and water
+    // jet reach for each aquatic enemy silhouette.
+    const finStroke=[2.1,1.4,2.8,1.9,2.5,1.65][kind]??2.4;
+    const jetReach=[.75,1.15,.9,1.35,.8,1.2][kind]??1;
     const thrust=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
-    const finBeat=reducedMotion?0:Math.sin(phase*2.4)*7;
+    const finBeat=reducedMotion?0:Math.sin(phase*finStroke)*7;
     ctx.fillStyle=['#f5b78b','#c7b5f2','#85e4e5','#f6df98','#b3e6a6','#f6acc8'][kind];
     ctx.strokeStyle='#e7ffff';ctx.lineWidth=1.3;
     for(const side of [-1,1]){
@@ -3007,7 +3014,7 @@
       ctx.save();ctx.globalAlpha=thrust*.7;ctx.strokeStyle='#bdfbff';ctx.lineWidth=2;
       for(let jet=0;jet<3;jet++){
         ctx.beginPath();ctx.moveTo(-26-jet*5,-7+jet*6);
-        ctx.quadraticCurveTo(-35-jet*6,-9+jet*6,-46-jet*7,-7+jet*6);
+        ctx.quadraticCurveTo(-35-jet*6*jetReach,-9+jet*6,-26-(20+jet*7)*jetReach,-7+jet*6);
         ctx.stroke();
       }
       ctx.restore();
