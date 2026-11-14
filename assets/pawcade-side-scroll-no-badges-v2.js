@@ -2466,7 +2466,12 @@
     ctx.lineWidth=1;
     for(let tile=first;tile<=first+Math.ceil(width/spacing)+2;tile++) {
       const x=tile*spacing-shift;
-      const rise=(47+Math.abs((tile*73+index*31)%79))*scale;
+      // Mix three terrain-height rhythms instead of repeating the same
+      // silhouette every few tiles. Each world has its own profile.
+      const broad=Math.sin(tile*.63+index*.71)*21;
+      const detail=Math.sin(tile*1.73+index*.39)*11;
+      const chapterPulse=Math.sin((tile+index*7)*.19)*17;
+      const rise=Math.max(36,(82+broad+detail+chapterPulse)*scale);
       const top=baseline-rise;
       ctx.beginPath();
       ctx.moveTo(x,baseline);
