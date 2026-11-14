@@ -3969,12 +3969,31 @@
         const side=leg===0?-1:1;
         const swing=Math.sin(gait+leg*Math.PI)*stride*5;
         const lift=Math.max(0,Math.cos(gait+leg*Math.PI))*stride*4;
+        // Bracing spreads the feet before firing; both legs stay grounded.
+        const brace=firing?side*3:0;
         ctx.beginPath();
         ctx.moveTo(side*12,-16);
-        ctx.quadraticCurveTo(side*15+swing*.55,-9,side*14+swing,-2-lift);
-        ctx.lineTo(side*14+swing+direction*5,-2-lift);
+        ctx.quadraticCurveTo(side*15+swing*.55+brace*.5,-9,side*14+swing+brace,-2-lift);
+        ctx.lineTo(side*14+swing+brace+direction*5,-2-lift);
         ctx.stroke();
       }
+      // Articulated forge-claw attack: shoulder, elbow and claw sweep
+      // follow the enemy's firing state rather than looping continuously.
+      const attackReach=firing?9+Math.sin(phase*2)*3:2+stride*2;
+      const shoulderX=direction*14;
+      ctx.lineWidth=3.6;
+      ctx.beginPath();
+      ctx.moveTo(shoulderX,-28);
+      ctx.quadraticCurveTo(direction*(19+attackReach*.45),-24,
+        direction*(22+attackReach),-17);
+      ctx.stroke();
+      ctx.lineWidth=2.5;
+      ctx.beginPath();
+      ctx.moveTo(direction*(22+attackReach),-17);
+      ctx.lineTo(direction*(28+attackReach),-22);
+      ctx.moveTo(direction*(22+attackReach),-17);
+      ctx.lineTo(direction*(29+attackReach),-13);
+      ctx.stroke();
     }else if(family===0){
       ctx.beginPath();ctx.moveTo(-8,-38);ctx.quadraticCurveTo(-15+Math.sin(phase)*4,-48,-4,-54);ctx.stroke();
     }else if(family===1){
