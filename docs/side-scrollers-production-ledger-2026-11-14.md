@@ -1,6 +1,36 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
 
+## Batches 9–10 — twenty original enemy motion families integrated (games 6–25)
+
+**Scope completed in this session:** ten new original game-specific 2.5D procedural **enemy body illustrations and state-driven motion routines**, covering games 6–15. These are visual simulations drawn with the Canvas 2D API, **not** 3D polygon models, character-sheet turnarounds, movie-quality renderer outputs, or the required full movement clip libraries. No paid APIs or services.
+
+| Game | Current individual enemy | New body-animation and attack language |
+| --- | --- | --- |
+| 06 Waterfall Climb | Mist Glider | Non-grounded water-veil airfoils, independent waterfall strands, dive bank and spray-on-recoil |
+| 07 Lantern Festival | Lantern Juggler | Asymmetric silk sleeves, alternating hopping feet, linked lantern swing, simulated triple-toss windup |
+| 08 Crystal Polarity | Flux Beetle | Four mechanical leg contacts, separate magnetic plates, extendable pole actuator and brief ion discharge |
+| 09 Stage Beat | Bass Bouncer | Contact-grounded stomp pads, responsive drum-shell compression, hinged acoustic hammers and rhythmic attack rings |
+| 10 Quarry Rescue | Slate Burrower | Layered sandstone quarry armor, embedded drill manipulators, turret-compatible fixed base and rock dust |
+| 11 Sunset Wind Sail | Gale Kite | Sailcloth airfoils, independent windward streamers, body lean and swoop without fictional walking feet |
+| 12 Cloud City | Nimbus Guard | Cloudglass plates, cushioned grounded footfalls, independently flexing shoulders and charged hover-like impact |
+| 13 Thunder Harbor | Coil Ray | Copper resonator coils, braced feet, charging core and short branching discharge synchronized to actual firing |
+| 14 Autumn Trail | Bramble Stalker | Asymmetric leaf mantle, two stalking feet, extending bramble claw and fall-leaf reaction |
+| 15 Inverted Observatory | Orbit Watcher | Star-chart body rings, travel-dependent support feet and connected gravity-pulse coil |
+
+**Source modules:**
+- `assets/animation/five-world-enemy-rigs-v1.js` (game indices 5–9, original art).
+- `assets/animation/cloud-trail-enemy-rigs-v1.js` (indices 10–14, original art).
+- Existing separate `mid-world-enemy-rigs-v1.js` and `late-world-enemy-rigs-v1.js` (indices 15–24) are unchanged except the single shared renderer now routes per-game correctly.
+
+**Integration:** The Games Room HTML loads each module before the main script. The game renderer selects an authored body per **exact game index**. It preserves existing foe position, enemy attack AI, platform geometry, sprite fallback, physics collisions and scoring. All twenty custom enemy bodies respond to actual distance-traveled gait, strike anticipation, shot recoil and facing (mirrored). Visually defeated enemies are removed from gameplay immediately and rendered for at most 0.42s as a non-colliding fading image, respecting reduced motion. On a missing module, the engine falls back to its pre-existing enemy artwork without stopping the game. Old game 6–10 supplemental motion accents are suppressed when their original body art loads to prevent duplicated overlapping appendages.
+
+**Verification gates:** Added independent unit tests for ten new vector-rig families, original enemy-family names, script initialization order, 2D canvas path safety and balanced `save/restore`, game-range isolation, offline caching and accurate source registration. A manual mocked-canvas state test also passed for all ten rigs. GitHub's source/Android compile workflow and Pages deployment need separate recorded outcomes; even a passing result does not prove real Android visual smoothness, correct 3D render fidelity or that counterpart source games were visually inspected.
+
+**Remaining substantial work:** Game indices 0–4 have not received comparable newly authored enemy motion-rig families in these batches. All 25 still need fully modeled original poster-accurate 3D heroes and enemies with per-action animation clips, full-stage original 3D scenery, live Android playtesting, optimized backgrounds, and complete narrated/sung/edited movie render outputs with captions. No movies were rendered or published in this session.
+
+
+
 ## Batch 8 — enemies for games 16–20 (original playable 2.5D vector rigs)
 
 Five new **separate** original enemy silhouettes and behavioral body-motion algorithms are now integrated into the playable Stage 1–6 builds. Source: `assets/animation/mid-world-enemy-rigs-v1.js` (new; latest code `6bc18e4`); integration: `assets/pawcade-side-scroll-no-badges-v2.js` (`ebd3453`). This is **not** a finished feature-film 3D animation pass.
