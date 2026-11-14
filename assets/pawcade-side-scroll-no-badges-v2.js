@@ -1241,19 +1241,29 @@
   }
   const pauseButton=byId('side-pause');
   const soundButton=byId('side-sound');
+  const soundPreference='pawcade-side-scroll-sound';
   let audio, sound=false;
-  soundButton.onclick=()=>{
-    const Audio=window.AudioContext || window.webkitAudioContext;
-    if(!Audio) return;
+  try {sound=localStorage.getItem(soundPreference)==='on';} catch {}
+  const Audio=window.AudioContext || window.webkitAudioContext;
+  function syncSoundButton() {
+    soundButton.disabled=!Audio;
+    soundButton.setAttribute('aria-pressed',String(sound && Boolean(Audio)));
+    soundButton.textContent=Audio?(sound?'Sound on':'Sound off'):'Sound unavailable';
+  }
+  function unlockAudio() {
+    if(!Audio) return Promise.resolve();
     try {
       audio ??= new Audio();
-      sound=!sound;
-      if(sound) audio.resume().catch(()=>{});
-      else stopMusic();
-      soundButton.setAttribute('aria-pressed',String(sound));
-      soundButton.textContent=sound?'Sound on':'Sound off';
-      playCue(440,660);
-    } catch {sound=false;}
+      return audio.resume().catch(()=>{});
+    } catch {return Promise.resolve();}
+  }
+  syncSoundButton();
+  soundButton.onclick=()=>{
+    sound=!sound;
+    try {localStorage.setItem(soundPreference,sound?'on':'off');} catch {}
+    syncSoundButton();
+    if(sound) unlockAudio().then(()=>playCue(440,660));
+    else stopMusic();
   };
   // Original synthesized voices in catalog order. Each voice sets a wave,
   // pitch multiplier and overtone ratio for the course's event cues.
@@ -1319,7 +1329,7 @@
     nextMusicAt=0;
   }
 
-  function musicNote(note,at,length,level,type) {
+  function musicNote(note,at,length,level,type,output=musicBus) {
     const voice=audio.createOscillator(), gain=audio.createGain();
     voice.type=type;
     voice.frequency.value=440*2**((note-69)/12);
@@ -1327,10 +1337,18 @@
     gain.gain.exponentialRampToValueAtTime(level,at+.014);
     gain.gain.exponentialRampToValueAtTime(.0001,at+length);
     voice.connect(gain);
-    gain.connect(musicBus);
+    gain.connect(output);
     voice.onended=()=>gain.disconnect();
     voice.start(at);
     voice.stop(at+length);
+  }
+
+  function playVictory() {
+    if(!sound || audio?.state!=='running') return;
+    const now=audio.currentTime;
+    for(const [beat,offset] of [0,4,7,12].entries()){
+      musicNote(musicRoot+offset,now+beat*.105,beat===3?.32:.15,.035,'triangle',audio.destination);
+    }
   }
 
   function updateMusic() {
@@ -6113,9 +6131,10 @@
     last=now;
     draw();
     if(phase==='playing' && !storyDialog?.open) frame=requestAnimationFrame(loop);
-    if(phase==='won') {stopMusic();clearInput();pauseButton.disabled=true;playCue(440,880,.3);if(index===0)showFoundryStory(6);}
+    if(phase==='won') {stopMusic();clearInput();pauseButton.disabled=true;playVictory();if(index===0)showFoundryStory(6);}
   }
   function startRun(saved) {
+    if(sound) unlockAudio();
     stopMusic();
     musicStep=0;
     cancelAnimationFrame(frame);
