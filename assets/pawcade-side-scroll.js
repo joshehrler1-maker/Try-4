@@ -1886,7 +1886,7 @@
         }
         ctx.fillStyle='#f0c37c';ctx.globalAlpha=.8;
         for(let leaf=0;leaf<6;leaf++){
-          const lx=x+12+leaf*35,ly=188+(leaf*19+variation*11)%82;
+          const lx=x+12+leaf*35+(reducedMotion?0:Math.sin(clock*.85+leaf+n)*10),ly=188+(leaf*19+variation*11+(reducedMotion?0:clock*12))%82;
           ctx.save();ctx.translate(lx,ly);ctx.rotate((leaf-2)*.38);
           ctx.beginPath();ctx.ellipse(0,0,5,2.5,0,0,Math.PI*2);ctx.fill();ctx.restore();
         }
@@ -1920,7 +1920,7 @@
             ctx.beginPath();ctx.moveTo(bx,jy);ctx.lineTo(bx+10,jy);ctx.stroke();
           }
           ctx.fillStyle='#79ae7b';
-          ctx.beginPath();ctx.ellipse(bx-12,top+25,21,5,-.3,0,Math.PI*2);ctx.fill();
+          ctx.beginPath();ctx.ellipse(bx-12+(reducedMotion?0:Math.sin(clock*1.1+stalk+n)*5),top+25,21,5,-.3,0,Math.PI*2);ctx.fill();
         }
         const roof=171+variation*9;
         ctx.fillStyle='#544b57';ctx.fillRect(x+65,roof+24,99,93);
@@ -2097,7 +2097,7 @@
         ctx.fillStyle='#71aa61';
         for(let leaf=0;leaf<3;leaf++){
           const ly=201+leaf*25;
-          ctx.beginPath();ctx.ellipse(flowerX+(leaf%2?25:-25),ly,30,11,leaf%2?-.35:.35,0,Math.PI*2);ctx.fill();
+          ctx.beginPath();ctx.ellipse(flowerX+(leaf%2?25:-25)+(reducedMotion?0:Math.sin(clock*.9+leaf+n)*4),ly,30,11,leaf%2?-.35:.35,0,Math.PI*2);ctx.fill();
         }
         ctx.fillStyle='#e8b84f';
         for(let petal=0;petal<12;petal++){
