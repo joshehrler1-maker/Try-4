@@ -1646,7 +1646,10 @@
   // Snapshot position at impact so the short visual cannot drift after death.
   function markFoeDefeated(foe) {
     if(foe.dead)return;
-    const shouldAnimate=index>=20 && index<=24 && !reducedMotion;
+    const shouldAnimate=!reducedMotion && (
+      index>=15 && index<=19 && typeof window.pawtopiaMidEnemyRigs?.draw === 'function' ||
+      index>=20 && index<=24 && typeof window.pawtopiaLateEnemyRigs?.draw === 'function'
+    );
     const pose=shouldAnimate?foePosition(foe):null;
     foe.dead=true;
     if(pose){
@@ -7394,8 +7397,10 @@
     // A short unique-rig defeat transition follows a confirmed kill.
     // It never resurrects a foe's physics or damages the player. On reduced
     // motion it is intentionally suppressed, matching user accessibility.
-    if(index>=20 && index<=24 && !reducedMotion &&
-       window.pawtopiaLateEnemyRigs?.draw){
+    const dyingEnemyArt = index>=15 && index<=19
+      ? window.pawtopiaMidEnemyRigs
+      : index>=20 && index<=24 ? window.pawtopiaLateEnemyRigs : null;
+    if(!reducedMotion && typeof dyingEnemyArt?.draw === 'function'){
       for(const foe of enemies){
         if(!foe.dead || !Number.isFinite(foe._defeatAt))continue;
         const age=clock-foe._defeatAt;
@@ -7410,7 +7415,7 @@
         ctx.rotate((foe.faceLeft?1:-1)*t*.26);
         ctx.scale(1-t*.23,1-t*.4);
         ctx.translate(-x,-y);
-        window.pawtopiaLateEnemyRigs.draw(ctx,index,{x,y},foe,{
+        dyingEnemyArt.draw(ctx,index,{x,y},foe,{
           faceLeft:foe.faceLeft,reduced:true
         });
         ctx.restore();
@@ -7646,10 +7651,22 @@
       // silhouettes in the playable canvas, not the generic enemy atlas.
       // If the free optional rig module fails to load, keep the old sprite
       // and articulated limbs so gameplay never depends on this art upgrade.
+      const midWorldRig = index>=15 && index<=19 &&
+        typeof window.pawtopiaMidEnemyRigs?.draw === 'function';
       const lateWorldRig = index>=20 && index<=24 &&
         typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
-      if(!lateWorldRig) drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
-      if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
+      if(!midWorldRig && !lateWorldRig)
+        drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
+      if(midWorldRig && window.pawtopiaMidEnemyRigs.draw(
+        ctx,index,at,foe,{
+          faceLeft,stride:movingWeight,attack:attackPose,
+          recoil,landing:landingPose,clock,reduced:reducedMotion,
+          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
+        })) {
+        // Each of games 16–20 has an original silhouette with its own
+        // traversal/contact articulation and visual-only impact timing.
+      }
+      else if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing,attackPose);
       else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft,attackPose);
       else if(foe.clockEnemy!==undefined) drawClockEnemy(at,foe,faceLeft,attackPose);
