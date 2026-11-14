@@ -2120,6 +2120,7 @@
           if(index===12 && p.pogo && !reducedMotion){
             burst(position.x,position.y-12,'#b8eeff',8);
           }
+          if(index===0) p.stompImpact={x:p.x,y:p.y+22,time:clock};
           p.vy=p.pogo || (movement==='pogo' && held('jump')) ? -560 :
             index===0 && held('jump') ? -440 : -320;
           p.pogo=false;p.on=false;
@@ -6566,6 +6567,23 @@
         ctx.moveTo(-tail,10);
         ctx.quadraticCurveTo(-8,20,18,7);
         ctx.stroke();
+        ctx.restore();
+      }
+    }
+    if(index===0 && p.stompImpact && !reducedMotion){
+      const {x,y,time}=p.stompImpact;
+      const progress=(clock-time)/.24;
+      if(progress>=0 && progress<1){
+        ctx.save();
+        ctx.globalAlpha=1-progress;
+        ctx.strokeStyle='#ffd085';
+        ctx.lineWidth=3-progress*2;
+        for(const side of [-1,1]){
+          ctx.beginPath();
+          ctx.moveTo(x+side*(5+progress*22),y-1);
+          ctx.lineTo(x+side*(13+progress*32),y-4-progress*7);
+          ctx.stroke();
+        }
         ctx.restore();
       }
     }
