@@ -1056,12 +1056,27 @@
       if(ledge.kind==='hazard'||ledge.kind==='ceilingSpikes'||ledge.kind==='rail'||ledge.kind==='ceiling') continue;
       if(x>=ledge.x && x<=ledge.x+ledge.w && ledge.y>=y) surface=Math.min(surface,ledge.y);
     }
-    const distance=surface-y;
-    if(distance>115) return;
+    // No surface below the actor means no floating shadow. Shadows remain
+    // on the actual platform top, fading and softening with jump height.
+    if(!Number.isFinite(surface))return;
+    const distance=Math.max(0,surface-y);
+    if(distance>115)return;
     ctx.save();
-    ctx.globalAlpha=.44*(1-distance/145);
-    ctx.fillStyle='#080b17';
-    ctx.beginPath();ctx.ellipse(x+distance*.16,surface-2,radius+distance*.07,4+distance*.018,0,0,Math.PI*2);ctx.fill();
+    const fade=Math.max(0,1-distance/125);
+    const spread=radius+distance*.085;
+    const thickness=4+distance*.025;
+    const centerX=x+distance*.11;
+    const centerY=surface-1;
+    const shadow=ctx.createRadialGradient(centerX,centerY,0,centerX,centerY,spread);
+    shadow.addColorStop(0,'rgba(7,9,22,'+(.43*fade).toFixed(3)+')');
+    shadow.addColorStop(.52,'rgba(7,9,22,'+(.22*fade).toFixed(3)+')');
+    shadow.addColorStop(1,'rgba(7,9,22,0)');
+    ctx.translate(centerX,centerY);
+    ctx.scale(1,thickness/spread);
+    ctx.fillStyle=shadow;
+    ctx.beginPath();
+    ctx.arc(0,0,spread,0,Math.PI*2);
+    ctx.fill();
     ctx.restore();
   }
   const atmosphere = {
