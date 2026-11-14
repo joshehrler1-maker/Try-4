@@ -1391,6 +1391,22 @@
     ctx.moveTo(x,y+1);
     ctx.lineTo(x+w,y+1);
     ctx.stroke();
+    // Angled end bevels make the platform's thickness legible while
+    // remaining strictly decorative. Keep them within the existing cap.
+    ctx.globalAlpha=.7;
+    ctx.fillStyle=recess;
+    ctx.beginPath();
+    ctx.moveTo(x,y-2);
+    ctx.lineTo(x+5,y-8);
+    ctx.lineTo(x+5,y-2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x+w,y-2);
+    ctx.lineTo(x+w-5,y-8);
+    ctx.lineTo(x+w-5,y-2);
+    ctx.closePath();
+    ctx.fill();
     ctx.restore();
   }
   // Twenty platform constructions, distributed deterministically across each
