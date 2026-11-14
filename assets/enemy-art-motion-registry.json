@@ -582,8 +582,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
+      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
       "motionDesign": {
         "profile": "vault-strike",
         "attackSequence": "plant pole, vault, extend strike, land",
@@ -601,7 +601,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 16,
@@ -619,8 +620,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
+      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
       "motionDesign": {
         "profile": "piston-jab",
         "attackSequence": "pressurize chamber, extend piston, retract, vent",
@@ -638,7 +639,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 17,
@@ -656,8 +658,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
+      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
       "motionDesign": {
         "profile": "frost-cone",
         "attackSequence": "inhale cold, lean forward, exhale cone, thaw",
@@ -675,7 +677,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 18,
@@ -693,8 +696,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
+      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
       "motionDesign": {
         "profile": "dash-feint",
         "attackSequence": "stutter-step, feint, burst, skid stop",
@@ -712,7 +715,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 19,
@@ -730,8 +734,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
+      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
       "motionDesign": {
         "profile": "sonar-bolt",
         "attackSequence": "scan cone, lock target, emit bolt, cool down",
@@ -749,7 +753,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 20,
