@@ -6440,6 +6440,11 @@
         const cableAngle=Math.atan2(p.x-p.cable.x,Math.max(1,p.y-p.cable.y));
         tilt=-Math.max(-.4,Math.min(.4,cableAngle*.6));
         scaleY=1.06;
+      } else if(index===13 && !p.on && held('jump') && p.jumpCut && p.vy<0){
+        const flutter=Math.sin((p.jumpAge||0)*42);
+        tilt=p.facing*(.08+flutter*.035);
+        scaleX=1+.035*flutter;
+        scaleY=1+.06*Math.abs(flutter);
       } else if(!p.on){
         // Rising compresses the silhouette; falling extends it. Cap both
         // responses so fast falls never distort the approved character art.
