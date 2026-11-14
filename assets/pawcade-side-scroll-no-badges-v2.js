@@ -313,10 +313,18 @@
         // opponent only on sufficiently broad, walkable platforms.
         // Keep early chapters sparse and avoid overcrowding narrow ledges.
         const baseCount=Math.max(1,Math.floor(w/(room==='arena'?420:540)));
-        const extraEncounter=stage>=3 && w>=720 && slot%3===stage%3 ? 1:0;
+        // Encounter density follows each course's traversal identity:
+        // fast courses keep wider reaction gaps, while combat-oriented
+        // courses use more sustained pressure on safe, wide platforms.
+        const fastCourse=[3,7,8,11,20,23].includes(index);
+        const combatCourse=[1,12,16,19,21,24].includes(index);
+        const extraEncounter=stage>=3 && w>=720 &&
+          slot%3===stage%3 && !fastCourse ? 1:0;
+        const combatEncounter=combatCourse && stage>=2 &&
+          w>=880 && slot%4===stage%4 ? 1:0;
         // Keep simultaneous enemy counts bounded on mobile while still
         // giving later chapters denser encounters on large platforms.
-        const count=Math.min(5,baseCount+extraEncounter);
+        const count=Math.min(5,baseCount+extraEncounter+combatEncounter);
         for(let encounter=0;encounter<count;encounter++) {
           // Alternate staggered encounter positions without changing the
           // underlying level geometry or pushing foes off a platform.
