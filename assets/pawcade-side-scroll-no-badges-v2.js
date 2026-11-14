@@ -3268,9 +3268,12 @@
           y:foe.y-33-Math.sin(t*2.7+foe.offset*.3)*enemyRise*.8};
       }
       case 'pursuit': { // Celeste-inspired chase: approach, pause, retreat
-        const cycle=(t*.42)%3;
-        const advance=cycle<1 ? cycle : cycle<1.7 ? 1 :
-          Math.max(.3,1-(cycle-1.7)*.5);
+        const cycle=((t*.42)%3+3)%3;
+        // Smooth pursuit, hold, and retreat. Return to the starting offset
+        // before the next cycle so collision positions never teleport.
+        const ease=x=>x*x*(3-2*x);
+        const advance=cycle<1 ? ease(cycle) : cycle<1.7 ? 1 :
+          1-ease((cycle-1.7)/1.3);
         // Chasers on ordinary platforms stay grounded; only explicitly
         // airborne course enemies use vertical flight paths.
         return {x:patrolX(foe.x+chase*enemyReach*advance),y:foe.y};
