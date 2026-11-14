@@ -2310,6 +2310,10 @@
       const lift=kind===3?(1+Math.cos(phase))/2:Math.max(0,wave)**2;
       return {x:patrolX(foe.x+travel*clockTravel[kind]),y:foe.y-lift*clockRise[kind]};
     }
+    if(index===3 && foe.clockEnemy===undefined){ // Clocktower Relay: accelerating patrol arcs
+      const burst=Math.sin(t*1.4);
+      return {x:patrolX(foe.x+Math.sign(burst)*Math.abs(burst)**.6*enemyReach),y:foe.y};
+    }
     // Ground-based ordinary enemies must not inherit decorative vertical
     // motion. Only explicit flyers, swimmers, gravity actors, or jumpers
     // are permitted to leave their platform's contact height.
@@ -2401,10 +2405,6 @@
     if(index===2 && foe.reefEnemy===undefined){ // Coral Courier: reef schools swim in waves
       return {x:patrolX(foe.x+Math.sin(t*.9)*enemyReach*.75),
         y:foe.y+Math.sin(t*1.3+foe.offset)*enemyRise*.55};
-    }
-    if(index===3 && foe.clockEnemy===undefined){ // Clocktower Relay: accelerating patrol arcs
-      const burst=Math.sin(t*1.4);
-      return {x:patrolX(foe.x+Math.sign(burst)*Math.abs(burst)**.6*enemyReach),y:foe.y};
     }
     // More course-specific enemy traversal, inspired by each game's
     // pacing rather than copying any counterpart's character or map.
