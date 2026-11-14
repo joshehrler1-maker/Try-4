@@ -729,6 +729,11 @@
     // the main path. Each game's movement identity determines its route type.
     // Keep supplemental landings clear of authored terrain and hazards.
     const addOptionalLanding = (x,y,w,kind) => {
+      // Optional decks must remain inside their own chapter and cannot
+      // overwrite the exit transition or the next chapter's spawn lane.
+      if(!Number.isFinite(x)||!Number.isFinite(y)||
+         !Number.isFinite(w)||w<48||
+         x<start+24||x+w>start+stageWidths[stage]-28) return false;
       const clear=platforms.every(ledge =>
         x+w+12<=ledge.x || x>=ledge.x+ledge.w+12 ||
         Math.abs(y-ledge.y)>=64
@@ -859,6 +864,7 @@
     const stageHeightOffsets=[0,-12,10,-18];
     const stageWidthOffsets=[0,-6,10,-4];
     let cx=challengeX;
+    let previousLandingPlaced=false;
     for(let part=0;part<3;part++){
       const gapAdjustment=part===0?0:
         stageGapOffsets[(chapterVariant+part)%4];
@@ -867,8 +873,15 @@
         profile.rises[part]+stageHeightOffsets[(chapterVariant+part)%4]);
       const cw=Math.max(70,profile.widths[part]+
         stageWidthOffsets[(chapterVariant+part)%4]+(part===1?12:0));
-      if(!clearLane && addOptionalLanding(cx,cy,cw,challengeKinds[part]) &&
-         part===1) crystals.push({x:cx+cw/2,y:cy-45});
+      // Do not strand later optional platforms when the preceding landing
+      // was rejected by a collision or stage-boundary check.
+      if(!clearLane && (part===0||previousLandingPlaced)){
+        const placed=addOptionalLanding(cx,cy,cw,challengeKinds[part]);
+        previousLandingPlaced=placed;
+        if(placed && part===1) crystals.push({x:cx+cw/2,y:cy-45});
+      }else{
+        previousLandingPlaced=false;
+      }
     }
     // Individually authored traversal signatures, one per adventure.
     // These are optional, collision-tested ledges; the authored main route
