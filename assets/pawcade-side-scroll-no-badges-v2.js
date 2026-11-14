@@ -710,6 +710,7 @@
         ['shelf','lift','shelf','belt','shelf']
       ];
       const beatOrder=worldBeatOrders[index];
+      // World mechanics palette batch 1.
       const chapterBeat=beatOrder[stage%beatOrder.length];
       for(const [slot,[dx,sy,sw,kind]] of (signatureFits?signature:[]).entries()){
         const sx=signatureX+dx;
