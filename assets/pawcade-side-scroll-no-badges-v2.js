@@ -4138,11 +4138,16 @@
     const markRight=Math.min(x+w-3,camera+width+12);
     ctx.beginPath();ctx.rect(markLeft,y-7,Math.max(0,markRight-markLeft),5);ctx.clip();
     ctx.strokeStyle=rim;ctx.fillStyle=rim;ctx.lineWidth=1.15;ctx.globalAlpha=.7;
+    // Determine artwork family once per visible platform, not for every
+    // tiny surface mark during every animation frame.
+    const mechanical=marking==='circuit'||marking==='gravity'||marking==='orbit'||marking==='hull'||marking==='gear';
+    const organic=marking==='leaf'||marking==='petal'||marking==='coral'||marking==='wood'||marking==='wind'||marking==='wave'||marking==='cloud'||marking==='snow';
+    const directional=marking==='speed'||marking==='beat'||marking==='chevron'||marking==='hazard'||marking==='cable';
     for(let n=start;n<=end;n++){
       const mx=x+n*interval+interval*.5;
       if(mx<x+8||mx>x+w-8)continue;
       ctx.beginPath();
-      if(['circuit','gravity','orbit','hull','gear'].includes(marking)){
+      if(mechanical){
         // Mechanical worlds each get their own silhouette instead of
         // sharing a circular stamp with a different label.
         if(marking==='circuit'){
@@ -4165,7 +4170,7 @@
           ctx.moveTo(mx-6,y-4.5);ctx.lineTo(mx-4,y-4.5);
           ctx.moveTo(mx+4,y-4.5);ctx.lineTo(mx+6,y-4.5);ctx.stroke();
         }
-      }else if(['leaf','petal','coral','wood','wind','wave','cloud','snow'].includes(marking)){
+      }else if(organic){
         // Individually drawn silhouettes, not the same oval recolored
         // for eight otherwise unrelated game worlds.
         if(marking==='leaf'||marking==='petal'){
@@ -4189,7 +4194,7 @@
           ctx.moveTo(mx+2,y-5);ctx.lineTo(mx+7,y-6);
         }
         ctx.stroke();
-      }else if(['speed','beat','chevron','hazard','cable'].includes(marking)){
+      }else if(directional){
         if(marking==='beat'){
           ctx.moveTo(mx-7,y-4);ctx.lineTo(mx-3,y-4);ctx.lineTo(mx-1,y-7);
           ctx.lineTo(mx+2,y-2);ctx.lineTo(mx+4,y-5);ctx.lineTo(mx+7,y-5);
