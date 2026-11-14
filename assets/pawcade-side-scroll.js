@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index!==0 && index!==1)return;
-    const spacing=index===0?230:188;
-    const shift=camera*(index===0?.22:.16);
+    if(index<0 || index>3)return;
+    const spacing=[230,188,205,178][index];
+    const shift=camera*([.22,.16,.19,.27][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -1596,7 +1596,7 @@
         ctx.fillStyle='#f8a35d';
         ctx.beginPath();ctx.ellipse(x+64,245,42,60,0,0,Math.PI*2);ctx.fill();
         ctx.globalAlpha=1;
-      }else{
+      }else if(index===1){
         // Moonlit Library: staggered book towers, arched windows and moonlit spires.
         const top=83+variation*16;
         ctx.fillStyle='#252943';
@@ -1617,6 +1617,58 @@
         }
         ctx.fillStyle='#7176a5';
         ctx.fillRect(x+77,top-48,4,18);
+      }else if(index===2){
+        // Coral Courier: original coral towers, underwater fans and bubbles.
+        const seabed=288;
+        ctx.fillStyle='#174c65';
+        ctx.beginPath();ctx.ellipse(x+94,seabed,73,21,0,Math.PI,0);ctx.fill();
+        ctx.strokeStyle=variation%2?'#f1a08c':'#77c9b9';
+        ctx.lineWidth=8;ctx.lineCap='round';
+        for(let branch=0;branch<4;branch++){
+          const bx=x+58+branch*24;
+          const rise=58+(variation*11+branch*17)%55;
+          ctx.beginPath();
+          ctx.moveTo(bx,seabed-5);
+          ctx.quadraticCurveTo(bx+10,seabed-rise*.5,bx+(branch%2?15:-12),seabed-rise);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(bx+4,seabed-rise*.5);
+          ctx.lineTo(bx+22,seabed-rise*.68);
+          ctx.stroke();
+        }
+        ctx.fillStyle='#9ce9f4';
+        ctx.globalAlpha=.4;
+        for(let bubble=0;bubble<5;bubble++){
+          const by=185+bubble*19+(variation*7)%11;
+          ctx.beginPath();ctx.arc(x+32+bubble*26,by,2+bubble%3,0,Math.PI*2);ctx.fill();
+        }
+        ctx.globalAlpha=1;
+      }else if(index===3){
+        // Clocktower Relay: original interlocking clock faces and gearwork.
+        const cy=169+variation*13;
+        const cx=x+86;
+        ctx.fillStyle='#27344a';
+        ctx.fillRect(x+65,cy,42,120);
+        ctx.fillStyle='#485975';
+        ctx.beginPath();ctx.arc(cx,cy,37,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#c7b079';ctx.lineWidth=4;
+        ctx.beginPath();ctx.arc(cx,cy,30,0,Math.PI*2);ctx.stroke();
+        ctx.strokeStyle='#e7d9b3';ctx.lineWidth=2;
+        for(let tick=0;tick<12;tick++){
+          const a=tick*Math.PI/6;
+          ctx.beginPath();
+          ctx.moveTo(cx+Math.sin(a)*24,cy-Math.cos(a)*24);
+          ctx.lineTo(cx+Math.sin(a)*28,cy-Math.cos(a)*28);
+          ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.lineTo(cx+12,cy-15);
+        ctx.moveTo(cx,cy);
+        ctx.lineTo(cx-5,cy-20);
+        ctx.stroke();
+        ctx.fillStyle='#d6b67a';
+        ctx.beginPath();ctx.arc(cx,cy,3,0,Math.PI*2);ctx.fill();
       }
     }
     ctx.restore();
