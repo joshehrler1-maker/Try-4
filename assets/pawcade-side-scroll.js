@@ -326,7 +326,7 @@
       platforms.push({x:middle,y:220-stage%3*10,w:Math.min(span,105),kind:'floor'});
       crystals.push({x:middle+span*.3,y:286-rise});
       enemies.push({x:middle+span*.7,y:303-rise,offset:stage+8,
-        foundryEnemy:stage<3?stage:undefined, patrolLeft:middle+12, patrolRight:middle+span-12});
+        foundryEnemy:stage<6?stage:undefined, patrolLeft:middle+12, patrolRight:middle+span-12});
     }
     const feature=setPieces[stage];
     const anchor=start+1050;
@@ -1359,7 +1359,7 @@
     ctx.restore();
   }
   function drawFoundryEnemy(at,kind,faceLeft,offset) {
-    const colors=[['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851']][kind];
+    const colors=[['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c']][kind];
     ctx.save();
     ctx.translate(at.x,at.y);
     if(faceLeft) ctx.scale(-1,1);
@@ -1380,6 +1380,13 @@
     }else if(kind===1){
       ctx.moveTo(-18,11);ctx.quadraticCurveTo(-22,-11,-7,-19);
       ctx.quadraticCurveTo(5,-26,15,-8);ctx.lineTo(20,11);
+    }else if(kind===3){
+      ctx.ellipse(-2,4,23,9,-.2,0,Math.PI*2);
+      ctx.ellipse(-8,-6,12,5,-.55,0,Math.PI*2);
+    }else if(kind===4){
+      ctx.moveTo(-22,12);ctx.lineTo(-13,-15);ctx.lineTo(-3,-8);ctx.lineTo(7,-21);ctx.lineTo(21,12);
+    }else if(kind===5){
+      ctx.moveTo(-21,12);ctx.quadraticCurveTo(-17,-17,1,-17);ctx.lineTo(20,-7);ctx.lineTo(14,12);
     }else{
       ctx.moveTo(-22,12);ctx.lineTo(-15,-9);ctx.lineTo(0,-17);
       ctx.lineTo(19,-8);ctx.lineTo(23,12);
@@ -1404,6 +1411,9 @@
       const cycle=(clock+foe.offset)%2.4;
       const hop=Math.max(0,1-Math.abs(cycle-1.65)/.42);
       const surge=Math.sin(Math.PI*Math.min(1,Math.max(0,(cycle-.65)/1.35)));
+      if(foe.foundryEnemy===3) return {x:patrolX(foe.x+wave*34),y:foe.y-14*(1+Math.cos(cycle*Math.PI/1.2))};
+      if(foe.foundryEnemy===4) return {x:patrolX(foe.x+wave*12),y:foe.y-34*hop**2};
+      if(foe.foundryEnemy===5) return {x:patrolX(foe.x+chase*surge**3*60),y:foe.y-12*surge};
       const shift=foe.foundryEnemy===1?0:foe.foundryEnemy===2?chase*surge**2*46:wave*24;
       return {x:patrolX(foe.x+shift),y:foe.y-(foe.foundryEnemy===1?hop*(2-hop)*49:0)};
     }
