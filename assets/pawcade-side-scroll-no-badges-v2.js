@@ -332,7 +332,38 @@
           w>=880 && slot%4===stage%4 ? 1:0;
         // Keep simultaneous enemy counts bounded on mobile while still
         // giving later chapters denser encounters on large platforms.
-        const count=Math.min(5,baseCount+extraEncounter+combatEncounter);
+        // Every adventure has its own six-chapter encounter budget.
+        // Early precision and speed stages stay readable; combat stages
+        // can sustain more opponents as their mechanics are introduced.
+        const worldEncounterCaps=[
+          [2,3,3,4,4,5],
+          [2,2,3,3,4,5],
+          [1,2,2,3,3,4],
+          [1,1,2,2,3,3],
+          [1,2,2,3,4,4],
+          [1,2,2,3,3,4],
+          [1,2,3,3,4,4],
+          [1,1,2,2,2,3],
+          [0,1,1,2,2,3],
+          [1,2,2,3,4,4],
+          [1,1,2,2,3,3],
+          [1,1,2,2,3,3],
+          [2,2,3,3,4,5],
+          [1,2,2,3,3,4],
+          [1,2,2,3,4,4],
+          [1,2,2,3,3,4],
+          [2,2,3,4,4,5],
+          [1,2,2,3,3,4],
+          [1,1,2,2,3,3],
+          [2,2,3,3,4,5],
+          [1,1,2,2,3,3],
+          [2,2,3,3,4,5],
+          [1,2,2,3,3,4],
+          [1,1,2,2,3,3],
+          [2,2,3,4,4,5]
+        ];
+        const chapterCap=worldEncounterCaps[index][Math.min(stage,5)];
+        const count=Math.min(chapterCap,baseCount+extraEncounter+combatEncounter);
         for(let encounter=0;encounter<count;encounter++) {
           // Alternate staggered encounter positions without changing the
           // underlying level geometry or pushing foes off a platform.
