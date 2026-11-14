@@ -2620,7 +2620,9 @@
     const colors=design?.colors ?? [['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c'],['#f0a271','#754021'],['#acf0dc','#285b6b'],['#e8d1ff','#583e83']][kind];
     ctx.save();
     ctx.translate(at.x,at.y);
-    if(faceLeft) ctx.scale(-1,1);
+    // Foundry crab artwork is authored facing left (unlike the generic
+    // right-facing enemy sprites). Mirror on rightward travel instead.
+    if(!faceLeft) ctx.scale(-1,1);
     const phase=reducedMotion?0:clock*13+offset;
     if(!design){
       ctx.save();
