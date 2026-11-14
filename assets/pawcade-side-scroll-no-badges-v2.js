@@ -6094,8 +6094,9 @@
       ctx.translate(-at.x,-at.y-19-footstep);
       if(!reducedMotion){
         const flex=airborne ? motion*.2 : footCycle*movingWeight*.22;
-        const trim=settleAccessory(foe,clock,flex+attackPose*.14,
-          airborne?1:Math.min(1,movingWeight+attackPose),faceLeft?-1:1);
+        const impact=Math.min(1,landingPose*12);
+        const trim=settleAccessory(foe,clock,flex+attackPose*.14-recoil*.28+impact*.23,
+          airborne?1:Math.min(1,movingWeight+attackPose+impact+recoil*.4),faceLeft?-1:1);
         drawMotionAccessory(at.x-trim.facing*14,at.y-4,trim.facing,
           trim.angle,9+index%5*2+trim.weight*4,courseMaterials[index][1],trim.weight<.02?0:trim.weight*.95);
       }
@@ -6691,7 +6692,9 @@
     if(!reducedMotion && !rolling && !p.morphed){
       const drag=Math.max(-.32,Math.min(.32,p.vy/1200));
       const flex=Math.sin(gait)*.12*(p.on?stride:0);
-      const trim=settleAccessory(p,clock,drag+flex,p.on?Math.min(1,stride*2):1,p.facing);
+      const impact=Math.min(1,(p.landingPose||0)/.13);
+      const trim=settleAccessory(p,clock,drag+flex+impact*.34,
+        p.on?Math.min(1,stride*2+impact*.75):1,p.facing);
       drawMotionAccessory(p.x-trim.facing*15,p.y-15,trim.facing,
         trim.angle,11+index%5*2+trim.weight*7,landingTrim[index][0],trim.weight<.02?0:trim.weight*.9);
     }
