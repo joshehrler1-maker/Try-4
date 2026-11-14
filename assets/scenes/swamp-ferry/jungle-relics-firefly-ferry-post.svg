@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Swamp Ferry Jungle Relics original firefly ferry post"><defs><linearGradient id="metal" x1=".06" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#eef9bc"/><stop offset=".25" stop-color="#7bca9a"/><stop offset=".68" stop-color="#1e615d"/><stop offset="1" stop-color="#7bca9a"/></linearGradient><linearGradient id="glass" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#fffbe4"/><stop offset=".35" stop-color="#fff6ad"/><stop offset="1" stop-color="#1e615d"/></linearGradient><radialGradient id="aura"><stop stop-color="#fff6ad" stop-opacity=".83"/><stop offset=".43" stop-color="#7bca9a" stop-opacity=".37"/><stop offset="1" stop-color="#1e615d" stop-opacity="0"/></radialGradient></defs><ellipse cx="100" cy="85" rx="72" ry="64" fill="url(#aura)" opacity=".7"/>
+<path d="M40 160V26h26v134" fill="url(#metal)" stroke="#38564a" stroke-width="5"/>
+<path d="M32 33h108l12 12-14 17H55z" fill="#5d7c62" stroke="#e5d5a6" stroke-width="4"/>
+<path d="M55 44h84" stroke="#ecf2bd" stroke-width="3"/>
+<path d="M73 60v17m58-18v18" stroke="#ded59f" stroke-width="3"/>
+<path d="M81 77h47l9 16-7 42-25 14-27-15-4-42z" fill="#173b44" stroke="#e7e6ab" stroke-width="5"/>
+<path d="M88 92h33l5 17-20 25-20-26z" fill="url(#glass)" opacity=".95"/>
+<path d="M92 99q11-20 23 0-11 7-12 25-12-8-11-25" fill="#fff9bf"/>
+<path d="M37 156q-24-25-25-52 35 4 35 32m18 15q8-25 31-32-2 34-31 32" fill="#3f9a70" stroke="#bcdf9c" stroke-width="4"/>
+<path d="M143 156q-5-36 26-47-7 36-26 47" fill="#7fbd81" stroke="#d7dca5" stroke-width="3"/>
+<circle cx="155" cy="88" r="6" fill="#faffae"/><circle cx="123" cy="20" r="4" fill="#fff6ac"/><circle cx="88" cy="18" r="3" fill="#fff6ac"/>
+<path d="M12 158h156" stroke="#426c5d" stroke-width="9"/></svg>
