@@ -2310,13 +2310,22 @@
       const moving=travel>.15 && travel<90;
       const footstep=reducedMotion||airborne||!moving?0:Math.abs(Math.sin(foe._gait))*2.2;
       const enemyLean=reducedMotion?0:(moving?Math.sin(foe._gait)*.045:Math.sin(clock*2+foe.offset)*.012);
+      // Travel-based animation gives each enemy type a distinct cadence and
+      // grounded compression without changing physics or hitboxes.
+      const gaitRate=[.8,1.15,.95,1.35,1.05][index%5];
+      const footCycle=Math.sin((foe._gait||0)*gaitRate);
+      const movingWeight=reducedMotion||!moving?0:Math.min(1,travel/4);
+      const anticipation=!reducedMotion && enemyPattern==='charge' && nearby && !airborne;
+      const bodyStretch=movingWeight*(.018+.012*(index%3))*footCycle;
+      const chargeCompression=anticipation?.07:0;
       ctx.save();
       // A distinct animation state for patrolling, hopping, flying and firing.
       ctx.translate(at.x,at.y+19);
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
       else ctx.rotate(enemyLean);
-      ctx.scale(firing?1.09:1+motion*.025,firing?.94:1-motion*.025);
+      ctx.scale((firing?1.09:1+motion*.025)+bodyStretch+chargeCompression,
+        (firing?.94:1-motion*.025)-bodyStretch*.7-chargeCompression);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
