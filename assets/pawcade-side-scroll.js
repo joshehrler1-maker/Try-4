@@ -1082,6 +1082,11 @@
     const targetCamera=Math.max(0,Math.min(finish+70,p.x-cameraAnchor+directionalLead));
     camera+=(targetCamera-camera)*Math.min(1,dt*followRate);
   }
+  function baronChargeOffset(cycle) {
+    if(cycle<1) return -100;
+    if(cycle<2) return -100+(cycle-1)*245;
+    return 145-(cycle-2)/1.2*245;
+  }
   function updateGuardian(dt,p,oldY) {
     boss.time+=dt;
     const t=boss.time;
@@ -1095,7 +1100,7 @@
         boss.y-=Math.max(0,Math.sin(t*2.9))*68;
         break;
       case 'charge':
-        boss.x+=cycle<1 ? -100 : cycle<2 ? -100+(cycle-1)*245 : 145;
+        boss.x+=baronChargeOffset(cycle);
         break;
       case 'volley': boss.x+=Math.sin(t*1.2)*65;break;
       case 'sweep':
