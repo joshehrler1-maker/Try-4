@@ -305,33 +305,38 @@
   ];
   // Peak timing and counter-motion for each hero's technique.
   const techniqueTiming={
+    3:[0.21,0.18],
+    14:[0.34,0.12],
+    19:[0.27,0.16],
+    22:[0.13,0.33],
+    23:[0.46,0.19],
     1:[0.19,0.34],
     6:[0.55,0.09],
     8:[0.12,0.08],
-    10:[0.28,0.18],
+    10:[0.28,0.18,1.6],
     11:[0.39,0.1],
     12:[0.16,0.28],
     13:[0.4,0.27],
     15:[0.14,0.2],
-    16:[0.17,0.32],
+    16:[0.17,0.32,2.7],
     18:[0.23,0.16],
     0:[.32,.22], // Whisker's cape sweep
     2:[.45,.12], // Luna's sonar pulse
-    4:[.24,.36], // Ivy's barrel launch
+    4:[.24,.36,2.8], // Ivy's barrel launch
     5:[.29,.30], // Frost's air punch
     7:[.18,.12], // Bolt's reversal
     9:[.24,.25], // Stone's cable release
-    17:[.31,.39], // Frost's sword stroke
+    17:[.31,.39,1.55], // Frost's sword stroke
     20:[.49,.14], // Shadow's taunt
-    21:[.26,.41], // Luna's returning cross
+    21:[.26,.41,1.45], // Luna's returning cross
     24:[.37,.32] // Whisker's grenade throw
   };
   function techniqueWeight(progress, timing){
     if(!timing) return Math.sin(progress*Math.PI)*(1-progress*.35);
-    const [peak, counter]=timing;
+    const [peak, counter, recoveryCurve=2]=timing;
     if(progress<peak) return Math.sin(progress/peak*Math.PI/2);
     const recovery=(progress-peak)/(1-peak);
-    return (1-recovery)**2-counter*Math.sin(Math.PI*recovery)**2;
+    return (1-recovery)**recoveryCurve-counter*Math.sin(Math.PI*recovery)**2;
   }
   let signatureEffect, landingEffect;
   const particles=[];
