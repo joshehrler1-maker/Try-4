@@ -683,11 +683,11 @@
       // adventures. Chapter beats select an interaction rather than merely
       // changing geometry, preserving each world's distinct movement rules.
       const worldMechanicPalettes=[
-        ['floor','spring','floor','shelf','spring'],
-        ['shelf','lift','shelf','floor','lift'],
-        ['current','floor','current','current','floor'],
-        ['belt','spring','belt','floor','belt'],
-        ['barrel','floor','barrel','spring','barrel'],
+        ['floor','spring','shelf','floor','spring'],
+        ['shelf','floor','lift','shelf','lift'],
+        ['current','current','floor','current','current'],
+        ['belt','belt','spring','belt','floor'],
+        ['barrel','spring','floor','barrel','barrel'],
         ['floor','lift','spring','lift','floor'],
         ['spring','floor','spring','lift','spring'],
         ['floor','shelf','floor','shelf','floor'],
