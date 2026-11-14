@@ -720,3 +720,15 @@ for(const room of window.pawtopiaRoomPlans[9].split(' ')){
   const [room]=window.pawtopiaRoomPlans[offset+10].split(' ');
   for(const [slot,x,y,w] of edits) window.pawtopiaRooms[room][slot].splice(0,3,x,y,w);
 });
+
+// Opening traversal revisions for Neon Circuit through Starship Cargo.
+[
+  [[1,310,284,420],[2,785,240,500],[3,1345,272,560]],
+  [[1,552,294,268],[2,865,248,240],[3,1150,282,310]],
+  [[1,442,293,220],[2,720,235,225],[3,995,274,245]],
+  [[1,600,287,310],[2,955,232,300],[3,1310,260,355]],
+  [[1,320,279,280],[2,730,232,315],[3,1175,269,335]]
+].forEach((edits,offset)=>{
+  const [room]=window.pawtopiaRoomPlans[20+offset].split(' ');
+  for(const [slot,x,y,w] of edits) window.pawtopiaRooms[room][slot].splice(0,3,x,y,w);
+});
