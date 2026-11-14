@@ -1074,8 +1074,8 @@
     if (phase !== 'playing') return;
     if (power==='flip') {if(buffer) action();return;}
     if (player.ledgeGrip) {climbFromLedge(player);return;}
-    if (buffer && index===16 && !player.on && hazards.some(h=>h.parry && h.life>0 && close(player,h,55,55))) {
-      if (player.techCooldown<=0) useTechnique();
+    if (buffer && index===16 && !player.on && player.techCooldown<=0 && hazards.some(h=>h.parry && h.life>0 && close(player,h,55,55))) {
+      useTechnique();
       return;
     }
     // Use the selected course's input forgiveness window on the initial
