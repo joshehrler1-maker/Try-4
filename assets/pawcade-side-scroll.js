@@ -1321,7 +1321,10 @@
           index===16 ? (foe.turret ? 1.35 : 2.25) : 1;
         // Escalate ranged threats chapter by chapter, capped to keep
         // dodge windows readable on touchscreen and avoid bullet spam.
-        const rangedPressure=1+Math.min(5,Math.max(0,chapter))*0.075;
+        // Use the enemy's authored home stage for stable encounter pacing
+        // even when the player crosses the boundary during a firefight.
+        const attackChapter=foe.spawnChapter??chapter;
+        const rangedPressure=1+Math.min(5,Math.max(0,attackChapter))*0.075;
         // Distinct ranged archetypes: sentries shoot more deliberately,
         // raiders press harder, while the existing chapter cap applies.
         const attackRhythm=[1,1.22,.92,.83][foe.archetype??0];
