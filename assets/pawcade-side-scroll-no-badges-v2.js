@@ -5372,9 +5372,26 @@
         drawLandingEdge(ledge);
         continue;
       }
-      if(index===9 && ledge.kind==='rail' &&
-         atlasSprite(propArt,4,3,ledge.x+ledge.w/2,ledge.y+10,42,39,false,2)) {
-        ctx.fillStyle='#aab7c6';ctx.fillRect(ledge.x,ledge.y,ledge.w,4);
+      if(index===9 && ledge.kind==='rail'){
+        const {x,y,w}=ledge;
+        ctx.save();
+        ctx.fillStyle='#2b2020';
+        ctx.fillRect(x,y,w,10);
+        ctx.fillStyle='#ffcc71';
+        ctx.fillRect(x,y,w,3);
+        ctx.beginPath();
+        ctx.rect(x,y+3,w,7);
+        ctx.clip();
+        ctx.strokeStyle='#b68655';
+        ctx.lineWidth=3;
+        for(let offset=-6;offset<w;offset+=14){
+          ctx.beginPath();
+          ctx.moveTo(x+offset,y+10);
+          ctx.lineTo(x+offset+7,y+3);
+          ctx.stroke();
+        }
+        ctx.restore();
+        atlasSprite(propArt,4,3,x+w/2,y+10,42,39,false,2);
         continue;
       }
       if(index===7 && (ledge.kind==='hazard' || ledge.kind==='ceilingSpikes')){
