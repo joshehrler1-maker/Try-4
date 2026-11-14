@@ -105,17 +105,32 @@
     'assets/scenes/steamworks/intake-valve-pressure-console.svg',
     'assets/scenes/snow-village/hearth-trail-ember-marker.svg',
     'assets/scenes/canyon-crossing/rope-bridge-winch.svg',
-    'assets/scenes/submarine-dock/research-pier-sonar-beacon.svg'
+    'assets/scenes/submarine-dock/street-insertion-comms-post.svg'
   ];
+  // Surveyed against the CURRENT first room in each platform-world plan.
+  // Art placement is decorative; no new hitboxes or platform collision edits.
+  // Each tuple: [worldX, worldY, drawWidth, drawHeight], bottom pivot.
   const firstStageLandmarkPositions = [
-    // First 15 game props retain their established decorative placement.
-    ...Array.from({length:15}, () => [590,326-170,180,170]),
-    // Batch 4: align prop feet with the actual first-room platform/floor tops.
-    [590,62,160,170],   // Bamboo Village roots, x=570..765, y=232
-    [620,156,175,170],  // Steamworks arena, floor y=326
-    [585,130,170,170],  // Snow Village bazaar ledge, x=560..795, y=300
-    [475,156,170,170],  // Canyon Crossing traps, x=465..720, y=326
-    [490,156,170,170]   // Submarine Dock barracks, floor y=326
+    [575,131,160,170], // 00 Foundry Trail: forgeTrail x420..785 top301
+    [535,146,170,170], // 01 Convoy Ambush: convoy x504..722 top316
+    [590,156,180,170], // 02 Home Reef: coralBay continuous floor top326
+    [620,156,170,170], // 03 Coastal Run: ground behind belt, floor326
+    [730,156,160,170], // 04 Seedship Deck: seedDeck x710..1280 top326
+    [605, 97,170,170], // 05 Forest Rescue: course5Stage1 x575..860 top267
+    [725,112,170,170], // 06 Spring Breeze: course6Stage1 x700..960 top282
+    [865,156,170,170], // 07 Transporter Deck: course7Stage1 x835..1405 top326
+    [520,156,170,170], // 08 Stereo Steps: course8Stage1 floor326
+    [535,118,170,170], // 09 Landing Gantry: course9Stage1 x496..779 top288
+    [650,104,170,170], // 10 Windmill Village: course10Stage1 x625..870 top274
+    [490,108,165,170], // 11 Forsaken Towers: cloudCity x470..685 top278
+    [570,125,170,170], // 12 Plains Approach: course12Stage1 x550..796 top295
+    [625, 77,170,170], // 13 Egg-Toss Meadow: eggMeadow x578..839 top247
+    [610,112,170,170], // 14 Surface Approach: observatorySurface x580..865 top282
+    [610,109,160,170], // 15 Spirit Glade: course15Stage1 x585..835 top279
+    [560, 95,170,170], // 16 Root Cellar: course16Stage1 x530..750 top265
+    [590,114,170,170], // 17 Market Rooftops: course17Stage1 x560..835 top284
+    [565,114,170,170], // 18 Prison Steps: course18Stage1 x550..780 top284
+    [340,105,170,170]  // 19 Street Insertion: course19Stage1 x300..540 top275
   ];
   const firstStageLandmark = index < firstStageLandmarkPaths.length ? new Image() : null;
   if (firstStageLandmark) firstStageLandmark.src = firstStageLandmarkPaths[index];
