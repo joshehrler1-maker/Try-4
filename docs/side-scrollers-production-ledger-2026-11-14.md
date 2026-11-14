@@ -1,6 +1,27 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
 
+## Batch 12 — first genuine 3D mesh prototypes for five original enemies
+
+**Real progress:** A separate **WebGL 1 3D enemy prototype studio** was added at `enemy-3d-prototype.html`. It renders actual index-based 3D triangle meshes with vertex normals and directional light — **not flat vector sprites or simulated 3D**. The five different scene descriptions and articulated pose samplers are authored locally in `assets/animation/enemy-3d-prototype-v1.js`. Each enemy has its own fully original parametric primitive assembly, surface colors and animation offsets; no imported or copied counterpart asset or paid dependency.
+
+| Game | 3D model prototype | Multi-part animation concepts |
+| --- | --- | --- |
+| 01 Ember Foundry | Cinder Tongs | Metallic furnace body, planted cylinder legs, separately opening clamp jaws and moving hammer arm |
+| 02 Moonlit Library | Atlas Warden | Book-shaped dimensional torso, folded page plates and hinged quill with grounded boots |
+| 03 Coral Courier | Reef Skimmer | True underwater 3D orb body, tail, independent side fins and tapered coral dorsal shapes (no feet) |
+| 04 Clocktower Relay | Pendulum Sentinel | Cylindrical clock body and depth offset clock face, braced boots and hinged hammer |
+| 05 Seed Garden | Thorn Hopper | Seedpod orb body with tapered thorns, independent planted spring legs and opening leaves |
+
+**What is integrated:** Model primitives/positions/pose samplers, local WebGL vertex/index buffers, actual 3D surface lighting, ground geometry, five interactive model selectors, idle/move/attack/hit/defeat demonstration states, orbit buttons/touch drag, reduced-motion behavior and visible unavailability on non-WebGL devices. Viewer and mesh module are cached by the service worker. The Games Room and Enemy Motion Lab link to the prototype studio. A new source regression test checks 3D model count, geometry/index validity, 25 modeled state samples, mock GPU command path, buffer lifecycle, no non-finite coordinates, and separation from the live gameplay engine.
+
+**Performance and accessibility:** Browser-based WebGL 1 with no third-party runtime or network fonts. Viewer caps its drawing surface at 1200px width, handles context loss, pauses GPU rendering when the demonstration is paused, and respects reduced-motion preference unless a person explicitly opts into playback. This remains a preliminary mesh study, not a benchmarking pass on a real Android device.
+
+**Explicit acceptance limit:** None of these experimental 3D meshes is yet installed in the 2.5D playable stages. The playable games still draw their own original specialized 2.5D Canvas enemy rigs, with all existing hitboxes and progression untouched. These models are *not* poster-reviewed feature-film-style enemy production meshes, not skinned/exported glTF assets, not cinematic 3D lighting/materials and not the movies. The experimental character studio is a separate opt-in QA surface, with no impact on Android FPS in the Games Room. No live WebGL screenshot or hardware-rendered playback has been inspected. Further stages require actually validating these models visually, preserving every game's original design rules, building high-quality 3D assets/animation, and optimizing an Android playback path without paid services.
+
+
+
+
 ## Batch 11 — five first-world base enemy rigs, preserving specialist variants
 
 **New verified GitHub source:** `assets/animation/origin-world-enemy-rigs-v1.js` (original game-specific Canvas-2D procedural art). Five unique animated base enemy types are now integrated into the playable Games Room. These are **illustrated 2.5D enemy designs**, **not film-quality 3D models or finished animation clips**.
