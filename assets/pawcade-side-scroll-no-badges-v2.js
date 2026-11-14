@@ -5805,7 +5805,7 @@
     // Foundry enemies breathe, brace, and recoil as articulated armor units.
     // The movement is visual-only: collision positions and gameplay stay fixed.
     const foundryMotion=index===0 && !reducedMotion;
-    const motionTime=foundryMotion?performance.now()/1000:0;
+    const motionTime=foundryMotion?clock:0;
     const motionPhase=motionTime*5+(Number(foe.x)||0)*.035;
     const groundedMotion=foundryMotion && !airborne;
     const motionBob=groundedMotion?Math.sin(motionPhase)*1.4:0;
