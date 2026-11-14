@@ -395,7 +395,9 @@
             (stage*3+slot+encounter+index)%4;
           // Keep the start of each chapter clear for checkpoint respawns.
           // Do not remove foes elsewhere: the authored combat lanes remain.
-          if(x+offset<190) continue;
+          // Respect each adventure's approach corridor so players have
+          // room to see and respond to the first enemy after a transition.
+          if(x+offset<worldReactionDistances[index]) continue;
           const foe={x:start+x+offset,y:y-23,offset:slot+stage+encounter,
             archetype,spawnChapter:stage};
           if(index===1 && !libraryEnemyPlaced && x>=250 && w>=100){
