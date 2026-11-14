@@ -802,3 +802,18 @@ for (const [room, placements] of Object.entries(clocktowerPlacements)) {
     window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
   }
 }
+
+// Neon Circuit: sprint lanes, raised shortcuts and recovery landings by stage.
+const neonCircuitPlacements = [
+  [[1,270,288,451],[2,772,254,523],[3,1344,286,587]],
+  [[1,548,301,282],[2,883,238,300],[3,1230,283,376]],
+  [[1,249,280,401],[2,743,227,333],[3,1211,263,620]],
+  [[1,358,286,191],[2,682,231,340],[3,1126,277,278]],
+  [[2,363,273,393],[3,845,228,380],[4,1357,269,584]],
+  [[1,381,264,340],[2,783,219,333],[3,1193,253,429],[4,1695,225,320]],
+];
+for (const [stage, room] of window.pawtopiaRoomPlans[20].split(' ').entries()) {
+  for (const [slot, x, y, width] of neonCircuitPlacements[stage]) {
+    window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+  }
+}
