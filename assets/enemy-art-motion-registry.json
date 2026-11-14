@@ -767,8 +767,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
+      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
       "motionDesign": {
         "profile": "blink-strike",
         "attackSequence": "telegraph glitch, disappear, reappear, strike, settle",
@@ -786,7 +786,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 21,
@@ -804,8 +805,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
+      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
       "motionDesign": {
         "profile": "rolling-crush",
         "attackSequence": "brace stone segments, curl, roll, uncoil",
@@ -823,7 +824,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 22,
@@ -841,8 +843,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
+      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
       "motionDesign": {
         "profile": "lure-burst",
         "attackSequence": "pulse lure, attract, inflate, burst, deflate",
@@ -860,7 +862,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 23,
@@ -878,8 +881,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
+      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
       "motionDesign": {
         "profile": "swoop-spiral",
         "attackSequence": "flutter, spiral downward, sweep, climb",
@@ -897,7 +900,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 24,
@@ -915,8 +919,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
+      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
       "motionDesign": {
         "profile": "grapple-snap",
         "attackSequence": "unfold crate disguise, extend grapple, snap, retract",
@@ -934,7 +938,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
     }
   ]
 }
