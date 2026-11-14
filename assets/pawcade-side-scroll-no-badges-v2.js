@@ -215,6 +215,35 @@
   const crystals = [];
   const landmarks=[];
   let player, boss, phase, camera, frame, last, clock, chapter, taken, attacks, hazards, escape;
+  // Color, silhouette, reach and duration for each adventure's signature move.
+  const signatureEffects=[
+    ['#ffbe69','arc',82,.32], // Cape sweep
+    ['#6ceaff','trail',114,.27], // Dash exhaust
+    ['#71f8ed','wave',132,.64], // Sonar pulses
+    ['#ffdc68','spiral',52,.36], // Spin streak
+    ['#ffd17c','launch',96,.39], // Barrel recoil
+    ['#82eaff','impact',73,.29], // Air punch
+    ['#ef91fe','pull',92,.48], // Inhale stream
+    ['#ba9bff','flip',70,.38], // Gravity reversal
+    ['#7bf6ff','tiles',65,.31], // Beat reset
+    ['#ffcf85','cable',88,.32], // Cable recoil
+    ['#a0ffe0','wave',76,.37], // Wind ring
+    ['#ff86b8','climb',70,.33], // Wall climb
+    ['#81c7ff','drop',93,.28], // Shovel descent
+    ['#ffc183','lob',100,.42], // Lob arc
+    ['#97e6ff','spiral',42,.31], // Morph shell
+    ['#acffcd','impact',94,.32], // Bash directions
+    ['#ff86dc','impact',61,.26], // Parry star
+    ['#ffe3a4','arc',94,.27], // Sword stroke
+    ['#ffd6a4','climb',50,.29], // Ledge contact
+    ['#91ffe8','fan',83,.28], // Weapon spread
+    ['#e5ff75','tiles',111,.38], // Taunt burst
+    ['#ded3ff','cross',61,.37], // Returning cross
+    ['#fff092','drop',65,.30], // Cane bounce
+    ['#f89ce4','pull',78,.44], // Yarn draw
+    ['#ff9f72','lob',121,.48] // Grenade trail
+  ];
+  let signatureEffect;
   const particles=[];
   let rings=0;
   let amberSwitch=false;
@@ -957,6 +986,7 @@
     camera = chapter = taken = clock = 0;
     escape = null;
     particles.length=0;
+    signatureEffect=null;
     looseRings.length=0;
     rings=0;
     amberSwitch=false;
@@ -1090,6 +1120,8 @@
     if (phase!=='playing' || player.techCooldown>0) return;
     const p=player;
     p.techCooldown=.32;
+    const before=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,attacks.length];
+    let activated=false;
     const nearby=range=>enemies.find(foe=>!foe.dead && close(p,foePosition(foe),range,65));
     const shot=extra=>attacks.push({x:p.x,y:p.y,v:p.facing*330,life:.55,...extra});
     switch(technique) {
@@ -1113,7 +1145,7 @@
         break;
       }
       case 'flip': action();break;
-      case 'retry': respawn();break;
+      case 'retry': respawn();activated=true;break;
       case 'release': if(p.cable){p.cable=null;p.grapple=.18;}break;
       case 'climb': if(p.wall){p.vy=-strength;p.wallLock=.08;}break;
       case 'drop': if(!p.on){p.vy=strength;p.pogo=true;}break;
@@ -1146,6 +1178,7 @@
         const target=hazards.find(h=>h.parry && h.life>0 && close(p,h,55,55));
         if(target && !p.on){
           target.life=0;
+          activated=true;
           p.vy=-470;
           p.grace=Math.max(p.grace,.35);
           if(!reducedMotion) burst(target.x,target.y,'#ff86dc',10);
@@ -1160,6 +1193,10 @@
       case 'swap': p.altWeapon=!p.altWeapon;status(p.altWeapon?'Spread fire equipped.':'Straight fire equipped.');break;
       case 'taunt': if(p.crystalCombo>=3){shot({v:0,radius:strength,life:.2,damage:2});p.crystalCombo=0;}break;
       case 'return': shot({v:p.facing*strength,returning:true,life:1.1,damage:2});break;
+    }
+    const after=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,attacks.length];
+    if(activated || technique==='reveal' || after.some((value,i)=>value!==before[i])){
+      signatureEffect={x:player.x,y:player.y,facing:player.facing,at:clock};
     }
   }
   const pauseButton=byId('side-pause');
@@ -1251,6 +1288,7 @@
   }
   function respawn() {
     clearInput();
+    signatureEffect=null;
     for(const ledge of platforms) if(ledge.kind==='drop') ledge.dropAt=undefined;
     if(index===11){
       const start=stageStarts[chapter];
@@ -4840,6 +4878,65 @@
     if(finale==='summit') return 'UPPER EXIT';
     return index===20?'RESET':'EXIT';
   }
+  function drawSignatureEffect() {
+    if(!signatureEffect) return;
+    const [color,shape,reach,duration]=signatureEffects[index];
+    const progress=(clock-signatureEffect.at)/duration;
+    if(progress>=1) return;
+    const t=reducedMotion ? .3 : progress;
+    const radius=reach*(.3+t*.7);
+    ctx.save();
+    ctx.translate(signatureEffect.x,signatureEffect.y);
+    ctx.scale(signatureEffect.facing,1);
+    ctx.strokeStyle=color;
+    ctx.fillStyle=color;
+    ctx.globalAlpha=(1-progress)*.83;
+    ctx.lineWidth=2.5;
+    ctx.lineCap='round';
+    ctx.beginPath();
+    if(shape==='wave' || shape==='spiral' || shape==='arc'){
+      for(let k=0;k<3;k++){
+        const r=radius*(1-k*.19);
+        const turn=shape==='spiral' ? t*7+k*.7 : 0;
+        ctx.moveTo(Math.cos(turn-1)*r,Math.sin(turn-1)*r*.62);
+        ctx.ellipse(0,0,r,r*.62,0,turn-1,turn+(shape==='wave'?Math.PI*2-1:1));
+      }
+    } else if(shape==='cross' || shape==='impact' || shape==='tiles'){
+      const count=shape==='cross'?4:8;
+      for(let k=0;k<count;k++){
+        const angle=k*Math.PI*2/count+(shape==='cross'?t*6:0);
+        const x=Math.cos(angle)*radius;
+        const y=Math.sin(angle)*radius*.65;
+        if(shape==='tiles') ctx.rect(x-3,y-3,6,6);
+        else {
+          ctx.moveTo(x*.45,y*.45);
+          ctx.lineTo(x,y);
+        }
+      }
+    } else {
+      for(let k=0;k<6;k++){
+        const f=k/5;
+        const spread=(k-2.5)*6;
+        let x=radius*(.4+f*.6),y=spread;
+        switch(shape){
+          case 'trail': x=-x; break;
+          case 'launch': x=-x;y+=radius*.45;break;
+          case 'pull': x*=1-t;y*=1-t;break;
+          case 'flip': y=x*(player.gravity<0?-1:1);x=spread;break;
+          case 'cable': y=-x*.75;break;
+          case 'climb': y=-x;x=spread;break;
+          case 'drop': y=x;x=spread;break;
+          case 'lob': y=-Math.sin(f*Math.PI)*radius*.55;break;
+          case 'fan': y*=1+f;break;
+        }
+        ctx.moveTo(x-4,y+3);
+        ctx.lineTo(x,y);
+        ctx.lineTo(x+4,y-3);
+      }
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -5259,6 +5356,7 @@
       }
       ctx.restore();
     }
+    drawSignatureEffect();
     for(const spark of particles) {
       ctx.globalAlpha=Math.min(1,spark.life/.23);
       ctx.fillStyle=spark.color;
