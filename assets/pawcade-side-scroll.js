@@ -768,6 +768,7 @@
     hud();
   }
   const close = (a,b,x,y) => Math.abs(a.x-b.x)<x && Math.abs(a.y-b.y)<y;
+  const floatHasLift = p => power==='bubble' && held('action') && p.y>55;
   function step(dt) {
     clock += dt;
     chapterReveal=Math.max(0,chapterReveal-dt);
@@ -831,7 +832,7 @@
 
     const floating = power === 'glide' && held('jump');
     if (power==='swim') p.vy += (vertical*230-p.vy)*Math.min(1,dt*5);
-    else if (power==='bubble' && held('action') && p.y>55) p.vy += (-160-p.vy)*Math.min(1,dt*5);
+    else if (floatHasLift(p)) p.vy += (-160-p.vy)*Math.min(1,dt*5);
     else if (floating && p.vy>0) p.vy=Math.min(72,p.vy+dt*90);
     else if (!(movement==='airdash' && p.power>.22)) {
       const arcFactor=p.vy*p.gravity<0
@@ -2983,17 +2984,18 @@
       ctx.lineCap='round';
       ctx.lineWidth=1.5;
       for(let strand=0;strand<3;strand++){
-        const x=p.x-p.facing*(19+strand*6);
+        const direction=Math.abs(p.vx)>12?Math.sign(p.vx):p.facing;
+        const x=p.x-direction*(19+strand*6);
         const y=p.y-8+strand*9;
         ctx.globalAlpha=.64-strand*.14;
         ctx.beginPath();
         ctx.moveTo(x,y);
-        ctx.quadraticCurveTo(x-p.facing*13,y+1,x-p.facing*27,y+9);
+        ctx.quadraticCurveTo(x-direction*13,y+1,x-direction*27,y+9);
         ctx.stroke();
       }
       ctx.restore();
     }
-    if(index===6 && power==='bubble' && !p.on && held('action')){
+    if(index===6 && !p.on && floatHasLift(p)){
       ctx.save();
       ctx.strokeStyle='#ffda94';
       ctx.lineWidth=1.4;
