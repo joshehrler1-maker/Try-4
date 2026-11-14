@@ -1667,8 +1667,11 @@
     // Keep accents inset so the collision edge remains visually unambiguous.
     const materialFamily=[0,2,3,1,4,3,2,0,2,1,4,3,1,4,0,4,1,3,4,3,2,0,4,4,1][index];
     const segment=materialFamily===1?23:materialFamily===2?17:materialFamily===3?31:27;
+    // Clamp decoration loops to the actual ledge bounds. A long level's
+    // camera can be far past this ledge; negative iteration counts otherwise
+    // create unnecessary work and off-platform pattern marks.
     const left=Math.max(0,Math.floor((camera-x)/segment)-1);
-    const right=Math.min(Math.ceil(w/segment),Math.ceil((camera+width-x)/segment)+1);
+    const right=Math.max(left,Math.min(Math.ceil(w/segment),Math.ceil((camera+width-x)/segment)+1));
     ctx.save();
     ctx.beginPath();ctx.rect(x+2,y-topDepth+1,Math.max(0,w-4),topDepth-1);ctx.clip();
     ctx.strokeStyle=rim;ctx.fillStyle=rim;ctx.globalAlpha=.66;ctx.lineWidth=1.5;
@@ -1708,8 +1711,8 @@
       ctx.globalAlpha=.46;
       ctx.strokeStyle=rim;ctx.lineWidth=1;
       const seamSpacing=44+(index%5)*7;
-      const firstSeam=Math.ceil((bevelStart-x)/seamSpacing);
-      const lastSeam=Math.floor((bevelEnd-x)/seamSpacing);
+      const firstSeam=Math.max(1,Math.ceil((bevelStart-x)/seamSpacing));
+      const lastSeam=Math.min(Math.ceil(w/seamSpacing)-1,Math.floor((bevelEnd-x)/seamSpacing));
       for(let seam=firstSeam;seam<=lastSeam;seam++){
         const sx=x+seam*seamSpacing;
         ctx.beginPath();ctx.moveTo(sx,y+4);ctx.lineTo(sx,y+bevelDepth-1);ctx.stroke();
