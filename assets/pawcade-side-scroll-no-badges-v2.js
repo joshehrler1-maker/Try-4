@@ -1040,6 +1040,7 @@
       .12,.14,.09,.115,.105,.13,.085,.11,.085,.1,.065,.085,.12,.13,.09][index];
     if (index===3 && held('down') && player.on) {player.spin=Math.min(5,player.spin+1);player.jumpBuffer=0;return;}
     if (buffer && index===10 && player.carry && !player.on) {
+      player.windRelease={x:player.x,y:player.y-44,time:clock};
       player.carry=false;player.vy=-jumpSpeed;player.jumpBuffer=0;
       player.jumpCut=true;player.jumpAge=0;
       return;
@@ -6640,6 +6641,25 @@
         ctx.beginPath();
         ctx.arc(8,0,13+progress*9,-1.25,.65);
         ctx.stroke();
+        ctx.restore();
+      }
+    }
+    if(index===10 && p.windRelease && !reducedMotion){
+      const {x,y,time}=p.windRelease;
+      const progress=(clock-time)/.24;
+      if(progress>=0 && progress<1){
+        ctx.save();
+        ctx.translate(x,y+progress*51);
+        ctx.globalAlpha=1-progress;
+        ctx.strokeStyle='#a8fff1';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.ellipse(0,0,18+progress*10,7,-.38,0,Math.PI*2);
+        ctx.stroke();
+        ctx.fillStyle='#ffba73';
+        ctx.beginPath();
+        ctx.ellipse(0,0,13-progress*6,10-progress*4,0,0,Math.PI*2);
+        ctx.fill();
         ctx.restore();
       }
     }
