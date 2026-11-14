@@ -1362,6 +1362,7 @@
     colors:[light,dark], shape:new Path2D(shape), reach,rise
   }));
   const foundryEnemyDetails=["M-18 8l-5 10m13-9-3 12m20-12 5 10m-8-24 4-4 4 4","M-15 8q-9 11 5 12h23q10-4 4-12m-9-15h8","M-24 4l12-4-5 11m23-18 11 3-11 3","M-16 8v11h-7m36-11v13h8m-29-27h14v5h-14z","M-18 9l-10 7m18-6-5 12m26-13 11 5m-9-19h6","M-23 3l-9-8v16zM-5 8l9 10 8-11m4-12h6","M-16 7q-17 8-9 14m26-13q-3 11 10 10m-1-25h8","M-17 9l-5 10m12-10v14m15-15 12 11m-10-27 9 5","M-18 9v12h9m21-12 9 9h7m-23-26h12l-4 6z"].map(shape=>new Path2D(shape));
+  const foundryEarlyDetails=[["M-15 8l-6 8 5 2m8-8-1 9m10-9 5 8m5-9 8 5","M-13-3q8-8 16-4m9 4h4"],["M-14 8q-11 4-9 10h13l7-7m10 0 6 9h10","M-2-17v12m6-10v12m6-8v8m3 3h5"],["M-17 7q-9 12 4 13q9 0 7-10m14 0q0 13 10 9q7-3 2-12","M4-8l13 4m-28-2h9"],["M-20 4q-9 0-11-9m10 15 7 7m14-8 7 5","M1-3q5-4 9 0m-22 3 6-5"],["M-15 8l-10 9h9m6-6 7 7m11-9 11 9","M-6 0l6-5 7 5m8-4 3 4"],["M-16 7l-9 5 1 7m10-8 3 10m22-11 9 4 4 6","M-11-9l8-3 6 3m5-3 8 4-5 4"],["M-14 7l-6 11h8m18-8 2 8h8","M13-16l5-7 2 12m-8 8 6 2"],["M-24 4q-7 9-12 4m23 3 11 5m10-7 10 4","M-11-6q9-5 20-2m4 3 4 2"],["M-12 0l-13-13m40 13 12-12m-27 22-8 6m12-6 7 6","M-4-8l3 3m7-3-2 3"]].map(paths=>paths.map(path=>new Path2D(path)));
   function drawFoundryEnemy(at,kind,faceLeft,offset) {
     const design=foundryLateEnemies[kind-9];
     const colors=design?.colors ?? [['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c'],['#f0a271','#754021'],['#acf0dc','#285b6b'],['#e8d1ff','#583e83']][kind];
@@ -1369,12 +1370,15 @@
     ctx.translate(at.x,at.y);
     if(faceLeft) ctx.scale(-1,1);
     const phase=reducedMotion?0:clock*13+offset;
-    if(!design) for(let i=0;i<4;i++){
-      const x=-13+i*8;
-      ctx.fillStyle='#38212a';
-      ctx.beginPath();
-      ctx.ellipse(x,15+Math.sin(phase+i*Math.PI)*2,6,6,0,0,Math.PI*2);
-      ctx.fill();
+    if(!design){
+      ctx.save();
+      ctx.translate(0,Math.sin(phase)*(kind===8?3:1.8));
+      ctx.strokeStyle=colors[1];
+      ctx.lineWidth=4;
+      ctx.lineJoin='round';
+      ctx.lineCap='round';
+      ctx.stroke(foundryEarlyDetails[kind][0]);
+      ctx.restore();
     }
     const shell=ctx.createRadialGradient(-8,-11,2,0,0,23);
     shell.addColorStop(0,colors[0]);shell.addColorStop(1,colors[1]);
@@ -1420,8 +1424,10 @@
       ctx.restore();
       return;
     }
-    ctx.fillStyle='#362632';ctx.fillRect(5,-5,13,8);
-    ctx.fillStyle='#fff2c4';ctx.fillRect(13,-4,3,5);
+    ctx.strokeStyle='#fff2c4';
+    ctx.lineWidth=2;
+    ctx.lineCap='round';
+    ctx.stroke(foundryEarlyDetails[kind][1]);
     ctx.restore();
   }
   function foePosition(foe) {
