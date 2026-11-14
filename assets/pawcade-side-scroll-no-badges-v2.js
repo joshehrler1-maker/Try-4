@@ -6146,8 +6146,8 @@
       const aiming=foe.turret || firing;
       // Foundry crabs must face their walking direction even when attacking.
       // Their old target-facing override could make moving crabs moonwalk.
-      const foundryCrab=index===0 && foe.foundryEnemy===0;
-      const faceLeft=walking && (foundryCrab || !aiming) ? displacement<0
+      const foundryWalker=index===0 && foe.foundryEnemy!==undefined;
+      const faceLeft=walking && (foundryWalker || !aiming) ? displacement<0
         : aiming || (nearby && ['turret','charge','pursuit'].includes(enemyPattern))
           ? player.x<at.x
           : (foe.faceLeft??player.x<at.x);
@@ -6157,7 +6157,11 @@
       foe.gaitTime=clock;
       const speed=elapsed>0 && travel<90 ? travel/elapsed : 0;
       if(travel>=90)foe._gait=0;
-      else foe._gait=(foe._gait||0)+travel/12;
+      else if(index===0 && foe.foundryEnemy!==undefined){
+        // Crab/Foundry feet must cycle in the direction of actual travel.
+        // A positive-only gait caused a backwards tread on leftward patrols.
+        foe._gait=(foe._gait||0)+displacement/12;
+      }else foe._gait=(foe._gait||0)+travel/12;
       if(elapsed>0){
         const target=Math.min(1,speed/115);
         foe.gaitWeight=(foe.gaitWeight||0)+(target-(foe.gaitWeight||0))*(1-Math.exp(-14*elapsed));
