@@ -2500,6 +2500,38 @@
     }
     ctx.restore();
   }
+  const enemyCueColors = ["#ffc282","#80dffe","#81ffe1","#ffd66d","#c8ed85","#c4f4ff","#ffe29a","#deb0ff","#ff91dd","#ffd18b","#ffbf98","#e6e2ff","#8aeaff","#ffbb76","#adbfff","#b9ff96","#ff9d62","#ddf4ff","#ffd1a2","#7affdc","#ff8ce1","#e0c5ff","#d1fb87","#ffeaa1","#a9d7ff"];
+  function drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing){
+    const recoveringShot=firing && foe.shotAt-clock>cadence/enemyTempo-.16;
+    const diving=airborne && at.y>foe.y-(enemyPattern==='school'?33:50);
+    const hopping=enemyPattern==='hopper' && foe.y-at.y>enemyRise*.7;
+    const charging=enemyPattern==='charge' && Math.abs(at.x-foe.x)>enemyReach*.45;
+    const pursuing=enemyPattern==='pursuit' && nearby;
+    const rhythmic=enemyPattern==='rhythm' && foe.y-at.y>enemyRise*.55;
+    const turning=enemyPattern==='patrol' && foe.patrolLeft!==undefined &&
+      Math.min(at.x-foe.patrolLeft,foe.patrolRight-at.x)<5;
+    if(!(recoveringShot || diving || hopping || charging || pursuing || rhythmic || turning)) return;
+    const facing=faceLeft?-1:1;
+    ctx.save();
+    ctx.translate(at.x,at.y);
+    ctx.scale(facing,1);
+    ctx.strokeStyle=enemyCueColors[index];
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    if(recoveringShot){
+      ctx.arc(24,-6,6,0,Math.PI*2);
+    }else if(diving || hopping){
+      const direction=diving?1:-1;
+      ctx.moveTo(-9,-36-direction*4);ctx.lineTo(0,-36+direction*2);ctx.lineTo(9,-36-direction*4);
+    }else if(rhythmic){
+      ctx.moveTo(-10,-37);ctx.lineTo(-4,-37);ctx.lineTo(0,-44);ctx.lineTo(4,-34);ctx.lineTo(10,-34);
+    }else{
+      ctx.moveTo(20,-16);ctx.lineTo(28,-10);ctx.lineTo(20,-4);
+      if(charging){ctx.moveTo(27,-16);ctx.lineTo(35,-10);ctx.lineTo(27,-4);}
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -2711,12 +2743,7 @@
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
       ctx.restore();
-      if(firing){
-        ctx.save();
-        ctx.strokeStyle='#ffcd7a';ctx.lineWidth=2;
-        ctx.beginPath();ctx.arc(at.x+(faceLeft?-23:23),at.y-6,7,0,Math.PI*2);ctx.stroke();
-        ctx.restore();
-      }
+      drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing);
     }
     if (boss.health && camera+width>finish) {
       castShadow(boss.x,boss.y+38,36);
