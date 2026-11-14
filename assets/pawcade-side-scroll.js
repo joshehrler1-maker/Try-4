@@ -3055,6 +3055,7 @@
   resumeButton.onclick=()=>{const saved=readCheckpoint();if(saved)startRun(saved);};
   const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||index===15?'up':'jump',KeyW:power==='swim'||movement==='airdash'||index===15?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
   addEventListener('keydown',event=>{
+    if(storyDialog?.open) return;
     if(event.code==='KeyP' && !event.repeat && (phase==='playing'||phase==='paused')) {event.preventDefault();togglePause();return;}
     const control=codes[event.code];
     if(!control || phase!=='playing' || event.target.closest('button,a,input,select')) return;
