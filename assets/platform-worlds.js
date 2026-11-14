@@ -1057,3 +1057,6 @@ window.pawtopiaRooms.eggCave = [[0,326,2200],[310,278,230],[590,234,260],[865,19
 // Autumn Trail: introduce raised targets in the meadow and tighten the fort staircase.
 window.pawtopiaRooms.eggMeadow = [[0,326,2200],[282,284,232],[578,247,261],[900,221,246],[1200,259,279],[1540,232,263],[1863,278,237]];
 window.pawtopiaRooms.eggFort = [[0,326,2200],[378,274,224],[662,235,231],[950,196,231],[1241,242,254],[1550,211,226],[1830,260,232]];
+
+// Lava Yard introduces a single rebound before a two-platform bounce chain.
+window.pawtopiaRooms.course12Stage3 = [[0,326,410],[470,288,192,"pogo"],[716,249,261],[1034,276,176,"pogo"],[1268,239,208,"pogo"],[1533,208,238],[1827,326,373]];
