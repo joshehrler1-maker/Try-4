@@ -623,14 +623,20 @@
     }
   }
   function findGrappleAnchor(p) {
+    const steer=Number(held('right'))-Number(held('left'));
     return platforms.reduce((nearest, ledge) => {
-        if(ledge.kind!=='rail') return nearest;
-        const x=ledge.x+ledge.w/2;
-        const y=ledge.y+8;
-        const distance=Math.hypot(p.x-x,p.y-y);
-        if(p.y<=y+16 || Math.abs(p.x-x)>=230 || (nearest && distance>=nearest.distance)) return nearest;
-        return {x,y,distance};
-      },null);
+      if(ledge.kind!=='rail') return nearest;
+      const x=ledge.x+ledge.w/2;
+      const y=ledge.y+8;
+      const dx=x-p.x;
+      if(p.y<=y+16 || Math.abs(dx)>=230) return nearest;
+      const distance=Math.hypot(dx,p.y-y);
+      // Downstream rails take priority while steering. Let go of the
+      // joystick to select the nearest anchor in either direction.
+      const behind=index===9 && steer!==0 && dx*steer< -8;
+      const score=distance+(behind?400:0);
+      return nearest && score>=nearest.score ? nearest : {x,y,distance,score};
+    },null);
   }
   function action() {
     if (phase==='playing' && movement==='buster') {player.chargeStart ??= clock;return;}
