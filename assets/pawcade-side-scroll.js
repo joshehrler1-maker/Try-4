@@ -1124,8 +1124,14 @@
   };
   const guardianCells={0:0,12:1,16:2,19:3,21:4,24:5};
   function castShadow(x,y,radius) {
+    // Avoid scanning terrain or allocating gradients for off-screen actors.
+    if(x<camera-radius-130 || x>camera+width+radius+130)return;
     let surface=Infinity;
-    for(const ledge of escape ? [...platforms,returnFloor] : platforms) {
+    // Keep the existing floor separate to avoid allocating a new array for
+    // every hero, enemy and guardian shadow on every animation frame.
+    if(escape && x>=returnFloor.x && x<=returnFloor.x+returnFloor.w && returnFloor.y>=y)
+      surface=returnFloor.y;
+    for(const ledge of platforms) {
       if(ledge.switchBridge && !amberSwitch) continue;
       if(ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
       if(ledge.kind==='hazard'||ledge.kind==='ceilingSpikes'||ledge.kind==='rail'||ledge.kind==='ceiling') continue;
@@ -1142,7 +1148,9 @@
     const thickness=4+distance*.025;
     const centerX=x+distance*.11;
     const centerY=surface-1;
-    const shadow=ctx.createRadialGradient(centerX,centerY,0,centerX,centerY,spread);
+    // Gradient coordinates must be local: the canvas is translated below.
+    // Using world coordinates here shifted the falloff away from the feet.
+    const shadow=ctx.createRadialGradient(0,0,0,0,0,spread);
     shadow.addColorStop(0,'rgba(7,9,22,'+(.43*fade).toFixed(3)+')');
     shadow.addColorStop(.52,'rgba(7,9,22,'+(.22*fade).toFixed(3)+')');
     shadow.addColorStop(1,'rgba(7,9,22,0)');
