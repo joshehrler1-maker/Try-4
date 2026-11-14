@@ -325,8 +325,15 @@
     }
     // Optional upper routes make each chapter less linear without blocking
     // the main path. Each game's movement identity determines its route type.
-    // Keep this outside the feature switch so all 25 adventures receive it.
-    if(index!==7 && index!==14) { // gravity-flip games need clear ceiling lanes
+    // Keep supplemental landings clear of authored terrain and hazards.
+    const addOptionalLanding = (x,y,w,kind) => {
+      const clear=platforms.every(ledge =>
+        x+w+10<=ledge.x || x>=ledge.x+ledge.w+10 || Math.abs(y-ledge.y)>=48
+      );
+      if(clear) platforms.push({x,y,w,kind});
+    };
+    const clearLane=[7,8,14,18,20].includes(index);
+    if(index!==7 && index!==14) {
       const routeKinds={
         momentum:['belt','floor','floor'],
         roll:['barrel','floor','floor'],
@@ -358,7 +365,7 @@
         const by=heights[(branch+stage+index)%heights.length];
         const bw=92+(branch%2)*20;
         // Only add a short, optional elevated chain; never remove floor paths.
-        platforms.push({x:bx,y:by,w:bw,kind:route[branch]});
+        if(!clearLane) addOptionalLanding(bx,by,bw,route[branch]);
         crystals.push({x:bx+bw/2,y:by-35});
       }
     }
@@ -388,7 +395,7 @@
       const cx=challengeX+part*138;
       const cy=challengeHeights[(stage+part+index)%6];
       const cw=85+(part===1?19:0);
-      platforms.push({x:cx,y:cy,w:cw,kind:challengeKinds[part]});
+      if(!clearLane) addOptionalLanding(cx,cy,cw,challengeKinds[part]);
       if(part===1) crystals.push({x:cx+cw/2,y:cy-45});
     }
     // A guarded optional reward on the alternate route. Existing enemy AI
@@ -424,7 +431,7 @@
     // actual landing points. Their layouts differ by game and chapter;
     // they never replace the primary floor route or introduce lethal gaps.
     // Gravity-flip and underwater games retain their authored navigation.
-    if(index!==7 && index!==14 && movement!=='swim'){
+    if(!clearLane && movement!=='swim'){
       const islandKinds={
         momentum:['floor','belt','floor'],roll:['barrel','floor','barrel'],
         pogo:['pogo','floor','pogo'],glide:['floor','lift','floor'],
