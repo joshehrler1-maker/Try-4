@@ -1959,6 +1959,34 @@
       return {x:patrolX(foe.x+wave*enemyReach*.65),
         y:foe.y-hop*enemyRise*.95};
     }
+    // More course-specific enemy traversal, inspired by each game's
+    // pacing rather than copying any counterpart's character or map.
+    if(index===6){ // Lantern Festival: floating lantern guardians
+      const bob=Math.sin(t*1.4);
+      return {x:patrolX(foe.x+Math.sin(t*.9)*enemyReach*.6),
+        y:foe.y-16-bob*enemyRise*.75};
+    }
+    if(index===10){ // Sunset Wind Sail: enemies ride updrafts
+      const gust=Math.sin(t*.85);
+      return {x:patrolX(foe.x+gust*enemyReach*.8),
+        y:foe.y-22-(.5+.5*Math.sin(t*1.7))*enemyRise};
+    }
+    if(index===15){ // Bamboo Village: ambush, then retreat
+      const cycle=(t*.65)%2;
+      const rush=cycle<.55?cycle/.55:cycle<1.1?1:Math.max(0,1-(cycle-1.1)/.9);
+      return {x:patrolX(foe.x+chase*rush*enemyReach*.7),
+        y:foe.y-Math.sin(t*1.6)*enemyRise*.2};
+    }
+    if(index===21){ // Marble Temple: guarded pendulum sweeps
+      const swing=Math.sin(t*.9);
+      return {x:patrolX(foe.x+swing*enemyReach*.65),
+        y:foe.y-Math.max(0,Math.cos(t*.9))*enemyRise*.5};
+    }
+    if(index===24){ // Starship Cargo: hovering drone patrols
+      const drift=Math.sin(t*1.25);
+      return {x:patrolX(foe.x+drift*enemyReach*.7),
+        y:foe.y-22-Math.cos(t*2.5)*enemyRise*.55};
+    }
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
       case 'charge': return {x:patrolX(foe.x+chase*Math.max(0,wave)*enemyReach),y:foe.y};
