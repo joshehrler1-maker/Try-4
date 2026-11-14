@@ -3806,6 +3806,17 @@
     // Four silhouettes: scout fins, sentry crest, skirmisher antennae,
     // raider horns. Colors remain unique to each world.
     const archetype=foe.archetype??0;
+    // Veteran silhouettes acquire a rear stabilizer or winglet in the
+    // final chapters, distinct from the rank emblem and front armor.
+    if(armorChapter>=4){
+      ctx.beginPath();
+      const spread=12+(index%4)*3;
+      ctx.moveTo(-18,-4);ctx.lineTo(-spread-14,-14);
+      ctx.lineTo(-spread-10,-22);
+      ctx.moveTo(18,-4);ctx.lineTo(spread+14,-14);
+      ctx.lineTo(spread+10,-22);
+      ctx.stroke();
+    }
     ctx.beginPath();
     if(archetype===0){
       ctx.moveTo(-17,-9);ctx.lineTo(-28,-17);ctx.lineTo(-18,-3);
