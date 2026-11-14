@@ -6166,6 +6166,26 @@
       }
       ctx.restore();
     }
+    if(index===12 && p.pogo && p.vy>0){
+      // Keep the attack silhouette visible with reduced motion enabled.
+      ctx.save();
+      ctx.translate(p.x+p.facing*13,p.y+8);
+      ctx.fillStyle='#81593a';
+      ctx.fillRect(-2,-8,4,19);
+      ctx.fillStyle='#83d9ff';
+      ctx.strokeStyle='#edfbff';
+      ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.moveTo(-8,9);
+      ctx.lineTo(8,9);
+      ctx.lineTo(7,18);
+      ctx.lineTo(0,23);
+      ctx.lineTo(-7,18);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
     drawAtmosphere(true);
     if(chapterReveal>0 && phase==='playing') {
       ctx.save();
