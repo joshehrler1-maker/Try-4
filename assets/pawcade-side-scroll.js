@@ -302,6 +302,7 @@
       continue;
     }
     let libraryEnemyPlaced=false;
+    let reefEnemyPlaced=false;
     const pieces = window.pawtopiaRooms[room];
     for (const [slot, [x, y, w, kind = 'floor']] of pieces.entries()) {
       platforms.push({x:start+x,y,w,kind});
@@ -316,6 +317,12 @@
             foe.patrolLeft=start+x+22;
             foe.patrolRight=start+x+w-22;
             libraryEnemyPlaced=true;
+          }
+          if(index===2 && !reefEnemyPlaced && w>=100){
+            foe.reefEnemy=stage;
+            foe.x=start+(x===0?410:Math.round(x+w*.5));
+            foe.y=[198,154,204,124,181,148][stage];
+            reefEnemyPlaced=true;
           }
           enemies.push(foe);
         }
@@ -1470,10 +1477,45 @@
     ctx.stroke(design.details);
     ctx.restore();
   }
+  const reefBodies=["M-26 0Q-8-23 18-10L26 0 15 8Q-9 15-26 0Z","M-21 6Q-17-20 1-21Q23-18 21 6L12 10 4 6-4 11-12 6Z","M-27 0L-8-9 0-24 10-8 28 0 10 6 0 16-10 7Z","M-25 7L-18-8-9-7-6-19 2-10 12-18 15-7 25 0 14 11Z","M-28-4Q-12-15 3-8Q22-17 27-1Q20 12 4 7Q-14 13-28-4Z","M-23 9Q-27-6-9-13L1-11 8-24 13-13 22-12 28 3 10 13Z"].map(shape=>new Path2D(shape));
+  const reefMotion=[[54,18,2],[19,28,1.7],[75,26,1.4],[35,12,2.8],[64,17,2.4],[43,37,1.3]];
+  function drawReefEnemy(at,foe,faceLeft){
+    const kind=foe.reefEnemy;
+    const phase=clock*reefMotion[kind][2]+foe.offset;
+    ctx.save();
+    ctx.translate(at.x,at.y);
+    if(faceLeft) ctx.scale(-1,1);
+    if(!reducedMotion) ctx.rotate(Math.cos(phase)*.13);
+    const flex=reducedMotion?0:Math.sin(phase*3)*(4+kind%3);
+    ctx.fillStyle=['#eb8a63','#a683c9','#5aa9ba','#d4a659','#87b869','#e17f9d'][kind];
+    ctx.beginPath();
+    if(kind===1){
+      for(const x of [-15,-5,5,15]){
+        ctx.moveTo(x,6);ctx.quadraticCurveTo(x+flex,17,x-3,24);
+        ctx.lineTo(x+2,24);ctx.quadraticCurveTo(x+flex+5,17,x+4,6);
+      }
+    }else{
+      ctx.moveTo(-15,0);ctx.lineTo(-30,-10+flex);
+      ctx.lineTo(-35+kind,1);ctx.lineTo(-30,11-flex);
+    }
+    ctx.fill();
+    const shade=ctx.createRadialGradient(-8,-12,1,0,0,29);
+    shade.addColorStop(0,['#ffd5a0','#edcfff','#b2f1ed','#fff0a2','#e4f99b','#ffe0d3'][kind]);
+    shade.addColorStop(1,['#80434e','#533267','#246078','#735143','#426752','#783451'][kind]);
+    ctx.fillStyle=shade;ctx.fill(reefBodies[kind]);
+    ctx.fillStyle='#fff2cf';ctx.beginPath();
+    ctx.ellipse(kind===1?4:12,kind===2?0:-4,3,2.5,0,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
   function foePosition(foe) {
     if(foe.bashed && clock<foe.bashed.until){
       const t=.48-(foe.bashed.until-clock);
       return {x:foe.bashed.x+foe.bashed.vx*t,y:foe.bashed.y+foe.bashed.vy*t};
+    }
+    if(foe.reefEnemy!==undefined){
+      const [reach,rise,tempo]=reefMotion[foe.reefEnemy];
+      const phase=clock*tempo+foe.offset;
+      return {x:foe.x+Math.sin(phase)*reach,y:foe.y+Math.cos(phase*(foe.reefEnemy%2?2:1))*rise};
     }
     if (foe.turret) return {x:foe.x,y:foe.y};
     const patrolX=x=>foe.patrolLeft===undefined ? x :
@@ -3249,6 +3291,7 @@
       ctx.translate(-at.x,-at.y-19-footstep);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing);
+      else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft);
       else if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
       else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
