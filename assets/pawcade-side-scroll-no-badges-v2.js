@@ -2700,8 +2700,10 @@
     if(ledge){
       foe.x=spawnOn(ledge);
       foe.y=ledge.y-23;
-      foe.patrolLeft=ledge.x+17;
-      foe.patrolRight=ledge.x+ledge.w-17;
+      const safeLeft=Math.max(ledge.x+17, Math.min(start+17,foe.x));
+      const safeRight=Math.min(ledge.x+ledge.w-17, Math.max(end-17,foe.x));
+      foe.patrolLeft=Math.max(safeLeft,Math.min(foe.x,foe.patrolLeft ?? safeLeft));
+      foe.patrolRight=Math.min(safeRight,Math.max(foe.x,foe.patrolRight ?? safeRight));
     }
   }
   // Enemy tempo, horizontal reach, and vertical travel in course order.
