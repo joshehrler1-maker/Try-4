@@ -220,3 +220,31 @@ a{color:#ffdb99}h1,h2{font-family:Georgia,serif;color:#ffe7b5}
 #side-player .side-controls .side-action-buttons button{
   flex:0 0 auto;max-width:100%;white-space:normal;overflow-wrap:anywhere;
 }
+
+
+/* Game Room responsive control and rendering safeguards, shared by all 25 games. */
+#side-player{min-width:0;max-width:100%;overflow-x:clip}
+#side-player #side-canvas{max-width:100%;touch-action:none;image-rendering:auto}
+#side-player .side-hud{min-width:0}
+#side-player .side-hud button{flex-shrink:0}
+#side-player .side-controls{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#side-player .side-controls .side-action-buttons{max-width:68%;min-width:0}
+#side-player .side-controls .side-action-buttons button{min-width:48px;min-height:48px}
+#side-player button:focus-visible,#side-player a:focus-visible{outline:3px solid #ffe36c;outline-offset:3px}
+@media(orientation:landscape) and (max-height:540px){
+  #side-player{padding:clamp(4px,1vh,10px)}
+  #side-player h1{font-size:clamp(16px,3.8vh,23px);margin:.15rem 0}
+  #side-player #side-rules,#side-player #side-status{font-size:12px;line-height:1.25;margin:.2rem 0}
+  #side-player .side-hud{gap:4px;margin:.25rem 0}
+  #side-player .side-hud button{min-height:34px;padding:3px 8px;font-size:12px}
+  #side-player .side-controls{margin:.25rem 0;gap:6px}
+  #side-player .side-controls .touch-joystick{width:clamp(58px,17vh,80px);height:clamp(58px,17vh,80px);flex-basis:clamp(58px,17vh,80px)}
+  #side-player .side-controls .side-action-buttons button{min-height:42px;padding:5px 10px;font-size:12px}
+}
+@media(max-width:360px){
+  #side-player .side-controls .side-action-buttons{max-width:72%;gap:3px}
+  #side-player .side-controls .side-action-buttons button{padding:5px;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+  #side-player .side-controls button,#side-player .side-hud button{transition:none!important;animation:none!important}
+}
