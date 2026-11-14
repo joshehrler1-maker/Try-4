@@ -316,7 +316,11 @@
         const extraEncounter=stage>=3 && w>=720 && slot%3===stage%3 ? 1:0;
         const count=Math.min(5,baseCount+extraEncounter);
         for(let encounter=0;encounter<count;encounter++) {
-          const offset = Math.round(w*(encounter+1)/(count+1));
+          // Alternate staggered encounter positions without changing the
+          // underlying level geometry or pushing foes off a platform.
+          const stagger=((index*11+stage*7+slot*3)%5-2)*8;
+          const offset=Math.max(30,Math.min(w-30,
+            Math.round(w*(encounter+1)/(count+1))+stagger));
           // Deterministic encounter archetypes: different patrol rhythms
           // within each stage, without randomizing checkpoint resumes.
           const archetype=(stage*3+slot+encounter+index)%4;
