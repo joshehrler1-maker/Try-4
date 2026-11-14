@@ -59,7 +59,7 @@
     stomp:index===0?'Land on enemies to bounce. Hold Jump for a higher rebound.':'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim. Charge into enemies from the front. Surface or visit a bubbling vent for air',
     dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
     throw:index===13?'Throw a crystal with Action. Hold the joystick up or use W/Up to arc the throw':'Press Action to throw a crystal', flip:index===7?'Press Flip (X or Space on keyboard) while on the floor or ceiling to reverse gravity':'Press Action to reverse gravity',
-    pulse:'Press Action to release a shockwave', grapple:'Press Action below an overhead rail to attach. Steer to swing, then press Release Cable to let go',
+    pulse:'Press Action to release a shockwave', grapple:'Press Action below an overhead rail to attach. Steer to swing. In Quarry Rescue, steer up to reel in or down to extend the cable. Press Release Cable to let go',
     double:'Jump again in midair', shield:'Hold Action to deflect hazards',
     photo:'Press Action to stun enemies with a flash', bubble:'Hold Action to float'
   };
@@ -665,7 +665,7 @@
     if (power === 'grapple') {
       const anchor = findGrappleAnchor(player);
       if (anchor && !player.cable) {
-          player.cable={x:anchor.x,y:anchor.y,length:anchor.distance};
+          player.cable={x:anchor.x,y:anchor.y,length:anchor.distance,maxLength:Math.max(240,anchor.distance)};
           player.vx+=player.facing*130;
       }
     }
@@ -983,6 +983,10 @@
     }
 
     if(p.cable){
+      if(index===9){
+        const reel=Number(held('down'))-Number(held('up'));
+        p.cable.length=Math.max(42,Math.min(p.cable.maxLength,p.cable.length+reel*150*dt));
+      }
       const dx=p.x-p.cable.x,dy=p.y-p.cable.y;
       const distance=Math.hypot(dx,dy);
       if(distance>p.cable.length){
