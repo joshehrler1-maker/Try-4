@@ -1324,16 +1324,17 @@
           clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
         // Count all enemy shots consistently; the Steamworks parry cycle
         // continues to mark every third shot as parryable.
+        // Only advance the firing cycle when an actual shot is emitted.
+        // Under the mobile projectile cap, defer instead of skipping the
+        // enemy's remaining collision and combat updates.
+        if(hazards.length>=28){
+          foe.shotAt=clock+Math.max(.45,cadence/enemyTempo);
+        }else{
         const firedCount=foe.shotsFired++;
         const parryable=index===16 && firedCount%3===0;
         const primaryShot=enemyRound(position,direction,parryable);
         // Prevent runaway projectile accumulation during busy mobile
         // encounters. A full screen of active shots should not grow forever.
-        if(hazards.length>=28){
-          foe.lastShotAt=clock;
-          foe.shotAt=clock+Math.max(.45,cadence/enemyTempo);
-          continue;
-        }
         // Scouts fire quick tracers, sentries slower heavy-looking shots,
         // and raiders faster bolts. Preserve Steamworks parry behavior.
         const projectileTempo=[1.12,.82,1.02,1.22][foe.archetype??0];
@@ -1375,6 +1376,7 @@
         const attackRhythm=[1,1.22,.92,.83][foe.archetype??0];
         foe.shotAt=clock+cadence/enemyTempo*shotDelay*
           attackRhythm/rangedPressure;
+        } // end available-projectile-budget branch
       }
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
       if(impact){
