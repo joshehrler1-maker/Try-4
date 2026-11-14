@@ -3600,13 +3600,30 @@
         // Forest and garden courses: layered branch canopies.
         const stem=top+35+motif*4;
         ctx.moveTo(cx,baseline);ctx.lineTo(cx,stem);
-        ctx.moveTo(cx,stem+24);ctx.quadraticCurveTo(cx-23,stem-9,cx-35,stem+12);
-        ctx.moveTo(cx,stem+17);ctx.quadraticCurveTo(cx+22,stem-15,cx+35,stem+5);
+        const branch=19+(index%5)*4;
+        ctx.moveTo(cx,stem+24);ctx.quadraticCurveTo(cx-branch*.7,stem-9,cx-branch,stem+12);
+        ctx.moveTo(cx,stem+17);ctx.quadraticCurveTo(cx+branch*.7,stem-15,cx+branch,stem+5);
+        // Forest worlds favor hanging boughs; garden worlds use upright
+        // shoots. Both are original line art and remain background-only.
+        if(index%2===0){
+          ctx.moveTo(cx-branch,stem+12);ctx.lineTo(cx-branch+4,stem+24);
+        }else{
+          ctx.moveTo(cx+branch,stem+5);ctx.lineTo(cx+branch+3,stem-6);
+        }
       }else if(sceneryShapes[index]==='reef'){
         // Underwater courses: branching reef fans and seagrass.
         ctx.moveTo(cx,baseline);ctx.quadraticCurveTo(cx-15,top+48,cx-5,top+30);
         ctx.moveTo(cx-8,baseline-29);ctx.quadraticCurveTo(cx-32,top+54,cx-24,top+37);
         ctx.moveTo(cx-8,baseline-42);ctx.quadraticCurveTo(cx+18,top+47,cx+20,top+27);
+        // Underwater worlds alternate coral branches and kelp fronds,
+        // rather than repeating the exact same reef fan silhouette.
+        if(index%2===0){
+          ctx.moveTo(cx+8,baseline-19);
+          ctx.quadraticCurveTo(cx+24,top+53,cx+12,top+38);
+        }else{
+          ctx.moveTo(cx-13,baseline-16);
+          ctx.quadraticCurveTo(cx-28,top+40,cx-16,top+24);
+        }
       }else{
         // Mountain, castle and canyon courses: distant carved ridges.
         ctx.moveTo(cx-28,baseline-12);
