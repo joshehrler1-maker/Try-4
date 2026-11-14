@@ -5996,12 +5996,22 @@
     }
     if(p.cable){
       ctx.save();
-      const handX=p.x+(index===9 ? p.facing*11 : 0);
-      const handY=p.y-(index===9 ? 17 : 7);
+      const shoulderX=p.x;
+      const shoulderY=p.y-7;
+      const reach=Math.atan2(p.cable.y-shoulderY,p.cable.x-shoulderX);
+      const handX=shoulderX+(index===9 ? Math.cos(reach)*19 : 0);
+      const handY=shoulderY+(index===9 ? Math.sin(reach)*19 : 0);
       ctx.beginPath();ctx.moveTo(handX,handY);ctx.lineTo(p.cable.x,p.cable.y);
       ctx.lineWidth=5;ctx.strokeStyle='#101827';ctx.stroke();
       ctx.lineWidth=2;ctx.strokeStyle='#b4e9ff';ctx.stroke();
-      if(index===9){ctx.fillStyle='#ffcc71';ctx.fillRect(handX-5,handY-4,10,8);}
+      if(index===9){
+        ctx.translate(handX,handY);
+        ctx.rotate(reach);
+        ctx.fillStyle='#79523b';
+        ctx.fillRect(-13,-4,14,8);
+        ctx.fillStyle='#ffcc71';
+        ctx.fillRect(-5,-5,10,10);
+      }
       ctx.restore();
     }
     if(index===2 && p.air<airCapacity){
