@@ -628,3 +628,13 @@ Object.assign(window.pawtopiaRooms, {
 window.pawtopiaRoomPlans[0] += ' forgeSwitchbacks forgeFloodplain';
 window.pawtopiaChapters[0].push('Smelter Switchbacks','Floodgate Crossing');
 window.pawtopiaSetPieces[0] += ' steps lifts';
+
+Object.assign(window.pawtopiaRooms,{
+  forgeKilnCanopy:[[0,326,490],[545,289,165,'spring'],[775,226,180],[1010,181,175],
+    [1245,231,230],[1515,278,250],[1815,326,385]],
+  forgeSlagAqueduct:[[0,326,465],[525,297,250],[842,276,210,'belt'],[1105,226,185],
+    [1350,280,220,'belt'],[1620,304,200],[1835,326,365]]
+});
+window.pawtopiaRoomPlans[0] += ' forgeKilnCanopy forgeSlagAqueduct';
+window.pawtopiaChapters[0].push('Kiln Canopy','Slag Aqueduct');
+window.pawtopiaSetPieces[0] += ' spring speed';
