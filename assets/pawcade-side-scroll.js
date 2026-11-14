@@ -1732,7 +1732,12 @@
     const attacking=p.power>.22 && power!=='dash';
     const rolling=(index===3 && (p.spin>0 || p.power>.22)) || (movement==='roll' && p.grapple>0);
     const rushing=p.grapple>0 || (power==='dash' && p.power>.22);
-    const pose=rolling ? 3 : attacking ? 2 : !p.on ? 3 :
+    const braking=p.on && Math.abs(p.vx)>runSpeed*.42 &&
+      ((p.vx>0 && held('left')) || (p.vx<0 && held('right')));
+    const gliding=power==='glide' && !p.on && held('jump') && p.vy>0;
+    const wallSliding=!!p.wall && !p.on && p.vy>0;
+    const swimming=power==='swim' && !p.on;
+    const pose=rolling ? 3 : attacking ? 2 : braking ? 0 : !p.on ? 3 :
       Math.abs(p.vx)>15 ? 1+Math.floor(clock*(7+Math.min(9,Math.abs(p.vx)/75)))%2 : 0;
     const cell = power==='slide' && held('action') ? 13 :
       light && !p.on && (power==='double' || power==='vine') ? 14 : (light?4:0)+pose;
@@ -1755,6 +1760,14 @@
       if(rolling){
         tilt=clock*(index===3?17:12)*p.facing;
         scaleX=.84;scaleY=.84;
+      } else if(braking){
+        tilt=-p.facing*.2;scaleX=.92;scaleY=1.05;
+      } else if(gliding){
+        tilt=p.facing*.09;scaleX=1.13;scaleY=.93;
+      } else if(wallSliding){
+        tilt=-p.facing*.14;scaleX=.93;
+      } else if(swimming){
+        tilt=Math.sin(clock*8)*.1;scaleX=1.08;scaleY=.94;
       } else if(rushing){
         tilt=-p.facing*(movement==='airdash'?.34:.22);
         scaleX=1.12;scaleY=.88;
@@ -1790,11 +1803,27 @@
     ctx.restore();
     // Move-specific silhouette and effects overlay the existing approved
     // character art; the promotional concept sheet is not a sprite atlas.
-    if(!reducedMotion && (rolling || rushing || attacking || p.pogo || p.cable || p.morphed)){
+    if(!reducedMotion && (rolling || rushing || attacking || p.pogo || p.cable || p.morphed || braking || gliding || wallSliding || swimming)){
       ctx.save();
       const fx=p.x,fy=p.y-7;
       ctx.lineCap='round';
-      if(rolling){
+      if(braking){
+        ctx.fillStyle='#f6e3c488';
+        for(let puff=0;puff<3;puff++){
+          ctx.beginPath();ctx.arc(fx-p.facing*(12+puff*9),fy+26,3+puff*2,0,Math.PI*2);ctx.fill();
+        }
+      } else if(gliding){
+        ctx.strokeStyle='#aeeaff';ctx.lineWidth=2;
+        ctx.beginPath();ctx.arc(fx,fy-9,27,Math.PI*1.12,Math.PI*1.88);ctx.stroke();
+      } else if(wallSliding){
+        ctx.strokeStyle='#ffe7b4';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(fx+p.facing*15,fy+12);ctx.lineTo(fx+p.facing*22,fy+24);ctx.stroke();
+      } else if(swimming){
+        ctx.strokeStyle='#9befff';ctx.lineWidth=2;
+        for(let bubble=0;bubble<3;bubble++){
+          ctx.beginPath();ctx.arc(fx-p.facing*(18+bubble*9),fy+8-bubble*8,3+bubble,0,Math.PI*2);ctx.stroke();
+        }
+      } else if(rolling){
         ctx.strokeStyle=index===3?'#ffe19b':'#9ff7cb';
         ctx.lineWidth=3;
         for(let arc=0;arc<3;arc++){
