@@ -934,8 +934,20 @@
     } else {
       p.gaitWeight=Math.max(0,(p.gaitWeight||0)-dt*12);
     }
-    const targetCamera=Math.max(0,Math.min(finish+70,p.x-238+Math.max(-72,Math.min(90,p.vx*.18))));
-    camera+=(targetCamera-camera)*Math.min(1,dt*10);
+    // Per-game camera language: precision platformers keep a tighter frame,
+    // while speed and exploration games look farther along the travel path.
+    // The dead-zone and follow speed remain bounded for phone readability.
+    const cameraProfiles=[
+      [238,.18,10],[252,.12,11],[250,.13,7],[228,.29,12],[240,.19,9],
+      [244,.16,9],[246,.13,8],[252,.09,13],[228,.28,13],[242,.16,9],
+      [236,.21,9],[252,.11,12],[236,.17,10],[246,.15,8],[258,.12,8],
+      [246,.15,8],[236,.18,10],[250,.13,8],[244,.16,9],[248,.18,8],
+      [222,.31,13],[246,.12,9],[250,.13,8],[238,.19,9],[230,.25,11]
+    ];
+    const [cameraAnchor,lookAhead,followRate]=cameraProfiles[index];
+    const directionalLead=Math.max(-78,Math.min(96,p.vx*lookAhead));
+    const targetCamera=Math.max(0,Math.min(finish+70,p.x-cameraAnchor+directionalLead));
+    camera+=(targetCamera-camera)*Math.min(1,dt*followRate);
   }
   function updateGuardian(dt,p,oldY) {
     boss.time+=dt;
