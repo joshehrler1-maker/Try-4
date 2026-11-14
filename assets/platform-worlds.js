@@ -1000,7 +1000,7 @@ window.pawtopiaRooms.forgeExpansion7 = [[0,326,420],[464,288,201],[719,249,225,"
 
 // Moonlit Library: broken convoy decks and a cargo-lift ascent.
 window.pawtopiaRooms.convoy = [[0,326,445],[504,316,218],[780,316,200],[1036,286,245],[1338,283,250],[1642,304,202],[1900,326,300]];
-window.pawtopiaRooms.airfield = [[0,326,365],[412,288,166,"lift"],[631,249,170,"lift"],[853,211,189,"lift"],[1095,174,250],[1400,231,245],[1700,279,210],[1964,326,236]];
+window.pawtopiaRooms.airfield = [[0,326,365],[413,282,172,"lift"],[638,234,175,"lift"],[865,188,181,"lift"],[1097,142,245],[1396,204,245],[1695,264,221],[1970,326,230]];
 
 // Moonlit Library: ice approaches, power plant hazards, and vault crossings.
 window.pawtopiaRooms.iceworks = [[0,326,435],[483,291,240,"ice"],[760,253,275,"ice"],[1082,302,260],[1390,271,320,"ice"],[1754,326,446]];
