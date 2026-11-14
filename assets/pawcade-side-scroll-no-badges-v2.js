@@ -7212,14 +7212,36 @@
         ?Math.max(0,Math.min(1,-verticalSpeed/340))*.04:0;
       const observatoryFlip=index===14 && !reducedMotion
         ?Math.max(-.055,Math.min(.055,verticalSpeed/5200)):0;
+      // Games 16–20: isolated pose responses, never reused across courses.
+      const bambooSwoop=index===15 && enemyPattern==='swoop' && !reducedMotion
+        ?Math.max(-.05,Math.min(.05,verticalSpeed/6000)):0;
+      const steamPulse=index===16 && enemyPattern==='rhythm' && !reducedMotion
+        ?attackPose*.04:0;
+      const snowBrace=index===17 && firing && !reducedMotion
+        ?attackPose*.035:0;
+      const canyonPatrol=index===18 && enemyPattern==='patrol' && !reducedMotion
+        ?(foe._bodyVelocity||0)*.03:0;
+      const submarineFin=index===19 && enemyPattern==='school' && !reducedMotion
+        ?Math.sin(clock*2.3+foe.offset)*.018:0;
+      // Games 21–25: keep arcade, temple, swamp, flight and cargo distinct.
+      const neonDash=index===20 && enemyPattern==='charge' && !reducedMotion
+        ?Math.min(.05,Math.abs(foe._bodyVelocity||0)*.05):0;
+      const marbleWeight=index===21 && firing && !reducedMotion
+        ?attackPose*.045:0;
+      const swampBob=index===22 && enemyPattern==='hopper' && !reducedMotion
+        ?Math.max(0,Math.min(1,-verticalSpeed/340))*.035:0;
+      const sunflowerBank=index===23 && enemyPattern==='swoop' && !reducedMotion
+        ?Math.max(-.06,Math.min(.06,verticalSpeed/6000)):0;
+      const cargoLatch=index===24 && firing && !reducedMotion
+        ?attackPose*.04:0;
       ctx.save();
       // A distinct animation state for patrolling, hopping, flying and firing.
       ctx.translate(at.x,at.y+19);
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
-      else ctx.rotate(enemyLean+attackTilt+verticalLean+polarityTurn+windBank+cloudPursuit+observatoryFlip);
-      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5-seedAscent*.5+seedDescent+stagePulse+quarryBrace-waterfallDive*.4+thunderCharge-autumnHop*.4,
-        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression+seedAscent-seedDescent+waterfallDive+lanternFloat-stagePulse-quarryBrace-thunderCharge+autumnHop);
+      else ctx.rotate(enemyLean+attackTilt+verticalLean+polarityTurn+windBank+cloudPursuit+observatoryFlip+bambooSwoop+canyonPatrol+sunflowerBank);
+      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5-seedAscent*.5+seedDescent+stagePulse+quarryBrace-waterfallDive*.4+thunderCharge-autumnHop*.4+steamPulse+snowBrace+neonDash+marbleWeight+cargoLatch-swampBob*.4,
+        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression+seedAscent-seedDescent+waterfallDive+lanternFloat-stagePulse-quarryBrace-thunderCharge+autumnHop-steamPulse-snowBrace+submarineFin-neonDash-marbleWeight-cargoLatch+swampBob);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(!reducedMotion){
         const flex=airborne ? motion*.2 : footCycle*movingWeight*.22;
