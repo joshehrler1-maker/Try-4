@@ -1426,8 +1426,14 @@
         // Distinct ranged archetypes: sentries shoot more deliberately,
         // raiders press harder, while the existing chapter cap applies.
         const attackRhythm=[1,1.22,.92,.83][foe.archetype??0];
+        // Keep each counterpart-inspired shooter distinct: Moonlit Library
+        // favors deliberate Mega Man-style lane reading, Submarine Dock
+        // favors sustained Contra-style pressure, and Starship Cargo uses
+        // short, readable Metal Slug-style volleys. Steamworks retains its
+        // own parry cadence above.
+        const courseFirePace=index===1?1.18:index===19?.84:index===24?.96:1;
         foe.shotAt=clock+cadence/enemyTempo*shotDelay*
-          attackRhythm/rangedPressure;
+          attackRhythm*courseFirePace/rangedPressure;
         } // end available-projectile-budget branch
       }
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
