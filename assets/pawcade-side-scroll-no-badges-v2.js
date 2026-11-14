@@ -5816,27 +5816,47 @@
     ctx.fillStyle=enemyCueColors[index];
     ctx.lineWidth=1.7;
     if(airborne){
-      // Wingbeats, propeller trails and air displacement for aerial threats.
-      for(let n=0;n<3;n++){
-        const side=direction*(23+n*8);
-        ctx.beginPath();ctx.moveTo(-side,-28+n*9);
-        ctx.quadraticCurveTo(-side-direction*11,-33+n*9+Math.sin(phase+n)*4,
-          -side-direction*(19+n*3),-28+n*9);ctx.stroke();
+      // World-specific flight trails: staggered wing strokes, compressed
+      // propulsion wakes and broad air currents use different silhouettes.
+      const trailCount=2+index%3;
+      const sweep=9+index%4*3;
+      for(let n=0;n<trailCount;n++){
+        const side=direction*(22+n*(7+index%3));
+        const y=-30+n*(7+index%3);
+        ctx.beginPath();ctx.moveTo(-side,y);
+        if(index%3===0){
+          ctx.quadraticCurveTo(-side-direction*sweep,y-5+Math.sin(phase+n)*4,
+            -side-direction*(sweep+7+n*2),y);
+        }else if(index%3===1){
+          ctx.lineTo(-side-direction*(sweep*.6),y-3);
+          ctx.lineTo(-side-direction*(sweep+6),y-2);
+        }else{
+          ctx.bezierCurveTo(-side-direction*5,y-9,
+            -side-direction*sweep,y+6,
+            -side-direction*(sweep+8),y-1);
+        }
+        ctx.stroke();
       }
     }else if(firing){
-      // Attack follow-through: bright, short-lived recoil arcs.
+      // Recoil is anchored to the facing side; radius and arc spacing vary
+      // by world instead of applying one generic muzzle effect everywhere.
+      const recoilRadius=8+index%4*2;
       for(let n=0;n<2;n++){
-        ctx.beginPath();ctx.arc(direction*22,-13,11+n*7,
+        ctx.beginPath();ctx.arc(direction*(21+index%3),-13,
+          recoilRadius+n*(5+index%3),
           -.9+Math.sin(phase)*.15,.9+Math.sin(phase)*.15);ctx.stroke();
       }
     }else if(stride>.12){
-      // Contact marks follow the actual distance-based gait.
+      // Distance-based ground contacts scale with movement and fade as the
+      // enemy slows, avoiding a permanent hovering ring beneath idle foes.
       const offset=Math.sin(foe._gait||0)*5;
+      ctx.globalAlpha=(.25+stride*.26)*stride;
       for(let n=0;n<2;n++){
         ctx.beginPath();
-        ctx.ellipse(-direction*(9+n*9),16+Math.abs(offset)*.2,
-          4+stride*4,1.2,0,0,Math.PI*2);ctx.fill();
+        ctx.ellipse(-direction*(9+n*(7+index%3)),16+Math.abs(offset)*.2,
+          3+stride*(3+index%3),1.2,0,0,Math.PI*2);ctx.fill();
       }
+      ctx.globalAlpha=.25+stride*.26;
     }
     // Distinct secondary motion families: flicker, sweep, orbit, pulse, sparkle.
     if(index===0 && !airborne){
