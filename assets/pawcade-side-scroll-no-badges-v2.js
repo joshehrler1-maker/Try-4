@@ -4610,8 +4610,12 @@
       const legSwing=airborne?Math.sin(clock*5+side)*5:swing*side*9*poseStride*chapterWeight;
       const kneeX=hip+legSwing*.65;
       const kneeY=at.y+4+(airborne?-5:Math.abs(swing)*2*poseKnee);
-      const footX=kneeX+legSwing*.45+dir*3;
-      const footY=at.y+18-(airborne?7:Math.max(0,side*swing)*5);
+      const footX=kneeX+legSwing*.45+dir*3-
+        (!airborne && Math.max(0,-side*swing)>.25?legSwing*.2:0);
+      // Plant the support foot while the opposite paw lifts; preserve a
+      // steady contact point rather than making both feet skate together.
+      const support=Math.max(0,side*swing);
+      const footY=at.y+18-(airborne?7:support*5*kneeScale);
       ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
       ctx.beginPath();ctx.moveTo(hip,at.y-6);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
       ctx.strokeStyle=armor;ctx.lineWidth=radius;
