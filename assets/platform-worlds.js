@@ -1041,3 +1041,6 @@ for (const [room, slot, x, y, width] of [
 // Seed Garden rigging routes climb before returning to deck level.
 window.pawtopiaRooms.seedRigging = [[0,326,365],[405,280,210],[657,233,201],[898,185,192,"barrel"],[1132,137,240],[1415,198,222],[1680,258,220],[1940,326,260]];
 window.pawtopiaRooms.seedTopsail = [[0,326,330],[377,287,165,"spring"],[590,237,183],[819,195,188,"spring"],[1052,142,202],[1297,106,225],[1568,182,200],[1812,251,160],[2017,326,183]];
+
+// A stable recovery deck breaks up the two chains of falling lifts.
+window.pawtopiaRooms.eggDonuts = [[0,326,385],[415,284,164,"drop"],[604,251,150,"drop"],[778,228,194,"drop"],[1010,255,165],[1208,285,205,"drop"],[1450,263,205,"drop"],[1705,326,495]];
