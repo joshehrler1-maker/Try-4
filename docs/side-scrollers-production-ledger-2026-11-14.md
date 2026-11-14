@@ -1,0 +1,74 @@
+# Super Paw Heroes — 25-game art and film production ledger
+
+Updated 2026-11-14, GitHub default branch `main`. This is a production-status record, **not** a claim of Android playtesting, cinematic 3D assets, or completed movies.
+
+## Reference authority
+- Use `docs/side-scrollers-25-individual-reference-review.md` and `assets/platform-worlds.js` for counterpart-to-game identity, story, stage names, and geometry.
+- Counterpart references are mechanics guidance only. Do not copy copyrighted maps, sprites, voices, or audio.
+- Character visuals must follow the approved master poster; no unverified replacement of canon character models.
+- The runtime draws in an 800 × 380 landscape canvas, with world ground at y=326.
+- Only free tooling and existing public GitHub Pages hosting.
+
+## Batch 1 — five individually authored Stage 1 background props
+
+These are **original vector-painted scenery assets, not 3D renders or character animations**. Placement is behind game collision shapes, deliberately decorative, with no gameplay hitbox changes. Stage 1-only coordinates are in the first section of each game (world x 590–770). All stage names are taken from the repo's chapter data.
+
+| Game # | Game | Stage | Asset | World position | Scale | Pivot | Collision surface | Depth layer | Animation trigger | Current status | Subject |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 01 | Ember Foundry | 1 — Cold Intake | `assets/scenes/ember-foundry/cold-intake-beacon.svg` | (590, 156) upper-left; base (680, 326) | 180 × 170 world units; source 180 × 170, 1× | Bottom center (0.5, 1) | None; existing `platforms` geometry controls collision | Behind world walls, tunnels, and platforms, ahead of parallax | Passive stage scenery, always on when loaded | SVG source added; runtime integrated; source checks only | furnace evacuation beacon |
+| 02 | Moonlit Library | 1 — Return Desk | `assets/scenes/moonlit-library/atlas-lectern.svg` | (590, 156) upper-left; base (680, 326) | 180 × 170 world units; source 180 × 170, 1× | Bottom center (0.5, 1) | None; existing `platforms` geometry controls collision | Behind world walls, tunnels, and platforms, ahead of parallax | Passive stage scenery, always on when loaded | SVG source added; runtime integrated; source checks only | moon atlas reading lectern |
+| 03 | Coral Courier | 1 — Tide Pools | `assets/scenes/coral-courier/pearl-vent.svg` | (590, 156) upper-left; base (680, 326) | 180 × 170 world units; source 180 × 170, 1× | Bottom center (0.5, 1) | None; existing `platforms` geometry controls collision | Behind world walls, tunnels, and platforms, ahead of parallax | Passive stage scenery, always on when loaded | SVG source added; runtime integrated; source checks only | pearl breathing vent |
+| 04 | Clocktower Relay | 1 — Market Gears | `assets/scenes/clocktower-relay/sunrise-gear.svg` | (590, 156) upper-left; base (680, 326) | 180 × 170 world units; source 180 × 170, 1× | Bottom center (0.5, 1) | None; existing `platforms` geometry controls collision | Behind world walls, tunnels, and platforms, ahead of parallax | Passive stage scenery, always on when loaded | SVG source added; runtime integrated; source checks only | sunrise timing gear |
+| 05 | Seed Garden | 1 — Seed Nursery | `assets/scenes/seed-garden/seed-lantern.svg` | (590, 156) upper-left; base (680, 326) | 180 × 170 world units; source 180 × 170, 1× | Bottom center (0.5, 1) | None; existing `platforms` geometry controls collision | Behind world walls, tunnels, and platforms, ahead of parallax | Passive stage scenery, always on when loaded | SVG source added; runtime integrated; source checks only | seed lantern |
+
+**Integration:** `assets/pawcade-side-scroll-no-badges-v2.js` loads only the selected game's corresponding `firstStageLandmarkPaths` entry. The canvas draws the asset when on-screen before walls, tunnels, and platform surfaces. `pawcade-side-scroll.html` has a bumped runtime URL. Failed or late image loads leave the prior scenery in place. The placement is visual-only, not a claim of matching an external game's platform layout.
+
+**Still missing in these five games:** detailed stage-by-stage asset placement for the rest of each level; approved poster-matched 3D hero renders; individual enemy meshes and motion clips; platform-specific art revisions; 3D environments; stage-specific film assets; dialogue/audio/captioned film exports; real-device performance and controls checks.
+
+## Other 20 games — unchanged in this batch
+
+- 06 Waterfall Climb: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 07 Lantern Festival: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 08 Crystal Polarity: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 09 Stage Beat: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 10 Quarry Rescue: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 11 Sunset Wind Sail: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 12 Cloud City: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 13 Thunder Harbor: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 14 Autumn Trail: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 15 Inverted Observatory: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 16 Bamboo Village: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 17 Steamworks: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 18 Snow Village: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 19 Canyon Crossing: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 20 Submarine Dock: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 21 Neon Circuit: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 22 Marble Temple: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 23 Swamp Ferry: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 24 Sunflower Flight: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 25 Starship Cargo: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+
+## Movie production ledger
+
+For **all 25 games**, final screenplay, approved voice recordings, storyboard-to-animatic timing, 3D character animation, soundtrack, dialogue sync, captions, finished exports, and live playback checks are **pending** unless another verified file-specific report establishes otherwise. The current source story arcs and chapter names in `assets/platform-worlds.js` are inputs, not finished movies. Never mark a concept still or screenplay as a completed movie.
+
+## Verification matrix
+
+| Check | Result | Evidence / limitation |
+| --- | --- | --- |
+| Five original source assets created | PASS (GitHub commit records) | Individual SVG files at their game-specific paths |
+| Each image requested only for its own game | PASS (source inspection) | `index < firstStageLandmarkPaths.length` and index-specific selection |
+| Scene draw order protects collider top readability | PASS (source inspection) | Draw before `walls`, `tunnels`, `localPlatforms` |
+| Trigger path stays at Stage 1 | PASS (source position) | All five assets at world x 590–770, within the first chapter |
+| Runtime JS syntax | PASS (JS parser check) | `new Function(...)` over updated runtime |
+| GitHub Pages actually serves all five paths | NOT VERIFIED | Must use browser/HTTP on deployed site |
+| Android landscape gameplay, framerate, multitouch | NOT VERIFIED | Requires actual landscape device run |
+| Landing/collision + enemy motion in changed stages | NOT VERIFIED | Requires live interactive playthrough |
+| Movie audio, captions, visuals | NOT VERIFIED | No finished new movie delivered |
+
+## Next verification gates
+
+1. Open the five `?game=0` through `?game=4` Games Room routes in landscape; verify each Stage 1 landmark visibly aligns with terrain without masking a landing.
+2. Observe network responses and console errors for all five SVGs; check slow-network behavior and 404 fallback.
+3. Run the repo's test suite and Android device tests; correct visual placement or frame-time regressions before declaring this batch fully verified live.
+4. Audit Stage 2 onward individually using that game's stage geometry and actual reference mechanic. Write exact collision and placement records before extending art. Create the original rendered 3D assets separately from vector sketches.
