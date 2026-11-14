@@ -1,6 +1,30 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
 
+## Batch 8 — enemies for games 16–20 (original playable 2.5D vector rigs)
+
+Five new **separate** original enemy silhouettes and behavioral body-motion algorithms are now integrated into the playable Stage 1–6 builds. Source: `assets/animation/mid-world-enemy-rigs-v1.js` (new; latest code `6bc18e4`); integration: `assets/pawcade-side-scroll-no-badges-v2.js` (`ebd3453`). This is **not** a finished feature-film 3D animation pass.
+
+| Game | Current reference identity | Individual new enemy | Integrated motion design | Remaining |
+| --- | --- | --- | --- | --- |
+| 16 Bamboo Village | Ori-inspired aerial traversal | Cane Striker | Airborne-tucked legs instead of false ground contacts, bamboo pole lunge, leaf armor, windup, projectile recoil | True wing/body 3D and full vault/land render |
+| 17 Steamworks | Cuphead-inspired shoot/dodge | Pressure Piston | Iron-boiler body, real attack-cued telescopic piston, walking wheels vs turret base, local steam relief | 3D mechanical hierarchy, unique boss motions |
+| 18 Snow Village | Aladdin-inspired platform jumps | Frost Lantern | Prism lantern, planted braking crampons, frost-cone breath at recoil, weighted body compression | 3D glass, snow interactions, complete impact clips |
+| 19 Canyon Crossing | Prince of Persia-inspired timed traversal | Dust Runner | Hinged sandstone plates, distance-based alternating grounded toes, lunge and short dust wake | 3D leg rig, step tests and attack frame audit |
+| 20 Submarine Dock | Contra III-inspired shooting | Abyss Probe | Separate hinged propulsor fins, rotating tail propeller, face-level sonar pulse, aquatic (no fake feet) | 3D underwater movement, full body and sonar effects |
+
+**Animation inputs:** Existing per-enemy world-position stride, facing direction, projectile/anticipation/recoil, landing phase, bash hit state, reduced-motion setting, and frame-clock. All five design bodies are original and not a copy of any assigned counterpart game artwork. Two unaffected game groups remain isolated: 1–15 preserve their previous artwork, and 21–25 keep their own distinct procedural rigs. Steamworks turret gameplay behavior and hitboxes remain unchanged.
+
+**Defeat logic:** The previously added 0.42s non-colliding visual fade/scale now applies to both mid- and late-world enemy rigs. Gameplay enemies become dead immediately; the visual is disabled by reduced-motion preference. Alpha is properly multiplied, preserving outer defeat compositing. Missing animation modules fall back to the existing atlas without stopping gameplay.
+
+**Integration and QA:** The Games Room loads the new module before runtime; service worker precaches both revised URLs and updates its cache version. Automated test fixtures exercise all five designs with idle, walking, attack and hit, 0 or 1 contact transitions, flipped facing, and safe canvas save/restore, and check their selection boundaries. One original unit test failed because its VM sandbox lacked `window`; repaired in `5fe3341`. Latest GitHub CI/Pages results must be checked separately; live Android landscape playback, frame timing and visual enemy hit alignment remain **unverified**. Zero paid dependencies.
+
+### Remaining strategic gap
+
+10/25 games have newly integrated individualized **illustrated** enemy rigs (games 16–25); the other 15 retain earlier enemy movement/visuals without new designs in these batches. 25-game final film-quality 3D geometry/lighting/renders and full motion clips have not been completed. 25 complete movies also remain unfinished.
+
+
+
 ## Batch 7 — playable enemy motion integration, games 21–25
 
 **What actually changed:** The playable canvas now draws five distinctly authored, runtime-procedural **2.5D illustrated enemy rigs** rather than falling back to the generic 5-column sprite atlas in games 21–25. Art source: `assets/animation/late-world-enemy-rigs-v1.js` (commit `fbe47754`). Game integration: `assets/pawcade-side-scroll-no-badges-v2.js` (commit `9f903e6`). Five individualized enemy families follow `assets/enemy-art-motion-registry.json`:
