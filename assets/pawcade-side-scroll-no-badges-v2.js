@@ -3061,7 +3061,12 @@
     const gamePitch=[113,89,137,73,131,109,127,83,61,149,107,97,101,139,79,151,67,103,157,71,59,163,137,127,73][index];
     const placement=Math.floor(x/gamePitch);
     const kindOffset=({floor:0,drop:1,barrel:2,pogo:3,ice:4,rail:5,shelf:6,spring:7,belt:8,lift:9,current:10,ceiling:11})[kind]||0;
-    const model=family[((placement*(index%4+1)+stage*(index%5+2)+kindOffset)%family.length+family.length)%family.length];
+    // Vary construction between nearby ledges of different lengths and
+    // elevations. Keep choices deterministic for replay/checkpoint parity.
+    const ledgeSignature=Math.floor(w/71)+Math.floor(y/29);
+    const familySlot=((placement*(index%4+1)+stage*(index%5+2)+
+      kindOffset+ledgeSignature)%family.length+family.length)%family.length;
+    const model=family[familySlot];
     const [face,recess,rim]=courseMaterials[index];
     const faceDepth=Math.min(depth,kind==='floor'?62:29);
     const pitch=24+(model%5)*9;
@@ -3075,7 +3080,11 @@
     ctx.globalAlpha=.46;
     for(let n=first;n<=last;n++){
       const px=x+n*pitch, py=y+5, mid=px+pitch*.5;
-      switch(model){
+      // Longer platforms alternate compatible construction details in
+      // distinct sections instead of repeating one motif for their full run.
+      const section=Math.floor((n*pitch)/Math.max(140,gamePitch*2));
+      const sectionModel=family[(familySlot+Math.max(0,section))%family.length];
+      switch(sectionModel){
         case 0: ctx.strokeRect(px+2,py,pitch-5,faceDepth-10);break; // masonry
         case 1: ctx.beginPath();ctx.arc(mid,py+7,4,0,7);ctx.stroke();break; // rivets
         case 2: ctx.beginPath();ctx.moveTo(px+2,py+13);ctx.lineTo(mid,py);ctx.lineTo(px+pitch-2,py+13);ctx.stroke();break; // crystals
