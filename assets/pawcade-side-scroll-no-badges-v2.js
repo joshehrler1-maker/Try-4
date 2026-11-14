@@ -1018,7 +1018,7 @@
     if (buffer) player.jumpBuffer=[.115,.095,.11,.075,.11,.12,.13,.075,.05,.095,
       .12,.14,.09,.115,.105,.13,.085,.11,.085,.1,.065,.085,.12,.13,.09][index];
     if (index===3 && held('down') && player.on) {player.spin=Math.min(5,player.spin+1);player.jumpBuffer=0;return;}
-    if (index===10 && player.carry && !player.on) {
+    if (buffer && index===10 && player.carry && !player.on) {
       player.carry=false;player.vy=-jumpSpeed;player.jumpBuffer=0;
       player.jumpCut=true;player.jumpAge=0;
       return;
@@ -1104,6 +1104,7 @@
       const speed = movement==='whip' ? 240 : power==='throw' ? 700 : 400;
       const life = movement==='whip' ? .24 : movement==='beat' && onBeat ? .72 : power==='throw' ? .8 : .36;
       const projectile={x:player.x,y:player.y,v:player.facing*speed,life};
+      if(index===13 && power==='throw') projectile.motionTrail='lob';
       if(index===13 && power==='throw' && held('up')){
         projectile.v=player.facing*460;
         projectile.vy=-285;
@@ -1145,7 +1146,7 @@
           status('Sonar revealed a hidden crystal trail. Follow it upward.');
         }
         break;
-      case 'launch': if(p.on){p.vy=-strength;p.vx=p.facing*350;p.grapple=.26;}break;
+      case 'launch': if(p.on){p.vy=-strength;p.vx=p.facing*350;p.grapple=.26;p.on=false;p.coyote=0;}break;
       case 'pull':
       case 'capture': {
         if(p.carry){shot({v:p.facing*550,damage:2});p.carry=false;break;}
@@ -1157,7 +1158,7 @@
       case 'retry': respawn();activated=true;break;
       case 'release': if(p.cable){p.cable=null;p.grapple=.18;}break;
       case 'climb': break; // Held climb is resolved against the wall each tick.
-      case 'drop': if(!p.on){p.vy=strength;p.pogo=true;}break;
+      case 'drop': if(!p.on){p.vy=strength;p.pogo=true;p.coyote=0;p.jumpBuffer=0;p.jumpCut=false;}break;
       case 'lob': shot({v:p.facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2,motionTrail:'lob'});break;
       case 'morph': {
         const nextBody=p.morphed?22:12;
@@ -1590,6 +1591,9 @@
     if (climbing) {
       const climbDirection=Number(held('down'))-Number(held('up'));
       p.vy=climbDirection*118;
+      if(!signatureEffect || clock-signatureEffect.at>.33){
+        signatureEffect={x:p.x,y:p.y,facing:p.wall,at:clock};
+      }
       p.climbStamina=Math.max(0,p.climbStamina-dt*(climbDirection<0?1:.45));
     } else if (power==='swim') {
       // Swimming near a reef current pulls the hero along its channel,
@@ -1705,7 +1709,7 @@
         p.jumpCut=false;
         if (ledge.kind==='spring') p.jumpBuffer=0;
         else if(p.jumpBuffer>0 && !p.pogo) jump(false);
-        if(p.pogo){p.vy=-410;p.pogo=false;p.on=false;}
+        if(p.pogo){p.vy=index===22 && held('technique')?-530:-410;p.pogo=false;p.on=false;p.jumpBuffer=0;p.coyote=0;}
         landed = true;
         if(ledge.kind==='drop') ledge.dropAt ??= clock+.38;
         p.onIce=p.on && ledge.kind==='ice';
@@ -1780,7 +1784,11 @@
           if(attack.trail.length>9) attack.trail.shift();
         }
       }
-      if(attack.returning && attack.life<.55) attack.v=Math.sign(p.x-attack.x)*420;
+      if(attack.returning && attack.life<.55){
+        attack.v=Math.sign(p.x-attack.x)*420;
+        attack.vy=Math.max(-320,Math.min(320,(p.y-attack.y)*8));
+        if(close(p,attack,16,18)){attack.life=0;continue;}
+      }
       attack.x+=attack.v*dt;
       if(attack.vy!==undefined){attack.y+=attack.vy*dt;attack.vy+=(attack.gravity||0)*dt;}
       attack.life-=dt;
