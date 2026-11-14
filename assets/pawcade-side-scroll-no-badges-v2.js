@@ -2382,6 +2382,18 @@
       return {x:patrolX(foe.x+step*enemyReach*.65),
         y:foe.y-pulse*pulse*enemyRise*.55};
     }
+    if(index===11){ // Cloud City: pursue then pause to allow precision dodges
+      const chaseWindow=Math.max(0,Math.sin(t*.92));
+      const dash=chaseWindow*chaseWindow;
+      return {x:patrolX(foe.x+chase*dash*enemyReach*.85),
+        y:foe.y-Math.max(0,Math.sin(t*1.4))*enemyRise*.65};
+    }
+    if(index===23){ // Sunflower Flight: drifting pollen guardians rise and settle
+      const drift=Math.sin(t*.64);
+      const float=Math.sin(t*1.15+.7);
+      return {x:patrolX(foe.x+drift*enemyReach*.7),
+        y:foe.y-enemyRise*(.45+.35*float)};
+    }
     // More course-specific enemy traversal, inspired by each game's
     // pacing rather than copying any counterpart's character or map.
     if(index===6){ // Lantern Festival: grounded hoppers return to their platforms
