@@ -3131,7 +3131,8 @@
     // These only affect ordinary foes, after the authored special-enemy cases.
     if(index===4){ // Seed Garden: canopy beetles leap between branches
       const leap=Math.max(0,Math.sin(t*2.3));
-      return {x:patrolX(foe.x+wave*enemyReach*.8),y:foe.y-leap*leap*enemyRise*1.3};
+      const arc=leap*leap*(3-2*leap);
+      return {x:patrolX(foe.x+wave*enemyReach*.8),y:foe.y-arc*enemyRise*1.3};
     }
     if(index===7){ // Crystal Polarity: inverted gravity sentries
       // Continuous gravity inversion prevents a full-height teleport each
@@ -3153,8 +3154,9 @@
     }
     if(index===13){ // Autumn Trail: springing woodland enemies land between hops
       const hop=Math.max(0,Math.sin(t*2.4));
+      const landing=hop*hop*(3-2*hop);
       return {x:patrolX(foe.x+wave*enemyReach*.9),
-        y:foe.y-hop*hop*enemyRise};
+        y:foe.y-landing*enemyRise};
     }
     if(index===14){ // Inverted Observatory: alternating gravity orbit
       const gravity=Math.sin(t*.95);
@@ -3205,14 +3207,16 @@
     }
     if(index===11){ // Cloud City: pursue then pause to allow precision dodges
       const chaseWindow=Math.max(0,Math.sin(t*.92));
-      const dash=chaseWindow*chaseWindow;
+      const dash=chaseWindow*chaseWindow*(3-2*chaseWindow);
+      const lift=Math.max(0,Math.sin(t*1.4));
       return {x:patrolX(foe.x+chase*dash*enemyReach*.85),
-        y:foe.y-Math.max(0,Math.sin(t*1.4))*enemyRise*.65};
+        y:foe.y-lift*lift*enemyRise*.65};
     }
     if(index===23){ // Sunflower Flight: drifting pollen guardians rise and settle
       const drift=Math.sin(t*.64);
       const float=Math.sin(t*1.15+.7);
-      return {x:patrolX(foe.x+drift*enemyReach*.7),
+      const gliding=drift*.8+drift**3*.2;
+      return {x:patrolX(foe.x+gliding*enemyReach*.7),
         y:foe.y-enemyRise*(.45+.35*float)};
     }
     if(index===1 && foe.libraryEnemy===undefined){ // Moonlit Library: deliberate sentry pauses
@@ -3229,8 +3233,9 @@
     // pacing rather than copying any counterpart's character or map.
     if(index===6){ // Lantern Festival: grounded hoppers return to their platforms
       const hop=Math.max(0,Math.sin(t*1.4));
+      const arc=hop*hop*(3-2*hop);
       return {x:patrolX(foe.x+Math.sin(t*.9)*enemyReach*.6),
-        y:foe.y-hop*hop*enemyRise};
+        y:foe.y-arc*enemyRise};
     }
     if(index===10){ // Sunset Wind Sail: enemies ride updrafts
       const gust=Math.sin(t*.85);
