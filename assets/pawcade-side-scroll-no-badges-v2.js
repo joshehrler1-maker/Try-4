@@ -6559,8 +6559,10 @@
       ctx.restore();
     }
     if(index===5 && gliding){
+      const rotor=reducedMotion?1:.76+.24*Math.cos(clock*48);
       ctx.save();
       ctx.translate(p.x,p.y-28);
+      ctx.scale(rotor,1);
       ctx.strokeStyle='#e1f9ff';
       ctx.lineWidth=2;
       ctx.fillStyle='#73afd6';
