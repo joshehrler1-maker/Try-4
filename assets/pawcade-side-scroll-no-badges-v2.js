@@ -2620,9 +2620,9 @@
     const colors=design?.colors ?? [['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c'],['#f0a271','#754021'],['#acf0dc','#285b6b'],['#e8d1ff','#583e83']][kind];
     ctx.save();
     ctx.translate(at.x,at.y);
-    // Foundry crab artwork is authored facing left (unlike the generic
-    // right-facing enemy sprites). Mirror on rightward travel instead.
-    if(!faceLeft) ctx.scale(-1,1);
+    // The Foundry enemy's face is authored on the RIGHT side of its local
+    // artwork. Mirror the complete body only when walking to the left.
+    if(faceLeft) ctx.scale(-1,1);
     const phase=reducedMotion?0:clock*13+offset;
     if(!design){
       ctx.save();
@@ -2670,6 +2670,19 @@
       ctx.lineTo(19,-8);ctx.lineTo(23,12);
     }
     ctx.closePath();ctx.fill();
+    // Give every grounded Foundry patrol enemy a clear forward-facing face.
+    // This is drawn in local coordinates, so the same body mirror turns the
+    // eyes and snout together instead of leaving the torso facing backwards.
+    if(kind!==8){
+      ctx.save();
+      ctx.fillStyle='#fff3ce';ctx.strokeStyle='#4b3340';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.ellipse(11,-10,6,5,-.15,0,Math.PI*2);
+      ctx.fill();ctx.stroke();
+      ctx.fillStyle='#242637';ctx.beginPath();ctx.arc(13,-10,2.5,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#f9c69c';ctx.beginPath();ctx.moveTo(17,-4);
+      ctx.lineTo(24,-1);ctx.lineTo(16,2);ctx.closePath();ctx.fill();
+      ctx.restore();
+    }
     // Foundry enemy: articulated mechanical pincers and layered chest plating.
     // Both limbs use pivoted transforms and move with the existing animation
     // clock. All geometry is visual-only, with no collision changes.
