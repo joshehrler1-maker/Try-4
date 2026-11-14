@@ -6243,11 +6243,18 @@
     const plantStrength=swimmingAttack?.12:defensiveAttack?.85:rushingAttack?.38:.6;
     const attackPlant=Math.min(.85,Math.max(0,attackPose||0)*plantStrength);
     const gaitBlend=Math.min(1,Math.max(0,stride||0))*(1-attackPlant);
+    // Smooth attack-driven gait suppression across consecutive rendered frames.
+    // A shot should not snap both feet to their planted poses in one frame.
+    const gaitDt=Math.min(.05,Math.max(0,clock-(foe._plantFrameAt??clock)));
+    foe._plantFrameAt=clock;
+    foe._attackGaitBlend=(foe._attackGaitBlend??gaitBlend)+
+      (gaitBlend-(foe._attackGaitBlend??gaitBlend))*(1-Math.exp(-13*gaitDt));
+    const smoothGaitBlend=reducedMotion?0:foe._attackGaitBlend;
     // Animation pose stays stable when paused or reduced motion is enabled.
     const animTime=reducedMotion?0:clock;
     // Separate stance and swing phases so planted feet do not lift together.
-    const swing=reducedMotion?0:Math.sin(phase)*gaitBlend;
-    const gaitContact=reducedMotion?0:Math.cos(phase)*gaitBlend;
+    const swing=reducedMotion?0:Math.sin(phase)*smoothGaitBlend;
+    const gaitContact=reducedMotion?0:Math.cos(phase)*smoothGaitBlend;
     const reach=reducedMotion?0:attackPose;
     // Individual game families get different windup and recoil timing.
     // Keep the pose attached to the existing foe sprite, not a floating cue.
@@ -6333,9 +6340,9 @@
       const footTravel=inSwing?(-1+2*ease):(1-2*ease);
       // A continuous sine swing arc keeps both ends of each airborne step
       // at ground height; per-game knee scales preserve distinct silhouettes.
-      const footLift=inSwing?Math.sin(Math.PI*progress)*5.5*poseKnee*gaitBlend:0;
+      const footLift=inSwing?Math.sin(Math.PI*progress)*5.5*poseKnee*smoothGaitBlend:0;
       const legSwing=airborne?flightCycle*(aerialWorld?7:5):
-        footTravel*9*poseStride*chapterWeight*gaitBlend;
+        footTravel*9*poseStride*chapterWeight*smoothGaitBlend;
       const kneeX=hip+legSwing*.65;
       const kneeY=at.y+4+(airborne?-5:footLift*.45);
       const footX=kneeX+legSwing*.45+dir*3;
