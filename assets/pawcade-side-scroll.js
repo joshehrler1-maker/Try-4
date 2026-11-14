@@ -3839,6 +3839,21 @@
       ctx.moveTo(18,-12);ctx.lineTo(24,-22);ctx.lineTo(17,-29);
     }
     ctx.stroke();
+    // Deterministic stage emblems: enemy units gain a different etched
+    // geometric crest in every chapter of their own course.
+    const rank=foe.spawnChapter??chapter;
+    ctx.save();
+    ctx.translate(0,-10);
+    ctx.rotate((index*7+rank*3)*Math.PI/18);
+    ctx.beginPath();
+    const points=3+(rank%4);
+    for(let n=0;n<points;n++){
+      const angle=-Math.PI/2+n*2*Math.PI/points;
+      const x=Math.cos(angle)*7,y=Math.sin(angle)*7;
+      if(n===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.closePath();ctx.stroke();
+    ctx.restore();
     // Each world has its own arrangement of layered, shaded armor panels.
     for(let n=0;n<plates;n++){
       const angle=Math.PI*(1.07+n*.86/Math.max(1,plates-1));
