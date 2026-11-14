@@ -3413,6 +3413,33 @@
         ctx.lineTo(x-radius*2,y);
         ctx.lineTo(x-radius*.5,y-radius*.5);
         ctx.closePath();
+      }else if(index===15){ // Bamboo Village: long, gently swaying leaves
+        const tilt=Math.sin(clock*.75+seed)*.5;
+        ctx.ellipse(x,y,radius*.65,radius*2.5,tilt,0,Math.PI*2);
+      }else if(index===16){ // Steamworks: rising vapor puffs
+        const vaporRadius=radius*(1+.35*Math.sin(clock*.9+seed));
+        ctx.ellipse(x,y,vaporRadius*1.8,vaporRadius,0,0,Math.PI*2);
+      }else if(index===17){ // Snow Village: softly falling snowflakes
+        ctx.moveTo(x-radius*1.5,y);
+        ctx.lineTo(x+radius*1.5,y);
+        ctx.moveTo(x,y-radius*1.5);
+        ctx.lineTo(x,y+radius*1.5);
+        ctx.moveTo(x-radius,y-radius);
+        ctx.lineTo(x+radius,y+radius);
+        ctx.moveTo(x-radius,y+radius);
+        ctx.lineTo(x+radius,y-radius);
+        ctx.lineWidth=.75;
+        ctx.strokeStyle=color;
+        ctx.stroke();
+        continue;
+      }else if(index===18){ // Canyon Crossing: airborne desert grit
+        ctx.ellipse(x,y,radius*1.8,radius*.55,-.2,0,Math.PI*2);
+      }else if(index===19){ // Submarine Dock: rising air bubbles
+        ctx.arc(x,y,radius*1.5,0,Math.PI*2);
+        ctx.lineWidth=.9;
+        ctx.strokeStyle=color;
+        ctx.stroke();
+        continue;
       }else{
         ctx.arc(x,y,radius,0,Math.PI*2);
       }
