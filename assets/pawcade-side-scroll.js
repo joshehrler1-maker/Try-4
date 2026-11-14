@@ -1611,11 +1611,34 @@
       if(c.refill){ctx.strokeStyle='#66ffe0';ctx.strokeRect(c.x-15,c.y-15,30,30);}
       if(!sprite(15,c.x,c.y,38,38)){ctx.fillStyle='#ffd967';ctx.fillRect(c.x-5,c.y-5,10,10);}
     }
-    for (const foe of enemies) if(!foe.dead && foe.x>=camera-80 && foe.x<camera+width+80) {
+    for (const foe of enemies) if(!foe.dead && foe.x>=camera-150 && foe.x<camera+width+150) {
       const at=foePosition(foe);
-      castShadow(at.x,at.y+20,20);
-      const cell = index;
-      if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73)){ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);}
+      const airborne=['swoop','school'].includes(enemyPattern);
+      // Airborne opponents cast a shadow on the floor, not in mid-air.
+      castShadow(at.x,airborne?ground:at.y+20,airborne?16:20);
+      const cell=index;
+      const faceLeft=player.x<at.x;
+      const nearby=Math.abs(player.x-at.x)<250;
+      const firing=(foe.turret || enemyPattern==='turret' || index===16) &&
+        nearby && Math.abs(player.y-at.y)<105 && foe.shotAt>clock;
+      const motion=reducedMotion?0:Math.sin(clock*(airborne?9:6)+foe.offset);
+      ctx.save();
+      // A distinct animation state for patrolling, hopping, flying and firing.
+      ctx.translate(at.x,at.y+19);
+      if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
+      if(airborne) ctx.rotate(motion*.065);
+      ctx.scale(firing?1.09:1+motion*.025,firing?.94:1-motion*.025);
+      ctx.translate(-at.x,-at.y-19);
+      if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
+        ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
+      }
+      ctx.restore();
+      if(firing){
+        ctx.save();
+        ctx.strokeStyle='#ffcd7a';ctx.lineWidth=2;
+        ctx.beginPath();ctx.arc(at.x+(faceLeft?-23:23),at.y-6,7,0,Math.PI*2);ctx.stroke();
+        ctx.restore();
+      }
     }
     if (boss.health && camera+width>finish) {
       castShadow(boss.x,boss.y+38,36);
