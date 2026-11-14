@@ -146,7 +146,7 @@
   ];
   const [jumpFactor,holdGravity,releaseGravity,fallGravity]=jumpProfiles[index];
   const sections = 6;
-  const sectionSize = index===0 ? 3020 : 2200;
+  const sectionSize = index===0 || index===16 ? 3020 : 2200;
   const finish = sections * sectionSize;
   const finale = ['guardian','sprint','switch','crystals','summit'][goalType];
   const guardian = {
@@ -208,7 +208,7 @@
   const airCapacity=18;
   const looseRings=[];
   let chapterReveal=0;
-  const saveKey='pawcade-platform-checkpoint-'+(index===0?'v2-':'v1-')+index;
+  const saveKey='pawcade-platform-checkpoint-'+(index===0 || index===16?'v2-':'v1-')+index;
   const resumeButton=byId('side-resume');
   function readCheckpoint() {
     try {
@@ -232,6 +232,28 @@
   const setPieces = window.pawtopiaSetPieces[index].split(' ');
   for (const [stage, room] of plan.entries()) {
     const start = stage * sectionSize;
+    if(index===16){
+      // Keep a continuous lower route. The catwalks offer cover and higher firing lanes.
+      platforms.push({x:start,y:ground,w:sectionSize,kind:'floor',steamDeck:-1});
+      const catwalks=[[[340,275,185],[615,224,200],[905,255,170],[1430,272,225],[1720,212,185],[2010,256,220],[2530,273,250]],
+        [[265,267,230],[575,223,155],[830,169,220],[1240,265,190],[1610,225,265],[2110,271,175],[2440,216,280]],
+        [[410,260,145],[635,204,145],[875,151,195],[1340,272,270],[1780,229,205],[2150,193,180],[2560,264,255]],
+        [[270,275,160],[540,220,195],[855,265,290],[1320,273,140],[1550,215,165],[1850,160,220],[2360,250,310]],
+        [[370,264,185],[650,216,195],[990,185,175],[1360,264,225],[1680,221,180],[1950,169,170],[2390,252,330]],
+        [[350,269,165],[615,236,245],[990,263,150],[1285,218,210],[1630,172,200],[2100,260,205],[2500,232,260]]];
+      catwalks[stage].forEach(([x,y,w],slot)=>{
+        platforms.push({x:start+x,y,w,kind:'floor',steamDeck:(stage+slot)%3});
+        crystals.push({x:start+x+w*.52,y:y-35});
+        if(slot%2===1) enemies.push({
+          x:start+x+w*.68,y:y-23,offset:stage+slot,turret:true
+        });
+      });
+      for(const x of [950,1490,2150,2720]){
+        enemies.push({x:start+x,y:ground-23,offset:stage+x/100,
+          patrolLeft:start+x-70,patrolRight:start+x+70});
+      }
+      continue;
+    }
     const pieces = window.pawtopiaRooms[room];
     for (const [slot, [x, y, w, kind = 'floor']] of pieces.entries()) {
       platforms.push({x:start+x,y,w,kind});
@@ -2707,6 +2729,26 @@
       if (ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
       if(ledge.switchBridge && !amberSwitch) continue;
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
+      if(ledge.steamDeck!==undefined){
+        const {x,y,w,steamDeck}=ledge;
+        const [top,body,trim]=[
+          ['#efb67b','#7b4637','#422d36'],
+          ['#9ac8bb','#42646a','#253c4a'],
+          ['#e3c487','#80613e','#453340']
+        ][steamDeck<0?1:steamDeck];
+        ctx.fillStyle=body;
+        ctx.fillRect(x,y,w,steamDeck<0?36:19);
+        ctx.fillStyle=top;
+        ctx.fillRect(x,y,w,5);
+        ctx.fillStyle=trim;
+        for(let bolt=Math.max(12,Math.floor((camera-x)/26)*26+12);bolt<w-7 && x+bolt<camera+width+12;bolt+=26){
+          ctx.fillRect(x+bolt,y+9,4,4);
+          if(steamDeck===1) ctx.fillRect(x+bolt-5,y+18,14,7);
+          if(steamDeck===2) ctx.fillRect(x+bolt-4,y+15,11,4);
+        }
+        drawLandingEdge(ledge);
+        continue;
+      }
       if(index===1 && ledge.kind==='floor' && !ledge.switchBridge){
         drawLibraryPlatform(ledge);
         drawLandingEdge(ledge);
