@@ -6234,7 +6234,14 @@
     // protects Android browsers from a huge limb snap after tab switching.
     // Plant the feet during a strike, then blend back into the world-specific
     // walking cycle. Attack animation stays visual-only and preserves hitboxes.
-    const attackPlant=Math.min(.72,Math.max(0,attackPose||0)*.6);
+    // Different enemies keep different amounts of foot travel while attacking:
+    // heavy defenders plant firmly, rushers retain momentum, and swimmers
+    // remain free-moving. These are per-game pose rules, not new hitboxes.
+    const defensiveAttack=[1,7,9,14,17,22].includes(index);
+    const rushingAttack=[0,3,8,15,20].includes(index);
+    const swimmingAttack=[2,19].includes(index);
+    const plantStrength=swimmingAttack?.12:defensiveAttack?.85:rushingAttack?.38:.6;
+    const attackPlant=Math.min(.85,Math.max(0,attackPose||0)*plantStrength);
     const gaitBlend=Math.min(1,Math.max(0,stride||0))*(1-attackPlant);
     // Animation pose stays stable when paused or reduced motion is enabled.
     const animTime=reducedMotion?0:clock;
