@@ -1570,17 +1570,21 @@
   // bounds. Airborne enemy patterns intentionally retain their flight paths.
   const flyingFoes=['swoop','school'].includes(enemyPattern);
   for(const foe of enemies){
-    if(flyingFoes) continue;
+    // Authored swimmers and flying enemies keep their intended airborne paths.
+    if(flyingFoes || foe.reefEnemy!==undefined ||
+       (foe.foundryEnemy!==undefined && [3,7,8,11,14].includes(foe.foundryEnemy))) continue;
     const supports=platforms.filter(ledge=>
-      !['hazard','rail','ceiling','ceilingSpikes','current'].includes(ledge.kind) &&
+      !['hazard','rail','ceiling','ceilingSpikes','current','drop'].includes(ledge.kind) &&
+      ledge.w>=42 &&
       foe.x>=ledge.x+12 && foe.x<=ledge.x+ledge.w-12 &&
       Math.abs((ledge.y-23)-foe.y)<28
     ).sort((a,b)=>Math.abs(a.y-23-foe.y)-Math.abs(b.y-23-foe.y));
     const ledge=supports[0];
     if(ledge){
       foe.y=ledge.y-23;
-      foe.patrolLeft=ledge.x+17;
-      foe.patrolRight=ledge.x+ledge.w-17;
+      const safeInset=Math.min(17,ledge.w/4);
+      foe.patrolLeft=ledge.x+safeInset;
+      foe.patrolRight=ledge.x+ledge.w-safeInset;
     } else if(Math.abs(foe.y-(ground-23))<35){
       foe.y=ground-23;
       foe.patrolLeft=Math.max(30,foe.x-48);
