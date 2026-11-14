@@ -3060,6 +3060,45 @@
   const enemyInsignias=['clamp','book','wave','clock','seed','mist','lantern','magnet','beat','quarry','wind','cloud','bolt','leaf','orbit','bamboo','steam','snow','canyon','sonar','neon','marble','bog','flower','cargo'];
   // Secondary motion accents are tied to each enemy's actual gait and combat
   // state. They never change hitboxes or interfere with touch controls.
+  // Distinctive dimensional armor accents are attached to each enemy sprite.
+  // Lightweight canvas geometry keeps the existing Android renderer intact.
+  const enemyArmorStyles=[
+    [3,16,5],[4,12,9],[2,21,4],[5,10,7],[6,15,5],
+    [3,20,8],[4,17,6],[5,13,10],[6,11,8],[3,22,5],
+    [4,19,7],[5,14,8],[6,16,6],[3,18,9],[4,23,4],
+    [5,15,7],[6,12,9],[3,21,5],[4,16,8],[5,20,6],
+    [6,13,9],[3,18,5],[4,22,7],[5,17,8],[6,14,6]
+  ];
+  function drawEnemyArmorAccent(at,foe,faceLeft,airborne){
+    if(foe.dead) return;
+    const [plates,radius,depth]=enemyArmorStyles[index];
+    ctx.save();
+    ctx.translate(at.x,at.y-17);
+    ctx.scale(faceLeft?-1:1,1);
+    ctx.lineJoin='round';
+    ctx.lineWidth=1.2;
+    ctx.strokeStyle=enemyCueColors[index];
+    ctx.fillStyle='#15233bc9';
+    // Each world has its own arrangement of layered, shaded armor panels.
+    for(let n=0;n<plates;n++){
+      const angle=Math.PI*(1.07+n*.86/Math.max(1,plates-1));
+      const px=Math.cos(angle)*radius;
+      const py=Math.sin(angle)*radius-4;
+      ctx.beginPath();
+      ctx.moveTo(px,py);
+      ctx.lineTo(px+depth*.6,py-depth*.65);
+      ctx.lineTo(px+depth+2,py+depth*.15);
+      ctx.lineTo(px+depth*.35,py+depth*.85);
+      ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.moveTo(px+1,py+1);ctx.lineTo(px+depth*.6,py-depth*.45);
+      ctx.stroke();
+    }
+    if(airborne){
+      ctx.globalAlpha=.65;
+      ctx.beginPath();ctx.ellipse(0,0,radius+6,4,0,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.restore();
+  }
   function drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft){
     if(reducedMotion || foe.dead) return;
     const family=index%5, phase=clock*(2.1+index%4*.33)+foe.offset;
@@ -3474,6 +3513,7 @@
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
       ctx.restore();
+      drawEnemyArmorAccent(at,foe,faceLeft,airborne);
       drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
       drawEnemyInsignia(at,foe);
       drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing);
