@@ -4310,13 +4310,14 @@
       const elapsed=Math.max(0,clock-(foe.gaitTime??clock));
       foe.gaitTime=clock;
       const speed=elapsed>0 && travel<90 ? travel/elapsed : 0;
-      if(travel>=90)foe._gait=0;
-      else foe._gait=(foe._gait||0)+travel/12;
+      // Keep stride phase continuous across camera/teleport corrections.
+      // Distance spikes must not reset the legs to an abrupt first frame.
+      if(travel<90)foe._gait=(foe._gait||0)+travel/12;
       if(elapsed>0){
         const target=Math.min(1,speed/115);
         foe.gaitWeight=(foe.gaitWeight||0)+(target-(foe.gaitWeight||0))*(1-Math.exp(-14*elapsed));
       }
-      const movingWeight=reducedMotion||travel>=90?0:foe.gaitWeight||0;
+      const movingWeight=reducedMotion?0:(foe.gaitWeight||0)*(travel>=90?0:1);
       // Twenty-five authored movement profiles: individual cadence, foot lift,
       // body lean, idle breathing and gait phase per adventure.
       const cadence=[.82,1.04,.94,1.27,.76,1.12,.88,1.31,1.08,.71,1.18,.9,1.34,.79,1.02,.86,1.25,.73,1.14,.97,1.42,.84,1.06,1.2,.92][index];
