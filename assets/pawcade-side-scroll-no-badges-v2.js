@@ -4041,6 +4041,60 @@
     if(x+w<camera-24 || x>camera+width+24) return;
     const stage=Math.min(sections-1,Math.max(0,stageAt(x)));
     const [face,recess,rim]=courseMaterials[index];
+    // Platform surface treatment is unique to every world. Keep all
+    // decorative geometry below/behind the unchanged collision top (y).
+    // Draw only the visible portion to avoid off-screen fill work.
+    const surfaceStart=Math.max(x,camera-20);
+    const surfaceEnd=Math.min(x+w,camera+width+20);
+    if(surfaceEnd>surfaceStart){
+      const span=surfaceEnd-surfaceStart;
+      const palette=[
+        ['#ffc17e','#704054'],['#d8c6fa','#64518b'],['#91e7e0','#357e98'],
+        ['#f6c26d','#765777'],['#c9e99a','#628b56'],['#c7efff','#528cae'],
+        ['#ffdfb3','#ad6c98'],['#d2b8ff','#624a9e'],['#f8d681','#8c5876'],
+        ['#e4b88b','#82604f'],['#f3d3a2','#aa775c'],['#d4efff','#6687bc'],
+        ['#e9c78d','#72678a'],['#e3b66d','#947e56'],['#b1baf7','#5968a0'],
+        ['#b5e9ca','#4c866f'],['#ffd7b2','#8d5365'],['#e7f4ff','#7795b7'],
+        ['#efc28f','#a2745c'],['#85d7e7','#44768b'],['#f7c78a','#886d76'],
+        ['#d5d0f0','#77719f'],['#a9db9a','#5b8a70'],['#ffe39c','#ac8d56'],
+        ['#a4d8ee','#577e9d']
+      ][index]||['#ddd','#777'];
+      const pattern=['rivets','inlay','ripples','speed','grain','spray',
+        'lantern','polarity','pulse','bolts','sails','cloud','forge',
+        'leaves','circuit','bamboo','vents','frost','stone','current',
+        'rails','mosaic','reeds','petals','hull'][index]||'inlay';
+      ctx.save();
+      // Two-tone beveled top, consistent readable walking edge.
+      ctx.fillStyle=palette[1];ctx.fillRect(surfaceStart,y-7,span,7);
+      ctx.fillStyle=palette[0];ctx.fillRect(surfaceStart,y-7,span,3);
+      ctx.fillStyle='rgba(255,255,255,.38)';
+      ctx.fillRect(surfaceStart,y-7,span,1);
+      const cell=pattern==='speed'||pattern==='pulse'?38:
+        pattern==='grain'||pattern==='bamboo'?62:54;
+      const firstCell=Math.max(0,Math.floor((surfaceStart-x)/cell));
+      const lastCell=Math.min(Math.ceil(w/cell),
+        Math.ceil((surfaceEnd-x)/cell));
+      ctx.strokeStyle=palette[0];ctx.lineWidth=1.4;
+      ctx.globalAlpha=.78;
+      for(let k=firstCell;k<=lastCell;k++){
+        const px=x+k*cell+cell*.5;
+        if(px<surfaceStart+6||px>surfaceEnd-6)continue;
+        ctx.beginPath();
+        if(['ripples','spray','sails','cloud','current','reeds'].includes(pattern)){
+          ctx.moveTo(px-8,y-3);ctx.quadraticCurveTo(px,y-6,px+8,y-3);
+        }else if(['speed','pulse','rails','polarity'].includes(pattern)){
+          ctx.moveTo(px-7,y-5);ctx.lineTo(px,y-2);ctx.lineTo(px+7,y-5);
+        }else if(['grain','leaves','bamboo','petals','frost'].includes(pattern)){
+          ctx.moveTo(px-5,y-3);ctx.lineTo(px+4,y-5);
+        }else if(['rivets','bolts','forge','vents','circuit','hull'].includes(pattern)){
+          ctx.arc(px,y-4,1.5,0,Math.PI*2);
+        }else{
+          ctx.moveTo(px-6,y-4);ctx.lineTo(px+6,y-4);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     // Ember Foundry: individual chapter-authored metalwork. Render
     // thickness below the walking surface, so the gameplay edge stays
     // readable and the platform never looks like a flat floating stripe.
