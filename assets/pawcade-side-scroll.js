@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>21)return;
-    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224,202,228,210,236,246,216,170,226][index];
-    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15,.12,.18,.23,.14,.21,.17,.32,.12][index]);
+    if(index<0 || index>24)return;
+    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224,202,228,210,236,246,216,170,226,220,214,206][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15,.12,.18,.23,.14,.21,.17,.32,.12,.16,.20,.27][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -2065,6 +2065,69 @@
         ctx.fillStyle='#f2d5a9';ctx.globalAlpha=.55;
         ctx.beginPath();ctx.arc(x+112,top+14,9,0,Math.PI*2);ctx.fill();
         ctx.globalAlpha=1;
+      }else if(index===22){
+        // Swamp Ferry: stilted boat landing, reeds and lantern-lit cabins.
+        const waterline=281,cabinY=169+variation*9;
+        ctx.fillStyle='#394c4b';
+        ctx.fillRect(x+45,cabinY,121,waterline-cabinY);
+        ctx.fillStyle='#66594c';
+        ctx.beginPath();ctx.moveTo(x+32,cabinY+8);ctx.lineTo(x+102,cabinY-24);
+        ctx.lineTo(x+177,cabinY+8);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#e8bc7b';ctx.globalAlpha=.82;
+        ctx.fillRect(x+78,cabinY+27,23,30);ctx.fillRect(x+124,cabinY+27,23,30);
+        ctx.globalAlpha=1;
+        ctx.fillStyle='#7b6853';
+        ctx.fillRect(x+19,waterline-24,181,10);
+        for(let post=0;post<4;post++)ctx.fillRect(x+28+post*50,waterline-14,7,31);
+        ctx.strokeStyle='#7a9b6e';ctx.lineWidth=3;
+        for(let reed=0;reed<7;reed++){
+          const rx=x+12+reed*30;
+          ctx.beginPath();ctx.moveTo(rx,waterline+5);
+          ctx.quadraticCurveTo(rx-9,waterline-23,rx+((reed%3)-1)*9,waterline-39-reed%3*8);
+          ctx.stroke();
+        }
+      }else if(index===23){
+        // Sunflower Flight: giant flower heads, seed spirals and leaf stalks.
+        const flowerX=x+110,flowerY=125+variation*12;
+        ctx.strokeStyle='#527c51';ctx.lineWidth=11;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(flowerX,286);ctx.quadraticCurveTo(flowerX-16,206,flowerX,flowerY+24);ctx.stroke();
+        ctx.fillStyle='#71aa61';
+        for(let leaf=0;leaf<3;leaf++){
+          const ly=201+leaf*25;
+          ctx.beginPath();ctx.ellipse(flowerX+(leaf%2?25:-25),ly,30,11,leaf%2?-.35:.35,0,Math.PI*2);ctx.fill();
+        }
+        ctx.fillStyle='#e8b84f';
+        for(let petal=0;petal<12;petal++){
+          const a=petal*Math.PI/6;
+          ctx.save();ctx.translate(flowerX+Math.cos(a)*28,flowerY+Math.sin(a)*28);
+          ctx.rotate(a);ctx.beginPath();ctx.ellipse(0,0,21,10,0,0,Math.PI*2);ctx.fill();ctx.restore();
+        }
+        ctx.fillStyle='#805641';ctx.beginPath();ctx.arc(flowerX,flowerY,29,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#d7a66c';ctx.globalAlpha=.8;
+        for(let seed=0;seed<13;seed++){
+          const a=seed*2.4,rad=Math.sqrt(seed)*6;
+          ctx.beginPath();ctx.arc(flowerX+Math.cos(a)*rad,flowerY+Math.sin(a)*rad,2,0,Math.PI*2);ctx.fill();
+        }
+        ctx.globalAlpha=1;
+      }else if(index===24){
+        // Starship Cargo: stacked freight pods, hull ribs and navigation lights.
+        const deckY=276,top=130+variation*10;
+        ctx.fillStyle='#34445e';ctx.fillRect(x+20,top+45,181,deckY-top-45);
+        ctx.fillStyle='#60748d';
+        for(let pod=0;pod<3;pod++){
+          const px=x+30+pod*55,py=top+58+(pod%2)*20;
+          ctx.fillRect(px,py,47,75);
+          ctx.strokeStyle='#a4c6d2';ctx.lineWidth=2;ctx.strokeRect(px+4,py+5,39,65);
+          ctx.fillStyle='#9cdded';ctx.fillRect(px+17,py+14,13,7);
+          ctx.fillStyle='#60748d';
+        }
+        ctx.strokeStyle='#a1b8c9';ctx.lineWidth=5;
+        ctx.beginPath();ctx.moveTo(x+14,top+41);ctx.lineTo(x+207,top+41);
+        ctx.moveTo(x+14,deckY);ctx.lineTo(x+207,deckY);ctx.stroke();
+        for(let light=0;light<4;light++){
+          ctx.fillStyle=light%2?'#f5b877':'#8be6df';
+          ctx.beginPath();ctx.arc(x+31+light*52,top+40,3,0,Math.PI*2);ctx.fill();
+        }
       }
     }
     ctx.restore();
