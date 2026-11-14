@@ -435,7 +435,16 @@
     }
     const feature=setPieces[stage];
     const anchor=start+1050;
-    const add=(x,y,w,kind)=>platforms.push({x:anchor+x,y,w,kind});
+    // The same set-piece category now has chapter-specific platform
+    // geometry. Variation stays within the authored encounter corridor.
+    const setpieceShift=((stage*7+index*3)%5-2)*13;
+    const setpieceRise=((stage+index)%3-1)*12;
+    const add=(x,y,w,kind)=>platforms.push({
+      x:anchor+x+setpieceShift,
+      y:Math.max(85,y+setpieceRise),
+      w:Math.max(48,w+((stage+index)%3-1)*14),
+      kind
+    });
     switch(feature) {
       case 'blocks': case 'steps': case 'eggs':
         add(30,261,85,'floor');add(170,226,105,'floor');add(325,193,95,'floor');
