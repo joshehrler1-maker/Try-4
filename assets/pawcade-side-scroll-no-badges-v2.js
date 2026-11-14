@@ -6156,7 +6156,28 @@
     // Draw one opaque pose so the hero keeps a clear silhouette in motion.
     const strideFrame=!reducedMotion && Math.cos(p.gaitPhase||0)<0 ? 2 : 1;
     const visiblePose=running ? strideFrame : pose;
-    const heroDrawn=rosterIndex>=0
+    let heroDrawn=false;
+    if(index===14 && p.morphed){
+      ctx.restore();
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      if(!reducedMotion) ctx.rotate((p.gaitPhase||0)*.7);
+      ctx.fillStyle='#392655';
+      ctx.strokeStyle='#cbaaff';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.arc(0,0,11,0,Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle='#8af0ec';
+      ctx.beginPath();
+      ctx.moveTo(-7,-5);
+      ctx.lineTo(0,2);
+      ctx.lineTo(7,-5);
+      ctx.stroke();
+      heroDrawn=true;
+    }
+    if(!heroDrawn) heroDrawn=rosterIndex>=0
       ? atlasSprite(heroArt,8,rosterIndex*4+visiblePose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4)
       : sprite((light?4:0)+visiblePose,p.x,p.y-15-heroLift,heroSize,heroSize,p.facing<0);
     if(!heroDrawn && poster.naturalWidth) {
@@ -6164,6 +6185,22 @@
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
     }
     ctx.restore();
+    if(index===10 && p.carry){
+      const cargoY=p.y-44;
+      ctx.save();
+      ctx.fillStyle='#ffba73';
+      ctx.strokeStyle='#442853';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.ellipse(p.x,cargoY,13,10,0,0,Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle='#a8fff1';
+      ctx.beginPath();
+      ctx.ellipse(p.x,cargoY,18,7,-.38,0,Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    }
     // Landing compression and takeoff trails are short, grounded cues.
     // They track the player's feet and never affect collision geometry.
     if(!reducedMotion){
