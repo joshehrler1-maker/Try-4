@@ -4350,8 +4350,8 @@
       drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
       drawEnemyArmorAccent(at,foe,faceLeft,airborne);
       drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
-      drawEnemyInsignia(at,foe);
-      drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing);
+      // Keep the space above enemies clear: no floating rank badges,
+      // insignias, arrows or attack symbols. Enemy art and motion remain.
       if(foe===bashReady){
         ctx.save();
         ctx.strokeStyle='#a8ffd9';
