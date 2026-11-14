@@ -980,3 +980,11 @@ Object.assign(window.pawtopiaRooms, {
     [903,218,200],[1160,232,155,'lift'],[1377,267,222],
     [1650,295,175],[1880,326,320]],
 });
+
+// Bellows Basin teaches the spring on a broad approach, then rewards
+// a second bounce with a raised landing before the descent to the exit.
+window.pawtopiaRooms.forgeExpansion2 = [
+  [0,326,430],[478,291,190,'spring'],[726,242,254],
+  [1038,216,155,'spring'],[1250,166,218],[1521,225,232],
+  [1810,280,156],[2015,326,185],
+];
