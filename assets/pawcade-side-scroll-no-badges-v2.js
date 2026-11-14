@@ -2500,6 +2500,42 @@
       ctx.globalAlpha=opacity*.34;
       ctx.stroke();
       ctx.globalAlpha=opacity;
+      // Secondary silhouettes add readable depth to the actual scrolling
+      // stages. World-specific motifs are deterministic and screen-cullable;
+      // no sprites, collisions, or copyrighted reference artwork are reused.
+      const motif=(tile+index*3)%4;
+      const cx=x+spacing*(.32+motif*.09);
+      ctx.save();
+      ctx.globalAlpha=opacity*.58;
+      ctx.strokeStyle=rim;
+      ctx.lineWidth=Math.max(1,scale*2);
+      ctx.beginPath();
+      if(sceneryShapes[index]==='works'){
+        // Foundries, observatories, factories and starships: vents and braces.
+        const towerY=top+32+motif*6;
+        ctx.moveTo(cx,towerY);ctx.lineTo(cx,baseline-10);
+        ctx.moveTo(cx-12,towerY+8);ctx.lineTo(cx+12,towerY+8);
+        ctx.moveTo(cx-9,towerY+8);ctx.lineTo(cx+9,towerY+22);
+        ctx.moveTo(cx+9,towerY+8);ctx.lineTo(cx-9,towerY+22);
+      }else if(sceneryShapes[index]==='grove'){
+        // Forest and garden courses: layered branch canopies.
+        const stem=top+35+motif*4;
+        ctx.moveTo(cx,baseline);ctx.lineTo(cx,stem);
+        ctx.moveTo(cx,stem+24);ctx.quadraticCurveTo(cx-23,stem-9,cx-35,stem+12);
+        ctx.moveTo(cx,stem+17);ctx.quadraticCurveTo(cx+22,stem-15,cx+35,stem+5);
+      }else if(sceneryShapes[index]==='reef'){
+        // Underwater courses: branching reef fans and seagrass.
+        ctx.moveTo(cx,baseline);ctx.quadraticCurveTo(cx-15,top+48,cx-5,top+30);
+        ctx.moveTo(cx-8,baseline-29);ctx.quadraticCurveTo(cx-32,top+54,cx-24,top+37);
+        ctx.moveTo(cx-8,baseline-42);ctx.quadraticCurveTo(cx+18,top+47,cx+20,top+27);
+      }else{
+        // Mountain, castle and canyon courses: distant carved ridges.
+        ctx.moveTo(cx-28,baseline-12);
+        ctx.lineTo(cx-7,top+44);ctx.lineTo(cx+5,top+55);
+        ctx.lineTo(cx+19,top+30);ctx.lineTo(cx+34,baseline-12);
+      }
+      ctx.stroke();
+      ctx.restore();
     }
     ctx.restore();
   }
