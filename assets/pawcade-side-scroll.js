@@ -1067,6 +1067,21 @@
         // committed aerial arcs and responsive grounded braking.
         const templeGrip=p.on?(steer?1.04:1.35):(reversing?.5:.7);
         p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*templeGrip);
+      }else if(index===22){
+        // Swamp Ferry: pogo-assisted precision with steady horizontal
+        // control and restrained steering during springy rebounds.
+        const marshGrip=p.on?1.26:(reversing?.76:.94);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*marshGrip);
+      }else if(index===23){
+        // Sunflower Flight: gentle, textile-like floating movement
+        // that preserves momentum between short airborne corrections.
+        const blossomGrip=p.on?1.12:(steer?.72:.38);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*blossomGrip);
+      }else if(index===24){
+        // Starship Cargo: crisp combat movement on deck with more
+        // committed airborne jumps under enemy fire.
+        const cargoGrip=p.on?(steer?1.35:1.5):(reversing?.6:.82);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*cargoGrip);
       }else{
         p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
       }
