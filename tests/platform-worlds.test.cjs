@@ -534,3 +534,71 @@ test('enemy motion lab previews real gameplay rigs without mislabeling them 3D',
   assert.match(inline,/rig\.draw\(ctx,index,/,
     'preview must draw the same registered enemy body as gameplay');
 });
+
+test('original base enemy rigs for games 1–5 preserve authored specialists and draw safely', () => {
+  const rigPath=path.join(__dirname,'../assets/animation/origin-world-enemy-rigs-v1.js');
+  const runtime=fs.readFileSync(path.join(__dirname,'../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const worker=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  const registry=JSON.parse(fs.readFileSync(path.join(__dirname,'../assets/enemy-art-motion-registry.json'),'utf8'));
+  assert.ok(fs.existsSync(rigPath));
+  const sandbox={window:{}};
+  vm.runInNewContext(fs.readFileSync(rigPath,'utf8'),sandbox,{timeout:1000});
+  const rigs=sandbox.window.pawtopiaOriginEnemyRigs;
+  assert.equal(typeof rigs?.draw,'function');
+  assert.equal(Object.keys(rigs.families).length,5);
+  assert.equal(new Set(Object.values(rigs.families)).size,5);
+  assert.ok(html.includes('src="assets/animation/origin-world-enemy-rigs-v1.js?'));
+  assert.ok(html.indexOf('src="assets/animation/origin-world-enemy-rigs-v1.js') <
+    html.indexOf('src="assets/pawcade-side-scroll-no-badges-v2.js'));
+  assert.ok(worker.includes("'assets/animation/origin-world-enemy-rigs-v1.js?"));
+  assert.ok(runtime.includes('originWorldRig = usesOriginRig(foe)'));
+  assert.ok(runtime.includes('window.pawtopiaOriginEnemyRigs.draw('));
+  assert.ok(runtime.includes('if(!originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion'),
+    'prevent duplicated seed-garden accessory art');
+  assert.ok(runtime.includes('const dyingEnemyArt = index<=4 ? window.pawtopiaOriginEnemyRigs'),
+    'the base enemy needs visual-only defeat pose');
+  const start=runtime.indexOf('  function usesOriginRig(foe) {');
+  const end=runtime.indexOf('\n  }',start);
+  assert.ok(start>=0 && end>start,'missing specialist art guard');
+  const allow=runtime.slice(start,end+4);
+  for(let i=0;i<5;i++){
+    const bare={index:i,foe:{}};
+    vm.runInNewContext(allow+'\nresult=usesOriginRig(foe);',bare,{timeout:1000});
+    assert.equal(bare.result,true,'no base enemy art for game '+(i+1));
+    for(const variant of ['foundryEnemy','libraryEnemy','reefEnemy','clockEnemy']){
+      const scope={index:i,foe:{[variant]:0}};
+      vm.runInNewContext(allow+'\nresult=usesOriginRig(foe);',scope,{timeout:1000});
+      assert.equal(scope.result,false,'existing specialist '+variant+' must retain its art');
+    }
+    assert.equal(registry.games[i].enemyFamily,rigs.families[i]);
+    assert.ok(registry.games[i].implementationStatus.includes('partial'));
+    let depth=0,draws=0,strokes=0;
+    const ctx=new Proxy({globalAlpha:1},{
+      get(target,k){
+        if(Object.hasOwn(target,k))return target[k];
+        return (...args)=>{
+          if(k==='save')depth++;
+          if(k==='restore')depth--;
+          if(k==='fill')draws++;
+          if(k==='stroke')strokes++;
+          assert.ok(args.every(v=>typeof v!=='number'||Number.isFinite(v)),
+            'nonfinite canvas coordinate in game '+i);
+        };
+      },
+      set(target,key,value){target[key]=value;return true;}
+    });
+    for(const pose of [
+      {stride:0,attack:0,recoil:0,landing:0,reduced:true,clock:0},
+      {stride:1,attack:0,recoil:0,landing:0,reduced:false,clock:1.2},
+      {stride:.35,attack:.7,recoil:.1,landing:.3,reduced:false,clock:2.4},
+      {stride:0,attack:1,recoil:1,landing:.45,reduced:false,clock:3.5,faceLeft:true,hit:1}
+    ]){
+      assert.equal(rigs.draw(ctx,i,{x:210,y:275},
+        {_gait:2.4,offset:i,spawnChapter:4},pose),true);
+      assert.equal(depth,0,'unbalanced canvas transforms in game '+i);
+    }
+    assert.ok(draws>16&&strokes>20,'enemy body drawing is incomplete: '+i);
+  }
+  assert.equal(rigs.draw({},5,{x:0,y:0},{},{}),false);
+});
