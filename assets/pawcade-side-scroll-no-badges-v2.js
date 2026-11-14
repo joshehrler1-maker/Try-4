@@ -5757,6 +5757,32 @@
     }
     for (const a of attacks) {
       const radius=a.radius||9;
+      if(index===13 && a.motionTrail==='lob'){
+        ctx.save();
+        ctx.translate(a.x,a.y);
+        ctx.fillStyle='#fff1b9';
+        ctx.strokeStyle='#522746';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.moveTo(0,-radius);
+        ctx.lineTo(radius*.8,-radius*.25);
+        ctx.lineTo(radius*.6,radius*.55);
+        ctx.lineTo(0,radius);
+        ctx.lineTo(-radius*.7,radius*.45);
+        ctx.lineTo(-radius*.8,-radius*.3);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle='#f28754';
+        ctx.beginPath();
+        ctx.moveTo(0,-radius*.75);
+        ctx.lineTo(radius*.58,-radius*.22);
+        ctx.lineTo(0,radius*.65);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+        continue;
+      }
       // Keep radial strikes as rings so their full hit area stays readable.
       if(a.v!==0 && atlasSprite(combatArt,3,a.returning?4:(index===24 && a.gravity)?5:movement==='buster'?1:3,
           a.x,a.y,radius*2.9,radius*2,a.v<0,2)) continue;
