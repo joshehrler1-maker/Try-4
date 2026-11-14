@@ -2101,8 +2101,8 @@
   // Original platform silhouettes for three distinct reference-inspired
   // worlds. All decorative elements remain outside the collision system.
   function drawSignaturePlatformArt(x,y,w,stage){
-    if(index>14 || w<70)return;
-    const interval=[90,115,130,105,112,124,120,108,88,102,132,116,106,122,118][index];
+    if(index>17 || w<70)return;
+    const interval=[90,115,130,105,112,124,120,108,88,102,132,116,106,122,118,104,110,126][index];
     const first=Math.max(0,Math.floor((camera-x)/interval)-1);
     const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
     ctx.save();ctx.lineJoin='round';
@@ -2289,6 +2289,51 @@
         ctx.beginPath();ctx.ellipse(px,y+15,16,7,-.25,0,Math.PI*2);ctx.stroke();
         ctx.beginPath();ctx.ellipse(px,y+15,16,7,.25,0,Math.PI*2);ctx.stroke();
         ctx.fillStyle='#9af2ed';ctx.beginPath();ctx.arc(px,y+15,4,0,Math.PI*2);ctx.fill();
+      }else if(index===15){
+        // Bamboo Village: split cane beams, woven ties and new shoots.
+        for(const side of [-1,1]){
+          const bx=px+side*13;
+          ctx.fillStyle=side<0?'#689b65':'#8cba70';
+          ctx.strokeStyle='#c4e8a0';ctx.lineWidth=1.5;
+          ctx.fillRect(bx-6,y+4,12,26);ctx.strokeRect(bx-6,y+4,12,26);
+          ctx.strokeStyle='#436d45';ctx.beginPath();
+          ctx.moveTo(bx-6,y+13);ctx.lineTo(bx+6,y+13);
+          ctx.moveTo(bx-6,y+23);ctx.lineTo(bx+6,y+23);ctx.stroke();
+        }
+        ctx.strokeStyle='#e7cc91';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(px-26,y+8);ctx.lineTo(px+26,y+8);ctx.stroke();
+        ctx.fillStyle='#b2db79';ctx.beginPath();ctx.moveTo(px,y+10);
+        ctx.quadraticCurveTo(px+19,y+11,px+23,y+2);
+        ctx.quadraticCurveTo(px+9,y-1,px,y+10);ctx.fill();
+      }else if(index===16){
+        // Steamworks: pressure pistons and a readable brass gauge.
+        ctx.fillStyle='#515a65';ctx.strokeStyle='#d4ad76';ctx.lineWidth=2;
+        ctx.fillRect(px-26,y+4,52,10);ctx.strokeRect(px-26,y+4,52,10);
+        for(const side of [-1,1]){
+          ctx.fillStyle='#7a8d9b';ctx.fillRect(px+side*17-5,y+14,10,16);
+          ctx.fillStyle='#c7d5d6';ctx.fillRect(px+side*17-3,y+16,6,9);
+        }
+        ctx.fillStyle='#e4cf9c';ctx.beginPath();ctx.arc(px,y+16,10,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#694f49';ctx.lineWidth=2;ctx.stroke();
+        ctx.beginPath();ctx.moveTo(px,y+16);
+        ctx.lineTo(px+5,y+11);ctx.stroke();
+        ctx.fillStyle='#6c3e3e';ctx.beginPath();ctx.arc(px,y+16,2,0,Math.PI*2);ctx.fill();
+      }else if(index===17){
+        // Snow Village: timber lodge brackets, ice trim and snow drifts.
+        ctx.fillStyle='#73546a';ctx.strokeStyle='#e5bda1';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-24,y+5);ctx.lineTo(px+24,y+5);
+        ctx.lineTo(px+15,y+25);ctx.lineTo(px-15,y+25);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#b7e8ff';ctx.lineWidth=4;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(px-25,y+4);
+        ctx.quadraticCurveTo(px-12,y+9,px,y+4);
+        ctx.quadraticCurveTo(px+12,y+9,px+25,y+4);ctx.stroke();
+        ctx.fillStyle='#e5f8ff';
+        for(const side of [-1,1]){
+          ctx.beginPath();ctx.moveTo(px+side*16,y+5);
+          ctx.lineTo(px+side*16-3,y+16);
+          ctx.lineTo(px+side*16+3,y+5);ctx.fill();
+        }
       }else{
         // Coral Courier: fan-shaped reef ledges and layered shell supports.
         ctx.fillStyle='#3c8794';ctx.strokeStyle='#a7e9d9';ctx.lineWidth=2;
