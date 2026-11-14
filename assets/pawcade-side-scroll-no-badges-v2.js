@@ -767,7 +767,7 @@
             return verticalDistance>=58;
           return verticalDistance>=52;
         });
-        if(islandClear){
+        if(islandClear && ix+iw<=start+stageWidths[stage]-65){
           platforms.push({x:ix,y:iy,w:iw,kind:islandKindsForGame[(island+stage)%3]});
         }
       }
