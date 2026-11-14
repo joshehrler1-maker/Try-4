@@ -1334,7 +1334,7 @@
   }
 
   function updateMusic() {
-    if(!sound || audio?.state!=='running' || phase!=='playing' || storyDialog?.open) return;
+    if(!sound || document.hidden || audio?.state!=='running' || phase!=='playing' || storyDialog?.open) return;
     const now=audio.currentTime;
     if(!musicBus){
       musicBus=audio.createGain();
@@ -1342,14 +1342,17 @@
       musicBus.connect(audio.destination);
     }
     if(nextMusicAt<now) nextMusicAt=now+.02;
+    const bossFight=player.x>finish && boss.health>0;
+    const interval=musicInterval*(bossFight?.82:1);
     while(nextMusicAt<now+.09){
-      const chordShift=[0,5,3,7][Math.floor(musicStep/8)%4];
+      const chordShift=(bossFight?[0,1,6,5]:[0,5,3,7])[Math.floor(musicStep/8)%4];
       const note=musicNotes[musicStep%8];
-      if(note!=='-') musicNote(musicRoot+chordShift+Number(note),nextMusicAt,musicInterval*.86,.025,soundProfiles[index][0]);
-      if(musicStep%4===0) musicNote(musicRoot+chordShift-12,nextMusicAt,musicInterval*2.6,.032,'triangle');
-      if(musicStep%4===2) musicNote(musicRoot+chordShift+7,nextMusicAt,musicInterval*1.2,.012,'sine');
+      if(note!=='-') musicNote(musicRoot+chordShift+Number(note),nextMusicAt,interval*.86,.025,soundProfiles[index][0]);
+      if(musicStep%4===0) musicNote(musicRoot+chordShift-12,nextMusicAt,interval*2.6,.032,'triangle');
+      if(musicStep%4===2) musicNote(musicRoot+chordShift+7,nextMusicAt,interval*1.2,.012,'sine');
       musicStep++;
-      nextMusicAt+=musicInterval;
+      if(bossFight && musicStep%2===0) musicNote(musicRoot-24,nextMusicAt,.08,.026,'sine');
+      nextMusicAt+=interval;
     }
   }
   const resetActionPointers=[];
@@ -1858,6 +1861,7 @@
       syncControllerArt(chapter);
       chapterReveal=2;
       const checkpointSaved=saveCheckpoint();
+      if(checkpointSaved) playCue(375,750,.19);
       const nextBeat=stage===sections-1 ? ending : (stage%2===0 ? epilogue : prologue);
       status(chapters[stage] + ' · ' + nextBeat + (checkpointSaved ? ' · Checkpoint saved.' : ' · Could not save this checkpoint.'));
       hud();
@@ -2036,6 +2040,7 @@
       if (p.x>exitX-20 && exitReady) {
         if (index===20 && escape===null) {
           escape=95;
+          playCue(700,185,.25);
           status('Reset triggered. Race back to the entrance!');
         } else if (index!==20) {phase='won';status(ending+'!');}
       }
