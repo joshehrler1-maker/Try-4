@@ -691,7 +691,8 @@ for(const room of window.pawtopiaRoomPlans[9].split(' ')){
 
 // Opening traversal revisions for the first ten titles.
 [
-  [[1,475,287,305],[2,830,228,255],[3,1140,282,420]],
+  // Ember Foundry: early descent, low approach and a short overhead landing.
+  [[1,420,301,365],[2,820,252,185],[3,1050,311,500]],
   [[1,420,298,205],[2,680,243,205],[3,930,289,240]],
   [[1,260,228,340],[2,715,124,300],[3,1120,206,590]],
   [[1,275,290,270],[2,585,242,485],[3,1115,188,330]],
