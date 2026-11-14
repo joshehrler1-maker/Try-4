@@ -6190,6 +6190,24 @@
     const strideFrame=!reducedMotion && Math.cos(p.gaitPhase||0)<0 ? 2 : 1;
     const visiblePose=running ? strideFrame : pose;
     let heroDrawn=false;
+    if(index===3 && rolling){
+      ctx.restore();
+      ctx.save();
+      ctx.translate(p.x,p.y+7);
+      if(!reducedMotion) ctx.rotate(clock*17*p.facing);
+      ctx.fillStyle='#324775';
+      ctx.strokeStyle='#a3eaff';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.arc(0,0,15,0,Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle='#ffd374';
+      ctx.beginPath();
+      ctx.arc(0,0,9,-1,2.8);
+      ctx.stroke();
+      heroDrawn=true;
+    }
     if(index===14 && p.morphed){
       ctx.restore();
       ctx.save();
@@ -6218,6 +6236,23 @@
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
     }
     ctx.restore();
+    if(index===23 && gliding){
+      ctx.save();
+      ctx.translate(p.x,p.y-25);
+      ctx.strokeStyle='#674460';
+      ctx.fillStyle='#ffe08a';
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(-29,1);
+      ctx.quadraticCurveTo(-19,-16,0,-6);
+      ctx.quadraticCurveTo(19,-16,29,1);
+      ctx.quadraticCurveTo(15,9,0,3);
+      ctx.quadraticCurveTo(-15,9,-29,1);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
     if(index===10 && p.carry){
       const cargoY=p.y-44;
       ctx.save();
