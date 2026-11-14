@@ -713,7 +713,7 @@
       'zigzag','line','line','zigzag','arc','arc','line'
     ];
     const trailStyle=trailStyles[index];
-    const trailBase=start+Math.min(sectionSize-490,630+((index*29+stage*41)%6)*44);
+    const trailBase=start+Math.max(120,Math.min(stageWidths[stage]-490,630+((index*29+stage*41)%6)*44));
     const trailCount=stage>=4?6:4;
     for(let gem=0;gem<trailCount;gem++){
       const fraction=gem/(trailCount-1);
