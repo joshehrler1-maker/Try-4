@@ -1263,6 +1263,8 @@
     keys.clear();
     pressedCodes.clear();
     mobile.clear();
+    player.jumpBuffer=0;
+    player.spin=0;
     resetStick?.();
     for(const resetPointer of resetActionPointers) resetPointer();
     releaseAction(false);
@@ -6041,13 +6043,22 @@
   }
   byId('side-start').onclick=()=>startRun(null);
   resumeButton.hidden=!readCheckpoint();
-  resumeButton.onclick=()=>{const saved=readCheckpoint();if(saved)startRun(saved);};
+  resumeButton.onclick=()=>{
+    const saved=readCheckpoint();
+    if(saved) startRun(saved);
+    else {
+      resumeButton.hidden=true;
+      byId('side-start').focus({preventScroll:true});
+      status('This checkpoint is no longer available.');
+    }
+  };
   const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||[9,13,15,18].includes(index)?'up':'jump',KeyW:power==='swim'||movement==='airdash'||[9,13,15,18].includes(index)?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
   addEventListener('keydown',event=>{
-    if(storyDialog?.open) return;
+    if(storyDialog?.open || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey ||
+       event.target?.closest?.('input,select,textarea,[contenteditable]')) return;
     if(event.code==='KeyP' && !event.repeat && (phase==='playing'||phase==='paused')) {event.preventDefault();togglePause();return;}
     const control=codes[event.code];
-    if(!control || phase!=='playing' || event.target.closest('button,a,input,select')) return;
+    if(!control || phase!=='playing' || event.target?.closest?.('button,a')) return;
     event.preventDefault();
     if(event.repeat && !pressedCodes.has(event.code)) return;
     const alreadyHeld=keys.has(control);
@@ -6063,9 +6074,9 @@
     if (!pressedCodes.delete(event.code)) return;
     const control=codes[event.code];
     if (!Array.from(pressedCodes).some(code=>codes[code]===control)) keys.delete(control);
-    if (control==='action') releaseAction(true);
+    if(control==='action') releaseAction(!event.defaultPrevented);
   });
-  addEventListener('blur',clearInput);
+  document.addEventListener('fullscreenchange',clearInput);
   const resetStick=window.bindTouchJoystick?.(byId('touch-stick'),direction=>{
     for (const axis of ['left','right','up','down']) mobile.delete(axis);
     if(direction) for(const axis of direction.split(' ')) mobile.add(axis);
