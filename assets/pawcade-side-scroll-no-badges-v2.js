@@ -3610,7 +3610,7 @@
   // Original platform silhouettes for three distinct reference-inspired
   // worlds. All decorative elements remain outside the collision system.
   function drawSignaturePlatformArt(x,y,w,stage){
-    if(index>24 || w<70)return;
+    if(index>24 || w<70 || x+w<camera-24 || x>camera+width+24)return;
     const interval=[90,115,130,105,112,124,120,108,88,102,132,116,106,122,118,104,110,126,116,94,100,112,108,118,96][index];
     const first=Math.max(0,Math.floor((camera-x)/interval)-1);
     const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
@@ -3961,6 +3961,9 @@
   }
   function drawPlatformAccents({x,y,w,kind}) {
     if(w<34 || kind==='hazard' || kind==='ceilingSpikes') return;
+    // Camera-cull detail work before creating gradients, clipping paths,
+    // or iterating decorative panels. Collision geometry is unaffected.
+    if(x+w<camera-24 || x>camera+width+24) return;
     const stage=Math.min(sections-1,Math.max(0,stageAt(x)));
     const [face,recess,rim]=courseMaterials[index];
     // Ember Foundry: individual chapter-authored metalwork. Render
