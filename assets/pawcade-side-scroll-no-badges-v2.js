@@ -2777,10 +2777,12 @@
     // The Foundry enemy's face is authored on the RIGHT side of its local
     // artwork. Mirror the complete body only when walking to the left.
     if(faceLeft) ctx.scale(-1,1);
-    const phase=reducedMotion?0:clock*13+offset;
+    // Foundry-only: clamp and kiln foes animate from traveled gait, with
+    // a small independent idle pulse instead of constant mechanical jitter.
+    const phase=reducedMotion?0:(gait*1.35+clock*.9+offset);
     if(!design){
       ctx.save();
-      ctx.translate(0,Math.sin(phase)*(kind===8?3:1.8));
+      ctx.translate(0,Math.sin(phase)*(kind===8?3:1.8)*(Math.abs(gait)>.03?1:.35));
       ctx.strokeStyle=colors[1];
       ctx.lineWidth=4;
       ctx.lineJoin='round';
@@ -3042,8 +3044,11 @@
     ctx.moveTo(-7-kind,0);ctx.lineTo(7+kind,0);
     ctx.stroke();
     // Clocktower Relay: ratcheting clock hands accelerate into a strike.
+    // Clocktower-only: different sentinels wind their ratchets at distinct
+    // angles before releasing a mechanical hand strike.
     const strike=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
-    ctx.rotate(strike*(kind%2?-1:1)*.95);
+    const ratchetArc=[.72,1.04,.88,1.18,.8,1.1][kind]??.95;
+    ctx.rotate(strike*(kind%2?-1:1)*ratchetArc);
     ctx.strokeStyle='#ffce71';ctx.lineWidth=3;ctx.lineCap='round';
     ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-17-kind);ctx.stroke();
     ctx.fillStyle='#fff1bc';ctx.beginPath();ctx.arc(0,0,3.5,0,Math.PI*2);ctx.fill();
