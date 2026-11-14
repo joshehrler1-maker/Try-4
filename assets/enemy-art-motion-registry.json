@@ -397,8 +397,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
+      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
       "motionDesign": {
         "profile": "wind-dive",
         "attackSequence": "tilt sail, ride gust, dive across lane, recover",
@@ -416,7 +416,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 11,
@@ -434,8 +435,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
+      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
       "motionDesign": {
         "profile": "hover-slam",
         "attackSequence": "hover charge, descend, cushion rebound, regain altitude",
@@ -453,7 +454,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 12,
@@ -471,8 +473,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
+      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
       "motionDesign": {
         "profile": "electric-discharge",
         "attackSequence": "charge coils, orient ray, discharge, vent",
@@ -490,7 +492,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 13,
@@ -508,8 +511,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
+      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
       "motionDesign": {
         "profile": "ambush-swipe",
         "attackSequence": "hide in foliage, uncoil, swipe, withdraw",
@@ -527,7 +530,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 14,
@@ -545,8 +549,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
+      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
       "motionDesign": {
         "profile": "gravity-pulse",
         "attackSequence": "orbit center, reverse lean, pulse, stabilize",
@@ -564,7 +568,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 15,
