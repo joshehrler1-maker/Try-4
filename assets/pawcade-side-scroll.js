@@ -3790,6 +3790,22 @@
     ctx.lineWidth=1.2;
     ctx.strokeStyle=enemyCueColors[index];
     ctx.fillStyle='#15233bc9';
+    // Four silhouettes: scout fins, sentry crest, skirmisher antennae,
+    // raider horns. Colors remain unique to each world.
+    const archetype=foe.archetype??0;
+    ctx.beginPath();
+    if(archetype===0){
+      ctx.moveTo(-17,-9);ctx.lineTo(-28,-17);ctx.lineTo(-18,-3);
+    }else if(archetype===1){
+      ctx.moveTo(-10,-22);ctx.lineTo(0,-32);ctx.lineTo(10,-22);
+    }else if(archetype===2){
+      ctx.moveTo(-13,-19);ctx.lineTo(-19,-32);
+      ctx.moveTo(13,-19);ctx.lineTo(19,-32);
+    }else{
+      ctx.moveTo(-16,-14);ctx.lineTo(-24,-29);ctx.lineTo(-5,-19);
+      ctx.moveTo(16,-14);ctx.lineTo(24,-29);ctx.lineTo(5,-19);
+    }
+    ctx.stroke();
     // Each world has its own arrangement of layered, shaded armor panels.
     for(let n=0;n<plates;n++){
       const angle=Math.PI*(1.07+n*.86/Math.max(1,plates-1));
