@@ -1306,10 +1306,16 @@
       tone.type=type;
       tone.frequency.setValueAtTime(from*pitch*ratio,now);
       tone.frequency.exponentialRampToValueAtTime(to*pitch*ratio,now+length);
-      tone.connect(volume);
+      const layer=audio.createGain();
+      layer.gain.value=ratio===1?.78:.22;
+      tone.connect(layer);
+      layer.connect(volume);
       tone.start(now);
       tone.stop(now+length);
-      if(ratio===harmonic) tone.onended=()=>volume.disconnect();
+      tone.onended=()=>{
+        layer.disconnect();
+        if(ratio===harmonic) volume.disconnect();
+      };
     }
   }
   // BPM, tonic (MIDI), melody offsets. A dash marks a rest.
@@ -1335,8 +1341,12 @@
 
   function stopMusic() {
     if(!musicBus) return;
-    musicBus.disconnect();
+    const fadingBus=musicBus;
+    const now=audio.currentTime;
+    fadingBus.gain.setTargetAtTime(0,now,.012);
+    setTimeout(()=>fadingBus.disconnect(),90);
     musicBus=null;
+    musicDucked=false;
     nextMusicAt=0;
   }
 
@@ -1348,8 +1358,13 @@
     gain.gain.exponentialRampToValueAtTime(level,at+.014);
     gain.gain.exponentialRampToValueAtTime(.0001,at+length);
     voice.connect(gain);
-    gain.connect(output);
-    voice.onended=()=>gain.disconnect();
+    const filter=audio.createBiquadFilter();
+    filter.type='lowpass';
+    filter.frequency.value=Math.min(4800,Math.max(1200,voice.frequency.value*5));
+    filter.Q.value=.1;
+    gain.connect(filter);
+    filter.connect(output);
+    voice.onended=()=>filter.disconnect();
     voice.start(at);
     voice.stop(at+length);
   }
