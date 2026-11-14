@@ -592,7 +592,7 @@
     reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
-    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;e.faceLeft=undefined;});
+    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;e.faceLeft=undefined;e._attackPose=0;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
@@ -3417,14 +3417,24 @@
       const anticipation=!reducedMotion && enemyPattern==='charge' && nearby && !airborne;
       const bodyStretch=movingWeight*(.018+.012*(index%3))*footCycle;
       const chargeCompression=anticipation?.07:0;
+      // Critically damped pose layers smooth attack anticipation and recovery.
+      // Visual-only; enemy AI, hitboxes, timing and damage remain untouched.
+      const blendDt=Math.min(.05,Math.max(0,elapsed));
+      const poseTarget=firing?1:anticipation?.55:0;
+      const poseRate=poseTarget>(foe._attackPose||0)?16:7;
+      foe._attackPose=(foe._attackPose||0)+(poseTarget-(foe._attackPose||0))*
+        (1-Math.exp(-poseRate*blendDt));
+      const attackPose=reducedMotion?0:foe._attackPose;
+      const squash=attackPose*.045;
+      const attackTilt=(faceLeft?-1:1)*attackPose*.055;
       ctx.save();
       // A distinct animation state for patrolling, hopping, flying and firing.
       ctx.translate(at.x,at.y+19);
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
-      else ctx.rotate(enemyLean);
-      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression,
-        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression);
+      else ctx.rotate(enemyLean+attackTilt);
+      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash,
+        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing);
