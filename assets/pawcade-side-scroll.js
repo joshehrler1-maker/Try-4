@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>19)return;
-    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224,202,228,210,236,246,216][index];
-    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15,.12,.18,.23,.14,.21,.17][index]);
+    if(index<0 || index>21)return;
+    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224,202,228,210,236,246,216,170,226][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15,.12,.18,.23,.14,.21,.17,.32,.12][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -2023,6 +2023,47 @@
         for(let bubble=0;bubble<4;bubble++){
           ctx.beginPath();ctx.arc(x+19+bubble*51,119+bubble%2*22,3+bubble%3,0,Math.PI*2);ctx.fill();
         }
+        ctx.globalAlpha=1;
+      }else if(index===20){
+        // Neon Circuit: distinct arcade speedways, neon conduits and terminals.
+        const base=280,top=116+variation*12;
+        ctx.fillStyle='#272b51';ctx.fillRect(x+28,top,124,base-top);
+        ctx.strokeStyle='#7ce7ee';ctx.lineWidth=3;
+        ctx.strokeRect(x+35,top+10,110,base-top-21);
+        ctx.strokeStyle='#ef79cd';ctx.lineWidth=2;
+        for(let track=0;track<4;track++){
+          const ty=top+32+track*30;
+          ctx.beginPath();ctx.moveTo(x+45,ty);
+          ctx.lineTo(x+77,ty);ctx.lineTo(x+88,ty-8);
+          ctx.lineTo(x+136,ty-8);ctx.stroke();
+        }
+        ctx.fillStyle='#ffdf7e';
+        for(let node=0;node<4;node++){
+          ctx.beginPath();ctx.arc(x+49+node*27,top+21,3,0,Math.PI*2);ctx.fill();
+        }
+        ctx.fillStyle='#b0b7f7';ctx.globalAlpha=.7;
+        ctx.fillRect(x+82,top-22,16,22);
+        ctx.globalAlpha=1;
+      }else if(index===21){
+        // Marble Temple: stepped colonnades, carved capitals and arches.
+        const top=117+variation*12;
+        ctx.fillStyle='#59526a';ctx.fillRect(x+25,top+16,179,164);
+        ctx.fillStyle='#c7b5bb';
+        ctx.fillRect(x+17,top+12,195,11);
+        ctx.fillRect(x+28,top+152,172,12);
+        for(let column=0;column<4;column++){
+          const cx=x+39+column*45;
+          ctx.fillStyle='#9c8ca5';ctx.fillRect(cx,top+34,20,117);
+          ctx.fillStyle='#e4d2d3';
+          ctx.fillRect(cx-4,top+27,28,9);
+          ctx.fillRect(cx-4,top+145,28,8);
+          ctx.fillStyle='#b6a3b4';
+          ctx.fillRect(cx+6,top+36,3,106);
+        }
+        ctx.strokeStyle='#e8d7db';ctx.lineWidth=3;
+        ctx.beginPath();ctx.arc(x+112,top+14,38,Math.PI,0);ctx.stroke();
+        ctx.fillStyle='#f2d5a9';ctx.globalAlpha=.55;
+        ctx.beginPath();ctx.arc(x+112,top+14,9,0,Math.PI*2);ctx.fill();
         ctx.globalAlpha=1;
       }
     }
