@@ -4107,6 +4107,11 @@
         'leaves','circuit','bamboo','vents','frost','stone','current',
         'rails','mosaic','reeds','petals','hull'];
 
+  const platformSupportFamilies=[
+    'bracket','arch','coral','girder','root','mist','lantern','crystal',
+    'pulse','cable','sail','cloud','anvil','branch','orbit','bamboo',
+    'pipe','icicle','stone','bubble','rail','column','reed','stem','hull'
+  ];
   function drawPlatformAccents({x,y,w,kind}) {
     if(w<34 || kind==='hazard' || kind==='ceilingSpikes') return;
     // Camera-cull detail work before creating gradients, clipping paths,
@@ -4196,11 +4201,7 @@
       const visibleEnd=Math.min(x+w,camera+width+20);
       const span=visibleEnd-visibleStart;
       if(span>0){
-        const supportFamily=[
-          'bracket','arch','coral','girder','root','mist','lantern','crystal',
-          'pulse','cable','sail','cloud','anvil','branch','orbit','bamboo',
-          'pipe','icicle','stone','bubble','rail','column','reed','stem','hull'
-        ][index];
+        const supportFamily=platformSupportFamilies[index];
         const shade=platformTopPalettes[index][1];
         ctx.save();ctx.strokeStyle=shade;ctx.fillStyle=shade;
         ctx.lineWidth=3;ctx.globalAlpha=.68;
