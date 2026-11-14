@@ -5802,17 +5802,20 @@
     // arrangement for each world; this is visual, not extra hit points.
     const plates=basePlates+variantPlate+(armorChapter>=3?1:0);
     ctx.save();
-    // Foundry enemies breathe, brace, and recoil as articulated armor units.
-    // The movement is visual-only: collision positions and gameplay stay fixed.
-    // Shared articulated armor motion with a different cadence in each world.
-    // Animation is cosmetic and follows the simulation clock (including pause).
+    // Cosmetic armor articulation follows the simulation clock, never wall time.
+    // Motion strength depends on the foe's existing gait/attack/landing state,
+    // so stationary guards do not constantly bounce as if running.
     const armorMotion=!reducedMotion;
     const motionTime=armorMotion?clock:0;
     const worldCadence=3.4+(index%5)*.48;
     const motionPhase=motionTime*worldCadence+(Number(foe.x)||0)*.035;
+    const gait=Math.max(0,Math.min(1,Number(foe.gaitWeight)||0));
+    const attack=Math.max(0,Math.min(1,Number(foe._attackPose)||0));
+    const landing=Math.max(0,Math.min(1,Number(foe._landingPose)||0));
     const groundedMotion=armorMotion && !airborne;
-    const motionBob=groundedMotion?Math.sin(motionPhase)*(0.65+(index%4)*.22):0;
-    const motionLean=armorMotion?Math.sin(motionPhase*.65)*(.018+(index%3)*.006):0;
+    const idleBreath=groundedMotion?Math.sin(motionPhase*.38)*.18:0;
+    const motionBob=idleBreath+(groundedMotion?Math.sin(motionPhase)*(0.65+(index%4)*.22)*gait:0)-landing*.65;
+    const motionLean=armorMotion?(Math.sin(motionPhase*.65)*(.018+(index%3)*.006)*(.25+.75*gait)+attack*.035):0;
     ctx.translate(at.x,at.y-17+motionBob);
     ctx.scale(faceLeft?-1:1,1);
     if(armorMotion)ctx.rotate(motionLean);
