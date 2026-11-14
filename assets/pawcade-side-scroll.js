@@ -581,7 +581,7 @@
     const charged=clock-player.chargeStart>=fullChargeTime;
     player.chargeStart=null;
     if (fire && phase==='playing') attacks.push({
-      x:player.x,y:player.y,v:player.facing*(charged?850:680),life:.85,radius:charged?22:8,damage:charged?2:1
+      x:player.x,y:player.y,v:player.facing*(charged?850:680),life:.85,radius:charged?22:8,damage:charged?2:1,blasterShot:true
     });
   }
   function useTechnique() {
@@ -973,7 +973,11 @@
         hazards.push({x:position.x+direction*12,y:position.y,v:direction*180,life:2,parry:index===16});
         foe.shotAt=clock+cadence/enemyTempo;
       }
-      if (attacks.some(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)))) foe.dead=true;
+      const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
+      if(impact){
+        foe.dead=true;
+        if(index===1 && impact.blasterShot && impact.damage===1) impact.life=0;
+      }
       if (!foe.dead && !(foe.bashed && clock<foe.bashed.until) && close(p,position,29,34)) {
         if ((p.vy>65 && oldY<position.y-17) || (power==='dash' && p.power>.22)) {
           foe.dead=true;
