@@ -1571,9 +1571,37 @@
     [51,23,new Path2D('M0 0H51V14Q43 29 34 17Q26 30 17 17Q8 29 0 14Z'),new Path2D('M3 7H49M7 8v5m9-5v5m9-5v5m9-5v5m9-5v5')],
     [68,30,new Path2D('M0 0H68V12H60L54 28H14L8 12H0Z'),new Path2D('M4 6H64M15 12H53M22 17H46V23H22Z')]
   ];
+  const platformBodies = [
+    [0,0,100,0,100,26,81,39,64,33,48,52,22,43,0,28 ],
+    [0,0,100,0,100,9,84,9,72,27,28,27,16,9,0,9 ],
+    [0,0,100,0,93,15,81,12,66,45,51,33,38,56,21,31,8,35 ],
+    [0,0,100,0,97,13,76,13,63,23,29,23,12,15 ],
+    [0,0,100,0,100,8,87,11,80,44,73,43,68,12,34,12,24,36,17,35,15,12,0,9 ],
+    [0,0,100,0,84,24,69,20,57,53,41,45,25,69,9,25 ],
+    [0,0,100,0,96,15,85,25,71,32,50,36,29,32,14,25,4,15 ],
+    [0,0,100,0,84,8,77,32,61,8,39,8,23,32,16,8 ],
+    [0,0,100,0,100,22,73,22,73,34,27,34,27,22,0,22 ],
+    [0,0,100,0,100,10,56,52,44,52,0,10 ],
+    [0,0,100,0,88,15,68,14,50,58,32,14,12,15 ],
+    [0,0,100,0,94,18,76,31,71,49,53,64,43,47,24,58,16,31,4,19 ],
+    [0,0,100,0,100,16,86,16,86,35,66,35,66,24,34,24,34,35,14,35,14,16,0,16 ],
+    [0,0,100,0,96,13,79,22,60,26,39,29,20,22,7,15 ],
+    [0,0,100,0,100,9,91,9,83,24,74,24,67,15,33,15,26,24,17,24,9,9,0,9 ],
+    [0,0,100,0,91,12,61,15,67,47,48,28,38,66,29,64,34,17,11,14 ],
+    [0,0,100,0,100,10,92,10,92,30,85,30,85,10,15,10,15,30,8,30,8,10,0,10 ],
+    [0,0,100,0,97,17,80,31,69,40,50,48,31,40,20,31,3,17 ],
+    [0,0,100,0,100,13,83,13,83,24,65,24,65,35,35,35,35,24,17,24,17,13,0,13 ],
+    [0,0,100,0,100,16,82,29,64,29,64,35,24,35,24,27,0,19 ],
+    [0,0,100,0,100,14,92,14,87,38,79,37,74,14,52,14,48,27,38,25,31,14,0,14 ],
+    [0,0,100,0,100,56,81,56,81,33,74,23,64,16,50,13,36,16,26,23,19,33,19,56,0,56 ],
+    [0,0,100,0,91,22,73,33,57,48,41,38,26,41,10,18 ],
+    [0,0,100,0,100,16,91,25,81,16,71,25,61,16,51,25,41,16,31,25,21,16,11,25,0,16 ],
+    [0,0,100,0,100,12,89,12,79,33,21,33,11,12,0,12 ]
+  ];
   function drawCoursePlatform({x,y,w}) {
     const [face,recess,rim]=courseMaterials[index];
-    const [spacing,depth,edge,marking]=platformProfiles[index];
+    const [spacing,, ,marking]=platformProfiles[index];
+    const body=platformBodies[index];
     const end=Math.min(x+w,camera+width);
     const first=x+Math.max(0,Math.floor((camera-x)/spacing))*spacing;
     ctx.save();
@@ -1582,21 +1610,30 @@
     ctx.clip();
     if(y>=ground){
       ctx.fillStyle=recess;
-      ctx.fillRect(x,y+depth*.6,w,height-y);
+      ctx.fillRect(x,y+12,w,height-y);
     }
-    const surface=ctx.createLinearGradient(0,0,0,depth);
+    ctx.beginPath();
+    ctx.moveTo(x,y);
+    for(let point=2;point<body.length;point+=2){
+      ctx.lineTo(x+body[point]*w/100,y+body[point+1]);
+    }
+    ctx.closePath();
+    const surface=ctx.createLinearGradient(0,y,0,y+58);
     surface.addColorStop(0,face);
     surface.addColorStop(1,recess);
+    ctx.fillStyle=surface;
+    ctx.fill();
+    ctx.save();
+    ctx.clip();
+    ctx.strokeStyle=rim;
+    ctx.globalAlpha=.72;
     for(let panel=first;panel<end;panel+=spacing){
       ctx.save();
       ctx.translate(panel,y);
-      ctx.fillStyle=surface;
-      ctx.fill(edge);
-      ctx.strokeStyle=rim;
-      ctx.globalAlpha=.72;
       ctx.stroke(marking);
       ctx.restore();
     }
+    ctx.restore();
     ctx.fillStyle=rim;
     ctx.fillRect(x,y,w,2);
     ctx.restore();
