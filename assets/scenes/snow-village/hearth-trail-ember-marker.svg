@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Hearth Trail — original snowbound ember sign"><defs><linearGradient id="bamboo" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#dcf4ff"/><stop offset=".27" stop-color="#5d87ad"/><stop offset=".65" stop-color="#1c2b3e"/><stop offset="1" stop-color="#5d87ad"/></linearGradient><linearGradient id="lantern" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#fff9d6"/><stop offset=".48" stop-color="#ffed9f"/><stop offset="1" stop-color="#ea643a"/></linearGradient><radialGradient id="aura"><stop stop-color="#dcf4ff" stop-opacity=".9"/><stop offset=".44" stop-color="#ffed9f" stop-opacity=".33"/><stop offset="1" stop-color="#dcf4ff" stop-opacity="0"/></radialGradient></defs><ellipse cx="92" cy="82" rx="64" ry="71" fill="url(#aura)" opacity=".5"/>
+<path d="M44 154V28l18-12h59l18 12v126" fill="url(#bamboo)" stroke="#b4d8ef" stroke-width="6"/>
+<path d="M32 36 90 3l58 33-10 12-48-24-48 24z" fill="#a6d1e5" stroke="#fff7e6" stroke-width="6"/>
+<path d="M58 64h64v68H58z" fill="#263a61" stroke="#e9dcc8" stroke-width="5"/>
+<path d="M74 122q-28-30 10-64 3 22 18-10 26 29 19 55-5 19-25 24z" fill="url(#lantern)" stroke="#ffd2a0" stroke-width="4"/>
+<path d="M88 121q-17-19 6-42 0 14 13 0 14 21-2 40z" fill="#ffefc0"/>
+<path d="M49 141h84" stroke="#f2f5ef" stroke-width="6"/>
+<path d="M36 154q11-18 34-12m37 1q21-6 42 11" fill="#f7fcff" stroke="#bcdbea" stroke-width="5"/>
+<path d="M19 158h140" stroke="#d9f3fb" stroke-width="8"/><circle cx="33" cy="82" r="5" fill="#e9fbff"/><circle cx="147" cy="63" r="4" fill="#e9fbff"/></svg>
