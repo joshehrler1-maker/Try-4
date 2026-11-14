@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Swamp Ferry Haunted Manor original ghost ferry lamp"><defs><linearGradient id="frame" x1=".08" y1=".04" x2=".92" y2="1"><stop stop-color="#e4facb"/><stop offset=".29" stop-color="#8bbd9f"/><stop offset=".65" stop-color="#345568"/><stop offset="1" stop-color="#8bbd9f"/></linearGradient><radialGradient id="glow"><stop stop-color="#d5ffbd" stop-opacity=".85"/><stop offset=".45" stop-color="#e4facb" stop-opacity=".4"/><stop offset="1" stop-color="#d5ffbd" stop-opacity="0"/></radialGradient></defs><ellipse cx="87" cy="75" rx="70" ry="72" fill="url(#glow)" opacity=".6"/>
+<path d="M48 161V19l11-11h28l12 11v142" fill="url(#frame)" stroke="#a7c7b1" stroke-width="5"/>
+<path d="M58 19h35" stroke="#e5dfb9" stroke-width="5"/>
+<path d="M92 46h41l16 23-17 16-17-19H92" fill="#324e59" stroke="#d8edc2" stroke-width="4"/>
+<path d="M105 71v17m25-12v12" stroke="#e5dfb5" stroke-width="3"/>
+<path d="M96 88h46l6 19-10 40-18 14-21-14-10-40z" fill="#2c4a59" stroke="#d5efbb" stroke-width="4"/>
+<path d="M103 105q-5-21 18-19 24 1 16 27-7 14-16 18-18-10-18-26z" fill="#daffbe" opacity=".88"/>
+<path d="M114 109h4m11 0h4" stroke="#286177" stroke-width="5" stroke-linecap="round"/>
+<path d="M114 119q6-6 12 0" stroke="#38797d" stroke-width="3" fill="none"/>
+<path d="M25 161h142" stroke="#557477" stroke-width="8"/><circle cx="35" cy="93" r="5" fill="#dbffb5"/><circle cx="158" cy="56" r="4" fill="#dbffb5"/></svg>
