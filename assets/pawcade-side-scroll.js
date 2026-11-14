@@ -1789,7 +1789,10 @@
     const chase = Math.sign(player.x-foe.x);
     const wave = Math.sin(t*2.1);
     if(foe.foundryEnemy!==undefined){
-      const cycle=(clock+foe.offset)%2.4;
+      // Foundry enemies have authored hop/charge cycles; scale the entire
+      // cycle rather than replacing their distinct attack motion.
+      const foundryPressure=1+Math.min(5,Math.max(0,chapter))*.05;
+      const cycle=(clock*foundryPressure+foe.offset)%2.4;
       const hop=Math.max(0,1-Math.abs(cycle-1.65)/.42);
       const surge=Math.sin(Math.PI*Math.min(1,Math.max(0,(cycle-.65)/1.35)));
       if(foe.foundryEnemy===3) return {x:patrolX(foe.x+wave*34),y:foe.y-14*(1+Math.cos(cycle*Math.PI/1.2))};
