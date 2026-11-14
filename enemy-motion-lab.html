@@ -7,7 +7,7 @@
 <p class="note">Original animated vector concept prototypes for 25 games. These are <strong>not</strong> final 3D models or integrated enemies.</p>
 <label for="game">Choose a game</label><select id="game"></select>
 <canvas id="scene" width="800" height="400" role="img" aria-label="Animated enemy concept on a platform"></canvas>
-<div class="controls"><button id="idle">Idle</button><button id="move">Move</button><button id="attack">Attack</button><button id="hit">Hit</button><button id="defeat">Defeat</button></div>
+<div class="controls"><button id="idle">Idle</button><button id="move">Move</button><button id="attack">Attack</button><button id="hit">Hit</button><button id="defeat">Defeat</button><button id="pause" aria-pressed="false">Pause animation</button><label for="speed">Playback speed <output id="speed-value">1.0×</output></label><input id="speed" type="range" min="0.25" max="1.5" step="0.05" value="1"></div>
 <p id="info" aria-live="polite"></p><footer>Motion prototype: anticipation → attack → recovery; reduced-motion preference supported. No paid services.</footer></main>
 <script>
 (async()=>{
@@ -16,11 +16,14 @@ let registry;
 try{const response=await fetch('assets/enemy-art-motion-registry.json');if(!response.ok)throw Error('Registry unavailable');registry=await response.json()}catch(e){info.textContent='Could not load enemy designs: '+e.message;return}
 for(const item of registry.games){const option=document.createElement('option');option.value=item.gameIndex;option.textContent=(item.gameIndex+1)+'. '+item.game+' — '+item.enemyFamily;select.append(option)}
 const palettes=[['#ff9a4d','#743529'],['#c6a6ff','#413466'],['#67f5e0','#246e8d'],['#eac978','#5b4d3b'],['#a6e868','#34694a'],['#a5edff','#396d9c'],['#ffcd69','#85446b'],['#f5a9ff','#543d9c'],['#ff85a6','#61346a'],['#d3d8e6','#596477'],['#a3f5ec','#39748d'],['#e7f4ff','#647caa'],['#ffde73','#386b98'],['#e8b36e','#685b32'],['#b3b4ff','#383f86'],['#b0ef83','#487d4b'],['#ff9e69','#805b4c'],['#d8f4ff','#6799bc'],['#e8bd84','#8c6945'],['#8ae6eb','#37618a'],['#ff79e3','#4942a5'],['#e8e2d6','#8b7792'],['#b6ed88','#506b58'],['#f8df70','#9e7435'],['#9ad8ff','#485f95']];
-let mode='idle',started=performance.now(),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let mode='idle',started=performance.now(),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,paused=false,pausedAt=0,speed=1;
+const pauseButton=document.querySelector('#pause'),speedInput=document.querySelector('#speed');
+pauseButton.onclick=()=>{paused=!paused;if(paused){pausedAt=performance.now()}else{started+=performance.now()-pausedAt}pauseButton.textContent=paused?'Resume animation':'Pause animation';pauseButton.setAttribute('aria-pressed',String(paused))};
+speedInput.oninput=()=>{const now=paused?pausedAt:performance.now();const elapsed=(now-started)*speed;speed=Number(speedInput.value);started=now-elapsed/speed;document.querySelector('#speed-value').textContent=speed.toFixed(2)+'×'};
 function describe(){const e=registry.games[Number(select.value)];info.textContent=e.enemyFamily+' — '+e.silhouette+'. Attack: '+e.signatureAttack+'. Effect: '+e.vfx+'. Current motion: '+mode+'.'}
 select.onchange=()=>{started=performance.now();describe()};for(const state of ['idle','move','attack','hit','defeat'])document.querySelector('#'+state).onclick=()=>{mode=state;started=performance.now();describe()};describe();
 function frame(now){
-const index=Number(select.value),t=reduced?0:(now-started)/1000,colors=palettes[index],p=mode==='attack'?Math.min(t/1.3,1):0;
+const index=Number(select.value),t=reduced?0:((paused?pausedAt:now)-started)/1000*speed,colors=palettes[index],p=mode==='attack'?Math.min(t/1.3,1):0;
 const anticipation=p<.27?p/.27:0,impact=p>=.27&&p<.65?Math.sin((p-.27)/.38*Math.PI):0;
 const walk=mode==='move'&&!reduced?Math.sin(t*9):0,bob=mode==='idle'&&!reduced?Math.sin(t*2)*2:0;
 ctx.clearRect(0,0,800,400);
@@ -28,10 +31,10 @@ const sky=ctx.createLinearGradient(0,0,0,400);sky.addColorStop(0,colors[1]);sky.
 for(let j=0;j<12;j++){ctx.fillStyle='#ffffff13';ctx.beginPath();ctx.arc((j*89+index*13)%800,50+(j*43)%220,2+(j%4),0,7);ctx.fill()}
 ctx.fillStyle='#31465e';ctx.fillRect(0,324,800,76);ctx.fillStyle=colors[0];ctx.fillRect(0,324,800,6);
 const x=400+(mode==='move'?Math.sin(t*1.4)*115:0)+(mode==='attack'?impact*65:0);
-ctx.save();ctx.translate(x,302+bob+(mode==='hit'?Math.sin(Math.min(t,1)*25)*7:0));ctx.scale(mode==='defeat'?Math.max(.1,1-Math.min(t,1)) :1,1);
+ctx.save();ctx.translate(x,302+bob+(mode==='move'?Math.abs(walk)*-3:0)+(mode==='hit'?Math.sin(Math.min(t,1)*25)*7:0));ctx.scale(mode==='defeat'?Math.max(.1,1-Math.min(t,1)) :1,1);
 ctx.fillStyle='#0008';ctx.beginPath();ctx.ellipse(0,23,75,12,0,0,7);ctx.fill();
 ctx.lineCap='round';ctx.strokeStyle=colors[1];ctx.lineWidth=15;
-for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(side*24,-20);ctx.lineTo(side*(25+walk*12),13);ctx.stroke();ctx.fillStyle=colors[0];ctx.beginPath();ctx.ellipse(side*(25+walk*12),15,19,8,0,0,7);ctx.fill()}
+for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(side*24,-20);ctx.lineTo(side*(25+walk*12),13-Math.max(0,walk*side)*9);ctx.stroke();ctx.fillStyle=colors[0];ctx.beginPath();ctx.ellipse(side*(25+walk*12),15-Math.max(0,walk*side)*9,19,8,0,0,7);ctx.fill()}
 ctx.rotate(mode==='attack'?-anticipation*.22:0);
 ctx.shadowColor=colors[0];ctx.shadowBlur=20;
 ctx.fillStyle=colors[1];ctx.beginPath();ctx.ellipse(0,-62,53,62,0,0,7);ctx.fill();ctx.shadowBlur=0;
