@@ -1902,7 +1902,14 @@
       case 'turret': return {x:foe.x,y:foe.y};
       case 'charge': return {x:patrolX(foe.x+chase*Math.max(0,wave)*enemyReach),y:foe.y};
       case 'hopper': return {x:patrolX(foe.x+wave*enemyReach),y:foe.y-Math.max(0,Math.sin(t*3.5))*enemyRise};
-      case 'swoop': return {x:foe.x+wave*enemyReach,y:foe.y-50-Math.cos(t*2.1)*enemyRise};
+      case 'swoop': { // Rayman / Klonoa / Ori: readable aerial swoops
+        // The dive is steepest at the center of the flight arc, with a
+        // distinct climb afterward rather than a flat sine-wave patrol.
+        const flight=Math.sin(t*1.6);
+        const dive=Math.max(0,1-Math.abs(flight));
+        return {x:patrolX(foe.x+flight*enemyReach),
+          y:foe.y-50-Math.cos(t*1.6)*enemyRise+dive*enemyRise*.35};
+      }
       case 'school': return {x:foe.x+wave*enemyReach,y:foe.y-33-Math.sin(t*3)*enemyRise};
       case 'pursuit': return {x:patrolX(foe.x+chase*(enemyReach*(.55+wave*.45))),y:foe.y-enemyRise};
       case 'rhythm': return {x:patrolX(foe.x+wave*enemyReach),y:foe.y-Math.max(0,wave)*enemyRise};
