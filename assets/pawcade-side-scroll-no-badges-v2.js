@@ -1221,20 +1221,23 @@
       });
     }
   }
-  function bashTarget(p) {
+  function closestTarget(player, candidates, position, eligible, reachX, reachY) {
     let nearest=null;
     let distance=Infinity;
-    for(const foe of enemies){
-      if(foe.dead) continue;
-      const at=foePosition(foe);
-      if(!close(p,at,125,65)) continue;
-      const gap=Math.hypot(p.x-at.x,p.y-at.y);
+    for(const candidate of candidates){
+      if(!eligible(candidate)) continue;
+      const at=position(candidate);
+      if(!close(player,at,reachX,reachY)) continue;
+      const gap=Math.hypot(player.x-at.x,player.y-at.y);
       if(gap<distance){
-        nearest=foe;
+        nearest=candidate;
         distance=gap;
       }
     }
     return nearest;
+  }
+  function bashTarget(p) {
+    return closestTarget(p,enemies,foePosition,foe=>!foe.dead,125,65);
   }
   function useTechnique() {
     if (phase!=='playing' || player.techCooldown>0) return;
@@ -1242,7 +1245,7 @@
     p.techCooldown=.32;
     const before=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,p.ledgeGrip,p.pogo,attacks.length];
     let activated=false;
-    const nearby=range=>enemies.find(foe=>!foe.dead && close(p,foePosition(foe),range,65));
+    const nearby=range=>closestTarget(p,enemies,foePosition,foe=>!foe.dead,range,65);
     const shot=extra=>attacks.push({x:p.x,y:p.y,v:p.facing*330,life:.55,...extra});
     switch(technique) {
       case 'sweep': shot({v:0,radius:strength-20,life:.13}); break;
@@ -1299,7 +1302,7 @@
         break;
       }
       case 'parry': {
-        const target=hazards.find(h=>h.parry && h.life>0 && close(p,h,55,55));
+        const target=closestTarget(p,hazards,h=>h,h=>h.parry && h.life>0,55,55);
         if(target && !p.on){
           target.life=0;
           p.parryFlash={x:target.x,y:target.y,time:clock};
