@@ -3834,6 +3834,22 @@
     ctx.strokeStyle=enemyCueColors[index];
     ctx.fillStyle='#0a1734df';
     ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.fill();ctx.stroke();
+    // Chapter markings are visible even when the enemy is standing still.
+    // Shape count and rotation are tied to the game and stage, not random.
+    if(chapter>0){
+      ctx.save();
+      ctx.rotate(index*.23);
+      ctx.strokeStyle=enemyCueColors[index];ctx.lineWidth=1.6;
+      const marks=Math.min(5,chapter);
+      for(let k=0;k<marks;k++){
+        const angle=(k+.5)*Math.PI*2/marks;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(angle)*14,Math.sin(angle)*14);
+        ctx.lineTo(Math.cos(angle)*18,Math.sin(angle)*18);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     ctx.beginPath();
     switch(theme){
       case 'clamp':ctx.moveTo(-5,-6);ctx.lineTo(-5,5);ctx.lineTo(0,8);ctx.lineTo(5,5);ctx.lineTo(5,-6);break;
