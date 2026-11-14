@@ -2476,7 +2476,37 @@
         // favors sustained Contra-style pressure, and Starship Cargo uses
         // short, readable Metal Slug-style volleys. Steamworks retains its
         // own parry cadence above.
-        const courseFirePace=index===1?1.18:index===19?.84:index===24?.96:1;
+        // Counterpart-inspired ranged pacing for all 25 individual courses.
+        // Longer values create readable dodge windows (precision/platform
+        // adventures); shorter values support faster action/shooter games.
+        // Preserve each foe's archetype, chapter pressure and special shots.
+        const courseFirePace=[
+          1.18, // Foundry: deliberate platformer hazards
+          1.18, // Library: telegraphed blaster duels
+          1.28, // Coral: room for underwater steering
+          1.08, // Clocktower: fast momentum traversal
+          1.30, // Garden: hopper-led platform encounters
+          1.22, // Waterfall: dodge between gliding approaches
+          1.25, // Lantern: forgiving float-and-throw windows
+          1.35, // Polarity: gravity-flip reaction time
+          1.12, // Stage Beat: measured rhythmic attacks
+          1.18, // Quarry: grapple approach windows
+          1.24, // Sunset: airlift recovery
+          1.27, // Cloud: precision air-dash traversal
+          1.06, // Thunder: armored pressure
+          1.25, // Autumn: throw-and-hop encounters
+          1.08, // Observatory: pursuit and ranged pressure
+          1.23, // Bamboo: aerial movement windows
+          1.00, // Steamworks: preserve parry cycle timing
+          1.20, // Snow: platform throw encounters
+          1.30, // Canyon: precision obstacle timing
+           .84, // Submarine: sustained shooter pressure
+          1.05, // Neon: high-speed pursuit
+          1.15, // Marble: measured action-platformer attacks
+          1.25, // Swamp: pogo and hop encounters
+          1.28, // Sunflower: airborne gliding
+           .96  // Starship: readable short volleys
+        ][index] ?? 1;
         foe.shotAt=clock+cadence/enemyTempo*shotDelay*
           attackRhythm*courseFirePace/rangedPressure;
         } // end available-projectile-budget branch
