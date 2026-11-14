@@ -7761,7 +7761,8 @@
         typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
       if(!originWorldRig && !fiveWorldRig && !cloudWorldRig && !midWorldRig && !lateWorldRig)
         drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
-      if(drawEnemy3d(at,foe,faceLeft,attackPose,recoil,movingWeight)) {
+      const rendered3D=drawEnemy3d(at,foe,faceLeft,attackPose,recoil,movingWeight);
+      if(rendered3D) {
         // Transparent 3D mesh composited at the original enemy position.
       }
       else if(originWorldRig && window.pawtopiaOriginEnemyRigs.draw(
@@ -7820,10 +7821,10 @@
       // New original silhouettes include their own mechanical, cloth,
       // mist and sound accents; avoid drawing the obsolete extra limbs
       // over them, but retain the original fallback when scripts are absent.
-      if(!enemy3dOn && !originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
+      if(!rendered3D && !originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
       // No detached armor outlines or U-shaped halo above enemies.
       // Render the enemy's own sprite and grounded motion effects only.
-      drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
+      if(!rendered3D) drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
       // Keep the space above enemies clear: no floating rank badges,
       // insignias, arrows or attack symbols. Enemy art and motion remain.
       if(foe===bashReady){
