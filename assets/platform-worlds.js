@@ -837,3 +837,23 @@ for (const [room, placements] of Object.entries({
     window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
   }
 }
+
+// Crystal Polarity ceiling catches and Canyon Crossing precision landings.
+for (const [room, placements] of Object.entries({
+  course7Stage1: [[3,426,105,567],[4,1248,82,585]],
+  course7Stage2: [[4,285,120,498],[5,954,92,571],[6,1591,124,459]],
+  course7Stage3: [[3,301,105,552],[4,1085,85,580]],
+  course7Stage4: [[4,390,88,468],[5,964,102,519],[6,1679,115,444]],
+  course7Stage5: [[3,438,130,503],[4,1130,110,558]],
+  course7Stage6: [[4,346,92,502],[5,911,130,526],[6,1485,84,543]],
+  course18Stage1: [[2,820,253,296]],
+  course18Stage2: [[3,1145,250,299]],
+  course18Stage3: [[2,731,255,267],[3,1021,220,252]],
+  course18Stage4: [[2,780,247,291],[4,1642,226,306]],
+  course18Stage5: [[3,1128,186,315]],
+  course18Stage6: [[2,757,251,245],[3,1039,215,301]],
+})) {
+  for (const [slot, x, y, width] of placements) {
+    window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+  }
+}
