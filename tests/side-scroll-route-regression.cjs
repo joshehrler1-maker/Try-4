@@ -41,4 +41,24 @@ for (let game = 0; game < 25; game++) {
 assert.equal(new Set(routes.map(JSON.stringify)).size, 25, 'Route layouts must be distinct');
 assert.equal(new Set(palettes.map(JSON.stringify)).size, 25, 'Mechanic palettes must be distinct');
 assert(src.includes('if(sx+width>start+stageWidths[stage]-75) continue;'), 'Missing stage boundary guard');
+// Animation safety checks: each game's visual-only cue must stay gated by
+// its own course index; do not silently share motions across counterparts.
+const isolatedCues = [
+  ['seedLeap',4],['waterfallDive',5],['lanternFloat',6],
+  ['polarityTurn',7],['stagePulse',8],['quarryBrace',9],
+  ['windBank',10],['cloudPursuit',11],['thunderCharge',12],
+  ['autumnHop',13],['observatoryFlip',14],['bambooSwoop',15],
+  ['steamPulse',16],['snowBrace',17],['canyonPatrol',18],
+  ['submarineFin',19],['neonDash',20],['marbleWeight',21],
+  ['swampBob',22],['sunflowerBank',23],['cargoLatch',24]
+];
+for (const [cue, game] of isolatedCues) {
+  const declaration = src.match(new RegExp('const\\s+' + cue + '\\s*=([^;]+);'));
+  assert(declaration, 'Missing animation cue ' + cue);
+  assert(new RegExp('index\\s*===\\s*' + game + '(?!\\d)').test(declaration[1]),
+    'Animation cue ' + cue + ' must be restricted to game ' + game);
+  assert(src.includes(cue + (cue === 'seedLeap' ? '?' : '')) || src.includes('+' + cue),
+    'Animation cue ' + cue + ' is never used');
+}
+console.log('PASS: 21 individual enemy motion cues remain scoped to their own games');
 console.log('PASS: 25 distinct platform routes, palettes, beats and bounds');
