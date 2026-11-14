@@ -477,7 +477,7 @@ test('five distinctive games 6–10 enemy rigs render safely without changing ga
     'new five-world animated bodies must work in the offline cache');
   assert.ok(runtime.includes('fiveWorldRig = index>=5 && index<=9'));
   assert.ok(runtime.includes('window.pawtopiaFiveEnemyRigs.draw('));
-  assert.ok(runtime.includes('if(!originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion'),
+  assert.ok(runtime.includes('if(!rendered3D && !originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion'),
     'obsolete motion accents must not overlap the new bespoke silhouettes');
   assert.ok(runtime.includes('window.pawtopiaFiveEnemyRigs?.draw'),
     'visual-only defeat transition must use the same enemy body');
@@ -557,7 +557,7 @@ test('original base enemy rigs for games 1–5 preserve authored specialists and
   assert.ok(worker.includes("'assets/animation/origin-world-enemy-rigs-v1.js?"));
   assert.ok(runtime.includes('originWorldRig = usesOriginRig(foe)'));
   assert.ok(runtime.includes('window.pawtopiaOriginEnemyRigs.draw('));
-  assert.ok(runtime.includes('if(!originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion'),
+  assert.ok(runtime.includes('if(!rendered3D && !originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion'),
     'prevent duplicated seed-garden accessory art');
   assert.ok(runtime.includes('const dyingEnemyArt = index<=4 ? window.pawtopiaOriginEnemyRigs'),
     'the base enemy needs visual-only defeat pose');
@@ -620,7 +620,7 @@ test('first-five real WebGL mesh prototypes have unique 3D parts and safe lifecy
   assert.ok(game.includes('href="enemy-3d-prototype.html"'),
     'prototype should be discoverable from Games Room');
   for(const file of ['enemy-3d-prototype.html',
-    'assets/animation/enemy-3d-prototype-v1.js?v=3d-mesh-dc52ddc']){
+    'assets/animation/enemy-3d-prototype-v1.js?v=3d-sprite-5c90e29']){
     assert.ok(worker.includes(file), 'new WebGL source not precached: '+file);
   }
   const ctx={window:{devicePixelRatio:2}};
