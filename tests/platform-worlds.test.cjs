@@ -219,3 +219,61 @@ test('third through sixth stage scenery is unique, cacheable, stage-scoped and p
   }
   assert.equal(seen.size,50,'all 50 individual game-and-stage scenic asset paths must be unique');
 });
+
+test('five late-game enemy rigs render distinct simulation-driven poses safely', () => {
+  const rigPath=path.join(__dirname,'../assets/animation/late-world-enemy-rigs-v1.js');
+  const runtime=fs.readFileSync(path.join(__dirname,'../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const worker=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  assert.ok(fs.existsSync(rigPath), 'missing late-world rig script');
+  const script=fs.readFileSync(rigPath,'utf8');
+  const sandbox={window:{}};
+  vm.runInNewContext(script,sandbox,{filename:'late-world-enemy-rigs-v1.js',timeout:1000});
+  const rig=sandbox.window.pawtopiaLateEnemyRigs;
+  assert.equal(typeof rig?.draw,'function','rig drawing API missing');
+  assert.equal(new Set(Object.values(rig.families)).size,5,'each enemy must have a distinct family');
+  assert.ok(html.includes('assets/animation/late-world-enemy-rigs-v1.js?'),
+    'motion rig script is not loaded in playable game HTML');
+  assert.ok(html.indexOf('late-world-enemy-rigs-v1.js') <
+            html.indexOf('pawcade-side-scroll-no-badges-v2.js'),
+            'enemy rigs must be loaded before main gameplay');
+  assert.ok(worker.includes("'assets/animation/late-world-enemy-rigs-v1.js?"),
+    'enemy rigs need offline cache');
+  assert.match(runtime,/const lateWorldRig = index>=20 && index<=24/,
+    'gameplay renderer must bind only the assigned five games');
+  assert.match(runtime,/pawtopiaLateEnemyRigs\.draw\(/,
+    'playable enemy renderer never calls animation art module');
+
+  for(let index=20;index<25;index++){
+    const counters={};
+    let saveDepth=0;
+    const context=new Proxy({},{
+      get(target,prop){
+        if(Object.hasOwn(target,prop))return target[prop];
+        return (...args)=>{
+          counters[prop]=(counters[prop]||0)+1;
+          if(prop==='save')saveDepth++;
+          if(prop==='restore')saveDepth--;
+          assert.ok(args.every(value=>typeof value!=='number'||Number.isFinite(value)),
+            'nonfinite rendering argument in '+String(prop)+' game '+index);
+        };
+      },
+      set(target,prop,value){target[prop]=value;return true;}
+    });
+    const poses=[
+      {stride:0,attack:0,recoil:0,landing:0,clock:0,reduced:true},
+      {stride:1,attack:0,recoil:0,landing:0,clock:1.1,reduced:false},
+      {stride:.35,attack:.7,recoil:0,landing:0,clock:2.2,reduced:false},
+      {stride:0,attack:1,recoil:1,landing:.4,clock:3.3,reduced:false,faceLeft:true}
+    ];
+    for(const pose of poses) {
+      assert.equal(rig.draw(context,index,{x:260,y:290},{_gait:2.6,offset:index},pose),true);
+      assert.equal(saveDepth,0,'canvas transform not restored in game '+index);
+    }
+    assert.ok((counters.fill||0)>12 && (counters.stroke||0)>8,
+      'insufficient body-part rendering in '+rig.families[index]);
+    assert.ok((counters.translate||0)>=4,'rig lacks world-position alignment');
+  }
+  assert.equal(rig.draw({},19,{x:0,y:0},{},{}),false,
+    'outside game 21–25 must keep its existing enemy art');
+});
