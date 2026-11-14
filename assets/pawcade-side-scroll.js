@@ -1406,6 +1406,36 @@
     ctx.moveTo(x,y+1);
     ctx.lineTo(x+w,y+1);
     ctx.stroke();
+    // Each of the 25 games has a distinct, repeatable top-surface marking.
+    // The marking stays inside the platform art, never changing collision.
+    const markings=['brick','circuit','coral','speed','wood','cloud','star','gravity','beat','cable','wind','snow','rune','leaf','orbit','glow','gear','mosaic','sand','hazard','chevron','gothic','wave','petal','hull'];
+    const marking=markings[index]||'brick';
+    const interval=marking==='beat'?22:marking==='speed'?36:marking==='hull'?54:46;
+    const start=Math.max(0,Math.floor((camera-x)/interval)-1);
+    const end=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
+    ctx.save();
+    ctx.beginPath();ctx.rect(x+3,y-7,w-6,5);ctx.clip();
+    ctx.strokeStyle=rim;ctx.fillStyle=rim;ctx.lineWidth=1.15;ctx.globalAlpha=.7;
+    for(let n=start;n<=end;n++){
+      const mx=x+n*interval+interval*.5;
+      if(mx<x+8||mx>x+w-8)continue;
+      ctx.beginPath();
+      if(['circuit','gravity','orbit','hull','gear'].includes(marking)){
+        ctx.arc(mx,y-4.5,marking==='orbit'?3:2,0,Math.PI*2);
+        ctx.stroke();
+        if(marking==='circuit'||marking==='hull'){
+          ctx.moveTo(mx+4,y-4.5);ctx.lineTo(mx+12,y-4.5);ctx.stroke();
+        }
+      }else if(['leaf','petal','coral','wood','wind','wave','cloud','snow'].includes(marking)){
+        ctx.ellipse(mx,y-4.5,marking==='petal'?5:7,1.7,n%2?.35:-.35,0,Math.PI*2);
+        ctx.stroke();
+      }else if(['speed','beat','chevron','hazard','cable'].includes(marking)){
+        ctx.moveTo(mx-4,y-6);ctx.lineTo(mx+2,y-3);ctx.lineTo(mx+7,y-6);ctx.stroke();
+      }else{
+        ctx.moveTo(mx-4,y-6);ctx.lineTo(mx,y-3);ctx.lineTo(mx+4,y-6);ctx.closePath();ctx.stroke();
+      }
+    }
+    ctx.restore();
     // Angled end bevels make the platform's thickness legible while
     // remaining strictly decorative. Keep them within the existing cap.
     ctx.globalAlpha=.7;
