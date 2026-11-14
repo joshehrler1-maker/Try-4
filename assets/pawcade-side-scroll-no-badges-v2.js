@@ -6590,8 +6590,8 @@
     }
     if(index===7 && !reducedMotion && clock-(p.flipTime??-Infinity)<.2){
       ctx.save();
-      ctx.translate(p.x,p.y-p.gravity*31);
-      ctx.scale(1,p.gravity);
+      ctx.translate(p.x,p.y+p.gravity*31);
+      ctx.scale(1,-p.gravity);
       ctx.globalAlpha=1-(clock-p.flipTime)/.2;
       ctx.strokeStyle='#e7beff';
       ctx.lineWidth=2;
