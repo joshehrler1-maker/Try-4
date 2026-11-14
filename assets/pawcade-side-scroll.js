@@ -375,6 +375,39 @@
           : 218-stage*5;
       crystals.push({x:tx,y:ty});
     }
+    // Optional stage-specific traversal islands give collectible trails
+    // actual landing points. Their layouts differ by game and chapter;
+    // they never replace the primary floor route or introduce lethal gaps.
+    // Gravity-flip and underwater games retain their authored navigation.
+    if(index!==7 && index!==14 && movement!=='swim'){
+      const islandKinds={
+        momentum:['floor','belt','floor'],roll:['barrel','floor','barrel'],
+        pogo:['pogo','floor','pogo'],glide:['floor','lift','floor'],
+        airlift:['lift','floor','lift'],airdash:['floor','lift','floor'],
+        grapple:['floor','floor','floor'],float:['spring','floor','spring'],
+        beat:['spring','floor','spring'],precision:['floor','shelf','floor'],
+        vine:['floor','spring','floor'],shooter:['shelf','floor','shelf'],
+        buster:['shelf','floor','shelf'],shield:['floor','ice','floor'],
+        whip:['shelf','floor','shelf'],throw:['floor','shelf','floor']
+      };
+      const islandKindsForGame=islandKinds[movement]||['floor','floor','lift'];
+      const islandX=start+Math.min(sectionSize-470,780+((index*11+stage*19)%5)*38);
+      const climb=stage%3;
+      const islandHeights=[
+        [282,251,226],[277,244,217],[285,256,231]
+      ][climb];
+      for(let island=0;island<3;island++){
+        const iw=82+(island===1?16:0);
+        const ix=islandX+island*124;
+        const iy=islandHeights[island];
+        // Avoid stacking duplicate solid platforms on the same position.
+        const overlaps=platforms.some(ledge=>
+          ledge.y===iy && ix<ledge.x+ledge.w && ix+iw>ledge.x);
+        if(!overlaps){
+          platforms.push({x:ix,y:iy,w:iw,kind:islandKindsForGame[(island+stage)%3]});
+        }
+      }
+    }
     if(index===0 && stage===1){
       landmarks.push({cell:0,x:start+610,y:223,w:66,h:39});
       for(let i=0;i<4;i++) platforms.push({x:start+735+i*115,y:210-i*19,w:94,kind:'floor',switchBridge:true});
