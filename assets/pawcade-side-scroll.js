@@ -534,7 +534,7 @@
       for (let beat=0;beat<4;beat++) crystals.push({x:start+375+beat*415,y:225});
     }
   }
-  if(power==='flip'){
+  if(power==='flip' && index!==7){
     for(let stage=0;stage<sections;stage++){
       const x=stageStarts[stage];
       platforms.push({x,y:32,w:stageWidths[stage],kind:'ceiling'});
