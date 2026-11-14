@@ -3959,7 +3959,23 @@
       }
     }
     // Distinct secondary motion families: flicker, sweep, orbit, pulse, sparkle.
-    if(family===0){
+    if(index===0 && !airborne){
+      // Ember Foundry: paired piston legs remain connected to the chassis.
+      // Gait is driven by the enemy's existing distance-based foot cycle.
+      const gait=foe._gait||0;
+      ctx.globalAlpha=.78;
+      ctx.lineWidth=3.2;
+      for(let leg=0;leg<2;leg++){
+        const side=leg===0?-1:1;
+        const swing=Math.sin(gait+leg*Math.PI)*stride*5;
+        const lift=Math.max(0,Math.cos(gait+leg*Math.PI))*stride*4;
+        ctx.beginPath();
+        ctx.moveTo(side*12,-16);
+        ctx.quadraticCurveTo(side*15+swing*.55,-9,side*14+swing,-2-lift);
+        ctx.lineTo(side*14+swing+direction*5,-2-lift);
+        ctx.stroke();
+      }
+    }else if(family===0){
       ctx.beginPath();ctx.moveTo(-8,-38);ctx.quadraticCurveTo(-15+Math.sin(phase)*4,-48,-4,-54);ctx.stroke();
     }else if(family===1){
       ctx.beginPath();ctx.moveTo(-20,-30);ctx.quadraticCurveTo(0,-43+Math.sin(phase)*5,20,-30);ctx.stroke();
