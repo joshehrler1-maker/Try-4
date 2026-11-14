@@ -3748,9 +3748,11 @@
   function drawEnemyArmorAccent(at,foe,faceLeft,airborne){
     if(foe.dead) return;
     const [basePlates,radius,depth]=enemyArmorStyles[index];
+    // Encounter archetypes alter silhouettes as well as patrol behavior.
+    const variantPlate=[0,1,0,2][foe.archetype??0];
     // Later chapters introduce an extra armor segment, with a different
     // arrangement for each world; this is visual, not extra hit points.
-    const plates=basePlates+(chapter>=3?1:0);
+    const plates=basePlates+variantPlate+(chapter>=3?1:0);
     ctx.save();
     ctx.translate(at.x,at.y-17);
     ctx.scale(faceLeft?-1:1,1);
