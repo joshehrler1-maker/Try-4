@@ -3337,8 +3337,13 @@
     for(let i=0;i<count;i++){
       const seed=i+(foreground?19:0);
       // Wrap with overscan to avoid edge popping on mobile screens.
-      const x=((seed*137+clock*drift-camera*(foreground ? .72 : .36))%spanX+spanX)%spanX-margin;
-      const y=((seed*73+clock*rise)%spanY+spanY)%spanY-margin;
+      // The opening five worlds have physically distinct particle travel:
+      // heat rises, dust hangs, bubbles ascend, sparks arc and pollen sways.
+      const windX=index===0?.35:index===1?.15:index===2?.2:index===3?1.45:index===4?.6:1;
+      const windY=index===0?-1.6:index===1?.15:index===2?-1.3:index===3?-.55:index===4?.4:1;
+      const sway=index===4?Math.sin(clock*.9+seed)*7:index===1?Math.sin(clock*.35+seed)*2:0;
+      const x=((seed*137+clock*drift*windX+sway-camera*(foreground ? .72 : .36))%spanX+spanX)%spanX-margin;
+      const y=((seed*73+clock*rise*windY)%spanY+spanY)%spanY-margin;
       const radius=foreground?2+seed%3:1+seed%2;
       ctx.globalAlpha=(foreground ? .18 : .34)*(.65+.35*Math.sin(clock*1.8+seed));
       // All 25 worlds have low-cost, theme-specific atmosphere silhouettes.
