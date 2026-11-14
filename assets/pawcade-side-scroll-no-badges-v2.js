@@ -1299,6 +1299,8 @@
           p.jumpCut=false;
           p.grace=Math.max(p.grace,.35);
           if(!reducedMotion) burst(target.x,target.y,'#ff86dc',10);
+        } else {
+          p.techCooldown=0;
         }
         break;
       }
