@@ -83,14 +83,19 @@
     catalog.before(notice);
     return;
   }
-  // Five individually authored stage-1 set pieces (not collision geometry).
-  // Images are deliberately lazy: no other game requests these five files.
+  // Ten individually authored stage-1 set pieces (not collision geometry).
+  // Images are per-game: no other game requests these ten files.
   const firstStageLandmarkPaths = [
     'assets/scenes/ember-foundry/cold-intake-beacon.svg',
     'assets/scenes/moonlit-library/atlas-lectern.svg',
     'assets/scenes/coral-courier/pearl-vent.svg',
     'assets/scenes/clocktower-relay/sunrise-gear.svg',
-    'assets/scenes/seed-garden/seed-lantern.svg'
+    'assets/scenes/seed-garden/seed-lantern.svg',
+    'assets/scenes/waterfall-climb/spray-bridge-icefall.svg',
+    'assets/scenes/lantern-festival/parade-gate-lantern.svg',
+    'assets/scenes/crystal-polarity/inverted-intake-core.svg',
+    'assets/scenes/stage-beat/sound-check-resonator.svg',
+    'assets/scenes/quarry-rescue/lift-house-winch.svg'
   ];
   const firstStageLandmark = index < firstStageLandmarkPaths.length ? new Image() : null;
   if (firstStageLandmark) firstStageLandmark.src = firstStageLandmarkPaths[index];
