@@ -734,10 +734,18 @@
       if(!Number.isFinite(x)||!Number.isFinite(y)||
          !Number.isFinite(w)||w<48||
          x<start+24||x+w>start+stageWidths[stage]-28) return false;
-      const clear=platforms.every(ledge =>
-        x+w+12<=ledge.x || x>=ledge.x+ledge.w+12 ||
-        Math.abs(y-ledge.y)>=64
-      );
+      const clear=platforms.every(ledge => {
+        const separated=x+w+12<=ledge.x || x>=ledge.x+ledge.w+12;
+        if(separated)return true;
+        // A ledge above or below an existing hazard still needs room
+        // for the hero's body and jump arc, not just the platform top.
+        if(ledge.kind==='hazard'||ledge.kind==='ceilingSpikes')
+          return Math.abs(y-ledge.y)>=100;
+        // Ceiling blocks are obstacles, not alternate landing surfaces.
+        if(ledge.kind==='ceiling')
+          return Math.abs(y-ledge.y)>=82;
+        return Math.abs(y-ledge.y)>=64;
+      });
       if(!clear) return false;
       platforms.push({x,y,w,kind});
       return true;
