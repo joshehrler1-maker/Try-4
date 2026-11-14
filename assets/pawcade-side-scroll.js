@@ -491,7 +491,7 @@
     reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
-    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.bashed=null;});
+    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.shotsFired=0;e.bashed=null;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
@@ -675,7 +675,12 @@
       }
       case 'parry': {
         const target=hazards.find(h=>h.parry && h.life>0 && close(p,h,55,55));
-        if(target && !p.on){target.life=0;p.vy=-470;p.grace=.35;}
+        if(target && !p.on){
+          target.life=0;
+          p.vy=-470;
+          p.grace=.35;
+          if(!reducedMotion) burst(target.x,target.y,'#ff86dc',10);
+        }
         break;
       }
       case 'grab': {
@@ -1027,7 +1032,8 @@
       );
       if ((foe.turret || enemyPattern==='turret' || index===16) &&
           clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
-        hazards.push(enemyRound(position,direction));
+        const parryable=index===16 && foe.shotsFired++%3===0;
+        hazards.push(enemyRound(position,direction,parryable));
         foe.shotAt=clock+cadence/enemyTempo;
       }
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
@@ -1216,9 +1222,9 @@
     17:[165,'#dbf7ff'], // Snow Village frost pellet
     24:[245,'#ffe28e'] // Starship Cargo tracer
   };
-  function enemyRound(position,direction) {
+  function enemyRound(position,direction,parryable) {
     const [speed,color]=enemyRounds[index] || [180,'#ff8479'];
-    return {x:position.x+direction*12,y:position.y,v:direction*speed,life:2,parry:index===16,color};
+    return {x:position.x+direction*12,y:position.y,v:direction*speed,life:2,parry:parryable,color};
   }
   function foePosition(foe) {
     if(foe.bashed && clock<foe.bashed.until){
