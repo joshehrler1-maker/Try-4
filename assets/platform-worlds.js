@@ -422,3 +422,37 @@ for (const [index, stages] of Object.entries(remainingPawcadeRoutes)) {
   window.pawtopiaChapters[index] = stages.map(([title]) => title);
   window.pawtopiaSetPieces[index] = stages.map(([, feature]) => feature).join(' ');
 }
+
+// First-stage placement adjustments in Game Room order.
+// Entries are [platform, x, surface height, width]. Preserve surface behavior.
+const pawcadeOpeningPlacements = [
+  [1, 480, 290, 310],
+  [1, 399, 289, 231],
+  [1, 335, 239, 250],
+  [2, 610, 238, 440],
+  [1, 280, 259, 150],
+  [2, 900, 217, 260],
+  [1, 685, 278, 305],
+  [2, 1670, 326, 530],
+  [1, 465, 286, 40],
+  [5, 545, 125, 165],
+  [2, 925, 232, 270],
+  [3, 1030, 189, 230],
+  [1, 555, 293, 265],
+  [1, 325, 269, 165],
+  [2, 922, 244, 298],
+  [3, 1255, 180, 335],
+  [1, 530, 265, 220],
+  [2, 895, 240, 275],
+  [3, 1175, 282, 295],
+  [1, 315, 276, 220],
+  [2, 813, 232, 447],
+  [1, 562, 293, 268],
+  [1, 447, 297, 218],
+  [2, 960, 250, 315],
+  [1, 360, 271, 235]
+];
+pawcadeOpeningPlacements.forEach(([platform, x, y, width], index) => {
+  const room = window.pawtopiaRoomPlans[index].split(' ')[0];
+  window.pawtopiaRooms[room][platform].splice(0, 3, x, y, width);
+});
