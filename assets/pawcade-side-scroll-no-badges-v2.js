@@ -1923,6 +1923,31 @@
       return {x:patrolX(foe.x+wave*enemyReach*.9),
         y:foe.y-18-Math.sin(t*2.4)*enemyRise*.6};
     }
+    if(index===14){ // Inverted Observatory: alternating gravity orbit
+      const gravity=Math.sin(t*.95);
+      return {x:patrolX(foe.x+Math.cos(t*1.2)*enemyReach*.6),
+        y:foe.y-gravity*enemyRise*.9};
+    }
+    if(index===17){ // Snow Village: short icy slides with recovery
+      const slide=Math.sin(t*.8);
+      return {x:patrolX(foe.x+Math.sign(slide)*Math.abs(slide)**2*enemyReach),
+        y:foe.y};
+    }
+    if(index===18){ // Canyon Crossing: patrol at rope-bridge crossings
+      const patrol=Math.sin(t*.9);
+      return {x:patrolX(foe.x+patrol*enemyReach*.75),
+        y:foe.y-Math.max(0,Math.sin(t*1.8))*enemyRise*.3};
+    }
+    if(index===20){ // Neon Circuit: burst sprint then braking phase
+      const sprint=Math.sin(t*1.55);
+      return {x:patrolX(foe.x+Math.sign(sprint)*Math.abs(sprint)**.55*enemyReach),
+        y:foe.y};
+    }
+    if(index===22){ // Swamp Ferry: hopping between reeds
+      const hop=Math.max(0,Math.sin(t*2.4));
+      return {x:patrolX(foe.x+wave*enemyReach*.65),
+        y:foe.y-hop*enemyRise*.95};
+    }
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
       case 'charge': return {x:patrolX(foe.x+chase*Math.max(0,wave)*enemyReach),y:foe.y};
