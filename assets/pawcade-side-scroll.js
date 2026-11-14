@@ -1025,6 +1025,9 @@
         }
         if ((p.vy>65 && oldY<position.y-17) || (power==='dash' && p.power>.22)) {
           foe.dead=true;
+          if(index===12 && p.pogo && !reducedMotion){
+            burst(position.x,position.y-12,'#b8eeff',8);
+          }
           p.vy=p.pogo || (movement==='pogo' && held('jump')) ? -560 :
             index===0 && held('jump') ? -440 : -320;
           p.pogo=false;p.on=false;
