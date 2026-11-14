@@ -65,7 +65,7 @@
   };
   const movementGuide = {
     buster:'Tap Fire to shoot, or hold and release to charge. Jump again while sliding against a wall to kick off.', roll:'Roll through enemies with Action.',
-    float:index===6?'Hold Float (X on keyboard) to rise. Release it to descend.':'Hold Action to float.', beat:'You run automatically. Jump over the beat barriers and use Action to pulse.',
+    float:index===6?'Hold Float (X on keyboard) to rise. Release it to descend.':'Hold Action to float.', beat:'You run automatically. Jump over the beat barriers and press Pulse (X on keyboard) in the gold timing zones.',
     airdash:'Press Dash in midair. Steer up or down to aim it, and jump against walls to kick off.',
     pogo:'Hold Jump while stomping to bounce higher.',
     precision:'Jump from ledge edges to clear wider gaps.',
@@ -167,6 +167,7 @@
   if (movement==='airdash') powerButton.textContent='Dash';
   const techniqueButton = document.querySelector('[data-control=technique]');
   if (techniqueButton) techniqueButton.textContent = techniqueName;
+  if(index===8 && movement==='beat') powerButton.textContent='Pulse';
   if(index===2) powerButton.textContent='Charge';
   if(index===7 && power==='flip') powerButton.textContent='Flip';
   if(index===6 && power==='bubble') powerButton.textContent='Float';
@@ -567,7 +568,7 @@
       }
     }
     if (power === 'throw' || power === 'pulse' || power === 'photo') {
-      const onBeat = clock % .65 < .2 || clock % .65 > .52;
+      const onBeat = isOnBeat(clock % beatPeriod);
       const speed = movement==='whip' ? 240 : power==='throw' ? 700 : 400;
       const life = movement==='whip' ? .24 : movement==='beat' && onBeat ? .72 : power==='throw' ? .8 : .36;
       attacks.push({x:player.x,y:player.y,v:player.facing*speed,life});
@@ -2307,6 +2308,29 @@
     }
     ctx.restore();
   }
+  const beatPeriod = .65;
+  const isOnBeat = position => position < .2 || position > .52;
+  function drawBeatMeter() {
+    if(index!==8 || movement!=='beat' || phase!=='playing') return;
+    const position=clock%beatPeriod;
+    const x=20,y=27,w=110;
+    ctx.save();
+    ctx.fillStyle='#211332';
+    ctx.fillRect(x-7,y-19,w+14,37);
+    ctx.font='bold 11px system-ui';
+    ctx.fillStyle=isOnBeat(position)?'#ffe3a0':'#fff';
+    ctx.fillText(isOnBeat(position)?'PULSE NOW':'FIND THE BEAT',x,y-4);
+    ctx.fillStyle='#634164';
+    ctx.fillRect(x,y,w,8);
+    ctx.fillStyle='#ffc779';
+    ctx.fillRect(x,y,w*.2/beatPeriod,8);
+    ctx.fillRect(x+w*.52/beatPeriod,y,w*(beatPeriod-.52)/beatPeriod,8);
+    if(!reducedMotion){
+      ctx.fillStyle='#fff';
+      ctx.fillRect(x+w*position/beatPeriod-1,y-2,2,12);
+    }
+    ctx.restore();
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -2983,6 +3007,7 @@
       ctx.fillText(phase==='paused'?'Paused':name,width/2,165);
       ctx.font='18px system-ui';ctx.fillText(phase==='paused'?'Resume when ready':opening,width/2,206);
     }
+    drawBeatMeter();
   }
   const tick = 1/120;
   let accumulator = 0;
