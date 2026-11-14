@@ -3572,8 +3572,10 @@
       // Secondary silhouettes add readable depth to the actual scrolling
       // stages. World-specific motifs are deterministic and screen-cullable;
       // no sprites, collisions, or copyrighted reference artwork are reused.
-      const motif=(tile+index*3)%4;
-      const cx=x+spacing*(.32+motif*.09);
+      // Each course has its own deterministic silhouette rhythm; avoid
+      // identical prop positions when two worlds share a terrain family.
+      const motif=(tile*(1+index%3)+index*3)%4;
+      const cx=x+spacing*(.24+motif*.11);
       ctx.save();
       ctx.globalAlpha=opacity*.58;
       ctx.strokeStyle=rim;
@@ -3583,9 +3585,17 @@
         // Foundries, observatories, factories and starships: vents and braces.
         const towerY=top+32+motif*6;
         ctx.moveTo(cx,towerY);ctx.lineTo(cx,baseline-10);
-        ctx.moveTo(cx-12,towerY+8);ctx.lineTo(cx+12,towerY+8);
-        ctx.moveTo(cx-9,towerY+8);ctx.lineTo(cx+9,towerY+22);
-        ctx.moveTo(cx+9,towerY+8);ctx.lineTo(cx-9,towerY+22);
+        const arm=8+(index%5)*2;
+        ctx.moveTo(cx-arm,towerY+8);ctx.lineTo(cx+arm,towerY+8);
+        if(index%2===0){
+          ctx.moveTo(cx-arm+3,towerY+8);ctx.lineTo(cx+arm-3,towerY+22);
+          ctx.moveTo(cx+arm-3,towerY+8);ctx.lineTo(cx-arm+3,towerY+22);
+        }else{
+          // Alternate machine worlds use upright conduits rather than
+          // repeating the Foundry's cross-braced silhouette.
+          ctx.moveTo(cx-arm+3,towerY+8);ctx.lineTo(cx-arm+3,towerY+25);
+          ctx.moveTo(cx+arm-3,towerY+8);ctx.lineTo(cx+arm-3,towerY+25);
+        }
       }else if(sceneryShapes[index]==='grove'){
         // Forest and garden courses: layered branch canopies.
         const stem=top+35+motif*4;
