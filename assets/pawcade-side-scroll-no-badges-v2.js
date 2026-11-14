@@ -4584,6 +4584,17 @@
       [.9,.8,1.4,1.35]
     ];
     const [strideScale,armScale,kneeScale,massScale]=enemyRigProfiles[index];
+    // Reference-inspired animation families: fast ground threats emphasize
+    // acceleration, shooters brace their arms, underwater foes paddle, and
+    // aerial foes tuck their legs. All remain original game artwork.
+    const speedWorld=[3,8,20].includes(index);
+    const waterWorld=[2,19].includes(index);
+    const aerialWorld=[5,6,10,15,23].includes(index);
+    const combatWorld=[0,4,12,16,21,24].includes(index);
+    const chapterWeight=1+Math.min(5,Math.max(0,chapter))*.045;
+    const poseStride=strideScale*(speedWorld?1.22:waterWorld?.55:1);
+    const poseArm=armScale*(combatWorld?1.22:waterWorld?1.4:1);
+    const poseKnee=kneeScale*(aerialWorld?.55:1);
     const mechanical=[4,12,16,20,24].includes(index);
     const swimmer=[2,19].includes(index);
     const radius=(mechanical?5.4:4.3)*massScale;
@@ -4596,9 +4607,9 @@
     // distinct enemy face, armor, silhouette, and hitbox.
     for(const side of [-1,1]){
       const hip=at.x+side*13,shoulder=at.x+side*20;
-      const legSwing=airborne?Math.sin(clock*5+side)*5:swing*side*9*strideScale;
+      const legSwing=airborne?Math.sin(clock*5+side)*5:swing*side*9*poseStride*chapterWeight;
       const kneeX=hip+legSwing*.65;
-      const kneeY=at.y+4+(airborne?-5:Math.abs(swing)*2*kneeScale);
+      const kneeY=at.y+4+(airborne?-5:Math.abs(swing)*2*poseKnee);
       const footX=kneeX+legSwing*.45+dir*3;
       const footY=at.y+18-(airborne?7:Math.max(0,side*swing)*5);
       ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
@@ -4606,7 +4617,7 @@
       ctx.strokeStyle=armor;ctx.lineWidth=radius;
       ctx.beginPath();ctx.moveTo(hip,at.y-6);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
       ctx.fillStyle=paw;ctx.beginPath();ctx.ellipse(footX+dir*2,footY,6,3.3,0,0,Math.PI*2);ctx.fill();
-      const armSwing=airborne?Math.sin(clock*6+side)*7:-side*swing*8*armScale;
+      const armSwing=airborne?Math.sin(clock*6+side)*7:-side*swing*8*poseArm*chapterWeight;
       const elbowX=shoulder+armSwing*.6+dir*reach*7;
       const elbowY=at.y-18+Math.abs(armSwing)*.3-reach*4;
       const handX=elbowX+armSwing*.5+dir*reach*13;
