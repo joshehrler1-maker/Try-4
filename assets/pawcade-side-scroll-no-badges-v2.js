@@ -7603,12 +7603,26 @@
         drawMotionAccessory(at.x-trim.facing*14,at.y-4,trim.facing,
           trim.angle,9+index%5*2+trim.weight*4,courseMaterials[index][1],trim.weight<.02?0:trim.weight*.95);
       }
-      drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
+      // Games 21–25 use their own original, simulation-driven enemy
+      // silhouettes in the playable canvas, not the generic enemy atlas.
+      // If the free optional rig module fails to load, keep the old sprite
+      // and articulated limbs so gameplay never depends on this art upgrade.
+      const lateWorldRig = index>=20 && index<=24 &&
+        typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
+      if(!lateWorldRig) drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing,attackPose);
       else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft,attackPose);
       else if(foe.clockEnemy!==undefined) drawClockEnemy(at,foe,faceLeft,attackPose);
       else if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
+      else if(lateWorldRig && window.pawtopiaLateEnemyRigs.draw(
+        ctx,index,at,foe,{
+          faceLeft,stride:movingWeight,attack:attackPose,
+          recoil,landing:landingPose,clock,reduced:reducedMotion
+        })) {
+        // Each late-world enemy's hinged parts now follow the game's actual
+        // gait and projectile timing; physics and hitboxes remain untouched.
+      }
       else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
