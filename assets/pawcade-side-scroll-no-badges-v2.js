@@ -1948,7 +1948,7 @@
       } else if(!inside && p.inPrism){
         p.inPrism=false;
         p.dashUsed=false;
-        p.power=0;
+        status('Dash recharged.');
         burst(p.x,p.y,'#82ffe6',10);
         playCue(550,880);
       }
