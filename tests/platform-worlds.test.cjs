@@ -519,6 +519,7 @@ test('enemy motion lab previews real gameplay rigs without mislabeling them 3D',
   assert.match(lab,/not<\/strong> final 3D models|not<\/strong> final 3D/i,
     'concept preview must not call vector rigs film-level 3D');
   for(const moduleName of [
+    'origin-world-enemy-rigs-v1.js',
     'five-world-enemy-rigs-v1.js',
     'cloud-trail-enemy-rigs-v1.js',
     'mid-world-enemy-rigs-v1.js',
