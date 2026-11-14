@@ -1146,6 +1146,9 @@
       player.vx = player.facing * (movement==='roll'?460:660);
       if (movement==='airdash') {
         player.dashUsed=true;
+        player.wallLock=0;
+        player.jumpCut=false;
+        player.coyote=0;
         const dx=Number(held('right'))-Number(held('left'));
         const dy=Number(held('down'))-Number(held('up'));
         const length=Math.hypot(dx,dy)||1;
