@@ -3513,6 +3513,12 @@
     shade.addColorStop(0,face);
     shade.addColorStop(.88,recess);
     ctx.fillStyle=shade;
+    // One directional light ramp per scenery layer instead of allocating
+    // a new canvas gradient for every background tile every frame.
+    const reflected=ctx.createLinearGradient(0,baseline-145,spacing,baseline);
+    reflected.addColorStop(0,'rgba(255,247,213,.17)');
+    reflected.addColorStop(.5,'rgba(255,247,213,.025)');
+    reflected.addColorStop(1,'rgba(8,13,30,.12)');
     ctx.strokeStyle=rim;
     ctx.lineWidth=1;
     for(let tile=first;tile<=first+Math.ceil(width/spacing)+2;tile++) {
@@ -3557,10 +3563,6 @@
       // rather than drawing a disconnected line over the backdrop.
       ctx.save();
       ctx.clip();
-      const reflected=ctx.createLinearGradient(x,top,x+spacing,baseline);
-      reflected.addColorStop(0,'rgba(255,247,213,.17)');
-      reflected.addColorStop(.5,'rgba(255,247,213,.025)');
-      reflected.addColorStop(1,'rgba(8,13,30,.12)');
       ctx.fillStyle=reflected;
       ctx.fillRect(x,top,spacing,baseline-top);
       ctx.restore();
