@@ -278,18 +278,22 @@ test('five late-game enemy rigs render distinct simulation-driven poses safely',
     'outside game 21–25 must keep its existing enemy art');
 });
 
-test('defeated late-world enemies retain only a short visual after their hitboxes vanish', () => {
+test('defeated mid- and late-world enemies retain only a short visual after hitboxes vanish', () => {
   const runtime=fs.readFileSync(path.join(__dirname,
     '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
   const helper=runtime.match(/  function markFoeDefeated\(foe\) \{[\s\S]*?\n  \}/)?.[0];
   assert.ok(helper,'missing visual-only defeat helper');
   const registry=JSON.parse(fs.readFileSync(path.join(__dirname,
     '../assets/enemy-art-motion-registry.json'),'utf8'));
-  for(let game=20;game<25;game++){
+  for(let game=15;game<25;game++){
     const enemyFamily=registry.games[game];
     assert.match(enemyFamily.implementationStatus,/partial/i,
       'do not label incomplete 3D enemy clips finished');
     const context={index:game,reducedMotion:false,clock:12.25,
+      window:{
+        pawtopiaMidEnemyRigs:{draw:()=>true},
+        pawtopiaLateEnemyRigs:{draw:()=>true}
+      },
       foePosition:foe=>({x:foe.x+11,y:foe.y+5}),foe:{x:200,y:275,dead:false}};
     vm.runInNewContext(helper+'\nmarkFoeDefeated(foe);',context,{timeout:1000});
     assert.equal(context.foe.dead,true,'defeated enemy must lose hitbox immediately');
@@ -299,9 +303,14 @@ test('defeated late-world enemies retain only a short visual after their hitboxe
     assert.match(runtime,/age>=\.42/,'defeat visuals must expire');
   }
   const contexts=[
-    {index:19,reducedMotion:false,clock:10,foePosition:()=>({x:1,y:2}),foe:{dead:false}},
+    {index:14,reducedMotion:false,clock:10,foePosition:()=>({x:1,y:2}),foe:{dead:false}},
+    {index:19,reducedMotion:true,clock:10,foePosition:()=>({x:1,y:2}),foe:{dead:false}},
     {index:21,reducedMotion:true,clock:10,foePosition:()=>({x:1,y:2}),foe:{dead:false}}
   ];
+  for(const context of contexts)context.window={
+    pawtopiaMidEnemyRigs:{draw:()=>true},
+    pawtopiaLateEnemyRigs:{draw:()=>true}
+  };
   for(const context of contexts){
     vm.runInNewContext(helper+'\nmarkFoeDefeated(foe);',context,{timeout:1000});
     assert.equal(context.foe.dead,true);
