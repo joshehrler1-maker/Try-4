@@ -58,7 +58,7 @@
   const descriptions = {
     stomp:'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim. Surface or visit a bubbling vent for air',
     dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
-    throw:'Press Action to throw a crystal', flip:'Press Action to reverse gravity',
+    throw:'Press Action to throw a crystal', flip:index===7?'Press Flip (X or Space on keyboard) while on the floor or ceiling to reverse gravity':'Press Action to reverse gravity',
     pulse:'Press Action to release a shockwave', grapple:'Press Action below an overhead rail to attach. Steer to swing, then press Release Cable to let go',
     double:'Jump again in midair', shield:'Hold Action to deflect hazards',
     photo:'Press Action to stun enemies with a flash', bubble:'Hold Action to float'
@@ -168,6 +168,7 @@
   const techniqueButton = document.querySelector('[data-control=technique]');
   if (techniqueButton) techniqueButton.textContent = techniqueName;
   if(index===2) powerButton.textContent='Charge';
+  if(index===7 && power==='flip') powerButton.textContent='Flip';
   if(index===6 && power==='bubble') powerButton.textContent='Float';
   powerButton.hidden = power === 'stomp' || power === 'double' || (power === 'swim' && index!==2) || power === 'glide';
   byId('side-player').hidden = false;
@@ -531,6 +532,7 @@
     }
     if (movement==='airdash' && player.dashUsed) return;
     if (phase !== 'playing' || player.power > 0 || (movement==='airdash' && player.on)) return;
+    if (index===7 && power==='flip' && !player.on) return;
     player.power = movement==='buster' || movement==='shooter' ? .24 : .48;
     if (power === 'dash') {
       player.vx = player.facing * (movement==='roll'?460:660);
