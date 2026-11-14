@@ -3757,9 +3757,12 @@
     const [basePlates,radius,depth]=enemyArmorStyles[index];
     // Encounter archetypes alter silhouettes as well as patrol behavior.
     const variantPlate=[0,1,0,2][foe.archetype??0];
+    // Use the foe's home chapter, so a camera crossing a stage boundary
+    // never changes an existing enemy's armor in the middle of combat.
+    const armorChapter=foe.spawnChapter??chapter;
     // Later chapters introduce an extra armor segment, with a different
     // arrangement for each world; this is visual, not extra hit points.
-    const plates=basePlates+variantPlate+(chapter>=3?1:0);
+    const plates=basePlates+variantPlate+(armorChapter>=3?1:0);
     ctx.save();
     ctx.translate(at.x,at.y-17);
     ctx.scale(faceLeft?-1:1,1);
