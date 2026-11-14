@@ -1274,6 +1274,12 @@
   }
   const close = (a,b,x,y) => Math.abs(a.x-b.x)<x && Math.abs(a.y-b.y)<y;
   const floatHasLift = p => power==='bubble' && held('action') && p.y>55;
+  function wallBlocksShot(fromX, toX, y) {
+    if (y >= ground) return false;
+    const left = Math.min(fromX, toX);
+    const right = Math.max(fromX, toX);
+    return walls.some(wall => y >= wall.top && left <= wall.x+20 && right >= wall.x);
+  }
   function step(dt) {
     clock += dt;
     chapterReveal=Math.max(0,chapterReveal-dt);
@@ -1680,7 +1686,9 @@
     }
     attacks = attacks.filter(a => a.life>0);
     for (const shot of hazards) {
-      shot.x+=shot.v*dt;
+      const nextX=shot.x+shot.v*dt;
+      if(wallBlocksShot(shot.x,nextX,shot.y)){shot.life=0;continue;}
+      shot.x=nextX;
       shot.life-=dt;
       if (shot.life>0 && close(p,shot,18,22)) {shot.life=0;if (hit()) return;}
     }
@@ -1706,13 +1714,13 @@
       const direction=Math.sign(p.x-position.x);
       const canFire=(foe.turret || foe.clockEnemy>=3 || enemyPattern==='turret' || index===16) &&
         clock>=foe.shotAt && inLane && inRange && direction;
-      const shotBlocked=canFire && platforms.some(ledge=>
+      const shotBlocked=canFire && (wallBlocksShot(position.x,p.x,position.y) || platforms.some(ledge=>
         ['floor','shelf','ceiling'].includes(ledge.kind) &&
         ledge.x<Math.max(position.x,p.x) &&
         ledge.x+ledge.w>Math.min(position.x,p.x) &&
         ledge.y<Math.max(position.y,p.y)-6 &&
         ledge.y+17>Math.min(position.y,p.y)+6
-      );
+      ));
       if (canFire && !shotBlocked) {
         // Count all enemy shots consistently; the Steamworks parry cycle
         // continues to mark every third shot as parryable.
