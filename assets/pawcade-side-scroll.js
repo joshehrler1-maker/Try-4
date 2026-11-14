@@ -2449,6 +2449,48 @@
           ctx.beginPath();ctx.arc(x+136+puff*10+drift,boilerY-78-puff*17-rise,13+puff*4,0,Math.PI*2);ctx.fill();
         }
         ctx.globalAlpha=1;
+
+        // Each chapter has its own factory machinery and silhouette.
+        const chapterIndex=Math.min(sections-1,Math.max(0,Math.floor((camera+width/2)/sectionSize)));
+        const machineX=x+190;
+        const machineY=262+variation*5;
+        ctx.save();
+        ctx.translate(machineX,machineY);
+        ctx.strokeStyle='#543b3c';
+        ctx.fillStyle='#bd8054';
+        ctx.lineWidth=5;
+        switch(chapterIndex){
+          case 0: // Intake valve
+            ctx.fillRect(-20,0,40,56);
+            ctx.beginPath();ctx.arc(0,-12,23,0,Math.PI*2);ctx.stroke();
+            ctx.beginPath();ctx.moveTo(-20,-12);ctx.lineTo(20,-12);
+            ctx.moveTo(0,-32);ctx.lineTo(0,8);ctx.stroke();
+            break;
+          case 1: // Cooling radiator
+            for(let fin=-2;fin<=2;fin++) ctx.fillRect(fin*10-3,-34,7,80);
+            ctx.strokeRect(-28,-38,56,87);
+            break;
+          case 2: // Crank assembly
+            ctx.beginPath();ctx.arc(0,0,26,0,Math.PI*2);ctx.fill();ctx.stroke();
+            ctx.beginPath();ctx.moveTo(-9,-9);ctx.lineTo(18,28);ctx.lineTo(29,48);ctx.stroke();
+            break;
+          case 3: // Hydraulic press
+            ctx.strokeRect(-27,-44,54,94);
+            ctx.fillRect(-7,-42,14,44);
+            ctx.fillRect(-21,0,42,10);
+            break;
+          case 4: // Condensate tank
+            ctx.beginPath();ctx.ellipse(0,3,27,36,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+            ctx.fillStyle='#b7d4cf';ctx.fillRect(-7,-15,14,34);
+            break;
+          case 5: // Main pressure gauge
+            ctx.beginPath();ctx.arc(0,-5,27,0,Math.PI*2);ctx.fill();ctx.stroke();
+            ctx.fillStyle='#ead2a3';
+            ctx.beginPath();ctx.arc(0,-5,20,0,Math.PI*2);ctx.fill();
+            ctx.beginPath();ctx.moveTo(0,-5);ctx.lineTo(11,-16);ctx.stroke();
+            break;
+        }
+        ctx.restore();
       }else if(index===17){
         // Snow Village: pitched snow roofs, warm windows and frosted pines.
         const roofY=151+variation*11;
