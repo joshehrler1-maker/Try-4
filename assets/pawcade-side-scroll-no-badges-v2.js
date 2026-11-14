@@ -1240,8 +1240,10 @@
     player.chargeStart=null;
     if (fire && phase==='playing') {
       playCue(charged?610:420,charged?160:245,charged?.21:.09);
+      const facing=(Number(held('right'))-Number(held('left')))||player.facing;
+      player.blasterRecoil={time:clock,facing,charged};
       attacks.push({
-      x:player.x,y:player.y,v:((Number(held('right'))-Number(held('left')))||player.facing)*(charged?850:680),life:.85,radius:charged?22:8,damage:charged?2:1,blasterShot:true
+      x:player.x,y:player.y,v:facing*(charged?850:680),life:.85,radius:charged?22:8,damage:charged?2:1,blasterShot:true
       });
     }
   }
@@ -6231,7 +6233,7 @@
       ctx.stroke();
       ctx.restore();
     }
-    if(index===1 && (p.chargeStart!==null || p.power>.13)){
+    if(index===1 && (p.chargeStart!==null || blasterFiring || p.power>.13)){
       ctx.save();
       ctx.translate(p.x,p.y-7);
       ctx.scale(p.facing,1);
@@ -6283,7 +6285,9 @@
       for(let i=1;i<=3;i++) ctx.fillRect(p.x-p.facing*(22+i*12),p.y-9+i*4,12,2);
     }
     const light=['Luna','Ivy','Frost','Melody','Spark'].includes(hero);
-    const attacking=p.power>.22 && power!=='dash';
+    const blasterAge=clock-(p.blasterRecoil?.time??-Infinity);
+    const blasterFiring=index===1 && blasterAge>=0 && blasterAge<.24;
+    const attacking=blasterFiring || (p.power>.22 && power!=='dash');
     const rolling=(index===3 && (p.spin>0 || p.power>.22 || p.spinJump)) || (movement==='roll' && p.power>.22);
     const rushing=p.grapple>0 || (power==='dash' && p.power>.22);
     const braking=p.on && Math.abs(p.vx)>runSpeed*.42 &&
@@ -6376,6 +6380,18 @@
       } else if(rushing){
         tilt=-p.facing*(movement==='airdash'?.34:.22);
         scaleX=1.12;scaleY=.88;
+      } else if(blasterFiring){
+        const recoil=(1-blasterAge/.24)**2;
+        tilt=-p.blasterRecoil.facing*recoil*(p.blasterRecoil.charged?.23:.12);
+        scaleY=1-recoil*.08;
+      } else if((index===12 || index===22) && p.pogo){
+        tilt=p.facing*.06;
+        scaleX=.91;
+        scaleY=1.16;
+      } else if(index===18 && p.ledgeGrip){
+        tilt=(p.ledgeGrip.left?1:-1)*.16;
+        scaleX=.94;
+        scaleY=1.1;
       } else if(attacking){
         const strike=Math.sin(clock*22);
         tilt=p.facing*(.11+strike*.16);
