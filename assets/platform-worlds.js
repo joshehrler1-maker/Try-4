@@ -1047,3 +1047,6 @@ window.pawtopiaRooms.eggDonuts = [[0,326,385],[415,284,164,"drop"],[604,251,150,
 
 // Stilt Patrol climbs above its floor route before descending to the exit.
 window.pawtopiaRooms.eggStilts = [[0,326,2200],[350,282,245],[651,236,228],[935,189,260],[1252,144,236],[1544,203,232],[1830,268,225]];
+
+// Falling Rock Ravine gives the floor hazard an elevated bypass.
+window.pawtopiaRooms.eggRavine = [[0,326,485],[536,292,277],[862,253,281],[1194,280,315],[1560,326,640],[1740,250,150],[1850,286,55,"hazard"],[1940,266,135]];
