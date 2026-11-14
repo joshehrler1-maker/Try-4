@@ -4034,6 +4034,22 @@
     }
     ctx.restore();
   }
+  const platformTopPalettes=[
+        ['#ffc17e','#704054'],['#d8c6fa','#64518b'],['#91e7e0','#357e98'],
+        ['#f6c26d','#765777'],['#c9e99a','#628b56'],['#c7efff','#528cae'],
+        ['#ffdfb3','#ad6c98'],['#d2b8ff','#624a9e'],['#f8d681','#8c5876'],
+        ['#e4b88b','#82604f'],['#f3d3a2','#aa775c'],['#d4efff','#6687bc'],
+        ['#e9c78d','#72678a'],['#e3b66d','#947e56'],['#b1baf7','#5968a0'],
+        ['#b5e9ca','#4c866f'],['#ffd7b2','#8d5365'],['#e7f4ff','#7795b7'],
+        ['#efc28f','#a2745c'],['#85d7e7','#44768b'],['#f7c78a','#886d76'],
+        ['#d5d0f0','#77719f'],['#a9db9a','#5b8a70'],['#ffe39c','#ac8d56'],
+        ['#a4d8ee','#577e9d']
+      ];
+  const platformTopPatterns=['rivets','inlay','ripples','speed','grain','spray',
+        'lantern','polarity','pulse','bolts','sails','cloud','forge',
+        'leaves','circuit','bamboo','vents','frost','stone','current',
+        'rails','mosaic','reeds','petals','hull'];
+
   function drawPlatformAccents({x,y,w,kind}) {
     if(w<34 || kind==='hazard' || kind==='ceilingSpikes') return;
     // Camera-cull detail work before creating gradients, clipping paths,
@@ -4048,22 +4064,33 @@
     const surfaceEnd=Math.min(x+w,camera+width+20);
     if(surfaceEnd>surfaceStart){
       const span=surfaceEnd-surfaceStart;
-      const palette=[
-        ['#ffc17e','#704054'],['#d8c6fa','#64518b'],['#91e7e0','#357e98'],
-        ['#f6c26d','#765777'],['#c9e99a','#628b56'],['#c7efff','#528cae'],
-        ['#ffdfb3','#ad6c98'],['#d2b8ff','#624a9e'],['#f8d681','#8c5876'],
-        ['#e4b88b','#82604f'],['#f3d3a2','#aa775c'],['#d4efff','#6687bc'],
-        ['#e9c78d','#72678a'],['#e3b66d','#947e56'],['#b1baf7','#5968a0'],
-        ['#b5e9ca','#4c866f'],['#ffd7b2','#8d5365'],['#e7f4ff','#7795b7'],
-        ['#efc28f','#a2745c'],['#85d7e7','#44768b'],['#f7c78a','#886d76'],
-        ['#d5d0f0','#77719f'],['#a9db9a','#5b8a70'],['#ffe39c','#ac8d56'],
-        ['#a4d8ee','#577e9d']
-      ][index]||['#ddd','#777'];
-      const pattern=['rivets','inlay','ripples','speed','grain','spray',
-        'lantern','polarity','pulse','bolts','sails','cloud','forge',
-        'leaves','circuit','bamboo','vents','frost','stone','current',
-        'rails','mosaic','reeds','petals','hull'][index]||'inlay';
+      const palette=platformTopPalettes[index]||platformTopPalettes[0];
+      const pattern=platformTopPatterns[index]||'inlay';
       ctx.save();
+      // A visible fascia gives ordinary ground decks a physical thickness,
+      // while keeping the existing collision surface and walkable y intact.
+      // Ember Foundry already has its own authored heavy-metal fascia.
+      if(kind==='floor' && index!==0){
+        const depth=10+index%4*2;
+        ctx.fillStyle=palette[1];
+        ctx.fillRect(surfaceStart,y+5,span,depth);
+        ctx.fillStyle='rgba(0,0,0,.25)';
+        ctx.fillRect(surfaceStart,y+5+depth-2,span,2);
+        ctx.fillStyle=palette[0];
+        ctx.globalAlpha=.4;
+        ctx.fillRect(surfaceStart,y+5,span,2);
+        ctx.globalAlpha=1;
+        if(x>=camera-20 && x<=camera+width+20){
+          ctx.strokeStyle=palette[1];ctx.lineWidth=1.5;
+          ctx.beginPath();ctx.moveTo(x+5,y-7);
+          ctx.lineTo(x,y+5);ctx.lineTo(x,y+5+depth);ctx.stroke();
+        }
+        if(x+w>=camera-20 && x+w<=camera+width+20){
+          ctx.strokeStyle=palette[1];ctx.lineWidth=1.5;
+          ctx.beginPath();ctx.moveTo(x+w-5,y-7);
+          ctx.lineTo(x+w,y+5);ctx.lineTo(x+w,y+5+depth);ctx.stroke();
+        }
+      }
       // Two-tone beveled top, consistent readable walking edge.
       ctx.fillStyle=palette[1];ctx.fillRect(surfaceStart,y-7,span,7);
       ctx.fillStyle=palette[0];ctx.fillRect(surfaceStart,y-7,span,3);
