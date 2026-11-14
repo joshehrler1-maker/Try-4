@@ -2802,13 +2802,17 @@
       if(ledge.switchBridge && !amberSwitch) continue;
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
       const foundryStage=index===0 ? Math.floor(ledge.x/sectionSize) : -1;
-      if(foundryStage>=6 && foundryStage<=9 && ['floor','lift','spring','belt'].includes(ledge.kind)){
+      if(foundryStage>=6 && foundryStage<=17 && ['floor','lift','spring','belt','current'].includes(ledge.kind)){
         const {x,y,w,kind}=ledge;
         const floodgate=foundryStage===7;
         const depth=y>=ground?height-y:23;
         const colors={
           6:['#673b35','#e9a065'],7:['#28515c','#85c9bf'],
-          8:['#57354e','#e9a1ad'],9:['#344541','#dfc267']
+          8:['#57354e','#e9a1ad'],9:['#344541','#dfc267'],
+          10:['#714034','#ffbe82'],11:['#573f35','#ddbb8e'],
+          12:['#693846','#ffa787'],13:['#515366','#c3c9de'],
+          14:['#54383d','#d2918c'],15:['#295457','#9ddbcc'],
+          16:['#553d53','#eac4d7'],17:['#62382e','#ffcf82']
         }[foundryStage];
         ctx.fillStyle=colors[0];
         ctx.fillRect(x,y,w,depth);
