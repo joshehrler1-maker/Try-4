@@ -212,3 +212,11 @@ a{color:#ffdb99}h1,h2{font-family:Georgia,serif;color:#ffe7b5}
 }
 
 #side-player .side-controls button[hidden]{display:none}
+
+#side-player .side-controls .side-action-buttons{
+  display:flex;flex:0 1 auto;flex-wrap:wrap;justify-content:flex-end;
+  align-items:center;gap:inherit;min-width:0;margin-left:auto;
+}
+#side-player .side-controls .side-action-buttons button{
+  flex:0 0 auto;max-width:100%;white-space:normal;overflow-wrap:anywhere;
+}
