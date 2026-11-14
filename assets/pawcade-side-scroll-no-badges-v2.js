@@ -1149,6 +1149,7 @@
       if (movement==='airdash') {
         player.dashUsed=true;
         player.wallLock=0;
+        player.jumpBuffer=0;
         player.jumpCut=false;
         player.coyote=0;
         const dx=Number(held('right'))-Number(held('left'));
@@ -1162,6 +1163,9 @@
       player.gravity *= -1;
       player.on = false;
       player.flipTime=clock;
+      player.coyote=0;
+      player.jumpBuffer=0;
+      player.jumpCut=false;
     }
     if (power === 'vine') {
       player.vy = -590;
@@ -2231,6 +2235,8 @@
           p.vy=p.pogo || (movement==='pogo' && held('jump')) ? -560 :
             index===0 && held('jump') ? -440 : -320;
           p.pogo=false;p.on=false;
+          p.jumpCut=false;
+          p.coyote=0;
         } else if (hit()) return;
       }
     }
@@ -2345,7 +2351,13 @@
       playCue(boss.health?180:330,boss.health?65:740,.19);
       burst(boss.x,boss.y,'#ffd08a',boss.health?12:22);
       if (attack) attack.life=0;
-      if (stomp) {p.vy=p.pogo?-510:-375;p.pogo=false;p.on=false;}
+      if (stomp) {
+        p.vy=p.pogo?-510:-375;
+        p.pogo=false;
+        p.on=false;
+        p.jumpCut=false;
+        p.coyote=0;
+      }
       if(rush) p.grace=Math.max(p.grace,.35);
       status(boss.health ? 'Baron Brasswhirl · '+boss.health+' hits left.' : 'Baron Brasswhirl defeated. '+finaleExitHint);
     } else if (close(p,boss,44,42)) hit();
