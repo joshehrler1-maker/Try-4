@@ -2213,8 +2213,8 @@
   // Original platform silhouettes for three distinct reference-inspired
   // worlds. All decorative elements remain outside the collision system.
   function drawSignaturePlatformArt(x,y,w,stage){
-    if(index>17 || w<70)return;
-    const interval=[90,115,130,105,112,124,120,108,88,102,132,116,106,122,118,104,110,126][index];
+    if(index>20 || w<70)return;
+    const interval=[90,115,130,105,112,124,120,108,88,102,132,116,106,122,118,104,110,126,116,94,100][index];
     const first=Math.max(0,Math.floor((camera-x)/interval)-1);
     const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
     ctx.save();ctx.lineJoin='round';
@@ -2445,6 +2445,44 @@
           ctx.beginPath();ctx.moveTo(px+side*16,y+5);
           ctx.lineTo(px+side*16-3,y+16);
           ctx.lineTo(px+side*16+3,y+5);ctx.fill();
+        }
+      }else if(index===18){
+        // Canyon Crossing: carved sandstone ledge blocks and climbing grips.
+        ctx.fillStyle='#a76c4d';ctx.strokeStyle='#f1bd86';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-25,y+4);ctx.lineTo(px+25,y+4);
+        ctx.lineTo(px+20,y+25);ctx.lineTo(px-18,y+25);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#724b42';ctx.lineWidth=2;
+        for(let k=-1;k<=1;k++){
+          ctx.beginPath();ctx.moveTo(px+k*13-5,y+13);
+          ctx.lineTo(px+k*13+4,y+13);ctx.stroke();
+        }
+        ctx.fillStyle='#f4d09e';
+        ctx.fillRect(px-4,y+17,8,3);
+      }else if(index===19){
+        // Submarine Dock: pressure-sealed metal braces and porthole lamps.
+        ctx.fillStyle='#34556b';ctx.strokeStyle='#86cfda';ctx.lineWidth=2.5;
+        ctx.beginPath();ctx.moveTo(px-27,y+4);ctx.lineTo(px+27,y+4);
+        ctx.lineTo(px+21,y+26);ctx.lineTo(px-21,y+26);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        ctx.fillStyle='#a7e9eb';ctx.beginPath();
+        ctx.arc(px,y+15,8,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#1f7188';ctx.beginPath();
+        ctx.arc(px,y+15,5,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#d7e8b2';
+        for(const side of [-1,1])ctx.fillRect(px+side*19-2,y+9,4,4);
+      }else if(index===20){
+        // Neon Circuit: angled speedway struts and pulsing circuit nodes.
+        ctx.fillStyle='#35365d';ctx.strokeStyle='#f48bc8';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-26,y+4);ctx.lineTo(px+26,y+4);
+        ctx.lineTo(px+16,y+24);ctx.lineTo(px-16,y+24);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#8ff5eb';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-17,y+10);ctx.lineTo(px-5,y+17);
+        ctx.lineTo(px+6,y+11);ctx.lineTo(px+17,y+19);ctx.stroke();
+        ctx.fillStyle='#ffe7a2';
+        for(const side of [-1,1]){
+          ctx.beginPath();ctx.arc(px+side*17,y+19,3,0,Math.PI*2);ctx.fill();
         }
       }else{
         // Coral Courier: fan-shaped reef ledges and layered shell supports.
