@@ -47,11 +47,11 @@ All 5 are **vector-painted concepts integrated as passive scene props**. They ar
 - 08 Crystal Polarity: Stage 1 prop integrated in Batch 2; Stage 2+ audit, 3D animation and movie pending.
 - 09 Stage Beat: Stage 1 prop integrated in Batch 2; Stage 2+ audit, 3D animation and movie pending.
 - 10 Quarry Rescue: Stage 1 prop integrated in Batch 2; Stage 2+ audit, 3D animation and movie pending.
-- 11 Sunset Wind Sail: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
-- 12 Cloud City: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
-- 13 Thunder Harbor: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
-- 14 Autumn Trail: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
-- 15 Inverted Observatory: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+- 11 Sunset Wind Sail: Stage 1 SVG landmark integrated in Batch 3; later-stage asset, collision audit and animated movie pending.
+- 12 Cloud City: Stage 1 SVG landmark integrated in Batch 3; later-stage asset, collision audit and animated movie pending.
+- 13 Thunder Harbor: Stage 1 SVG landmark integrated in Batch 3; later-stage asset, collision audit and animated movie pending.
+- 14 Autumn Trail: Stage 1 SVG landmark integrated in Batch 3; later-stage asset, collision audit and animated movie pending.
+- 15 Inverted Observatory: Stage 1 SVG landmark integrated in Batch 3; later-stage asset, collision audit and animated movie pending.
 - 16 Bamboo Village: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
 - 17 Steamworks: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
 - 18 Snow Village: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
@@ -62,6 +62,21 @@ All 5 are **vector-painted concepts integrated as passive scene props**. They ar
 - 23 Swamp Ferry: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
 - 24 Sunflower Flight: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
 - 25 Starship Cargo: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+
+
+## Batch 3 — five further game-specific Stage 1 set pieces (games 11–15)
+
+**Production classification:** original SVG scenery (vector illustration), not 3D geometry, rendered movie footage, collision shapes, or character animation. All assets use world rectangle x=590–770, y=156–326 (180×170 world pixels), pivot bottom-center (680,326), decorative/non-colliding world-depth art behind walls, tunnels and platform collision tops; passive draw when onscreen. Exact source paths:
+
+| Game | Stage | Counterpart mechanics | Asset path | Asset role | Repository verification |
+| --- | --- | --- | --- | --- | --- |
+| 11 Sunset Wind Sail | 1 Sunset Pier | Klonoa: Door to Phantomile — airlift/wind | `assets/scenes/sunset-wind-sail/sunset-pier-wind-sock.svg` | Sunset wind direction vane | SVG exists, path wired |
+| 12 Cloud City | 1 Cloud Ferry | Celeste — dash/checkpoint | `assets/scenes/cloud-city/cloud-ferry-beacon.svg` | Ferry arrival signal beacon | SVG exists, path wired |
+| 13 Thunder Harbor | 1 Breakwater | Shovel Knight — pogo/combat | `assets/scenes/thunder-harbor/breakwater-lightning-rod.svg` | Lightning conductor | SVG exists, path wired |
+| 14 Autumn Trail | 1 Feather Trail | Yoshi's Island — arced throws | `assets/scenes/autumn-trail/feather-trail-marker.svg` | Migration path waymarker | SVG exists, path wired |
+| 15 Inverted Observatory | 1 Lower Dome | Super Metroid — exploration | `assets/scenes/inverted-observatory/lower-dome-star-lens.svg` | Observatory star lens | SVG exists, path wired |
+
+**Integration commit:** `ab710080`. **Runtime version commit:** `b54fa5c2`. **Checks:** JavaScript parsed without syntax errors, each SVG checked for opening/closing tags, file retrieval successful, runtime selection and HTML asset-version reference present. **Not checked:** 3D appearance, actual visual rendering in a browser, live Pages asset delivery, platform alignment in Android landscape, FPS, enemy trigger/animation, stage clear, film output. Stage 2+ and movies for each of these five remain pending. No paid services used.
 
 ## Movie production ledger
 
