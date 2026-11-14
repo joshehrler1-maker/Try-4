@@ -1103,6 +1103,7 @@
     }
     const rollJump=index===4 && movement==='roll' && player.power>.22 && player.jumps===0;
     if (player.on || rollJump || player.coyote>0 || power === 'swim' || (power === 'double' && player.jumps < 2)) {
+      if(index===3 && player.power>.22) player.spinJump=true;
       player.vy = -jumpSpeed * jumpFactor * player.gravity;
       player.on = false;
       player.jumps++;
@@ -2044,6 +2045,7 @@
       }
     }
     if(landingSurface){
+      p.spinJump=false;
       const ledge=landingSurface;
       if(!wasGrounded && p.vy>190) {
         p.landingPose=.13;
@@ -2299,7 +2301,7 @@
     }
     // Distance-driven footfalls avoid the skating effect when movement is
     // blocked by a wall or platform. Update after collision resolution.
-    if(index===3 && (p.spin || p.power>.22)){
+    if(index===3 && (p.spin || p.power>.22 || p.spinJump)){
       const rotation=p.spin ? p.facing*(12+p.spin*3)*dt : (p.x-oldX)/15;
       p.spinAngle=((p.spinAngle||0)+rotation)%(Math.PI*2);
     }
@@ -6256,7 +6258,7 @@
     }
     const light=['Luna','Ivy','Frost','Melody','Spark'].includes(hero);
     const attacking=p.power>.22 && power!=='dash';
-    const rolling=(index===3 && (p.spin>0 || p.power>.22)) || (movement==='roll' && p.power>.22);
+    const rolling=(index===3 && (p.spin>0 || p.power>.22 || p.spinJump)) || (movement==='roll' && p.power>.22);
     const rushing=p.grapple>0 || (power==='dash' && p.power>.22);
     const braking=p.on && Math.abs(p.vx)>runSpeed*.42 &&
       ((p.vx>0 && held('left')) || (p.vx<0 && held('right')));
