@@ -2030,18 +2030,35 @@
         // Consume the buffered jump on the landing tick instead of
         // requiring the player to wait until the next simulation frame.
         p.jumpCut=false;
-        if (ledge.kind==='spring') p.jumpBuffer=0;
-        else if(p.jumpBuffer>0 && !p.pogo) jump(false);
-        if(p.pogo){p.vy=index===22 && held('technique')?-530:-410;p.pogo=false;p.on=false;p.jumpBuffer=0;p.coyote=0;}
+        const barrelLaunch=!p.pogo && ledge.kind==='barrel' && held('technique');
+        const pogoLaunch=!p.pogo && ledge.kind==='pogo' && (held('technique') || held('jump'));
+        const liftLaunch=!p.pogo && ledge.kind==='lift' && held('jump');
+        const springLaunch=ledge.kind==='spring';
+        if (springLaunch || p.pogo || barrelLaunch || pogoLaunch || liftLaunch) {
+          if (barrelLaunch) {
+            p.vx=p.facing*440;
+            p.grapple=.35;
+          }
+          if (springLaunch) {
+            p.vy=-565;
+            playSpring();
+          } else if (p.pogo) {
+            p.vy=index===22 && held('technique') ? -530 : -410;
+          } else {
+            p.vy=barrelLaunch ? -610 : pogoLaunch ? -590 : -560;
+          }
+          p.pogo=false;
+          p.on=false;
+          p.jumpBuffer=0;
+          p.coyote=0;
+        } else if (p.jumpBuffer>0) {
+          jump(false);
+        }
         landed = true;
         if(ledge.kind==='drop') ledge.dropAt ??= clock+.38;
         p.onIce=p.on && ledge.kind==='ice';
-        if(p.on && ledge.kind==='barrel' && held('technique')) {p.vx=p.facing*440;p.vy=-610;p.grapple=.35;p.on=false;}
-        if(p.on && ledge.kind==='pogo' && (held('technique') || held('jump'))) {p.vy=-590;p.on=false;}
-        if (ledge.kind === 'spring') {p.vy=-565;p.on=false;playSpring();}
         if (p.on && ledge.kind === 'belt') p.surfaceDrift=index===3 ? 120 : index===20 ? 95 : 75;
         if (p.on && ledge.kind === 'current' && index!==2) p.surfaceDrift=-65;
-        if (p.on && ledge.kind === 'lift' && held('jump')) {p.vy=-560;p.on=false;}
       }
     }
     if (power==='bubble' && p.y<48) {p.y=48;p.vy=0;}
