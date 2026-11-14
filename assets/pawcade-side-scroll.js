@@ -924,6 +924,16 @@
         } else if (index!==20) {phase='won';status(ending+'!');}
       }
     }
+    // Distance-driven footfalls avoid the skating effect when movement is
+    // blocked by a wall or platform. Update after collision resolution.
+    if(p.on && !p.morphed){
+      const traveled=Math.min(55,Math.abs(p.x-oldX));
+      p.gaitPhase=(p.gaitPhase||0)+traveled/15;
+      p.gaitWeight=Math.min(1,(p.gaitWeight||0)+dt*9);
+      if(traveled<.3)p.gaitWeight=Math.max(0,p.gaitWeight-dt*13);
+    } else {
+      p.gaitWeight=Math.max(0,(p.gaitWeight||0)-dt*12);
+    }
     const targetCamera=Math.max(0,Math.min(finish+70,p.x-238+Math.max(-72,Math.min(90,p.vx*.18))));
     camera+=(targetCamera-camera)*Math.min(1,dt*10);
   }
@@ -1809,10 +1819,10 @@
     // Secondary motion gives existing sprite poses some life without
     // altering collisions or gameplay timing.
     const stride=Math.min(1,Math.abs(p.vx)/Math.max(1,runSpeed));
-    const gait=clock*(6+stride*11);
+    const gait=p.gaitPhase||0;
     const breath=reducedMotion?0:Math.sin(clock*2.9)*.012;
     const footBob=reducedMotion||!p.on?0:
-      stride>.12 ? Math.abs(Math.sin(gait))*(1.2+stride*2.4) : Math.sin(clock*2.9)*.55;
+      stride>.12 ? Math.abs(Math.sin(gait))*(1.2+stride*2.4)*(p.gaitWeight||0) : Math.sin(clock*2.9)*.55;
     const bodySway=reducedMotion?0:
       p.on && stride>.12 ? Math.sin(gait)*stride*.035 : Math.sin(clock*1.8)*.008;
     if(p.gravity<0){
@@ -1877,8 +1887,8 @@
     const running=p.on && Math.abs(p.vx)>45 && !rolling && !rushing && !attacking && !braking;
     // Blend the existing two running poses continuously instead of snapping
     // abruptly between them. The cadence follows real movement speed.
-    const stridePhase=clock*(5+Math.min(13,Math.abs(p.vx)/42));
-    const blend=reducedMotion?0:(.5-.5*Math.cos(stridePhase))*.78;
+    const stridePhase=p.gaitPhase||0;
+    const blend=reducedMotion?0:(.5-.5*Math.cos(stridePhase))*.7*(p.gaitWeight||0);
     const drawHeroPose=(nextPose,alpha)=>{
       ctx.save();
       ctx.globalAlpha*=alpha;
@@ -1891,7 +1901,7 @@
     let heroDrawn=false;
     if(running){
       heroDrawn=drawHeroPose(1,1);
-      if(heroDrawn)drawHeroPose(2,blend);
+      if(heroDrawn && blend>.03)drawHeroPose(2,blend);
     } else if(rosterIndex>=0){
       heroDrawn=atlasSprite(heroArt,8,rosterIndex*4+pose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4);
     } else {
