@@ -6414,6 +6414,23 @@
       ctx.stroke();
       ctx.restore();
     }
+    const swimRush=index===2 && swimming && p.power>.22;
+    const skyDash=index===11 && rushing && p.dashUsed && !p.on;
+    if(!reducedMotion && (swimRush || skyDash)){
+      const angle=Math.atan2(p.vy,p.vx);
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(angle);
+      ctx.strokeStyle=swimRush?'#b5fff1':'#b8dcff';
+      ctx.lineWidth=2;
+      for(let trail=-1;trail<=1;trail++){
+        ctx.beginPath();
+        ctx.moveTo(-24,trail*8);
+        ctx.quadraticCurveTo(-42,trail*10,-58+Math.abs(trail)*9,trail*13);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     drawAtmosphere(true);
     if(chapterReveal>0 && phase==='playing') {
       ctx.save();
