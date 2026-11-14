@@ -946,7 +946,7 @@
     reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
-    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;e.faceLeft=undefined;e._attackPose=0;e._previousDrawY=undefined;e._lastVerticalSpeed=0;e._landingPose=0;});
+    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;e.faceLeft=undefined;e._attackPose=0;e._previousDrawY=undefined;e._lastVerticalSpeed=0;e._landingPose=0;e._bodyVelocity=0;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
@@ -4894,9 +4894,23 @@
       const lift=[2.4,1.2,2.8,1.5,3.4,2.1,1.8,2.5,3.2,1.1,2.9,1.7,2.4,3.1,1.5,2.6,1.3,2.8,3.5,1.6,2.2,1.9,3,2.7,1.4][index];
       const sway=[.038,.021,.045,.016,.06,.03,.025,.018,.048,.014,.04,.022,.027,.052,.019,.041,.017,.033,.055,.02,.023,.029,.05,.044,.018][index];
       const footCycle=Math.sin((foe._gait||0)*cadence+(foe.offset||0)*.12);
+      // Smooth the velocity and facing transitions so a patrol reversal
+      // transfers body weight rather than snapping from one lean to another.
+      // Visual-only springs: collision, enemy speed and attack AI are intact.
+      const motionDt=Math.min(.05,Math.max(0,elapsed));
+      const signedVelocity=elapsed>0 && travel<90?displacement/elapsed:0;
+      const velocityTarget=reducedMotion?0:Math.max(-1,Math.min(1,signedVelocity/135));
+      foe._bodyVelocity=(foe._bodyVelocity||0)+
+        (velocityTarget-(foe._bodyVelocity||0))*(1-Math.exp(-7*motionDt));
+      const velocityLean=(foe._bodyVelocity||0)*(.035+sway*.65);
       const footstep=airborne?0:Math.abs(footCycle)*lift*movingWeight;
-      const enemyLean=reducedMotion?0:footCycle*sway*movingWeight+
-        Math.sin(clock*(1.6+index%4*.23)+foe.offset)*.012*(1-movingWeight);
+      // The stride's support phase compresses the torso, while idle breathing
+      // fades out as the foe starts moving. Never animate a walking foe in place.
+      const strideCompression=airborne?0:
+        Math.max(0,footCycle)*.018*movingWeight;
+      const breathing=Math.sin(clock*(1.6+index%4*.23)+foe.offset)*.012*(1-movingWeight);
+      const enemyLean=reducedMotion?0:
+        footCycle*sway*movingWeight+velocityLean+breathing;
       const anticipation=!reducedMotion && enemyPattern==='charge' && nearby && !airborne;
       const bodyStretch=movingWeight*(.018+.012*(index%3))*footCycle;
       const chargeCompression=anticipation?.07:0;
@@ -4940,8 +4954,8 @@
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
       else ctx.rotate(enemyLean+attackTilt+verticalLean);
-      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose,
-        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose);
+      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5,
+        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing,attackPose);
