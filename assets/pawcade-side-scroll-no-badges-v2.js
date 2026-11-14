@@ -563,12 +563,32 @@
     };
     const challengeKinds=challengeTypes[movement]||['floor','shelf','floor'];
     const challengeHeights=[277,249,223,258,234,267];
+    // Platform rhythm is based on the counterpart's movement vocabulary:
+    // rapid runways, staggered aerial landings, tight climbing steps,
+    // underwater current lanes and deliberate precision jumps.
+    const rhythmFamilies=[
+      'steps','precision','water','run','steps','aerial','aerial',
+      'precision','run','climb','aerial','climb','steps','steps',
+      'precision','aerial','run','steps','precision','water',
+      'run','precision','steps','aerial','run'
+    ];
+    const rhythm=rhythmFamilies[index];
+    const rhythmProfiles={
+      run:{spacing:164,width:132,rises:[0,-12,0]},
+      aerial:{spacing:148,width:96,rises:[16,-32,9]},
+      climb:{spacing:132,width:102,rises:[18,-17,-45]},
+      precision:{spacing:146,width:78,rises:[12,-25,17]},
+      water:{spacing:160,width:130,rises:[-25,22,-8]},
+      steps:{spacing:138,width:108,rises:[13,-18,-35]}
+    };
+    const profile=rhythmProfiles[rhythm];
     for(let part=0;part<3;part++){
-      const cx=challengeX+part*138;
-      const cy=challengeHeights[(stage+part+index)%6];
-      const cw=85+(part===1?19:0);
-      if(!clearLane) addOptionalLanding(cx,cy,cw,challengeKinds[part]);
-      if(part===1) crystals.push({x:cx+cw/2,y:cy-45});
+      const cx=challengeX+part*profile.spacing;
+      const cy=Math.max(110,challengeHeights[(stage+index)%6]+
+        profile.rises[part]+((stage%3)-1)*8);
+      const cw=profile.width+(part===1?12:0);
+      if(!clearLane && addOptionalLanding(cx,cy,cw,challengeKinds[part]) &&
+         part===1) crystals.push({x:cx+cw/2,y:cy-45});
     }
     // A guarded optional reward on the alternate route. Existing enemy AI
     // handles this encounter, so no new combat controls are required.
