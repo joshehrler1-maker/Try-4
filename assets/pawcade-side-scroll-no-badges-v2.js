@@ -5695,6 +5695,13 @@
     ctx.stroke();
     ctx.restore();
   }
+  const forgeLighting=index===0 ? ctx.createLinearGradient(0,0,0,height) : null;
+  if(forgeLighting){
+    forgeLighting.addColorStop(0,'#101b41a0');
+    forgeLighting.addColorStop(.58,'#18295238');
+    forgeLighting.addColorStop(.78,'#d5632316');
+    forgeLighting.addColorStop(1,'#ff871b7a');
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -5717,6 +5724,10 @@
     drawAtmosphere(false);
     drawSceneryLayer(stageSceneryLayer(sceneryLayers[2],2));
     ctx.fillStyle=sceneHaze;ctx.fillRect(0,0,width,height);
+    if(forgeLighting){
+      ctx.fillStyle=forgeLighting;
+      ctx.fillRect(0,0,width,height);
+    }
     ctx.save();
     ctx.translate(-camera,0);
     for (const wall of walls) {
