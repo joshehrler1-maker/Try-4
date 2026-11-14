@@ -4615,6 +4615,16 @@
     const chapterRigScale=1+Math.min(5,Math.max(0,chapter))*.035;
     const foePhase=((foe.offset||0)%6.283+6.283)%6.283;
     const enemyStrideVariant=.88+foePhase/6.283*.24;
+    // Per-adventure enemy stance varies with the actual configured movement
+    // mechanic rather than relying solely on a shared animation template.
+    const movementRig={
+      stomp:[1.1,.9],buster:[.75,1.35],swim:[.55,1.55],
+      momentum:[1.55,.8],roll:[1.3,.75],glide:[.65,1.2],
+      float:[.5,1.35],flip:[.85,.9],beat:[1.25,1.1],
+      grapple:[.8,1.35],airlift:[.7,1.25],airdash:[1.15,1.1],
+      pogo:[.95,.85],throw:[.85,1.4],blaster:[.8,1.3],
+      shooter:[.75,1.4],precision:[.9,.8],whip:[1.0,1.5]
+    }[movement]||[1,1];
     // Reference-inspired animation families: fast ground threats emphasize
     // acceleration, shooters brace their arms, underwater foes paddle, and
     // aerial foes tuck their legs. All remain original game artwork.
@@ -4623,8 +4633,8 @@
     const aerialWorld=[5,6,10,15,23].includes(index);
     const combatWorld=[0,4,12,16,21,24].includes(index);
     const chapterWeight=1+Math.min(5,Math.max(0,chapter))*.045;
-    const poseStride=strideScale*chapterRigScale*enemyStrideVariant*(speedWorld?1.22:waterWorld?.55:1);
-    const poseArm=armScale*(combatWorld?1.22:waterWorld?1.4:1);
+    const poseStride=strideScale*movementRig[0]*chapterRigScale*enemyStrideVariant*(speedWorld?1.22:waterWorld?.55:1);
+    const poseArm=armScale*movementRig[1]*(combatWorld?1.22:waterWorld?1.4:1);
     const poseKnee=kneeScale*(aerialWorld?.55:1);
     const mechanical=[4,12,16,20,24].includes(index);
     const swimmer=[2,19].includes(index);
