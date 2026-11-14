@@ -605,3 +605,71 @@ test('original base enemy rigs for games 1–5 preserve authored specialists and
   }
   assert.equal(rigs.draw({},5,{x:0,y:0},{},{}),false);
 });
+
+test('first-five real WebGL mesh prototypes have unique 3D parts and safe lifecycle', () => {
+  const lab=fs.readFileSync(path.join(__dirname,'../enemy-3d-prototype.html'),'utf8');
+  const game=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const worker=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  const source=fs.readFileSync(path.join(__dirname,'../assets/animation/enemy-3d-prototype-v1.js'),'utf8');
+  const registry=JSON.parse(fs.readFileSync(path.join(__dirname,
+    '../assets/enemy-art-motion-registry.json'),'utf8'));
+  assert.ok(lab.includes('<script src="assets/animation/enemy-3d-prototype-v1.js?'),
+    'preview must initialize its WebGL renderer before the inline UI code');
+  assert.ok(lab.includes('not installed in the 2.5D games'),
+    'experimental 3D models must be labeled honestly');
+  assert.ok(game.includes('href="enemy-3d-prototype.html"'),
+    'prototype should be discoverable from Games Room');
+  for(const file of ['enemy-3d-prototype.html',
+    'assets/animation/enemy-3d-prototype-v1.js?v=3d-mesh-dc52ddc']){
+    assert.ok(worker.includes(file), 'new WebGL source not precached: '+file);
+  }
+  const ctx={window:{devicePixelRatio:2}};
+  vm.runInNewContext(source,ctx,{timeout:2000});
+  const art=ctx.window.SuperPawEnemy3D;
+  assert.equal(art.models.length,5);
+  assert.equal(new Set(art.models.map(m=>m.enemy)).size,5);
+  for(const [kind,m] of Object.entries(art.meshes)){
+    assert.equal(m.p.length,m.n.length,'normals must match 3D vertices: '+kind);
+    assert.equal(m.p.length%3,0);
+    assert.equal(m.idx.length%3,0,'triangles need 3 vertices: '+kind);
+    assert.ok(m.idx.every(i=>i>=0&&i<m.p.length/3),'invalid index in '+kind);
+    assert.ok(m.p.every(Number.isFinite)&&m.n.every(Number.isFinite),'invalid mesh geometry: '+kind);
+  }
+  for(let i=0;i<5;i++){
+    assert.equal(art.models[i].enemy,registry.games[i].enemyFamily);
+    assert.ok(registry.games[i].implementationStatus.includes('partial'));
+    for(const mode of ['idle','move','attack','hit','defeat']){
+      const sample=art.build(i,mode,1.2,false);
+      assert.ok(sample.parts.length>=8,'model missing body pieces: '+sample.enemy);
+      for(const part of sample.parts){
+        assert.ok(art.meshes[part.type],'unknown 3D primitive '+part.type);
+        assert.ok([...part.position,...part.scale,part.tilt].every(Number.isFinite),
+          'nonfinite 3D pose in '+sample.game);
+      }
+    }
+  }
+  let drawCalls=0,buffers=0,deletes=0;
+  const gl=new Proxy({}, {get(target,name){
+    if(name==='getShaderParameter'||name==='getProgramParameter')return()=>true;
+    if(name==='getAttribLocation')return()=>0;
+    if(name==='getUniformLocation'||name==='createShader'||name==='createProgram')return()=>({});
+    if(name==='createBuffer')return()=>{buffers++;return{};};
+    if(name==='deleteBuffer')return()=>{deletes++;};
+    if(name==='getShaderInfoLog'||name==='getProgramInfoLog')return()=>'';
+    if(typeof name==='string'&&name.toUpperCase()===name)return 1;
+    return (...args)=>{
+      if(name==='drawElements')drawCalls++;
+      assert.ok(args.every(v=>typeof v!=='number'||Number.isFinite(v)),
+        'invalid WebGL numeric argument: '+name);
+    };
+  }});
+  const canvas={clientWidth:500,width:0,height:0,getContext:()=>gl};
+  const stage=art.init(canvas);
+  for(let i=0;i<5;i++)for(const mode of ['idle','move','attack','hit','defeat'])
+    assert.ok(stage.render(i,mode,1.2,.25,false).meshes>=8);
+  assert.ok(drawCalls>200,'no 3D triangle mesh draw calls');
+  assert.ok(buffers>=12,'four mesh types require dedicated GPU vertex/index buffers');
+  assert.ok(canvas.width>=1&&canvas.width<=1200,'Android preview must cap drawing resolution');
+  stage.dispose();
+  assert.equal(deletes,buffers,'WebGL buffers should be disposed on page exit');
+});
