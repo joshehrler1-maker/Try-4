@@ -2502,6 +2502,17 @@
           ctx.lineTo(x+spacing,baseline);
       }
       ctx.fill();
+      // Directional rim lighting: the ridge follows the same silhouette
+      // rather than drawing a disconnected line over the backdrop.
+      ctx.save();
+      ctx.clip();
+      const reflected=ctx.createLinearGradient(x,top,x+spacing,baseline);
+      reflected.addColorStop(0,'rgba(255,247,213,.17)');
+      reflected.addColorStop(.5,'rgba(255,247,213,.025)');
+      reflected.addColorStop(1,'rgba(8,13,30,.12)');
+      ctx.fillStyle=reflected;
+      ctx.fillRect(x,top,spacing,baseline-top);
+      ctx.restore();
       ctx.globalAlpha=opacity*.34;
       ctx.stroke();
       ctx.globalAlpha=opacity;
