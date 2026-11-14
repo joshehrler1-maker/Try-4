@@ -6378,7 +6378,9 @@
       } else if(swimming){
         tilt=Math.sin(clock*8)*.1;scaleX=1.08;scaleY=.94;
       } else if(rushing){
-        tilt=-p.facing*(movement==='airdash'?.34:.22);
+        tilt=movement==='airdash'
+          ? p.facing*Math.atan2(p.vy,Math.abs(p.vx))*.34
+          : -p.facing*.22;
         scaleX=1.12;scaleY=.88;
       } else if(blasterFiring){
         const recoil=(1-blasterAge/.24)**2;
@@ -6410,7 +6412,9 @@
         tilt=p.facing*(.11+strike*.16);
         scaleX=1.06;scaleY=.96;
       } else if(p.cable && !p.on){
-        tilt=Math.max(-.32,Math.min(.32,p.vx/900));
+        const cableAngle=Math.atan2(p.x-p.cable.x,Math.max(1,p.y-p.cable.y));
+        tilt=-Math.max(-.4,Math.min(.4,cableAngle*.6));
+        scaleY=1.06;
       } else if(!p.on){
         // Rising compresses the silhouette; falling extends it. Cap both
         // responses so fast falls never distort the approved character art.
