@@ -303,6 +303,26 @@
     ['#f89ce4','pull',78,.44], // Yarn draw
     ['#ff9f72','lob',121,.48] // Grenade trail
   ];
+  // Peak timing and counter-motion for each hero's technique.
+  const techniqueTiming={
+    0:[.32,.22], // Whisker's cape sweep
+    2:[.45,.12], // Luna's sonar pulse
+    4:[.24,.36], // Ivy's barrel launch
+    5:[.29,.30], // Frost's air punch
+    7:[.18,.12], // Bolt's reversal
+    9:[.24,.25], // Stone's cable release
+    17:[.31,.39], // Frost's sword stroke
+    20:[.49,.14], // Shadow's taunt
+    21:[.26,.41], // Luna's returning cross
+    24:[.37,.32] // Whisker's grenade throw
+  };
+  function techniqueWeight(progress, timing){
+    if(!timing) return Math.sin(progress*Math.PI)*(1-progress*.35);
+    const [peak, counter]=timing;
+    if(progress<peak) return Math.sin(progress/peak*Math.PI/2);
+    const recovery=(progress-peak)/(1-peak);
+    return (1-recovery)**2-counter*Math.sin(Math.PI*recovery)**2;
+  }
   let signatureEffect, landingEffect;
   const particles=[];
   let rings=0;
@@ -6476,7 +6496,7 @@
         const duration=signatureEffects[index][3];
         const progress=(clock-signatureEffect.at)/duration;
         if(progress>=0 && progress<1){
-          const weight=Math.sin(progress*Math.PI)*(1-progress*.35);
+          const weight=techniqueWeight(progress,techniqueTiming[index]);
           const [lean,widthScale,heightScale]=techniquePoses[index];
           tilt+=lean*signatureEffect.facing*weight;
           scaleX*=1+(widthScale-1)*weight;
