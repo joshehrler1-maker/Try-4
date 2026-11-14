@@ -1535,6 +1535,12 @@
     const ranged=['volley','sweep','barrage'].includes(guardian.pattern);
     const volleyPhase=guardian.pattern==='volley' ? (boss.health<=1?3:boss.health<=3?2:1) : 0;
     if(ranged && !boss.aim && boss.nextShot-t<.3) boss.aim=Math.sign(p.x-boss.x)||-1;
+    // Respect the same mobile projectile budget as ordinary enemies.
+    // Delay a volley rather than flooding the screen during the finale.
+    if (ranged && t>=boss.nextShot && hazards.length>=26) {
+      boss.nextShot=t+.35;
+      boss.aim=0;
+    }
     if (ranged && t>=boss.nextShot) {
       const aim=boss.aim || Math.sign(p.x-boss.x) || -1;
       boss.aim=0;
