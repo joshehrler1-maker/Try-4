@@ -1,5 +1,22 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
+## Batch 15 — scene art installed for stages 3 and 4 of games 1–5
+
+**Goal:** Move the 2.5D Games Room closer to the approved feature-film-*look* while keeping side-scrolling mechanics. This batch creates ten different, hand-authored perspective-lit SVG landmarks (one for each of stages 3 and 4 of each of the first five adventures). They have unique silhouettes and palettes, separate scene paths, and are positioned over existing verified platforms only. These are **illustrated, 3D-looking depth-plane props**, not real modeled feature-film 3D, rigged enemies, cinematic film renders or whole-scene 3D environments.
+
+| Game | Stage 3 landmark (local x/y; footprint w×h) | Stage 4 landmark (local x/y; footprint w×h) |
+|---|---|---|
+| Ember Foundry | Cinder Hills pneumatic spring (714,154;150×135) | Suspended Bridges hanging anchor beacon (426,147;138×135) |
+| Moonlit Library | Airship Platforms enchanted atlas lift (423,147;150×135) | Generator Blackout arcane electric generator (709,191;150×135) |
+| Coral Courier | Undercaves glowing kelp arch (649,95;150×135) | Thermal Vents hydrothermal chimney (24,191;150×135) |
+| Clocktower Relay | Sunken Ruins tide-clock weight (599,83;150×135) | Pinball Hall chromed bumper (785,39;145×135) |
+| Seed Garden | Sunset Galley seed barrels and lantern (584,140;150×135) | Flooded Locker tidal seed chest (651,104;150×135) |
+
+**Runtime:** Each game loads *only its own two stage-3/4 assets*. Each drawing location adds the selected stage's actual start offset and culls by camera viewport. Decorative only; no new platforms, hitboxes, NPC/foe replacements or physics changes. Existing stage 1/2 art and optional 3D enemies remain unchanged. Mobile cost: ten small standalone static SVG resources shared across five games, but only two instantiated per play session. Service worker caches paths and version bump forces new Game Room JS. A new source regression test checks stage local positions, artwork uniqueness, no remote SVG elements, runtime wiring and offline assets.
+
+**Verification boundary:** A green CI run and Pages deployment, if observed, establish source checks and site deployment—not true feature-film production quality, Android GPU/FPS, frame-by-frame visual checks, or hands-on stage traversal. The previous full-stage art audit is a *historical gap snapshot* and still lists these ten positions as proposed .webp slots; this new SVG batch supersedes those slots only.
+
+
 
 ## Batch 14 — ten original 3D mesh enemy families playable on opt-in
 

@@ -243,6 +243,36 @@
     [694,191,150,135], // Clocktower Relay: chemical works floor y326; x670..2200
     [425,145,150,135]  // Seed Garden: high rigging floor y280; x405..615
   ];
+  // Two original stage-specific cinematic-depth set pieces for each of games 1-5.
+  // Stage indices 2/3 => displayed stages 3/4. Scenery only: no hitboxes or mechanics.
+  const earlyFilmStageSetpieces = [
+    [
+      ['assets/scenes/ember-foundry/stage-03-cinder-hills-spring.svg', 714, 154, 150, 135],
+      ['assets/scenes/ember-foundry/stage-04-suspended-bridges-bridge.svg', 426, 147, 138, 135]
+    ],
+    [
+      ['assets/scenes/moonlit-library/stage-03-airship-platforms-lifts.svg', 423, 147, 150, 135],
+      ['assets/scenes/moonlit-library/stage-04-generator-blackout-dodge.svg', 709, 191, 150, 135]
+    ],
+    [
+      ['assets/scenes/coral-courier/stage-03-undercaves-kelp.svg', 649, 95, 150, 135],
+      ['assets/scenes/coral-courier/stage-04-thermal-vents-dodge.svg', 24, 191, 150, 135]
+    ],
+    [
+      ['assets/scenes/clocktower-relay/stage-03-sunken-ruins-bridge.svg', 599, 83, 150, 135],
+      ['assets/scenes/clocktower-relay/stage-04-pinball-hall-spring.svg', 785, 39, 145, 135]
+    ],
+    [
+      ['assets/scenes/seed-garden/stage-03-sunset-galley-barrels.svg', 584, 140, 150, 135],
+      ['assets/scenes/seed-garden/stage-04-flooded-locker-current.svg', 651, 104, 150, 135]
+    ]
+  ];
+  const earlyFilmStageArt = index < 5
+    ? earlyFilmStageSetpieces[index].map(([url,x,y,w,h], offset) => {
+        const image = new Image(); image.src = url;
+        return {stage:offset + 2, image, x, y, w, h};
+      })
+    : [];
   const earlySecondStage = index < 5 ? new Image() : null;
   if (earlySecondStage) earlySecondStage.src = earlySecondStagePaths[index];
   const secondStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
@@ -7162,6 +7192,14 @@
       }
     }
     // Opt-in 3D enemy meshes never change this 2.5D fixed-plane stage art.
+    // Individual stage 3/4 depth-painted landmarks. Do not alter player or foe collision.
+    for (const slot of earlyFilmStageArt) {
+      if (sections <= slot.stage || !slot.image.naturalWidth) continue;
+      const artX = stageStarts[slot.stage] + slot.x;
+      if (artX + slot.w >= camera && artX <= camera + width) {
+        ctx.drawImage(slot.image, artX, slot.y, slot.w, slot.h);
+      }
+    }
     if (earlySecondStage?.naturalWidth && sections >= 2) {
       const [localX,artY,artW,artH] = earlySecondStagePositions[index];
       const artX = stageStarts[1] + localX;
