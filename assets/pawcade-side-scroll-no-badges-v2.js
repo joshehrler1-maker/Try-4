@@ -677,15 +677,30 @@
         whip:['shelf','floor','shelf'],throw:['floor','shelf','floor']
       };
       const islandKindsForGame=islandKinds[movement]||['floor','floor','lift'];
-      const islandX=start+Math.min(sectionSize-470,780+((index*11+stage*19)%5)*38);
-      const climb=stage%3;
-      const islandHeights=[
-        [282,251,226],[277,244,217],[285,256,231]
-      ][climb];
+      // Author a different island rhythm for each traversal family.
+      // Narrow stepping stones serve precision games; wider decks support
+      // speed and combat; staggered heights reward aerial and climbing play.
+      const islandFamilies=[
+        'steps','combat','water','speed','steps','aerial','aerial',
+        'precision','speed','climb','aerial','climb','combat','steps',
+        'precision','aerial','combat','precision','precision','water',
+        'speed','combat','steps','aerial','combat'
+      ];
+      const islandProfiles={
+        steps:{width:100,gap:132,heights:[282,249,219]},
+        combat:{width:142,gap:174,heights:[277,251,228]},
+        water:{width:155,gap:188,heights:[244,264,232]},
+        speed:{width:170,gap:194,heights:[286,275,283]},
+        aerial:{width:94,gap:146,heights:[282,235,206]},
+        precision:{width:76,gap:126,heights:[275,238,218]},
+        climb:{width:102,gap:140,heights:[287,244,197]}
+      };
+      const islandProfile=islandProfiles[islandFamilies[index]];
+      const islandX=start+Math.min(sectionSize-650,780+((index*11+stage*19)%5)*38);
       for(let island=0;island<3;island++){
-        const iw=82+(island===1?16:0);
-        const ix=islandX+island*124;
-        const iy=islandHeights[island];
+        const iw=islandProfile.width+(island===1?12:0);
+        const ix=islandX+island*islandProfile.gap;
+        const iy=islandProfile.heights[island]+((stage%3)-1)*9;
         // Reject platforms that visually intersect existing terrain, block
         // hazards, or leave an unusably narrow vertical clearance. The prior
         // exact-Y test missed almost every near-overlap.
