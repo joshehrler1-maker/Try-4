@@ -27,11 +27,12 @@ window.bindTouchJoystick = function (base, onChange, options = {}) {
     const distance = Math.hypot(x, y);
     const scale = Math.min(1, box.width * .27 / (distance || 1));
     knob.style.transform = 'translate(' + x * scale + 'px,' + y * scale + 'px)';
-    if(options.diagonal && distance>=deadZone && Math.min(Math.abs(x),Math.abs(y))>=distance*.38){
+    const threshold = direction ? deadZone * .65 : deadZone;
+    if(options.diagonal && distance>=threshold && Math.min(Math.abs(x),Math.abs(y))>=distance*.38){
       change((x<0?'left':'right')+' '+(y<0?'up':'down'));
       return;
     }
-    change(distance < deadZone ? '' : Math.abs(x) > Math.abs(y) ? (x < 0 ? 'left' : 'right') : (y < 0 ? 'up' : 'down'));
+    change(distance < threshold ? '' : Math.abs(x) > Math.abs(y) ? (x < 0 ? 'left' : 'right') : (y < 0 ? 'up' : 'down'));
   }
   base.addEventListener('pointerdown', event => {
     if (pointer !== null || event.button !== 0) return;
@@ -46,7 +47,12 @@ window.bindTouchJoystick = function (base, onChange, options = {}) {
     base.addEventListener(type, event => { if (event.pointerId === pointer) reset(); });
   }
   addEventListener('blur', reset);
-  if (options.cacheBounds) addEventListener('resize', reset);
+  if (options.cacheBounds) {
+    addEventListener('resize', reset);
+    addEventListener('scroll', () => {
+      if (pointer !== null) bounds = base.getBoundingClientRect();
+    }, {capture: true, passive: true});
+  }
   return reset;
 };
 
