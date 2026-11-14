@@ -1143,6 +1143,9 @@
         projectile.gravity=570;
       }
       if(index===19 || index===24) player.shotPose={time:clock,facing:player.facing};
+      if(index===13 || index===17){
+        player.throwPose={time:clock,angle:Math.atan2(projectile.vy||0,projectile.v)};
+      }
       attacks.push(projectile);
       playCue(470,180,.085);
       if(player.altWeapon) for(const vy of [-105,105]) attacks.push({x:player.x,y:player.y,v:player.facing*speed,vy,life});
@@ -6609,6 +6612,21 @@
           ctx.closePath();
           ctx.fill();
         }
+        ctx.restore();
+      }
+    }
+    if((index===13 || index===17) && p.throwPose && !reducedMotion){
+      const progress=(clock-p.throwPose.time)/.17;
+      if(progress>=0 && progress<1){
+        ctx.save();
+        ctx.translate(p.x,p.y-5);
+        ctx.rotate(p.throwPose.angle);
+        ctx.globalAlpha=1-progress;
+        ctx.strokeStyle=index===13?'#ffe2a5':'#ff9c68';
+        ctx.lineWidth=3;
+        ctx.beginPath();
+        ctx.arc(8,0,13+progress*9,-1.25,.65);
+        ctx.stroke();
         ctx.restore();
       }
     }
