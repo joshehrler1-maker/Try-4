@@ -3066,7 +3066,11 @@
     const archetypeTempo=[1,.82,1.18,1.06][foe.archetype??0];
     const t = clock * (2 * enemyTempo / cadence) * chapterPressure *
       archetypeTempo + foe.offset;
-    const chase = Math.sign(player.x-foe.x);
+    // Blend pursuit direction near the player's position instead of
+    // snapping instantly from -1 to +1. This prevents enemy charge and
+    // ambush hitboxes from flickering as the hero crosses their center.
+    // Outside the close-range blend, enemies still pursue at full reach.
+    const chase = Math.tanh((player.x-foe.x)/24);
     // Different encounter archetypes get distinct movement envelopes:
     // scout = narrow, sentry = measured, skirmisher = wide, raider = sharp.
     const patrolSpan=[.75,.9,1.15,1][foe.archetype??0];
