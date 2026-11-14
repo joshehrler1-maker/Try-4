@@ -326,7 +326,7 @@
       platforms.push({x:middle,y:220-stage%3*10,w:Math.min(span,105),kind:'floor'});
       crystals.push({x:middle+span*.3,y:286-rise});
       enemies.push({x:middle+span*.7,y:303-rise,offset:stage+8,
-        foundryEnemy:stage<6?stage:undefined, patrolLeft:middle+12, patrolRight:middle+span-12});
+        foundryEnemy:stage<9?stage:undefined, patrolLeft:middle+12, patrolRight:middle+span-12});
     }
     const feature=setPieces[stage];
     const anchor=start+1050;
@@ -1359,7 +1359,7 @@
     ctx.restore();
   }
   function drawFoundryEnemy(at,kind,faceLeft,offset) {
-    const colors=[['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c']][kind];
+    const colors=[['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c'],['#f0a271','#754021'],['#acf0dc','#285b6b'],['#e8d1ff','#583e83']][kind];
     ctx.save();
     ctx.translate(at.x,at.y);
     if(faceLeft) ctx.scale(-1,1);
@@ -1385,6 +1385,19 @@
       ctx.ellipse(-8,-6,12,5,-.55,0,Math.PI*2);
     }else if(kind===4){
       ctx.moveTo(-22,12);ctx.lineTo(-13,-15);ctx.lineTo(-3,-8);ctx.lineTo(7,-21);ctx.lineTo(21,12);
+    }else if(kind===6){ // Switchback ram
+      ctx.moveTo(-20,12);ctx.lineTo(-18,-8);ctx.lineTo(-9,-17);
+      ctx.lineTo(6,-17);ctx.lineTo(15,-29);ctx.lineTo(15,-10);
+      ctx.lineTo(24,-3);ctx.lineTo(17,12);
+    }else if(kind===7){ // Floodgate skimmer
+      ctx.moveTo(-26,1);ctx.quadraticCurveTo(-14,-18,8,-13);
+      ctx.quadraticCurveTo(18,-12,23,-3);ctx.lineTo(13,10);
+      ctx.lineTo(-16,12);ctx.lineTo(-10,5);
+    }else if(kind===8){ // Kiln canopy flier
+      const wing=reducedMotion?0:Math.sin(phase)*7;
+      ctx.moveTo(-4,7);ctx.lineTo(-25,-9-wing);ctx.lineTo(-11,-11);
+      ctx.lineTo(-4,-22);ctx.lineTo(8,-13);ctx.lineTo(25,-8-wing);
+      ctx.lineTo(15,8);ctx.lineTo(5,14);
     }else if(kind===5){
       ctx.moveTo(-21,12);ctx.quadraticCurveTo(-17,-17,1,-17);ctx.lineTo(20,-7);ctx.lineTo(14,12);
     }else{
@@ -1414,6 +1427,9 @@
       if(foe.foundryEnemy===3) return {x:patrolX(foe.x+wave*34),y:foe.y-14*(1+Math.cos(cycle*Math.PI/1.2))};
       if(foe.foundryEnemy===4) return {x:patrolX(foe.x+wave*12),y:foe.y-34*hop**2};
       if(foe.foundryEnemy===5) return {x:patrolX(foe.x+chase*surge**3*60),y:foe.y-12*surge};
+      if(foe.foundryEnemy===6) return {x:patrolX(foe.x+Math.sin(cycle*Math.PI/1.2)**3*39),y:foe.y};
+      if(foe.foundryEnemy===7) return {x:patrolX(foe.x+Math.sin(cycle*Math.PI/1.2)*38),y:foe.y-8-6*Math.cos(cycle*Math.PI/1.2)};
+      if(foe.foundryEnemy===8) return {x:patrolX(foe.x+Math.sin(cycle*Math.PI/1.2)*30),y:foe.y-26-13*Math.cos(cycle*Math.PI/1.2)};
       const shift=foe.foundryEnemy===1?0:foe.foundryEnemy===2?chase*surge**2*46:wave*24;
       return {x:patrolX(foe.x+shift),y:foe.y-(foe.foundryEnemy===1?hop*(2-hop)*49:0)};
     }
