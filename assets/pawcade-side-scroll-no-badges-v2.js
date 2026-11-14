@@ -1912,7 +1912,14 @@
       }
       case 'school': return {x:foe.x+wave*enemyReach,y:foe.y-33-Math.sin(t*3)*enemyRise};
       case 'pursuit': return {x:patrolX(foe.x+chase*(enemyReach*(.55+wave*.45))),y:foe.y-enemyRise};
-      case 'rhythm': return {x:patrolX(foe.x+wave*enemyReach),y:foe.y-Math.max(0,wave)*enemyRise};
+      case 'rhythm': { // Geometry Dash-inspired predictable beat timing
+        const beat=Math.floor(t*1.5);
+        const beatPhase=(t*1.5)%1;
+        const bounce=Math.sin(beatPhase*Math.PI);
+        const direction=beat%2===0?1:-1;
+        return {x:patrolX(foe.x+direction*enemyReach*.72),
+          y:foe.y-Math.max(0,bounce)*enemyRise};
+      }
       default: return {x:patrolX(foe.x+wave*enemyReach),y:foe.y};
     }
   }
