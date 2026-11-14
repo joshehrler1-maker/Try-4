@@ -1316,6 +1316,13 @@
         const firedCount=foe.shotsFired++;
         const parryable=index===16 && firedCount%3===0;
         const primaryShot=enemyRound(position,direction,parryable);
+        // Prevent runaway projectile accumulation during busy mobile
+        // encounters. A full screen of active shots should not grow forever.
+        if(hazards.length>=28){
+          foe.lastShotAt=clock;
+          foe.shotAt=clock+Math.max(.45,cadence/enemyTempo);
+          continue;
+        }
         // Scouts fire quick tracers, sentries slower heavy-looking shots,
         // and raiders faster bolts. Preserve Steamworks parry behavior.
         const projectileTempo=[1.12,.82,1.02,1.22][foe.archetype??0];
