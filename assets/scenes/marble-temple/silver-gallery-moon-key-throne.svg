@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Silver Gallery original moon-key throne"><defs><linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff9eb"/><stop offset=".3" stop-color="#f4edd9"/><stop offset=".7" stop-color="#bac7db"/><stop offset="1" stop-color="#5f668a"/></linearGradient><radialGradient id="glow"><stop stop-color="#e0fff6" stop-opacity=".8"/><stop offset=".45" stop-color="#f4edd9" stop-opacity=".3"/><stop offset="1" stop-color="#bac7db" stop-opacity="0"/></radialGradient></defs><ellipse cx="91" cy="90" rx="78" ry="76" fill="url(#glow)" opacity=".6"/>
+<path d="M35 164V50Q44 17 91 10q47 6 54 40v114" fill="url(#metal)" stroke="#f7ecdc" stroke-width="6"/>
+<path d="M52 151V57Q65 39 91 35q29 4 39 22v94" fill="#414a77" stroke="#e5e1dc" stroke-width="4"/>
+<path d="M66 132V95l13-13h24l13 13v37z" fill="#9da9be" stroke="#f5e8c7" stroke-width="4"/>
+<path d="M91 51v57m-11-21h22" stroke="#fff8dc" stroke-width="9" stroke-linecap="round"/>
+<circle cx="90" cy="49" r="14" fill="#e7f9f2" stroke="#f7f6dc" stroke-width="4"/>
+<path d="M57 129h69v23H57z" fill="#a7abc1" stroke="#f9e5c8" stroke-width="4"/>
+<path d="M26 164h129" stroke="#9c9caf" stroke-width="10"/><path d="M37 55h16m72 0h16" stroke="#f6ecdd" stroke-width="4"/></svg>
