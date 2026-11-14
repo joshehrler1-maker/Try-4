@@ -1563,6 +1563,64 @@
     ctx.fillRect(x+Math.max(0,w-7),y,Math.min(7,w),3);
     drawPlatformAccents({x,y,w,kind:'landing'});
   }
+  // Individually authored environmental silhouettes for the first two games.
+  // Decorative only: no collision, spawn, or camera changes.
+  function drawSignatureBackdrop(){
+    if(index!==0 && index!==1)return;
+    const spacing=index===0?230:188;
+    const shift=camera*(index===0?.22:.16);
+    const start=Math.floor(shift/spacing)-1;
+    ctx.save();
+    for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
+      const x=n*spacing-shift;
+      const variation=((n*17+29)%5+5)%5;
+      if(index===0){
+        // Ember Foundry: layered brick smokestacks and glowing furnace windows.
+        const top=114+variation*13;
+        const stackWidth=31+variation*3;
+        ctx.fillStyle='#291d32';
+        ctx.fillRect(x+50,top,stackWidth,270-top);
+        ctx.fillStyle='#5b3341';
+        ctx.fillRect(x+46,top-8,stackWidth+8,10);
+        ctx.fillStyle='#ad5b49';
+        for(let row=0;row<4;row++){
+          ctx.globalAlpha=.38;
+          ctx.fillRect(x+52,top+15+row*21,stackWidth-4,2);
+        }
+        ctx.globalAlpha=.8;
+        ctx.fillStyle='#ffa34d';
+        for(let row=0;row<3;row++){
+          ctx.fillRect(x+59,210+row*21,8,10);
+        }
+        ctx.globalAlpha=.18;
+        ctx.fillStyle='#f8a35d';
+        ctx.beginPath();ctx.ellipse(x+64,245,42,60,0,0,Math.PI*2);ctx.fill();
+        ctx.globalAlpha=1;
+      }else{
+        // Moonlit Library: staggered book towers, arched windows and moonlit spires.
+        const top=83+variation*16;
+        ctx.fillStyle='#252943';
+        ctx.fillRect(x+38,top,83,275-top);
+        ctx.fillStyle='#444567';
+        ctx.beginPath();
+        ctx.moveTo(x+28,top+4);ctx.lineTo(x+79,top-31);
+        ctx.lineTo(x+130,top+4);ctx.closePath();ctx.fill();
+        for(let row=0;row<3;row++){
+          const wy=top+31+row*45;
+          ctx.fillStyle='#171e3a';
+          ctx.beginPath();ctx.arc(x+79,wy,12,Math.PI,0);
+          ctx.lineTo(x+91,wy+21);ctx.lineTo(x+67,wy+21);ctx.closePath();ctx.fill();
+          ctx.fillStyle='#b6a4dd';
+          ctx.globalAlpha=.55;
+          ctx.fillRect(x+77,wy,4,19);
+          ctx.globalAlpha=1;
+        }
+        ctx.fillStyle='#7176a5';
+        ctx.fillRect(x+77,top-48,4,18);
+      }
+    }
+    ctx.restore();
+  }
   function draw() {
     ctx.fillStyle='#211332';
     ctx.fillRect(0,0,width,height);
@@ -1578,6 +1636,7 @@
         ctx.restore();
       }
     }
+    drawSignatureBackdrop();
     drawSceneryLayer(stageSceneryLayer(sceneryLayers[0],0));
     ctx.fillStyle=worldLight;ctx.fillRect(0,0,width,height);
     drawSceneryLayer(stageSceneryLayer(sceneryLayers[1],1));
