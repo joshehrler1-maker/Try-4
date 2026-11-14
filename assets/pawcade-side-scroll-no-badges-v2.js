@@ -2446,9 +2446,13 @@
     const seed=(index*37+stage*19+plane*11)%17;
     return {
       ...layer,
-      spacing:layer.spacing+seed*3,
-      baseline:layer.baseline+(seed%5-2)*4,
-      scale:layer.scale*(.94+(seed%6)*.025),
+      // Each chapter shifts the composition of all three parallax planes:
+      // broad foreground shapes, distant smaller silhouettes, and different
+      // sightlines. Keep the closest plane slow enough for mobile readability.
+      speed:layer.speed*(.92+(seed%5)*.035),
+      spacing:layer.spacing+seed*3+(stage%3-1)*12,
+      baseline:layer.baseline+(seed%5-2)*4+(stage%4-1.5)*5,
+      scale:layer.scale*(.94+(seed%6)*.025)*(1+(stage%3-1)*.045),
       opacity:layer.opacity*(.93+(seed%4)*.035)
     };
   }
