@@ -2708,13 +2708,22 @@
         ctx.lineTo(side*6,5);ctx.closePath();ctx.fill();ctx.stroke();
         ctx.restore();
       }
-      // Furnace Crab: a visible forward-facing sensor and leading foot
-      // distinguish its travel direction from its symmetrical pincers.
-      // The entire crab is already mirrored by faceLeft above.
+      // Furnace Crab: unmistakable right-facing silhouette in local space.
+      // The entire body mirrors with faceLeft. A forward beak, eye stalk,
+      // leading pincer and rear exhaust make left/right travel readable.
       ctx.save();
-      ctx.fillStyle='#fff5ca';ctx.strokeStyle='#593443';ctx.lineWidth=1.5;
-      ctx.beginPath();ctx.ellipse(10,-12,5,4,0,0,Math.PI*2);ctx.fill();ctx.stroke();
-      ctx.fillStyle='#28243c';ctx.beginPath();ctx.arc(12,-12,2,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#583444';ctx.lineWidth=3;ctx.lineJoin='round';
+      ctx.fillStyle='#ffdd94';
+      ctx.beginPath();ctx.moveTo(9,-9);ctx.lineTo(29,-5);
+      ctx.lineTo(33,1);ctx.lineTo(17,6);ctx.closePath();
+      ctx.fill();ctx.stroke();
+      ctx.strokeStyle='#7c4152';ctx.lineWidth=4;
+      ctx.beginPath();ctx.moveTo(11,-8);ctx.lineTo(18,-23);ctx.stroke();
+      ctx.fillStyle='#fff8d4';ctx.beginPath();ctx.arc(19,-24,6,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#30253b';ctx.beginPath();ctx.arc(22,-24,3,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#d06d50';ctx.lineWidth=5;
+      ctx.beginPath();ctx.moveTo(-14,-1);ctx.lineTo(-29,1);ctx.stroke();
+      ctx.fillStyle='#813f46';ctx.beginPath();ctx.ellipse(-30,1,7,5,0,0,Math.PI*2);ctx.fill();
       ctx.strokeStyle='#ffb66b';ctx.lineWidth=3;ctx.lineCap='round';
       const step=reducedMotion?0:Math.sin(gait)*3;
       ctx.beginPath();ctx.moveTo(9,8);ctx.lineTo(14+step,13);ctx.lineTo(20+step,14);
