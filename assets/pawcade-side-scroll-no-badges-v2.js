@@ -2369,6 +2369,19 @@
       return {x:patrolX(foe.x+wave*enemyReach*.65),
         y:foe.y-hop*enemyRise*.95};
     }
+    if(index===5){ // Waterfall Climb: descending mist swoops with a recovery climb
+      const dive=Math.max(0,Math.sin(t*1.35));
+      const glide=Math.sin(t*.72);
+      return {x:patrolX(foe.x+glide*enemyReach*.85),
+        y:foe.y-enemyRise*(.3+.7*(1-dive*dive))};
+    }
+    if(index===8){ // Stage Beat: enemies move on predictable musical counts
+      const beat=t*1.45;
+      const step=Math.round(Math.sin(beat)*3)/3;
+      const pulse=Math.max(0,Math.sin(beat*2));
+      return {x:patrolX(foe.x+step*enemyReach*.65),
+        y:foe.y-pulse*pulse*enemyRise*.55};
+    }
     // More course-specific enemy traversal, inspired by each game's
     // pacing rather than copying any counterpart's character or map.
     if(index===6){ // Lantern Festival: grounded hoppers return to their platforms
