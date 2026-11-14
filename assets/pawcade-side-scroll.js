@@ -1009,7 +1009,7 @@
       );
       if ((foe.turret || enemyPattern==='turret' || index===16) &&
           clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
-        hazards.push({x:position.x+direction*12,y:position.y,v:direction*180,life:2,parry:index===16});
+        hazards.push(enemyRound(position,direction));
         foe.shotAt=clock+cadence/enemyTempo;
       }
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
@@ -1176,6 +1176,16 @@
     [0.92, 0, 0], // 25
   ];
   const [enemyTempo, enemyReach, enemyRise] = enemyProfiles[index];
+  const enemyRounds = {
+    1:[215,'#86daff'], // Moonlit Library sentry bolt
+    9:[150,'#ffc178'], // Quarry Rescue warning shot
+    17:[165,'#dbf7ff'], // Snow Village frost pellet
+    24:[245,'#ffe28e'] // Starship Cargo tracer
+  };
+  function enemyRound(position,direction) {
+    const [speed,color]=enemyRounds[index] || [180,'#ff8479'];
+    return {x:position.x+direction*12,y:position.y,v:direction*speed,life:2,parry:index===16,color};
+  }
   function foePosition(foe) {
     if(foe.bashed && clock<foe.bashed.until){
       const t=.48-(foe.bashed.until-clock);
@@ -2894,7 +2904,7 @@
       ctx.save();
       ctx.translate(shot.x,shot.y);
       if(shot.v<0) ctx.scale(-1,1);
-      ctx.fillStyle=shot.parry?'#ff86dc':'#ff8479';
+      ctx.fillStyle=shot.parry?'#ff86dc':(shot.color || '#ff8479');
       ctx.strokeStyle='#471723';
       ctx.lineWidth=2;
       ctx.beginPath();
