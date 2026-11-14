@@ -1644,9 +1644,20 @@
   // Defeat state is visual-only: the original immediate dead flag still
   // removes enemies from collisions, attacks, progress, and save logic.
   // Snapshot position at impact so the short visual cannot drift after death.
+  // Preserve the extensive already-authored special enemy sprites in the
+  // first four adventures; their unique attacks are more specific than a
+  // new base rig. New per-game base bodies serve only ordinary enemy slots.
+  function usesOriginRig(foe) {
+    return index>=0 && index<=4 &&
+      foe.foundryEnemy===undefined &&
+      foe.libraryEnemy===undefined &&
+      foe.reefEnemy===undefined &&
+      foe.clockEnemy===undefined;
+  }
   function markFoeDefeated(foe) {
     if(foe.dead)return;
     const shouldAnimate=!reducedMotion && (
+      usesOriginRig(foe) && typeof window.pawtopiaOriginEnemyRigs?.draw === 'function' ||
       index>=5 && index<=9 && typeof window.pawtopiaFiveEnemyRigs?.draw === 'function' ||
       index>=10 && index<=14 && typeof window.pawtopiaCloudEnemyRigs?.draw === 'function' ||
       index>=15 && index<=19 && typeof window.pawtopiaMidEnemyRigs?.draw === 'function' ||
@@ -7399,13 +7410,15 @@
     // A short unique-rig defeat transition follows a confirmed kill.
     // It never resurrects a foe's physics or damages the player. On reduced
     // motion it is intentionally suppressed, matching user accessibility.
-    const dyingEnemyArt = index>=5 && index<=9 ? window.pawtopiaFiveEnemyRigs
+    const dyingEnemyArt = index<=4 ? window.pawtopiaOriginEnemyRigs
+      : index>=5 && index<=9 ? window.pawtopiaFiveEnemyRigs
       : index>=10 && index<=14 ? window.pawtopiaCloudEnemyRigs
       : index>=15 && index<=19 ? window.pawtopiaMidEnemyRigs
       : index>=20 && index<=24 ? window.pawtopiaLateEnemyRigs : null;
     if(!reducedMotion && typeof dyingEnemyArt?.draw === 'function'){
       for(const foe of enemies){
         if(!foe.dead || !Number.isFinite(foe._defeatAt))continue;
+        if(index<=4 && !usesOriginRig(foe))continue;
         const age=clock-foe._defeatAt;
         if(age<0 || age>=.42)continue;
         const x=foe._defeatX,y=foe._defeatY;
@@ -7654,6 +7667,8 @@
       // silhouettes in the playable canvas, not the generic enemy atlas.
       // If the free optional rig module fails to load, keep the old sprite
       // and articulated limbs so gameplay never depends on this art upgrade.
+      const originWorldRig = usesOriginRig(foe) &&
+        typeof window.pawtopiaOriginEnemyRigs?.draw === 'function';
       const fiveWorldRig = index>=5 && index<=9 &&
         typeof window.pawtopiaFiveEnemyRigs?.draw === 'function';
       const cloudWorldRig = index>=10 && index<=14 &&
@@ -7662,9 +7677,18 @@
         typeof window.pawtopiaMidEnemyRigs?.draw === 'function';
       const lateWorldRig = index>=20 && index<=24 &&
         typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
-      if(!fiveWorldRig && !cloudWorldRig && !midWorldRig && !lateWorldRig)
+      if(!originWorldRig && !fiveWorldRig && !cloudWorldRig && !midWorldRig && !lateWorldRig)
         drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
-      if(fiveWorldRig && window.pawtopiaFiveEnemyRigs.draw(
+      if(originWorldRig && window.pawtopiaOriginEnemyRigs.draw(
+        ctx,index,at,foe,{
+          faceLeft,stride:movingWeight,attack:attackPose,
+          recoil,landing:landingPose,clock,reduced:reducedMotion,
+          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
+        })) {
+        // Distinct first-five base enemy bodies; preserve already-authored
+        // Foundry/Library/Reef/Clock specialist motions by dispatch guard.
+      }
+      else if(fiveWorldRig && window.pawtopiaFiveEnemyRigs.draw(
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
           recoil,landing:landingPose,clock,reduced:reducedMotion,
@@ -7711,7 +7735,7 @@
       // New original silhouettes include their own mechanical, cloth,
       // mist and sound accents; avoid drawing the obsolete extra limbs
       // over them, but retain the original fallback when scripts are absent.
-      if(!fiveWorldRig) drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
+      if(!originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
       // No detached armor outlines or U-shaped halo above enemies.
       // Render the enemy's own sprite and grounded motion effects only.
       drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
