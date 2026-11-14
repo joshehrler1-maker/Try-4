@@ -1,6 +1,28 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
 
+## Batch 7 — playable enemy motion integration, games 21–25
+
+**What actually changed:** The playable canvas now draws five distinctly authored, runtime-procedural **2.5D illustrated enemy rigs** rather than falling back to the generic 5-column sprite atlas in games 21–25. Art source: `assets/animation/late-world-enemy-rigs-v1.js` (commit `fbe47754`). Game integration: `assets/pawcade-side-scroll-no-badges-v2.js` (commit `9f903e6`). Five individualized enemy families follow `assets/enemy-art-motion-registry.json`:
+
+| Game | Original enemy family | Implemented 2.5D body motion | Known limitations |
+| --- | --- | --- | --- |
+| Neon Circuit | Pixel Phantom | Localized glitch plates, roller gait based on world displacement, telescoping strike | Not rendered 3D; teleport/glitch effects and per-archetype variants incomplete |
+| Marble Temple | Mosaic Golem | Carved multi-tile shell, attack brace and timed shield/hit extension, plated grounded feet | Not 3D; no real rolling collision behavior |
+| Swamp Ferry | Bog Lantern | Sprung reed feet, moss body compression, growing luminous lure and attack pulse | Not 3D; spore FX and physics interactions incomplete |
+| Sunflower Flight | Pollen Drifter | Independent hinged petal wings, flight flutter, strike tip and trailing pollen | Not 3D; full swoop animation and edge transitions unverified |
+| Starship Cargo | Cargo Mimic | Planted box stabilizers, independently hinged crate panels, extending grapple and recoil | Not 3D; no physical crate folding or mechanical joints in 3D |
+
+**Simulation synchronization:** Existing foe gait is distance based; walking/airborne/attack/recoil/landing render parameters come from the actual gameplay tick rather than separate timers. Face-left mirrors the entire authored rig. The attack pose follows projectile release. The module fails safely back to the original gameplay atlas when unavailable. Enemy hitboxes, spawn points, AI attack simulation, joystick, score, and progression are unchanged.
+
+**Defeat transition:** `markFoeDefeated` records the defeated enemy's last visible world position at the actual kill. The foe's gameplay `dead` flag switches immediately, preserving collision/attack removal, while its original rig shrinks/fades for at most 0.42 seconds, unless reduced-motion is enabled. No "death" body remains to block the route or resurrect at checkpoint load. New test cases cover rig canvas draw safety, all five runtime families, reduced-motion behavior, and kill snapshot.
+
+**Deployment:** `pawcade-side-scroll.html` loads the new motion module before the game runtime and `sw.js` precaches both with aligned cache-busting versions. GitHub CI and GitHub Pages results are recorded separately; source tests do not substitute for real Android landscape and visual playback verification.
+
+**What remains:** The enemy vector rigs are **not** feature-film quality 3D models, nor full original motion art for takeoff, all landings, hit, and defeat. Hero models, poster-matched rigs, lighting, enemy archetype varieties, tail/cape checks and all 25 finished movies are still outstanding. No paid services were used.
+
+
+
 ## Batch 6 — all six stage-scene props for each of games 21–25
 
 **Repository integration:** 20 original SVG scenery props created and installed for Stages 3, 4, 5 and 6 of Neon Circuit, Marble Temple, Swamp Ferry, Sunflower Flight and Starship Cargo. These add to their first two stage props already installed. Each game now has one **game- and stage-specific 2D-painted scenery prop in each of its six stages**. They are not 3D models or rendered movie frames.
