@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>17)return;
-    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224,202,228,210,236][index];
-    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15,.12,.18,.23,.14][index]);
+    if(index<0 || index>19)return;
+    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190,214,224,202,228,210,236,246,216][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13,.26,.15,.12,.18,.23,.14,.21,.17][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -1978,6 +1978,50 @@
         for(let flake=0;flake<7;flake++){
           const fx=x+12+flake*29,fy=102+((flake*37+variation*19)%135);
           ctx.beginPath();ctx.arc(fx,fy,1.5+flake%2,0,Math.PI*2);ctx.fill();
+        }
+        ctx.globalAlpha=1;
+      }else if(index===18){
+        // Canyon Crossing: layered sandstone mesas, bridge cables and arches.
+        const mesaTop=126+variation*15;
+        ctx.fillStyle='#845a53';
+        ctx.beginPath();ctx.moveTo(x+16,286);ctx.lineTo(x+16,mesaTop+43);
+        ctx.lineTo(x+40,mesaTop+43);ctx.lineTo(x+40,mesaTop);
+        ctx.lineTo(x+155,mesaTop);ctx.lineTo(x+155,mesaTop+56);
+        ctx.lineTo(x+183,mesaTop+56);ctx.lineTo(x+183,286);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#b88167';
+        for(let band=0;band<4;band++)ctx.fillRect(x+42,mesaTop+15+band*28,112,4);
+        ctx.fillStyle='#5d4447';
+        ctx.beginPath();ctx.moveTo(x+58,286);ctx.lineTo(x+58,mesaTop+106);
+        ctx.quadraticCurveTo(x+100,mesaTop+62,x+141,mesaTop+106);
+        ctx.lineTo(x+141,286);ctx.closePath();ctx.fill();
+        ctx.strokeStyle='#d4aa83';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(x+10,mesaTop+25);
+        ctx.quadraticCurveTo(x+113,mesaTop+66,x+230,mesaTop+22);ctx.stroke();
+        for(let cable=0;cable<4;cable++){
+          const bx=x+35+cable*44;
+          ctx.beginPath();ctx.moveTo(bx,mesaTop+35);ctx.lineTo(bx,mesaTop+79);ctx.stroke();
+        }
+      }else if(index===19){
+        // Submarine Dock: pressure hulls, portholes and service piping.
+        const hullY=171+variation*11;
+        ctx.fillStyle='#314c63';
+        ctx.beginPath();ctx.ellipse(x+112,hullY+56,87,53,0,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#7d9ba6';ctx.lineWidth=5;
+        ctx.beginPath();ctx.ellipse(x+112,hullY+56,79,46,0,0,Math.PI*2);ctx.stroke();
+        for(let port=0;port<3;port++){
+          const px=x+62+port*49,py=hullY+52;
+          ctx.fillStyle='#9cdce5';
+          ctx.beginPath();ctx.arc(px,py,13,0,Math.PI*2);ctx.fill();
+          ctx.strokeStyle='#d4b789';ctx.lineWidth=4;
+          ctx.beginPath();ctx.arc(px,py,13,0,Math.PI*2);ctx.stroke();
+        }
+        ctx.fillStyle='#476879';ctx.fillRect(x+102,hullY-37,23,52);
+        ctx.fillRect(x+115,hullY-37,35,11);
+        ctx.strokeStyle='#83b9c7';ctx.lineWidth=4;
+        ctx.beginPath();ctx.moveTo(x+12,273);ctx.lineTo(x+203,273);ctx.stroke();
+        ctx.fillStyle='#b5e8f2';ctx.globalAlpha=.35;
+        for(let bubble=0;bubble<4;bubble++){
+          ctx.beginPath();ctx.arc(x+19+bubble*51,119+bubble%2*22,3+bubble%3,0,Math.PI*2);ctx.fill();
         }
         ctx.globalAlpha=1;
       }
