@@ -399,8 +399,8 @@
         // higher ledges. Swimming routes stay open for free movement.
         const widthFactor=fastRoute?1.38:precisionRoute?.72:
           aerialRoute?.82:aquaticRoute?.88:1;
-        const routeW=Math.round((routeWidths[index]+
-          ((stage+route)%3-1)*12)*widthFactor);
+        const routeW=Math.max(70,Math.round((routeWidths[index]+
+          ((stage+route)%3-1)*12)*widthFactor));
         const routeDrift=aerialRoute?(route%2?48:-34):
           precisionRoute?(route%2?-25:25):0;
         const localX=rx+Math.round(rw*(route+1)/(routeCount+1)-
