@@ -359,7 +359,8 @@
           }
           if(index===2 && !reefEnemyPlaced && w>=100){
             foe.reefEnemy=stage;
-            foe.x=start+(x===0?410:Math.round(x+w*.5));
+            // Keep authored swimmers within their source platform's span.
+            foe.x=start+x+Math.min(w-30,Math.max(30,w*.5));
             foe.y=[198,154,204,124,181,148][stage];
             reefEnemyPlaced=true;
           }
@@ -1582,7 +1583,7 @@
     if(flyingFoes || foe.reefEnemy!==undefined ||
        (foe.foundryEnemy!==undefined && [3,7,8,11,14].includes(foe.foundryEnemy))) continue;
     const supports=platforms.filter(ledge=>
-      !['hazard','rail','ceiling','ceilingSpikes','current','drop'].includes(ledge.kind) &&
+      !['hazard','rail','ceiling','ceilingSpikes','current','drop','spring','lift','pogo'].includes(ledge.kind) &&
       ledge.w>=42 &&
       foe.x>=ledge.x+12 && foe.x<=ledge.x+ledge.w-12 &&
       Math.abs((ledge.y-23)-foe.y)<28
