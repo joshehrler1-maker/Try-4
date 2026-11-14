@@ -2101,8 +2101,8 @@
   // Original platform silhouettes for three distinct reference-inspired
   // worlds. All decorative elements remain outside the collision system.
   function drawSignaturePlatformArt(x,y,w,stage){
-    if(index>8 || w<70)return;
-    const interval=[90,115,130,105,112,124,120,108,88][index];
+    if(index>11 || w<70)return;
+    const interval=[90,115,130,105,112,124,120,108,88,102,132,116][index];
     const first=Math.max(0,Math.floor((camera-x)/interval)-1);
     const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
     ctx.save();ctx.lineJoin='round';
@@ -2211,6 +2211,43 @@
         }
         ctx.strokeStyle='#fff1b3';ctx.beginPath();
         ctx.moveTo(px-26,y+4);ctx.lineTo(px+26,y+4);ctx.stroke();
+      }else if(index===9){
+        // Quarry Rescue: cable anchor, pulley and braced mine gantry.
+        ctx.strokeStyle='#bfa58b';ctx.lineWidth=3;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(px-24,y+4);ctx.lineTo(px+24,y+4);
+        ctx.moveTo(px-21,y+5);ctx.lineTo(px-10,y+27);
+        ctx.moveTo(px+21,y+5);ctx.lineTo(px+10,y+27);ctx.stroke();
+        ctx.fillStyle='#665b60';ctx.strokeStyle='#e2c79e';ctx.lineWidth=2;
+        ctx.beginPath();ctx.arc(px,y+14,9,0,Math.PI*2);ctx.fill();ctx.stroke();
+        ctx.fillStyle='#e6d4aa';ctx.beginPath();ctx.arc(px,y+14,3,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#e6d4aa';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-8,y+14);ctx.lineTo(px-8,y+28);
+        ctx.moveTo(px+8,y+14);ctx.lineTo(px+8,y+28);ctx.stroke();
+      }else if(index===10){
+        // Sunset Wind Sail: curved sail ribs, wind vane and taut canvas.
+        const flutter=reducedMotion?0:Math.sin(clock*2.6+n)*2.5;
+        ctx.strokeStyle='#e9bc7e';ctx.lineWidth=2.5;
+        ctx.beginPath();ctx.moveTo(px-22,y+3);ctx.lineTo(px+22,y+3);
+        ctx.moveTo(px,y+3);ctx.lineTo(px,y+29);ctx.stroke();
+        ctx.fillStyle='#f2d2a0';ctx.strokeStyle='#b97c70';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(px+1,y+6);
+        ctx.quadraticCurveTo(px+23+flutter,y+13,px+20+flutter,y+25);
+        ctx.lineTo(px+1,y+24);ctx.closePath();ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#fff0c7';ctx.beginPath();
+        ctx.moveTo(px+3,y+9);ctx.lineTo(px+14+flutter,y+22);ctx.stroke();
+      }else if(index===11){
+        // Cloud City: layered floating-stone arches and wind crystal lamps.
+        ctx.fillStyle='#7798b8';ctx.strokeStyle='#d8ecff';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-27,y+4);ctx.lineTo(px+27,y+4);
+        ctx.lineTo(px+20,y+12);ctx.lineTo(px+13,y+12);
+        ctx.quadraticCurveTo(px,y+32,px-13,y+12);
+        ctx.lineTo(px-20,y+12);ctx.closePath();ctx.fill();ctx.stroke();
+        ctx.fillStyle='#b4eaff';ctx.beginPath();ctx.moveTo(px,y+7);
+        ctx.lineTo(px+7,y+15);ctx.lineTo(px,y+24);
+        ctx.lineTo(px-7,y+15);ctx.closePath();ctx.fill();
+        ctx.strokeStyle='#f4faff';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(px-15,y+9);ctx.lineTo(px-10,y+9);
+        ctx.moveTo(px+10,y+9);ctx.lineTo(px+15,y+9);ctx.stroke();
       }else{
         // Coral Courier: fan-shaped reef ledges and layered shell supports.
         ctx.fillStyle='#3c8794';ctx.strokeStyle='#a7e9d9';ctx.lineWidth=2;
