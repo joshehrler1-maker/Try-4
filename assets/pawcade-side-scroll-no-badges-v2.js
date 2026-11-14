@@ -6012,6 +6012,35 @@
       ctx.moveTo(18,-12);ctx.lineTo(24,-22);ctx.lineTo(17,-29);
     }
     ctx.stroke();
+    // Authored enemy attachments for the first five adventures. These are
+    // purely visual, sit on the existing body and never alter hitboxes.
+    ctx.save();
+    ctx.strokeStyle=enemyCueColors[index];
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    if(index===0){ // Ember Foundry: paired furnace exhausts and heat guards
+      ctx.moveTo(-13,-27);ctx.lineTo(-13,-38);ctx.lineTo(-8,-40);
+      ctx.moveTo(12,-29);ctx.lineTo(12,-40);ctx.lineTo(17,-42);
+      ctx.moveTo(-17,3);ctx.lineTo(-23,8);ctx.lineTo(-14,9);
+    }else if(index===1){ // Moonlit Library: articulated atlas-reading antenna
+      ctx.moveTo(-12,-28);ctx.lineTo(-18,-37);ctx.lineTo(-11,-41);
+      ctx.moveTo(12,-28);ctx.lineTo(18,-37);ctx.lineTo(11,-41);
+      ctx.moveTo(-9,-32);ctx.lineTo(9,-32);
+    }else if(index===2){ // Coral Courier: long swept reef fins and tail rudder
+      ctx.moveTo(-18,-7);ctx.quadraticCurveTo(-32,-16,-28,-31);
+      ctx.moveTo(18,-7);ctx.quadraticCurveTo(32,-16,28,-31);
+      ctx.moveTo(-14,9);ctx.lineTo(-24,16);ctx.lineTo(-19,5);
+    }else if(index===3){ // Clocktower Relay: asymmetric winding-key prongs
+      ctx.moveTo(-12,-30);ctx.lineTo(-12,-43);ctx.lineTo(-17,-43);
+      ctx.moveTo(12,-30);ctx.lineTo(12,-39);ctx.lineTo(20,-39);
+      ctx.moveTo(20,-39);ctx.lineTo(20,-45);
+    }else if(index===4){ // Seed Garden: leaf-shell shields and thorn tips
+      ctx.moveTo(-18,-14);ctx.quadraticCurveTo(-30,-25,-19,-38);
+      ctx.moveTo(18,-14);ctx.quadraticCurveTo(30,-25,19,-38);
+      ctx.moveTo(-17,7);ctx.lineTo(-24,3);ctx.lineTo(-22,-4);
+    }
+    ctx.stroke();
+    ctx.restore();
     // Deterministic stage emblems: enemy units gain a different etched
     // geometric crest in every chapter of their own course.
     const rank=foe.spawnChapter??chapter;
