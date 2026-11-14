@@ -5,7 +5,9 @@
   const courses = window.pawtopiaCourses;
   const catalog = byId('side-catalog');
   if (!catalog) return;
-  if (!Array.isArray(courses) || !Array.isArray(window.pawtopiaStyles) || !Array.isArray(window.pawtopiaVariants) || !Array.isArray(window.pawtopiaTechniques) || !Array.isArray(window.pawtopiaChapters)) {
+  const gameData = [courses, window.pawtopiaStyles, window.pawtopiaVariants,
+    window.pawtopiaTechniques, window.pawtopiaChapters, window.pawtopiaRoomPlans, window.pawtopiaSetPieces];
+  if (!gameData.every(Array.isArray)) {
     catalog.textContent = 'The games could not load. Please refresh the page.';
     return;
   }
@@ -27,14 +29,15 @@
   if (!canvas) return;
   const selection = new URLSearchParams(location.search).get('game');
   if (selection === null) return;
-  if (!/^\d+$/.test(selection) || !courses[Number(selection)] || !window.pawtopiaStyles[Number(selection)] || !window.pawtopiaVariants[Number(selection)] || !window.pawtopiaTechniques[Number(selection)] || !window.pawtopiaChapters[Number(selection)]) {
+  const index = Number(selection);
+  if (!/^\d+$/.test(selection) || !gameData.slice(0,5).every(table=>Array.isArray(table[index])) ||
+      !gameData.slice(5).every(table=>typeof table[index]==='string')) {
     const notice = document.createElement('p');
     notice.setAttribute('role', 'alert');
     notice.textContent = 'This game is unavailable. Choose another adventure below.';
     catalog.before(notice);
     return;
   }
-  const index = Number(selection);
   const [name, hero, opening, ending, coursePower, terrain] = courses[index];
   const [reference, movement, enemyPattern, prologue, epilogue] = window.pawtopiaStyles[index];
   const [runSpeed, handling, jumpSpeed, cadence, , goalType] = window.pawtopiaVariants[index];
@@ -73,6 +76,13 @@
     momentum:index===3?'Hold down and tap Jump to charge a spin dash. Release down to roll.':'Hold a direction to build speed. Press Action to burst forward.'
   };
   const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    const notice = document.createElement('p');
+    notice.setAttribute('role', 'alert');
+    notice.textContent = 'This browser could not start the playfield.';
+    catalog.before(notice);
+    return;
+  }
   const backdrop = new Image();
   backdrop.src = scenery;
   const sprites = new Image();
@@ -1754,7 +1764,7 @@
       const nextBeat=stage===sections-1 ? ending : (stage%2===0 ? epilogue : prologue);
       status(chapters[stage] + ' · ' + nextBeat + (checkpointSaved ? ' · Checkpoint saved.' : ' · Could not save this checkpoint.'));
       hud();
-      if(index===0 && stage<foundryStory.length-1){showFoundryStory(stage);return;}
+      if(index===0 && stage<foundryStory.length-1 && showFoundryStory(stage)) return;
     }
     for (const c of crystals) {
       if (!c.taken && (!c.reefCache || reefCacheOpen) && close(p,c,24,29)) {if(c.refill){p.dashUsed=false;p.power=0;}c.taken=true;burst(c.x,c.y,c.refill?'#82ffe6':'#ffdb80',9);playCue(650,980);taken++;if(index===3)rings++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
@@ -5954,6 +5964,7 @@
     storyFrame=requestAnimationFrame(render);
   }
   function showFoundryStory(scene) {
+    if(typeof window.HTMLDialogElement?.prototype.showModal!=='function') return false;
     clearInput();
     if(!storyDialog){
       storyDialog=document.createElement('dialog');
@@ -5986,6 +5997,7 @@
     storyDialog.children[2].textContent=scene===6?'Close':'Continue';
     storyDialog.showModal();
     playFoundryShot(scene);
+    return true;
   }
   function loop(now) {
     accumulator += Math.min(.075,Math.max(0,(now-last)/1000));
@@ -6024,7 +6036,7 @@
     canvas.focus({preventScroll:true});
     accumulator=0;
     last=performance.now();
-    if(index===0 && !saved){draw();showFoundryStory(0);}
+    if(index===0 && !saved && typeof window.HTMLDialogElement?.prototype.showModal==='function'){draw();showFoundryStory(0);}
     else frame=requestAnimationFrame(loop);
   }
   byId('side-start').onclick=()=>startRun(null);
