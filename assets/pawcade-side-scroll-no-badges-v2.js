@@ -3991,6 +3991,24 @@
           ctx.lineTo(px+cell*.48,y+15);ctx.lineTo(px+cell-4,y+9);ctx.stroke();
           ctx.fillStyle='#ffcb81';ctx.beginPath();
           ctx.arc(px+5,y+7,2,0,Math.PI*2);ctx.arc(px+cell-5,y+7,2,0,Math.PI*2);ctx.fill();
+          // Each foundry chapter alternates forged panels, inset vents,
+          // and heat-tempered plates. Keep decoration behind the top lip.
+          if((k+stage)%3===0 && cell>=48){
+            const ventX=px+cell*.31;
+            const ventY=y+10;
+            ctx.fillStyle='#261b2e';
+            ctx.fillRect(ventX,ventY,cell*.38,5);
+            const heat=ctx.createLinearGradient(0,ventY,0,ventY+5);
+            heat.addColorStop(0,'#ffce81');
+            heat.addColorStop(1,'#c64d40');
+            ctx.fillStyle=heat;
+            ctx.fillRect(ventX+2,ventY+2,cell*.38-4,1.5);
+            ctx.strokeStyle='#8f6b76';ctx.lineWidth=1;
+            for(let slit=0;slit<3;slit++){
+              const sx=ventX+4+slit*(cell*.38-8)/2;
+              ctx.beginPath();ctx.moveTo(sx,ventY+1);ctx.lineTo(sx,ventY+5);ctx.stroke();
+            }
+          }
         }
         ctx.restore();
       }
