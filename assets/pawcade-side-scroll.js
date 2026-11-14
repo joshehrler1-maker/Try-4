@@ -1056,7 +1056,8 @@
           clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
         const parryable=index===16 && foe.shotsFired++%3===0;
         hazards.push(enemyRound(position,direction,parryable));
-        foe.shotAt=clock+cadence/enemyTempo;
+        const shotDelay=index===16 ? (foe.turret ? 1.35 : 2.25) : 1;
+        foe.shotAt=clock+cadence/enemyTempo*shotDelay;
       }
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
       if(impact){
@@ -1241,12 +1242,40 @@
   const enemyRounds = {
     1:[215,'#86daff'], // Moonlit Library sentry bolt
     9:[150,'#ffc178'], // Quarry Rescue warning shot
+    16:[195,'#ffc562'], // Steamworks pressure pellet
     17:[165,'#dbf7ff'], // Snow Village frost pellet
     24:[245,'#ffe28e'] // Starship Cargo tracer
   };
   function enemyRound(position,direction,parryable) {
     const [speed,color]=enemyRounds[index] || [180,'#ff8479'];
     return {x:position.x+direction*12,y:position.y,v:direction*speed,life:2,parry:parryable,color};
+  }
+  function drawSteamworksEnemy(at,foe,faceLeft,firing) {
+    ctx.save();
+    ctx.translate(at.x,at.y);
+    if(faceLeft) ctx.scale(-1,1);
+    ctx.fillStyle='#302731';
+    ctx.fillRect(-18,8,36,14);
+    ctx.fillStyle=foe.turret?'#54817e':'#ba714b';
+    ctx.fillRect(-15,-16,29,28);
+    ctx.strokeStyle='#f1cb8a';
+    ctx.lineWidth=2;
+    ctx.strokeRect(-15,-16,29,28);
+    ctx.fillStyle='#392d34';
+    if(foe.turret){
+      ctx.fillRect(7,-12,24,12);
+      ctx.fillRect(-9,-23,12,7);
+    }else{
+      for(const x of [-11,10]){
+        ctx.beginPath();
+        ctx.arc(x,16,7,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.fillRect(-16,-23,6,9);
+    }
+    ctx.fillStyle=firing?'#fff1a5':'#e79651';
+    ctx.fillRect(0,-10,8,5);
+    ctx.restore();
   }
   function foePosition(foe) {
     if(foe.bashed && clock<foe.bashed.until){
@@ -2915,7 +2944,8 @@
       ctx.scale((firing?1.09:1+motion*.025)+bodyStretch+chargeCompression,
         (firing?.94:1-motion*.025)-bodyStretch*.7-chargeCompression);
       ctx.translate(-at.x,-at.y-19-footstep);
-      if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
+      if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
+      else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
       ctx.restore();
