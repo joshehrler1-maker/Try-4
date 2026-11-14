@@ -4695,11 +4695,21 @@
     if(index!==10 || phase!=='playing' || !player.carry) return;
     ctx.save();
     ctx.fillStyle='#302036';
-    ctx.fillRect(13,12,260,25);
+    ctx.fillRect(13,12,288,25);
+    // Wind-wrapped cargo icon stays in the HUD during the jump.
+    ctx.strokeStyle='#8df5ed';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.ellipse(27,24,9,6,-.45,0,Math.PI*2);
+    ctx.stroke();
+    ctx.fillStyle='#ffbb77';
+    ctx.beginPath();
+    ctx.arc(27,24,3.5,0,Math.PI*2);
+    ctx.fill();
     ctx.fillStyle='#ffe0a5';
     ctx.font='bold 11px system-ui';
     ctx.textAlign='left';
-    ctx.fillText('Carrying enemy · Jump in midair or use '+techniqueName+' to throw',20,28,246);
+    ctx.fillText('Carrying enemy · Jump in midair or use '+techniqueName+' to throw',43,28,250);
     ctx.restore();
   }
   function drawGravityStatus() {
