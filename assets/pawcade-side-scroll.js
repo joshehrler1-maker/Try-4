@@ -147,7 +147,20 @@
   const [jumpFactor,holdGravity,releaseGravity,fallGravity]=jumpProfiles[index];
   const sections = chapters.length;
   const sectionSize = index===0 || index===16 ? 3020 : 2200;
-  const finish = sections * sectionSize;
+  // Steamworks alternates compact shooting galleries with longer factory runs.
+  const stageWidths=index===16 ? [3020,3270,3020,3460,3220,3020] : Array(sections).fill(sectionSize);
+  const stageStarts=[0];
+  for(const width of stageWidths) stageStarts.push(stageStarts.at(-1)+width);
+  const finish=stageStarts[sections];
+  function stageAt(x){
+    let low=0,high=sections-1;
+    while(low<high){
+      const mid=Math.ceil((low+high)/2);
+      if(x>=stageStarts[mid]) low=mid;
+      else high=mid-1;
+    }
+    return low;
+  }
   const finale = ['guardian','sprint','switch','crystals','summit'][goalType];
   const guardian = {
     0:{name:'Furnace Crab',pattern:'hop',hint:'Jump over Baron and land a stomp.'},
@@ -165,7 +178,6 @@
   })[finale] || 'Reach the exit.';
   const exitX = finish+720;
   const ground = 326;
-  const checkpoint = x => Math.floor(x / sectionSize) * sectionSize;
   const status = message => { byId('side-status').textContent = message; };
   const powerButton = document.querySelector('[data-control="action"]');
   if (index===3) powerButton.style.display='none';
@@ -259,10 +271,10 @@
     [[1200,274,178],[1430,239,156],[1635,210,148]]
   ];
   for (const [stage, room] of plan.entries()) {
-    const start = stage * sectionSize;
+    const start = stageStarts[stage];
     if(index===16){
       // Keep a continuous lower route. The catwalks offer cover and higher firing lanes.
-      platforms.push({x:start,y:ground,w:sectionSize,kind:'floor',steamDeck:-1});
+      platforms.push({x:start,y:ground,w:stageWidths[stage],kind:'floor',steamDeck:-1});
       const catwalks=[[[340,275,185],[600,236,205],[895,260,195],[1430,272,225],[1720,212,185],[2010,256,220],[2530,273,250]],
         [[265,267,230],[575,223,155],[830,169,220],[1215,251,220],[1610,225,265],[2110,271,175],[2440,216,280]],
         [[410,260,145],[635,204,145],[875,151,195],[1340,272,270],[1740,221,238],[2150,193,180],[2560,264,255]],
@@ -276,6 +288,13 @@
           x:start+x+w*.68,y:y-23,offset:stage+slot,turret:true
         });
       });
+      if(stageWidths[stage]>sectionSize){
+        const x=start+2860;
+        const y=stage===3?224:266;
+        platforms.push({x,y,w:stageWidths[stage]-2930,kind:'floor',steamDeck:stage%3});
+        crystals.push({x:x+65,y:y-35});
+        enemies.push({x:x+100,y:y-23,offset:stage,turret:true});
+      }
       for(const x of [950,1490,2150,2720]){
         enemies.push({x:start+x,y:ground-23,offset:stage+x/100,
           patrolLeft:start+x-70,patrolRight:start+x+70});
@@ -512,8 +531,8 @@
   }
   if(power==='flip'){
     for(let stage=0;stage<sections;stage++){
-      const x=stage*sectionSize;
-      platforms.push({x,y:32,w:sectionSize,kind:'ceiling'});
+      const x=stageStarts[stage];
+      platforms.push({x,y:32,w:stageWidths[stage],kind:'ceiling'});
       for(const offset of [315,1010,1785]){
         platforms.push({x:x+offset+stage*11,y:68,w:50+stage*5,kind:'ceilingSpikes'});
       }
@@ -528,7 +547,7 @@
     for(let i=0;i<3;i++) crystals.push({x:finish+140+i*160,y:ground-24});
   }
   const walls = wallMoves ? plan.map((room,stage)=>({
-    x:stage*sectionSize+(movement==='buster'?700:800),top:movement==='buster'?200:163
+    x:stageStarts[stage]+(movement==='buster'?700:800),top:movement==='buster'?200:163
   })) : [];
   for(const wall of walls) {
     platforms.push({x:wall.x,y:wall.top,w:20,kind:'floor'});
@@ -536,7 +555,7 @@
     platforms.push({x:wall.x-160,y:wall.top+62,w:145,kind:'floor'});
     platforms.push({x:wall.x+24,y:wall.top+49,w:106,kind:'floor'});
   }
-  const tunnels = index===14 ? plan.map((room,stage)=>({x:stage*sectionSize+480,w:130,y:ground-33})) : [];
+  const tunnels = index===14 ? plan.map((room,stage)=>({x:stageStarts[stage]+480,w:130,y:ground-33})) : [];
   const resetPlayer = (x = 100) => ({
     x,y:ground-22,air:airCapacity,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0,spin:0,dashUsed:false,chargeStart:null,jumpBuffer:0,coyote:0,jumpCut:false
   });
@@ -837,15 +856,15 @@
   function respawn() {
     for(const ledge of platforms) if(ledge.kind==='drop') ledge.dropAt=undefined;
     if(index===11){
-      const start=chapter*sectionSize;
+      const start=stageStarts[chapter];
       for(const crystal of crystals){
-        if(crystal.refill && crystal.taken && crystal.x>=start && crystal.x<start+sectionSize){
+        if(crystal.refill && crystal.taken && crystal.x>=start && crystal.x<stageStarts[chapter+1]){
           crystal.taken=false;
           taken--;
         }
       }
     }
-    player = resetPlayer(escape ? finish+635 : chapter * sectionSize + 100);
+    player = resetPlayer(escape ? finish+635 : stageStarts[chapter] + 100);
     if (escape) escape=95;
     player.grace = 1.1;
     attacks = [];
@@ -1029,7 +1048,7 @@
       playCue(390,780);
       status('Amber switch activated. The upper bridge is open.');
     }
-    const stage = Math.min(sections-1,Math.floor(checkpoint(p.x)/sectionSize));
+    const stage = stageAt(p.x);
     if (oldY <= height && p.x>=finish && p.x-p.vx*dt<finish) {
       status(boss.health ? 'Baron Brasswhirl · '+guardian.hint : finaleExitHint);
     }
@@ -1446,7 +1465,7 @@
     ['#285457','#142b36','#88ecd7','#4b9e98',58,'grates']
   ];
   function drawLibraryPlatform({x,y,w}) {
-    const stage=Math.min(libraryPlatforms.length-1,Math.floor(x/sectionSize));
+    const stage=Math.min(libraryPlatforms.length-1,stageAt(x));
     const [face,shadow,rim,trim,spacing,detail]=libraryPlatforms[stage];
     const depth=y>=ground?height-y:22;
     const material=ctx.createLinearGradient(0,y,0,y+depth);
@@ -1729,7 +1748,7 @@
   // Small deterministic stage-specific surface accents. Draw-only; no collision changes.
   function drawPlatformAccents({x,y,w,kind}) {
     if(w<34 || kind==='hazard' || kind==='ceilingSpikes') return;
-    const stage=Math.min(sections-1,Math.max(0,Math.floor(x/sectionSize)));
+    const stage=Math.min(sections-1,Math.max(0,stageAt(x)));
     const [face,recess,rim]=courseMaterials[index];
     const motif=(index*7+stage*3)%5;
     const pitch=motif===0?38:motif===1?48:motif===2?57:motif===3?43:65;
@@ -1839,7 +1858,7 @@
   function drawPlatformConstruction(ledge,depth) {
     const {x,y,w,kind}=ledge;
     if(w<22 || depth<10 || kind==='hazard' || kind==='ceilingSpikes') return;
-    const stage=Math.min(sections-1,Math.max(0,Math.floor(x/sectionSize)));
+    const stage=Math.min(sections-1,Math.max(0,stageAt(x)));
     // Reference-inspired construction families (not copied sprites or layouts).
     // Each adventure has its own palette of platform motifs, based on the
     // movement challenges and setting of its named gameplay inspiration.
@@ -2079,7 +2098,7 @@
         const center=x+24+panel*spacing;
         ctx.save();
         ctx.translate(center,y+19);
-        const stage=Math.min(platformPlaqueFrames.length-1,Math.floor(center/sectionSize));
+        const stage=Math.min(platformPlaqueFrames.length-1,stageAt(center));
         const frame=platformPlaqueFrames[stage];
         ctx.fillStyle='#161423';
         ctx.fill(frame);
@@ -2527,7 +2546,7 @@
         ctx.globalAlpha=1;
 
         // Each chapter has its own factory machinery and silhouette.
-        const chapterIndex=Math.min(sections-1,Math.max(0,Math.floor((camera+width/2)/sectionSize)));
+        const chapterIndex=Math.min(sections-1,Math.max(0,stageAt((camera+width/2))));
         const machineX=x+190;
         const machineY=262+variation*5;
         ctx.save();
@@ -2875,7 +2894,7 @@
       if (ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
       if(ledge.switchBridge && !amberSwitch) continue;
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
-      const foundryStage=index===0 ? Math.floor(ledge.x/sectionSize) : -1;
+      const foundryStage=index===0 ? stageAt(ledge.x) : -1;
       if(foundryStage>=6 && foundryStage<=17 && ['floor','lift','spring','belt','current'].includes(ledge.kind)){
         const {x,y,w,kind}=ledge;
         const floodgate=foundryStage===7;
@@ -2934,7 +2953,7 @@
         drawLandingEdge(ledge);
         continue;
       }
-      if(index===3 && Math.floor(ledge.x/sectionSize)===3 && ledge.kind==='spring' &&
+      if(index===3 && stageAt(ledge.x)===3 && ledge.kind==='spring' &&
          atlasSprite(propArt,4,2,ledge.x+ledge.w/2,ledge.y+14,ledge.w,28,false,2)) {
         drawLandingEdge(ledge);
         continue;
@@ -2994,7 +3013,7 @@
       }
     }
     for(let stage=1;stage<sections;stage++){
-      const x=stage*sectionSize+100;
+      const x=stageStarts[stage]+100;
       if(x<camera-30 || x>camera+width+30) continue;
       const reached=stage<=chapter;
       ctx.save();
@@ -3696,7 +3715,7 @@
       for(const i of saved.crystals) if(crystals[i]) crystals[i].taken=true;
       for(const i of saved.enemies) if(enemies[i]) enemies[i].dead=true;
       taken=crystals.filter(c=>c.taken).length;
-      player=resetPlayer(chapter*sectionSize+100);
+      player=resetPlayer(stageStarts[chapter]+100);
       camera=Math.max(0,player.x-238);
       status(chapters[chapter]+' · Checkpoint resumed.');
       hud();
