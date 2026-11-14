@@ -3229,8 +3229,12 @@
         y:foe.y-22-(.5+.5*Math.sin(t*1.7))*enemyRise};
     }
     if(index===15){ // Bamboo Village: ambush, then retreat
-      const cycle=(t*.65)%2;
-      const rush=cycle<.55?cycle/.55:cycle<1.1?1:Math.max(0,1-(cycle-1.1)/.9);
+      const cycle=((t*.65)%2+2)%2;
+      // Ease in and out of the ambush instead of snapping velocity at
+      // the attack/hold/retreat boundaries; keep a full recovery interval.
+      const ease=x=>x*x*(3-2*x);
+      const rush=cycle<.55?ease(cycle/.55):cycle<1.1?1:
+        ease(Math.max(0,1-(cycle-1.1)/.9));
       return {x:patrolX(foe.x+chase*rush*enemyReach*.7),
         y:foe.y};
     }
