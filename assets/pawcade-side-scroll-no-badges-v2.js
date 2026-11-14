@@ -6288,7 +6288,9 @@
     // Brief body-level recoil for confirmed bash states; no overhead markers.
     // A hit reaction must decay; a persistent bashed flag must not make
     // an enemy jitter forever. Advance only while the enemy is rendered.
-    const reactionDt=Math.min(.05,Math.max(0,clock-(foe._rigFrameAt??clock)));
+    const rawReactionDt=Math.max(0,clock-(foe._rigFrameAt??clock));
+    const reactionDt=Math.min(.05,rawReactionDt);
+    if(rawReactionDt>.15)foe._rigHitReaction=0;
     foe._rigFrameAt=clock;
     const hitEdge=Boolean(foe.bashed)&&!foe._rigWasBashed;
     foe._rigWasBashed=Boolean(foe.bashed);
@@ -7156,6 +7158,9 @@
       // Visual-only; enemy AI, hitboxes, timing and damage remain untouched.
       const blendDt=Math.min(.05,Math.max(0,elapsed));
       const poseTarget=firing?1:anticipation?.55:0;
+      // Reset visual windup after a long render gap; attack simulation is
+      // authoritative and will supply a fresh pose on the next frame.
+      if(elapsed>.15)foe._attackPose=poseTarget;
       // Attack pose profiles vary by world: quick jabs, heavy windups,
       // spring-loaded strikes and slow mechanical recoveries.
       const attackProfiles=[
