@@ -1070,6 +1070,31 @@
     platforms.push({x:wall.x-160,y:wall.top+62,w:145,kind:'floor'});
     platforms.push({x:wall.x+24,y:wall.top+49,w:106,kind:'floor'});
   }
+  const platformBucketWidth=800;
+  const platformBuckets=new Map();
+  for(const ledge of platforms){
+    const first=Math.floor((ledge.x-width-8)/platformBucketWidth);
+    const last=Math.floor((ledge.x+ledge.w+8)/platformBucketWidth);
+    for(let bucket=first;bucket<=last;bucket++){
+      if(!platformBuckets.has(bucket)) platformBuckets.set(bucket,[]);
+      platformBuckets.get(bucket).push(ledge);
+    }
+  }
+  // Keep authored collision and draw order within each local list.
+  const escapePlatformBuckets=new Map();
+  if(index===20){
+    for(const [bucket,ledges] of platformBuckets){
+      escapePlatformBuckets.set(bucket,[...ledges,returnFloor]);
+    }
+  }
+  const noPlatforms=[];
+  const returnFloorOnly=[returnFloor];
+  function localPlatforms(x){
+    const bucket=Math.floor(x/platformBucketWidth);
+    return escape===null
+      ? platformBuckets.get(bucket)??noPlatforms
+      : escapePlatformBuckets.get(bucket)??returnFloorOnly;
+  }
   const observatoryTunnelWidths = [86, 114, 158, 104, 172, 126];
   const tunnels = index===14 ? plan.map((_,stage)=>({
     x:stageStarts[stage]+480,w:observatoryTunnelWidths[stage],y:ground-33
@@ -2060,7 +2085,7 @@
     }
     let landingSurface=null;
     let upperContact=null;
-    for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
+    for (const ledge of localPlatforms(p.x)) {
       if(ledge.switchBridge && !amberSwitch) continue;
       if (p.x < ledge.x-8 || p.x > ledge.x+ledge.w+8) continue;
       if(ledge.kind==='ceilingSpikes'){
@@ -4189,10 +4214,10 @@
     ctx.strokeStyle=color;
     ctx.lineWidth=1;
     ctx.globalAlpha*=.72;
+    ctx.beginPath();
     for(let offset=spacing/2;offset<w-8;offset+=spacing){
       const px=x+offset;
       const py=y-depth/2;
-      ctx.beginPath();
       if(motif===0) {
         ctx.moveTo(px-5,py);ctx.lineTo(px+5,py);
       } else if(motif===1) {
@@ -4202,10 +4227,11 @@
       } else if(motif===3) {
         ctx.moveTo(px-4,py+2);ctx.lineTo(px,py-2);ctx.lineTo(px+4,py+2);
       } else {
+        ctx.moveTo(px+4*Math.cos(.25),py-4*Math.sin(.25));
         ctx.ellipse(px,py,4,1.8,-.25,0,Math.PI*2);
       }
-      ctx.stroke();
     }
+    ctx.stroke();
   }
   function drawLandingEdge({x,y,w,kind}) {
     const rim=courseMaterials[index][2];
@@ -5649,7 +5675,7 @@
       ctx.fillRect(t.x,t.y-12,4,10);
       ctx.fillRect(t.x+t.w-4,t.y-12,4,10);
     }
-    for (const ledge of escape ? [...platforms,returnFloor] : platforms) {
+    for (const ledge of localPlatforms(camera)) {
       if (ledge.dropAt!==undefined && clock>=ledge.dropAt) continue;
       if(ledge.switchBridge && !amberSwitch) continue;
       if (ledge.x+ledge.w<camera || ledge.x>camera+width) continue;
