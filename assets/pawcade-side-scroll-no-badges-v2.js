@@ -675,6 +675,8 @@
         // the existing water physics and leave ample swim-through space.
         const swimKind=(index===2||index===19) && kind==='lift'
           ? 'current':kind;
+        // Do not append a ledge past the chapter's right boundary.
+        if(sx+width>start+stageWidths[stage]-75) continue;
         if(addOptionalLanding(sx,height,width,swimKind) && slot===1)
           crystals.push({x:sx+width/2,y:height-37});
       }
