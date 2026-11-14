@@ -1060,3 +1060,7 @@ window.pawtopiaRooms.eggFort = [[0,326,2200],[378,274,224],[662,235,231],[950,19
 
 // Lava Yard introduces a single rebound before a two-platform bounce chain.
 window.pawtopiaRooms.course12Stage3 = [[0,326,410],[470,288,192,"pogo"],[716,249,261],[1034,276,176,"pogo"],[1268,239,208,"pogo"],[1533,208,238],[1827,326,373]];
+
+// Thunder Harbor: a staged mechanical ascent and upper airship crossing.
+window.pawtopiaRooms.course12Stage4 = [[0,326,505],[558,280,201,"belt"],[816,238,190,"lift"],[1060,192,245],[1363,224,220],[1637,270,217,"belt"],[1906,326,294]];
+window.pawtopiaRooms.course12Stage5 = [[0,326,2200],[370,269,249],[675,228,228],[959,247,243],[1260,286,88,"hazard"],[1258,211,170],[1482,250,228],[1766,278,285]];
