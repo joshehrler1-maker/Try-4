@@ -817,3 +817,23 @@ for (const [stage, room] of window.pawtopiaRoomPlans[20].split(' ').entries()) {
     window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
   }
 }
+
+// Marble Temple stairs and Quarry Rescue grapple landings.
+for (const [room, placements] of Object.entries({
+  moonVillage: [[2,860,259,255]],
+  moonGate: [[2,613,232,221]],
+  moonChapel: [[3,1004,182,312]],
+  moonHalls: [[3,976,255,263]],
+  moonShip: [[2,841,256,245],[3,1132,222,266]],
+  moonGallery: [[3,889,168,270]],
+  course9Stage1: [[1,496,288,283]],
+  course9Stage2: [[2,858,208,272]],
+  course9Stage3: [[2,895,235,275]],
+  course9Stage4: [[3,1216,189,313]],
+  course9Stage5: [[2,781,215,270]],
+  course9Stage6: [[2,873,230,302]],
+})) {
+  for (const [slot, x, y, width] of placements) {
+    window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+  }
+}
