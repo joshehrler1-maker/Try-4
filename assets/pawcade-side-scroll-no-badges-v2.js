@@ -3366,6 +3366,23 @@
       }else if(index===4){ // drifting seed pollen
         const sway=Math.sin(clock*.7+seed)*radius*1.5;
         ctx.ellipse(x+sway,y,radius*.8,radius*1.6,seed*.3,0,Math.PI*2);
+      }else if(index===5){ // Waterfall Climb: mist droplets stretched by falling water
+        ctx.ellipse(x,y,radius*.65,radius*1.9,0,0,Math.PI*2);
+      }else if(index===6){ // Lantern Festival: glowing lantern motes
+        ctx.roundRect(x-radius,y-radius*1.3,radius*2,radius*2.6,radius*.5);
+      }else if(index===7){ // Crystal Polarity: angular charged fragments
+        ctx.moveTo(x,y-radius*2);
+        ctx.lineTo(x+radius,y);
+        ctx.lineTo(x,y+radius*2);
+        ctx.lineTo(x-radius,y);
+        ctx.closePath();
+      }else if(index===8){ // Stage Beat: pulsing sound notes
+        const pulse=1+.2*Math.sin(clock*4+seed);
+        ctx.arc(x,y,radius*pulse,0,Math.PI*2);
+        ctx.moveTo(x+radius*pulse,y);
+        ctx.lineTo(x+radius*pulse,y-radius*2);
+      }else if(index===9){ // Quarry Rescue: falling grit and stone dust
+        ctx.rect(x-radius*.7,y-radius*.7,radius*1.4,radius*1.4);
       }else{
         ctx.arc(x,y,radius,0,Math.PI*2);
       }
