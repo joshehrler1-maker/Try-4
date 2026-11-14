@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v62-controller-sides';
+const CACHE = 'try4-public-v63-20-stage1-art';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-companions.html","pawtopia-arcade.html","crystal-regions/blue-tech-mines.html","crystal-regions/brown-earth-quarries.html","crystal-regions/cyan-frost-caverns.html","crystal-regions/green-life-groves.html","crystal-regions/indigo-shadow-tunnels.html","crystal-regions/orange-volcanic-depths.html","crystal-regions/pink-harmony-grotto.html","crystal-regions/purple-mystic-halls.html","crystal-regions/red-flame-caves.html","crystal-regions/yellow-light-ruins.html","assets/pawtopia-scenes.css","assets/scenes/pawtopia.webp","assets/scenes/cottage.webp","assets/scenes/arcade.webp","assets/scenes/catacombs.webp","assets/scenes/red-flame-caves.webp","assets/scenes/purple-mystic-halls.webp","assets/scenes/blue-tech-mines.webp","assets/scenes/green-life-groves.webp","assets/scenes/orange-volcanic-depths.webp","assets/scenes/cyan-frost-caverns.webp","assets/scenes/indigo-shadow-tunnels.webp","assets/scenes/yellow-light-ruins.webp","assets/scenes/pink-harmony-grotto.webp","assets/scenes/brown-earth-quarries.webp","assets/whisker-luna-master.png","assets/pawtopia-atlas.css","assets/crystal-regions.css","assets/pawtopia-save.js","assets/companion-cottage.css","assets/companion-cottage.js");
 FILES.push("pawtopia-town.html","assets/pawtopia-town.js","assets/pawtopia-town.css");
@@ -15,13 +15,37 @@ FILES.push("pawcade-collection.html","assets/pawcade-collection.js","assets/pawc
 FILES.push("assets/pawcade-directory.css");
 FILES.push("pawcade-side-scroll.html","assets/pawcade-side-scroll.js","assets/pawcade-side-scroll.js?v=landing-edges","assets/pawcade-side-scroll.css","assets/pawcade-side-directory.css","assets/scenes/side-scroll-worlds.webp");
 FILES.push(
-  'assets/platform-worlds.js?v=opening-traversal-25',
-  'assets/pawcade-side-scroll-no-badges-v2.js?v=event-audio-v1',
-  'assets/pawcade-side-scroll.css?v=controller-sides-v1',
+  'assets/platform-worlds.js?v=harbor-finale-e803531',
+  'assets/pawcade-side-scroll-no-badges-v2.js?v=stage1-art-775c47c',
+  'assets/pawcade-side-scroll.css?v=landscape-controls-68386cd',
   'assets/platform-worlds.js', 'assets/game-fullscreen.css', 'assets/game-fullscreen.js',
   'assets/touch-joystick.css', 'assets/touch-joystick.js', 'assets/touch-joystick.js?v=pointer-stability-v1', 'assets/whisker-luna-master.webp',
   ...['levels','sprites','enemies','heroes','terrain','stage-props','combat','landmarks','guardians']
     .map(name => 'assets/scenes/platform-' + name + '.webp')
+);
+// Game-specific Stage 1 illustrated landmarks. Keep each path separate so
+// a player returning offline sees the same scene instead of a missing asset.
+FILES.push(
+  'assets/scenes/ember-foundry/cold-intake-beacon.svg',
+  'assets/scenes/moonlit-library/atlas-lectern.svg',
+  'assets/scenes/coral-courier/pearl-vent.svg',
+  'assets/scenes/clocktower-relay/sunrise-gear.svg',
+  'assets/scenes/seed-garden/seed-lantern.svg',
+  'assets/scenes/waterfall-climb/spray-bridge-icefall.svg',
+  'assets/scenes/lantern-festival/parade-gate-lantern.svg',
+  'assets/scenes/crystal-polarity/inverted-intake-core.svg',
+  'assets/scenes/stage-beat/sound-check-resonator.svg',
+  'assets/scenes/quarry-rescue/lift-house-winch.svg',
+  'assets/scenes/sunset-wind-sail/sunset-pier-wind-sock.svg',
+  'assets/scenes/cloud-city/cloud-ferry-beacon.svg',
+  'assets/scenes/thunder-harbor/breakwater-lightning-rod.svg',
+  'assets/scenes/autumn-trail/feather-trail-marker.svg',
+  'assets/scenes/inverted-observatory/lower-dome-star-lens.svg',
+  'assets/scenes/bamboo-village/bamboo-gate-lantern.svg',
+  'assets/scenes/steamworks/intake-valve-pressure-console.svg',
+  'assets/scenes/snow-village/hearth-trail-ember-marker.svg',
+  'assets/scenes/canyon-crossing/rope-bridge-winch.svg',
+  'assets/scenes/submarine-dock/research-pier-sonar-beacon.svg'
 );
 const gamePage = new URL('pawcade-side-scroll.html', self.registration.scope);
 const allowed = new Set(FILES.map(file => new URL(file, self.registration.scope).href));
