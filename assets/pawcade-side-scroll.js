@@ -3979,7 +3979,16 @@
       }
       // Articulated forge-claw attack: shoulder, elbow and claw sweep
       // follow the enemy's firing state rather than looping continuously.
-      const attackReach=firing?9+Math.sin(phase*2)*3:2+stride*2;
+      // Blend between locomotion and striking instead of snapping the arm.
+      // Clamp elapsed time so a background-tab resume cannot jump the pose.
+      const poseNow=performance.now();
+      const poseDelta=Math.min(.05,Math.max(0,(poseNow-(foe._foundryPoseAt||poseNow))/1000));
+      foe._foundryPoseAt=poseNow;
+      const targetAttack=firing?1:0;
+      const previousAttack=Number.isFinite(foe._foundryAttackBlend)?foe._foundryAttackBlend:0;
+      foe._foundryAttackBlend=previousAttack+(targetAttack-previousAttack)*(1-Math.exp(-poseDelta*(firing?18:9)));
+      const attackBlend=foe._foundryAttackBlend;
+      const attackReach=2+stride*2+attackBlend*(7+Math.sin(phase*2)*3);
       const shoulderX=direction*14;
       ctx.lineWidth=3.6;
       ctx.beginPath();
