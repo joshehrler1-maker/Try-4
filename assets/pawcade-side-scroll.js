@@ -3781,6 +3781,17 @@
     const direction=faceLeft?-1:1;
     ctx.save();ctx.translate(at.x,at.y);
     ctx.globalAlpha=.25+stride*.26;
+    // Late chapters add a restrained trailing motion accent during travel.
+    // Skip it when reduced-motion accessibility is enabled (guard above).
+    if(chapter>=3 && stride>.25 && !airborne){
+      const wake=9+Math.min(5,chapter)*2;
+      ctx.strokeStyle=enemyCueColors[index];ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.moveTo(-direction*23,-12);
+      ctx.quadraticCurveTo(-direction*(23+wake*.5),-15+Math.sin(phase)*3,
+        -direction*(23+wake),-12);
+      ctx.stroke();
+    }
     ctx.lineCap='round';
     ctx.strokeStyle=enemyCueColors[index];
     ctx.fillStyle=enemyCueColors[index];
