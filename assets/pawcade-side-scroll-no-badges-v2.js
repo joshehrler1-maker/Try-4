@@ -192,6 +192,38 @@
   ];
   const thirdStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
   if (thirdStageLandmark) thirdStageLandmark.src = thirdStageLandmarkPaths[index - 20];
+  const fifthStageLandmarkPaths = [
+    'assets/scenes/neon-circuit/factory-dash-power-lane-meter.svg',
+    'assets/scenes/marble-temple/phantom-ship-moon-lantern.svg',
+    'assets/scenes/swamp-ferry/moon-outpost-firefly-signal.svg',
+    'assets/scenes/sunflower-flight/snowy-seams-warmth-stitch.svg',
+    'assets/scenes/starship-cargo/factory-assault-safety-keypad.svg'
+  ];
+  const fifthStageLandmarkPositions = [
+    [880, 58,170,170], // 20 Factory Dash x845..1225 belt top228
+    [520,121,170,170], // 21 Phantom Ship x485..803 top291
+    [700, 43,170,170], // 22 Moon Outpost x675..895 top213
+    [625,111,170,170], // 23 Snowy Seams x585..855 ice top281
+    [875, 59,170,170]  // 24 Factory Assault x853..1168 top229
+  ];
+  const sixthStageLandmarkPaths = [
+    'assets/scenes/neon-circuit/tower-reset-finish-clock.svg',
+    'assets/scenes/marble-temple/silver-gallery-moon-key-throne.svg',
+    'assets/scenes/swamp-ferry/return-to-manor-ferry-lighthouse.svg',
+    'assets/scenes/sunflower-flight/patchwork-orbit-final-bloom.svg',
+    'assets/scenes/starship-cargo/cargo-stronghold-rescue-pod-launch.svg'
+  ];
+  const sixthStageLandmarkPositions = [
+    [815, 49,170,170], // 20 Tower Reset x783..1116 top219
+    [665, 35,160,170], // 21 Silver Gallery x655..830 top205
+    [715, 37,170,170], // 22 Return to the Manor x690..915 top207
+    [835, 50,170,170], // 23 Patchwork Orbit x818..1108 top220
+    [835, 31,170,170]  // 24 Cargo Stronghold x820..1090 top201
+  ];
+  const fifthStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
+  if (fifthStageLandmark) fifthStageLandmark.src = fifthStageLandmarkPaths[index - 20];
+  const sixthStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
+  if (sixthStageLandmark) sixthStageLandmark.src = sixthStageLandmarkPaths[index - 20];
   const fourthStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
   if (fourthStageLandmark) fourthStageLandmark.src = fourthStageLandmarkPaths[index - 20];
   const secondStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
@@ -7012,6 +7044,20 @@
       const artX = stageStarts[3] + localX;
       if (artX + artW >= camera && artX <= camera + width) {
         ctx.drawImage(fourthStageLandmark, artX, artY, artW, artH);
+      }
+    }
+    if (fifthStageLandmark?.naturalWidth && sections >= 5) {
+      const [localX,artY,artW,artH] = fifthStageLandmarkPositions[index - 20];
+      const artX = stageStarts[4] + localX;
+      if (artX + artW >= camera && artX <= camera + width) {
+        ctx.drawImage(fifthStageLandmark, artX, artY, artW, artH);
+      }
+    }
+    if (sixthStageLandmark?.naturalWidth && sections >= 6) {
+      const [localX,artY,artW,artH] = sixthStageLandmarkPositions[index - 20];
+      const artX = stageStarts[5] + localX;
+      if (artX + artW >= camera && artX <= camera + width) {
+        ctx.drawImage(sixthStageLandmark, artX, artY, artW, artH);
       }
     }
     for (const wall of walls) {
