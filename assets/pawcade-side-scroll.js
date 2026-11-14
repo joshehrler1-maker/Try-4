@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>9)return;
-    const spacing=[230,188,205,178,226,196,218,174,156,232][index];
-    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17][index]);
+    if(index<0 || index>11)return;
+    const spacing=[230,188,205,178,226,196,218,174,156,232,240,190][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17,.20,.13][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -1803,6 +1803,54 @@
         ctx.fillRect(x+165,top+106,22,3);
         ctx.strokeStyle='#8f7b65';ctx.lineWidth=5;
         ctx.beginPath();ctx.moveTo(x+125,top-18);ctx.lineTo(x+201,top-18);ctx.stroke();
+      }else if(index===10){
+        // Sunset Wind Sail: layered sailboats and wind-driven harbor pennants.
+        const mastX=x+110,deckY=245+variation*5;
+        ctx.fillStyle='#54425c';
+        ctx.beginPath();ctx.moveTo(x+48,deckY);ctx.lineTo(x+175,deckY);
+        ctx.lineTo(x+153,deckY+19);ctx.lineTo(x+75,deckY+19);
+        ctx.closePath();ctx.fill();
+        ctx.strokeStyle='#c4a58b';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(mastX,deckY);ctx.lineTo(mastX,94+variation*8);ctx.stroke();
+        const sailTop=105+variation*8;
+        const sail=ctx.createLinearGradient(mastX-53,sailTop,mastX+51,deckY);
+        sail.addColorStop(0,'#ffe1ae');sail.addColorStop(1,'#eaa17c');
+        ctx.fillStyle=sail;
+        ctx.beginPath();ctx.moveTo(mastX-5,sailTop);
+        ctx.quadraticCurveTo(mastX-63,deckY-76,mastX-54,deckY-13);
+        ctx.lineTo(mastX-5,deckY-13);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#f5c8a1';
+        ctx.beginPath();ctx.moveTo(mastX+5,sailTop+22);
+        ctx.quadraticCurveTo(mastX+51,deckY-78,mastX+47,deckY-23);
+        ctx.lineTo(mastX+5,deckY-23);ctx.closePath();ctx.fill();
+        ctx.strokeStyle='#e8b98b';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(x+18,deckY+26);ctx.quadraticCurveTo(x+110,deckY+18,x+210,deckY+26);ctx.stroke();
+      }else if(index===11){
+        // Cloud City: floating skyline silhouettes with suspended bridges.
+        const towerTop=105+variation*19;
+        ctx.fillStyle='#637b9b';
+        ctx.fillRect(x+35,towerTop,74,280-towerTop);
+        ctx.fillStyle='#a9c6d7';
+        ctx.beginPath();ctx.moveTo(x+26,towerTop+6);ctx.lineTo(x+72,towerTop-30);
+        ctx.lineTo(x+119,towerTop+6);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#daeaf2';ctx.globalAlpha=.75;
+        for(let row=0;row<4;row++){
+          const wy=towerTop+23+row*29;
+          ctx.fillRect(x+49,wy,11,15);
+          ctx.fillRect(x+81,wy,11,15);
+        }
+        ctx.globalAlpha=1;
+        ctx.fillStyle='#748daa';
+        ctx.fillRect(x+109,towerTop+90,85,9);
+        ctx.strokeStyle='#d4e5ed';ctx.lineWidth=2;
+        for(let cable=0;cable<3;cable++){
+          const cx=x+117+cable*33;
+          ctx.beginPath();ctx.moveTo(cx,towerTop+90);
+          ctx.lineTo(cx,towerTop+34);ctx.stroke();
+        }
+        ctx.fillStyle='#e8f6ff';ctx.globalAlpha=.4;
+        ctx.beginPath();ctx.ellipse(x+103,276,95,18,0,0,Math.PI*2);ctx.fill();
+        ctx.globalAlpha=1;
       }
     }
     ctx.restore();
