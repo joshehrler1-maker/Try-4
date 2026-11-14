@@ -1229,7 +1229,7 @@
     if (phase!=='playing' || player.techCooldown>0) return;
     const p=player;
     p.techCooldown=.32;
-    const before=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,attacks.length];
+    const before=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,p.ledgeGrip,p.pogo,attacks.length];
     let activated=false;
     const nearby=range=>enemies.find(foe=>!foe.dead && close(p,foePosition(foe),range,65));
     const shot=extra=>attacks.push({x:p.x,y:p.y,v:p.facing*330,life:.55,...extra});
@@ -1323,7 +1323,7 @@
       case 'taunt': if(p.crystalCombo>=3){shot({v:0,radius:strength,life:.2,damage:2});p.crystalCombo=0;}break;
       case 'return': shot({v:p.facing*strength,returning:true,life:1.1,damage:2,motionTrail:'cross'});break;
     }
-    const after=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,attacks.length];
+    const after=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,p.ledgeGrip,p.pogo,attacks.length];
     if(activated || technique==='reveal' || after.some((value,i)=>value!==before[i])){
       signatureEffect={x:player.x,y:player.y,facing:player.facing,at:clock};
       if(technique==='parry' || technique==='reveal') playCue(520,1020,.16);
