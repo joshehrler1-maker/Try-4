@@ -4570,6 +4570,8 @@
     // Clamp the animation speed when the simulation skips frames. This
     // protects Android browsers from a huge limb snap after tab switching.
     const gaitBlend=Math.min(1,Math.max(0,stride||0));
+    // Animation pose stays stable when paused or reduced motion is enabled.
+    const animTime=reducedMotion?0:clock;
     // Separate stance and swing phases so planted feet do not lift together.
     const swing=reducedMotion?0:Math.sin(phase)*gaitBlend;
     const gaitContact=reducedMotion?0:Math.cos(phase)*gaitBlend;
@@ -4588,7 +4590,7 @@
     foe._rigWasBashed=Boolean(foe.bashed);
     if(hitEdge)foe._rigHitReaction=1;
     foe._rigHitReaction=(foe._rigHitReaction||0)*Math.exp(-10*reactionDt);
-    const hitRecoil=Math.sin(clock*18+foe.offset)*.12*(foe._rigHitReaction||0);
+    const hitRecoil=Math.sin(animTime*18+foe.offset)*.12*(foe._rigHitReaction||0);
     // Each counterpart-inspired adventure gets its own animation silhouette:
     // stride length, arm follow-through, knee bend and body mass. These are
     // original Super Paw Heroes motions, not copied reference-game assets.
@@ -4627,7 +4629,7 @@
     // distinct enemy face, armor, silhouette, and hitbox.
     for(const side of [-1,1]){
       const hip=at.x+side*13,shoulder=at.x+side*20;
-      const flightCycle=Math.sin(clock*(4.2+index%5*.55)+foe.offset+side);
+      const flightCycle=Math.sin(animTime*(4.2+index%5*.55)+foe.offset+side);
       const legSwing=airborne?flightCycle*(aerialWorld?7:5):
         swing*side*9*poseStride*chapterWeight;
       const kneeX=hip+legSwing*.65;
@@ -4649,8 +4651,8 @@
       const rushWorld=[0,3,8,15,20].includes(index);
       const strike=shooterWorld?strikePhase*(side===dir?1:.55):
         rushWorld?strikePhase*(side===dir?1:.25):strikePhase;
-      const armSwing=airborne?Math.sin(clock*6+side)*7:
-        waterWorld?Math.sin(clock*3.6+side*Math.PI)*6*poseArm:
+      const armSwing=airborne?Math.sin(animTime*6+side)*7:
+        waterWorld?Math.sin(animTime*3.6+side*Math.PI)*6*poseArm:
         -side*swing*8*poseArm*chapterWeight;
       const elbowX=shoulder+armSwing*.6+dir*strike*7-dir*hitRecoil*10;
       const elbowY=at.y-18+Math.abs(armSwing)*.3-strike*4;
