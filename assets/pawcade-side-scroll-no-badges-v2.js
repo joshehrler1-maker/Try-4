@@ -3147,7 +3147,8 @@
     }
     if(index===12){ // Thunder Harbor: measured armored charge and recovery
       const surge=Math.max(0,Math.sin(t*1.2));
-      return {x:patrolX(foe.x+chase*enemyReach*surge*surge),
+      const charge=surge*surge*(3-2*surge);
+      return {x:patrolX(foe.x+chase*enemyReach*charge),
         y:foe.y};
     }
     if(index===13){ // Autumn Trail: springing woodland enemies land between hops
@@ -3162,7 +3163,7 @@
     }
     if(index===17){ // Snow Village: short icy slides with recovery
       const slide=Math.sin(t*.8);
-      return {x:patrolX(foe.x+Math.sign(slide)*Math.abs(slide)**2*enemyReach),
+      return {x:patrolX(foe.x+slide*Math.abs(slide)*enemyReach),
         y:foe.y};
     }
     if(index===18){ // Canyon Crossing: patrol at rope-bridge crossings
@@ -3172,19 +3173,23 @@
     }
     if(index===20){ // Neon Circuit: burst sprint then braking phase
       const sprint=Math.sin(t*1.55);
-      return {x:patrolX(foe.x+Math.sign(sprint)*Math.abs(sprint)**.55*enemyReach),
+      // Cubic shaping keeps the sprint aggressive without infinite
+      // acceleration at the zero crossing.
+      const dash=sprint*.65+sprint**3*.35;
+      return {x:patrolX(foe.x+dash*enemyReach),
         y:foe.y};
     }
     if(index===22){ // Swamp Ferry: hopping between reeds
       const hop=Math.max(0,Math.sin(t*2.4));
       return {x:patrolX(foe.x+wave*enemyReach*.65),
-        y:foe.y-hop*enemyRise*.95};
+        y:foe.y-hop*hop*enemyRise*.95};
     }
     if(index===5){ // Waterfall Climb: descending mist swoops with a recovery climb
       const dive=Math.max(0,Math.sin(t*1.35));
       const glide=Math.sin(t*.72);
+      const descent=dive*dive*(3-2*dive);
       return {x:patrolX(foe.x+glide*enemyReach*.85),
-        y:foe.y-enemyRise*(.3+.7*(1-dive*dive))};
+        y:foe.y-enemyRise*(.3+.7*(1-descent))};
     }
     if(index===8){ // Stage Beat: enemies move on predictable musical counts
       const beat=t*1.45;
@@ -3212,7 +3217,9 @@
     }
     if(index===1 && foe.libraryEnemy===undefined){ // Moonlit Library: deliberate sentry pauses
       const aim=Math.sin(t*.8);
-      return {x:patrolX(foe.x+Math.sign(aim)*Math.max(0,Math.abs(aim)-.3)*enemyReach*.65),y:foe.y};
+      const ready=Math.max(0,(Math.abs(aim)-.3)/.7);
+      const eased=ready*ready*(3-2*ready);
+      return {x:patrolX(foe.x+Math.sign(aim)*eased*enemyReach*.455),y:foe.y};
     }
     if(index===2 && foe.reefEnemy===undefined){ // Coral Courier: reef schools swim in waves
       return {x:patrolX(foe.x+Math.sin(t*.9)*enemyReach*.75),
