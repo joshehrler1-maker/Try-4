@@ -2525,8 +2525,12 @@
     const breath=reducedMotion?0:Math.sin(clock*2.9)*.012;
     const footBob=reducedMotion||!p.on?0:
       stride>.12 ? Math.abs(Math.sin(gait))*(1.2+stride*2.4)*(p.gaitWeight||0) : Math.sin(clock*2.9)*.55;
+    // Five locomotion styles are assigned by game, while the movement state
+    // remains driven by actual player velocity and existing collision physics.
+    const motionStyle=index%5;
+    const strideSway=[.027,.036,.021,.045,.031][motionStyle];
     const bodySway=reducedMotion?0:
-      p.on && stride>.12 ? Math.sin(gait)*stride*.035 : Math.sin(clock*1.8)*.008;
+      p.on && stride>.12 ? Math.sin(gait)*stride*strideSway : Math.sin(clock*1.8+index*.37)*.008;
     if(p.gravity<0){
       ctx.translate(0,p.y*2);ctx.scale(1,-1);
     }
@@ -2569,11 +2573,18 @@
       } else if(p.cable && !p.on){
         tilt=Math.max(-.32,Math.min(.32,p.vx/900));
       } else if(!p.on){
-        tilt=p.vy<0 ? -p.facing*.09 : p.facing*.1;
-        scaleX=p.vy<0?.94:1.04;
-        scaleY=p.vy<0?1.06:.97;
+        // Rising compresses the silhouette; falling extends it. Cap both
+        // responses so fast falls never distort the approved character art.
+        const airborneSpeed=Math.min(1,Math.abs(p.vy)/650);
+        tilt=p.facing*(p.vy<0?-.065:.07)*(1+airborneSpeed*.65);
+        scaleX=p.vy<0?1-.035*airborneSpeed:1+.045*airborneSpeed;
+        scaleY=p.vy<0?1+.055*airborneSpeed:1-.035*airborneSpeed;
       } else if(Math.abs(p.vx)>45){
         tilt=p.facing*Math.min(.13,Math.abs(p.vx)/4200);
+        // Distinct run silhouette: sprint-forward energy without moving
+        // the feet or altering collision dimensions.
+        scaleX=1+stride*[.014,.025,.018,.035,.022][motionStyle];
+        scaleY=1-stride*[.012,.019,.015,.026,.017][motionStyle];
       }
       if(p.morphed){scaleX*=1.18;scaleY*=.77;}
       ctx.translate(p.x,pivotY);
