@@ -631,7 +631,11 @@
       const span=Math.floor((remaining-2*gap)/3);
       const rise=[36,0,54,46,25,0,55,42,55,18,38,52,53,45,39,30,55,48][stage] ?? 36;
       const middle=start+2170+span+gap;
-      platforms.push({x:start+2170,y:326,w:span,kind:'floor'});
+      // Give the Foundry's three-deck exit a distinct rhythm per chapter:
+      // short step-up, alternating ledge, then a safe recovery landing.
+      // Preserve the existing enemy corridor and lower escape route.
+      const firstDeckY=326-(stage%4===1?14:stage%4===3?9:0);
+      platforms.push({x:start+2170,y:firstDeckY,w:span,kind:'floor'});
       platforms.push({x:middle,y:326-rise,w:span,kind:'floor'});
       platforms.push({x:middle+span+gap,y:326,w:remaining-2*(span+gap),kind:'floor'});
       platforms.push({x:middle,y:220-stage%3*10,w:Math.min(span,105),kind:'floor'});
@@ -3950,6 +3954,19 @@
         ctx.save();
         ctx.fillStyle=['#54354b','#4c3543','#473e51','#59404a'][chapterStyle];
         ctx.fillRect(visibleStart,y+5,visibleEnd-visibleStart,13);
+        // Layered bevel and furnace bounce-light create a stylized 3D
+        // platform silhouette without adding expensive image textures.
+        const sideShade=ctx.createLinearGradient(0,y+4,0,y+19);
+        sideShade.addColorStop(0,'#e7a66d');
+        sideShade.addColorStop(.18,'#926477');
+        sideShade.addColorStop(.65,'#4c354b');
+        sideShade.addColorStop(1,'#261f36');
+        ctx.fillStyle=sideShade;
+        ctx.fillRect(visibleStart,y+5,visibleEnd-visibleStart,13);
+        ctx.fillStyle='rgba(255,218,154,.34)';
+        ctx.fillRect(visibleStart,y+5,visibleEnd-visibleStart,2);
+        ctx.fillStyle='rgba(24,15,35,.55)';
+        ctx.fillRect(visibleStart,y+16,visibleEnd-visibleStart,2);
         ctx.strokeStyle='#ffbf73';ctx.lineWidth=2;
         ctx.beginPath();ctx.moveTo(visibleStart,y+5);ctx.lineTo(visibleEnd,y+5);ctx.stroke();
         for(let k=Math.floor((visibleStart-x)/cell);k<=Math.ceil((visibleEnd-x)/cell);k++){
