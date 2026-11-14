@@ -966,6 +966,16 @@
         const traction=p.on?(steer?(sameDirection?3.3:7.6):1.75)
           :(steer?1.8:.12);
         p.vx+=(sonicTarget-p.vx)*Math.min(1,dt*traction*controlFactor);
+      }else if(index===0){
+        // Ember Foundry: responsive precision platforming, with strong
+        // grounded reversals and predictable aerial correction.
+        const precision=steer?(p.on?1.32:1.08):1.55;
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*precision);
+      }else if(index===1){
+        // Moonlit Library: combat-platformer handling, fast grounded starts
+        // and slightly constrained airborne reversals for wall-jump control.
+        const combatHandling=p.on?1.22:(reversing?.68:.88);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*combatHandling);
       }else{
         p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
       }
