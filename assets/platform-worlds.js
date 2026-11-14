@@ -947,3 +947,26 @@ for (const [room, slot, x, y, width] of [
 ]) {
   window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
 }
+
+// Ember Foundry landings after Foundry Trail.
+for (const [room, slot, x, y, width] of [
+  ["switchHall",2,808,201,402],
+  ["forgeHills",2,1005,251,328],
+  ["forgeBridges",2,696,228,272],
+  ["forgeBanks",2,758,255,315],
+  ["forgeKeep",2,882,259,350],
+  ["forgeSwitchbacks",2,681,253,183],
+  ["forgeFloodplain",3,962,290,243],
+  ["forgeKilnCanopy",2,765,229,202],
+  ["forgeSlagAqueduct",2,830,281,229],
+  ["forgeExpansion0",2,715,249,203],
+  ["forgeExpansion1",2,715,261,240],
+  ["forgeExpansion2",2,752,251,235],
+  ["forgeExpansion3",2,758,273,170],
+  ["forgeExpansion4",2,664,231,213],
+  ["forgeExpansion5",2,763,247,226],
+  ["forgeExpansion6",2,686,255,187],
+  ["forgeExpansion7",2,723,251,252],
+]) {
+  window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+}
