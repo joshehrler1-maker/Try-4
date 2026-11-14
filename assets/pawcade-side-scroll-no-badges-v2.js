@@ -1216,6 +1216,7 @@
         p.vx=(dx || (dy ? 0 : p.facing*.65))*strength/length;
         p.vy=(dy || (dx ? 0 : -1))*strength/length;
         p.grapple=.27;
+        p.bashPose={time:clock,angle:Math.atan2(p.vy,p.vx)};
         target.bashed={x:position.x,y:position.y,vx:-p.vx*.75,vy:-p.vy*.75,until:clock+.48};
         burst(position.x,position.y,'#a8ffd9',12);
         break;
@@ -6548,6 +6549,25 @@
         ctx.stroke();
       }
       ctx.restore();
+    }
+    if(index===15 && p.bashPose && !reducedMotion){
+      const progress=(clock-p.bashPose.time)/.27;
+      if(progress>=0 && progress<1){
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.bashPose.angle);
+        ctx.globalAlpha=1-progress;
+        ctx.strokeStyle='#a8ffd9';
+        ctx.lineWidth=2.5;
+        const tail=18+progress*38;
+        ctx.beginPath();
+        ctx.moveTo(-tail,-10);
+        ctx.quadraticCurveTo(-8,-20,18,-7);
+        ctx.moveTo(-tail,10);
+        ctx.quadraticCurveTo(-8,20,18,7);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
     drawAtmosphere(true);
     if(chapterReveal>0 && phase==='playing') {
