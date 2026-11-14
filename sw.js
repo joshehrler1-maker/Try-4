@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v65-25-stage2-scene-art';
+const CACHE = 'try4-public-v66-stage34-scene-art';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-companions.html","pawtopia-arcade.html","crystal-regions/blue-tech-mines.html","crystal-regions/brown-earth-quarries.html","crystal-regions/cyan-frost-caverns.html","crystal-regions/green-life-groves.html","crystal-regions/indigo-shadow-tunnels.html","crystal-regions/orange-volcanic-depths.html","crystal-regions/pink-harmony-grotto.html","crystal-regions/purple-mystic-halls.html","crystal-regions/red-flame-caves.html","crystal-regions/yellow-light-ruins.html","assets/pawtopia-scenes.css","assets/scenes/pawtopia.webp","assets/scenes/cottage.webp","assets/scenes/arcade.webp","assets/scenes/catacombs.webp","assets/scenes/red-flame-caves.webp","assets/scenes/purple-mystic-halls.webp","assets/scenes/blue-tech-mines.webp","assets/scenes/green-life-groves.webp","assets/scenes/orange-volcanic-depths.webp","assets/scenes/cyan-frost-caverns.webp","assets/scenes/indigo-shadow-tunnels.webp","assets/scenes/yellow-light-ruins.webp","assets/scenes/pink-harmony-grotto.webp","assets/scenes/brown-earth-quarries.webp","assets/whisker-luna-master.png","assets/pawtopia-atlas.css","assets/crystal-regions.css","assets/pawtopia-save.js","assets/companion-cottage.css","assets/companion-cottage.js");
 FILES.push("pawtopia-town.html","assets/pawtopia-town.js","assets/pawtopia-town.css");
@@ -16,7 +16,7 @@ FILES.push("assets/pawcade-directory.css");
 FILES.push("pawcade-side-scroll.html","assets/pawcade-side-scroll.js","assets/pawcade-side-scroll.js?v=landing-edges","assets/pawcade-side-scroll.css","assets/pawcade-side-directory.css","assets/scenes/side-scroll-worlds.webp");
 FILES.push(
   'assets/platform-worlds.js?v=harbor-finale-e803531',
-  'assets/pawcade-side-scroll-no-badges-v2.js?v=stage1and2-art-31e6f5e',
+  'assets/pawcade-side-scroll-no-badges-v2.js?v=stage34-scenes-2fcc14c5',
   'assets/pawcade-side-scroll.css?v=landscape-controls-68386cd',
   'assets/platform-worlds.js', 'assets/game-fullscreen.css', 'assets/game-fullscreen.js',
   'assets/touch-joystick.css', 'assets/touch-joystick.js', 'assets/touch-joystick.js?v=pointer-stability-v1', 'assets/whisker-luna-master.webp',
@@ -55,7 +55,17 @@ FILES.push(
   'assets/scenes/marble-temple/moon-gate-key-relief.svg',
   'assets/scenes/swamp-ferry/haunted-manor-ghost-ferry-lamp.svg',
   'assets/scenes/sunflower-flight/stitched-desert-thread-spool.svg',
-  'assets/scenes/starship-cargo/mountain-convoy-supply-uplink.svg'
+  'assets/scenes/starship-cargo/mountain-convoy-supply-uplink.svg',
+  'assets/scenes/neon-circuit/western-run-turbo-road-sign.svg',
+  'assets/scenes/marble-temple/marble-chapel-moon-window.svg',
+  'assets/scenes/swamp-ferry/gem-mines-crystal-winch.svg',
+  'assets/scenes/sunflower-flight/threaded-treats-ribbon-wheel.svg',
+  'assets/scenes/starship-cargo/river-crossing-coolant-valve.svg',
+  'assets/scenes/neon-circuit/haunted-circuit-ghost-mirror.svg',
+  'assets/scenes/marble-temple/inner-halls-balance-pendulum.svg',
+  'assets/scenes/swamp-ferry/snowbound-pass-ice-ferry-marker.svg',
+  'assets/scenes/sunflower-flight/felt-ocean-petal-buoy.svg',
+  'assets/scenes/starship-cargo/city-siege-defense-repeater.svg'
 );
 const gamePage = new URL('pawcade-side-scroll.html', self.registration.scope);
 const allowed = new Set(FILES.map(file => new URL(file, self.registration.scope).href));
