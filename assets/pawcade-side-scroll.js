@@ -1768,7 +1768,7 @@
         ctx.fillStyle='#272340';
         ctx.fillRect(bx,135+variation*9,118,base-135-variation*9);
         for(let bar=0;bar<6;bar++){
-          const h=28+((bar*23+variation*17)%72);
+          const h=28+((bar*23+variation*17)%72)*(reducedMotion?1:(.64+.36*Math.sin(clock*4.5+bar*.85+n*.7)**2));
           ctx.fillStyle=bar%2?'#ef78c6':'#7ce4ef';
           ctx.globalAlpha=.65;
           ctx.fillRect(bx+8+bar*18,base-18-h,10,h);
@@ -1950,7 +1950,9 @@
         }
         ctx.fillStyle='#d8e3df';ctx.globalAlpha=.28;
         for(let puff=0;puff<3;puff++){
-          ctx.beginPath();ctx.arc(x+136+puff*10,boilerY-78-puff*17,13+puff*4,0,Math.PI*2);ctx.fill();
+          const drift=reducedMotion?0:Math.sin(clock*.8+puff+n)*9;
+          const rise=reducedMotion?0:(clock*13+puff*23)%42;
+          ctx.beginPath();ctx.arc(x+136+puff*10+drift,boilerY-78-puff*17-rise,13+puff*4,0,Math.PI*2);ctx.fill();
         }
         ctx.globalAlpha=1;
       }else if(index===17){
@@ -1976,7 +1978,8 @@
         }
         ctx.globalAlpha=.75;ctx.fillStyle='#ffffff';
         for(let flake=0;flake<7;flake++){
-          const fx=x+12+flake*29,fy=102+((flake*37+variation*19)%135);
+          const fx=x+12+flake*29+(reducedMotion?0:Math.sin(clock*.9+flake+n)*7);
+          const fy=102+((flake*37+variation*19+(reducedMotion?0:clock*17))%135);
           ctx.beginPath();ctx.arc(fx,fy,1.5+flake%2,0,Math.PI*2);ctx.fill();
         }
         ctx.globalAlpha=1;
