@@ -226,6 +226,25 @@
   if (sixthStageLandmark) sixthStageLandmark.src = sixthStageLandmarkPaths[index - 20];
   const fourthStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
   if (fourthStageLandmark) fourthStageLandmark.src = fourthStageLandmarkPaths[index - 20];
+  // Five unique, perspective-shaded 2.5D scene props for games 1–5, stage 2.
+  // These are decorative depth-plane art, NOT movement surfaces or hitboxes.
+  // Positions are stage-local; visibility is culled against the active camera.
+  const earlySecondStagePaths = [
+    'assets/scenes/ember-foundry/stage-02-amber-switch-hall-blocks.svg',
+    'assets/scenes/moonlit-library/stage-02-frozen-archive-ice.svg',
+    'assets/scenes/coral-courier/stage-02-kelp-channels-current.svg',
+    'assets/scenes/clocktower-relay/stage-02-chemical-works-speed.svg',
+    'assets/scenes/seed-garden/stage-02-high-rigging-vines.svg'
+  ];
+  const earlySecondStagePositions = [
+    [429, 99,150,135], // Ember Foundry: switchHall floor y234; x405..715
+    [506,155,150,135], // Moonlit Library: iceworks ice floor y290; x483..703
+    [404, 35,150,135], // Coral Courier: kelp channels floor y170; x380..800
+    [694,191,150,135], // Clocktower Relay: chemical works floor y326; x670..2200
+    [425,145,150,135]  // Seed Garden: high rigging floor y280; x405..615
+  ];
+  const earlySecondStage = index < 5 ? new Image() : null;
+  if (earlySecondStage) earlySecondStage.src = earlySecondStagePaths[index];
   const secondStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
   if (secondStageLandmark) secondStageLandmark.src = secondStageLandmarkPaths[index - 20];
   const firstStageLandmark = index < firstStageLandmarkPaths.length ? new Image() : null;
@@ -7140,6 +7159,14 @@
       const [artX,artY,artW,artH] = firstStageLandmarkPositions[index];
       if (artX + artW >= camera && artX <= camera + width) {
         ctx.drawImage(firstStageLandmark, artX, artY, artW, artH);
+      }
+    }
+    // Opt-in 3D enemy meshes never change this 2.5D fixed-plane stage art.
+    if (earlySecondStage?.naturalWidth && sections >= 2) {
+      const [localX,artY,artW,artH] = earlySecondStagePositions[index];
+      const artX = stageStarts[1] + localX;
+      if (artX + artW >= camera && artX <= camera + width) {
+        ctx.drawImage(earlySecondStage, artX, artY, artW, artH);
       }
     }
     if (secondStageLandmark?.naturalWidth && sections >= 2) {
