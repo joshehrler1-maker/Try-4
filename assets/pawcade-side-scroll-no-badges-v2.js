@@ -589,7 +589,7 @@
       0:['floor','spring','floor'], 1:['shelf','lift','shelf'],
       2:['current','current','current'], 3:['belt','spring','belt'],
       4:['barrel','spring','barrel'], 5:['lift','floor','lift'],
-      6:['spring','floor','spring'], 7:['floor','ceiling','floor'],
+      6:['spring','floor','spring'], 7:['floor','shelf','floor'],
       8:['spring','floor','spring'], 9:['rail','lift','rail'],
       10:['current','lift','current'], 11:['lift','floor','lift'],
       12:['pogo','floor','pogo'], 13:['shelf','spring','shelf'],
@@ -635,7 +635,9 @@
     if(index!==7 && index!==14){
       const guardX=challengeX+290;
       enemies.push({x:guardX,y:ground-23,offset:stage+index+31,turret:movement==='shooter'||movement==='buster'});
-      crystals.push({x:challengeX+340,y:190});
+      // Keep the guarded reward near the actual ground encounter rather
+      // than suspended high above a platform that may not have spawned.
+      crystals.push({x:challengeX+340,y:ground-44});
     }
     // Each game's six chapters now carry a different collectible trail.
     // These are optional visual wayfinding rewards, not required jumps:
