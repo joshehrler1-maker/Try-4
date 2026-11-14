@@ -1753,9 +1753,14 @@
         const current=Math.abs(p.vx);
         const sameDirection=steer && Math.sign(p.vx)===steer;
         const sonicTarget=steer*topSpeed*(sameDirection && current>topSpeed*.72?1.12:1);
+        if(p.spinJump && sameDirection && current>Math.abs(sonicTarget)){
+          // Holding forward during a spin jump should not brake the roll.
+          p.vx*=Math.max(0,1-dt*.12);
+        }else{
         const traction=p.on?(steer?(sameDirection?3.3:7.6):1.75)
           :(steer?1.8:.12);
         p.vx+=(sonicTarget-p.vx)*Math.min(1,dt*traction*controlFactor);
+        }
       }else if(index===0){
         // Ember Foundry: responsive precision platforming, with strong
         // grounded reversals and predictable aerial correction.
