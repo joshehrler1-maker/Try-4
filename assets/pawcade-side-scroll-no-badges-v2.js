@@ -174,7 +174,7 @@
   const sections = chapters.length;
   const sectionSize = index===0 || index===16 ? 3020 : 2200;
   // Steamworks alternates compact shooting galleries with longer factory runs.
-  const stageWidths=index===0 && sections===18 ? [3170,2390,3300,3110,3075,2520,3420,3160,3310,3100,3030,3500,3205,3140,2980,3310,3680,3250] : index===16 ? [3020,3270,3020,3460,3220,3020] : index===1 && sections===6 ? [2200,2278,1903,2195,3750,2191] : index===3 && sections===6 ? [2200,2249,2299,2225,2571,1879] : index===4 && sections===6 ? [2200,1450,2200,1710,1375,1050] : Array(sections).fill(sectionSize);
+  const stageWidths=index===0 && sections===18 ? [3170,2390,3300,3110,3075,2520,3420,3160,3310,3100,3030,3500,3205,3140,2980,3310,3680,3250] : index===16 ? [3020,3270,3020,3460,3220,3020] : index===1 && sections===6 ? [2200,2278,1903,2195,3750,2191] : index===3 && sections===6 ? [2200,2249,2299,2225,2571,1879] : index===4 && sections===6 ? [2200,1450,2200,1710,1375,1050] : index===2 && sections===6 ? [2200,3300,2613,2819,2613,2819] : Array(sections).fill(sectionSize);
   const stageStarts=[0];
   for(const width of stageWidths) stageStarts.push(stageStarts.at(-1)+width);
   const finish=stageStarts[sections];
@@ -447,7 +447,7 @@
           [2081,265,310],[2448,226,272,'belt'],[2774,253,290,'belt'],
           [3118,213,260],[3430,275,217,'belt'],
         ]
-      : index===1 || index===3 || index===4
+      : index===1 || index===2 || index===3 || index===4
         ? window.pawtopiaRooms[room].map(([x,y,w,kind])=>{
             const scale=stageWidths[stage]/sectionSize;
             const left=Math.round(x*scale);
@@ -1182,7 +1182,7 @@
         [[566,264],[1490,215]],
       ][stage];
       for (const [x, y] of pockets) {
-        landmarks.push({cell:7,x:start+x,y,w:72,h:75});
+        landmarks.push({cell:7,x:start+Math.round(x*stageWidths[stage]/sectionSize),y,w:72,h:75});
       }
     }
     if(index===11 && stage===1) landmarks.push({cell:5,x:start+1010,y:169,w:76,h:70});
