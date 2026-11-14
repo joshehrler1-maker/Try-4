@@ -957,8 +957,14 @@
       if (Math.floor(escape)!==Math.floor(escape+dt)) status('Escape back to the entrance · '+Math.ceil(escape)+'s');
     }
     const p = player;
-    p.coyote=p.on ? .085 : Math.max(0,p.coyote-dt);
-    p.jumpBuffer=Math.max(0,p.jumpBuffer-dt);
+    // Precision platformers allow forgiving edge jumps; momentum and
+    // action games retain more committed takeoff timing.
+    const edgeGrace=[.095,.085,.11,.075,.095,.11,.115,.065,.045,.085,
+      .105,.125,.075,.11,.095,.12,.075,.095,.075,.085,.06,.07,.105,.12,.075][index];
+    const inputBuffer=[.115,.095,.11,.075,.11,.12,.13,.075,.05,.095,
+      .12,.14,.09,.115,.105,.13,.085,.11,.085,.1,.065,.085,.12,.13,.09][index];
+    p.coyote=p.on ? edgeGrace : Math.max(0,p.coyote-dt);
+    p.jumpBuffer=Math.min(inputBuffer,Math.max(0,p.jumpBuffer-dt));
     if (p.jumpBuffer && (p.on || p.coyote>0 || (index===4 && movement==='roll' && p.power>.22 && p.jumps===0))) jump(false);
     p.jumpAge=(p.jumpAge||0)+dt;
     if (p.jumpCut && !held('jump') && p.jumpAge>=.035) {
