@@ -1443,6 +1443,37 @@
       ctx.lineTo(19,-8);ctx.lineTo(23,12);
     }
     ctx.closePath();ctx.fill();
+    // Foundry enemy: articulated mechanical pincers and layered chest plating.
+    // Both limbs use pivoted transforms and move with the existing animation
+    // clock. All geometry is visual-only, with no collision changes.
+    if(kind===0){
+      const swing=reducedMotion?0:Math.sin(phase*.58)*.22;
+      for(const side of [-1,1]){
+        ctx.save();
+        ctx.translate(side*13,-3);
+        ctx.rotate(side*(.15+swing));
+        const arm=ctx.createLinearGradient(0,-3,side*24,-18);
+        arm.addColorStop(0,'#7a3541');arm.addColorStop(.48,'#ffca82');arm.addColorStop(1,'#8c4052');
+        ctx.fillStyle=arm;ctx.strokeStyle='#4a293e';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(0,-4);ctx.lineTo(side*16,-12);
+        ctx.lineTo(side*24,-9);ctx.lineTo(side*9,4);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        ctx.translate(side*23,-10);
+        ctx.rotate(side*(.18+Math.sin(phase*.85+side)*.13));
+        ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(side*11,-11);
+        ctx.lineTo(side*16,-12);ctx.lineTo(side*13,-3);
+        ctx.lineTo(side*6,5);ctx.closePath();ctx.fill();ctx.stroke();
+        ctx.restore();
+      }
+      const chest=ctx.createLinearGradient(-12,-7,12,10);
+      chest.addColorStop(0,'#fff1bc');chest.addColorStop(.5,'#c66e53');
+      chest.addColorStop(1,'#673a45');
+      ctx.fillStyle=chest;ctx.strokeStyle='#ffe1a0';ctx.lineWidth=1.3;
+      ctx.beginPath();ctx.moveTo(-9,-5);ctx.lineTo(8,-5);
+      ctx.lineTo(11,5);ctx.lineTo(0,10);ctx.lineTo(-10,5);
+      ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.fillStyle='#fff6c6';ctx.beginPath();ctx.arc(0,1,2.7,0,Math.PI*2);ctx.fill();
+    }
     if(design){
       ctx.strokeStyle=colors[0];
       ctx.lineWidth=2.5;
