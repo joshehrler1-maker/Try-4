@@ -946,9 +946,20 @@
       const ring=looseRings[i];
       ring.age+=dt;
       ring.x+=ring.vx*dt;
+      const previousRingY=ring.y;
       ring.y+=ring.vy*dt;
       ring.vy+=660*dt;
-      if(ring.y>ground-8 && ring.vy>0){ring.y=ground-8;ring.vy*=-.55;}
+      if(ring.vy>0){
+        let landing=Infinity;
+        for(const ledge of platforms){
+          if(ledge.kind==='hazard' || ledge.kind==='rail' || ledge.kind==='ceiling' ||
+             ledge.kind==='ceilingSpikes' || (ledge.switchBridge && !amberSwitch) ||
+             (ledge.dropAt!==undefined && clock>=ledge.dropAt)) continue;
+          if(ring.x>=ledge.x && ring.x<=ledge.x+ledge.w &&
+             previousRingY<=ledge.y-8 && ring.y>=ledge.y-8) landing=Math.min(landing,ledge.y-8);
+        }
+        if(landing!==Infinity){ring.y=landing;ring.vy*=-.55;}
+      }
       if(ring.age>3.2) looseRings.splice(i,1);
       else if(ring.age>.45 && close(p,ring,21,25)){
         looseRings.splice(i,1);rings++;playCue(650,980);hud();
