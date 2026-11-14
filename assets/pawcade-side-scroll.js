@@ -1874,8 +1874,30 @@
     const rosterIndex = roster.indexOf(hero);
     const heroSize=index===0?107:81;
     const heroLift=(heroSize-81)/2;
-    const companionDrawn = rosterIndex>=0 && atlasSprite(heroArt,8,rosterIndex*4+pose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4);
-    if(!companionDrawn && !sprite(cell,p.x,p.y-15-heroLift,heroSize,heroSize,p.facing<0) && poster.naturalWidth) {
+    const running=p.on && Math.abs(p.vx)>45 && !rolling && !rushing && !attacking && !braking;
+    // Blend the existing two running poses continuously instead of snapping
+    // abruptly between them. The cadence follows real movement speed.
+    const stridePhase=clock*(5+Math.min(13,Math.abs(p.vx)/42));
+    const blend=reducedMotion?0:(.5-.5*Math.cos(stridePhase))*.78;
+    const drawHeroPose=(nextPose,alpha)=>{
+      ctx.save();
+      ctx.globalAlpha*=alpha;
+      const drawn=rosterIndex>=0
+        ? atlasSprite(heroArt,8,rosterIndex*4+nextPose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4)
+        : sprite((light?4:0)+nextPose,p.x,p.y-15-heroLift,heroSize,heroSize,p.facing<0);
+      ctx.restore();
+      return drawn;
+    };
+    let heroDrawn=false;
+    if(running){
+      heroDrawn=drawHeroPose(1,1);
+      if(heroDrawn)drawHeroPose(2,blend);
+    } else if(rosterIndex>=0){
+      heroDrawn=atlasSprite(heroArt,8,rosterIndex*4+pose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4);
+    } else {
+      heroDrawn=sprite(cell,p.x,p.y-15-heroLift,heroSize,heroSize,p.facing<0);
+    }
+    if(!heroDrawn && poster.naturalWidth) {
       const sw=poster.naturalWidth/2;
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
     }
