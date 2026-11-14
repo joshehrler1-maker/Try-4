@@ -1176,6 +1176,12 @@
     [0.92, 0, 0], // 25
   ];
   const [enemyTempo, enemyReach, enemyRise] = enemyProfiles[index];
+  const enemyRoundArt = {
+    1:new Path2D('M-13 0L-5-3 2-7 12 0 2 7-5 3Z'),
+    9:new Path2D('M-10-5H4Q12-5 12 0Q12 5 4 5H-10L-6 0Z'),
+    17:new Path2D('M0-8L3-3 9-5 7 0 9 5 3 3 0 8-3 3-9 5-7 0-9-5-3-3Z'),
+    24:new Path2D('M-14-3H5L13 0 5 3H-14L-9 0Z')
+  };
   const enemyRounds = {
     1:[215,'#86daff'], // Moonlit Library sentry bolt
     9:[150,'#ffc178'], // Quarry Rescue warning shot
@@ -2907,10 +2913,16 @@
       ctx.fillStyle=shot.parry?'#ff86dc':(shot.color || '#ff8479');
       ctx.strokeStyle='#471723';
       ctx.lineWidth=2;
-      ctx.beginPath();
-      ctx.moveTo(-12,0);ctx.lineTo(-3,-6);ctx.lineTo(7,-6);
-      ctx.lineTo(11,0);ctx.lineTo(7,6);ctx.lineTo(-3,6);
-      ctx.closePath();ctx.fill();ctx.stroke();
+      const silhouette=shot.color && enemyRoundArt[index];
+      if(silhouette){
+        ctx.fill(silhouette);
+        ctx.stroke(silhouette);
+      }else{
+        ctx.beginPath();
+        ctx.moveTo(-12,0);ctx.lineTo(-3,-6);ctx.lineTo(7,-6);
+        ctx.lineTo(11,0);ctx.lineTo(7,6);ctx.lineTo(-3,6);
+        ctx.closePath();ctx.fill();ctx.stroke();
+      }
       ctx.restore();
     }
     for(const spark of particles) {
