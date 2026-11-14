@@ -6126,9 +6126,15 @@
       }
       const displacement=at.x-(foe._drawX??at.x);
       const travel=Math.abs(displacement);
-      const faceLeft=foe.turret || firing || (nearby && ['turret','charge','pursuit'].includes(enemyPattern))
-        ? player.x<at.x
-        : travel>.15 && travel<90 ? displacement<0 : (foe.faceLeft??player.x<at.x);
+      // Face the direction of actual travel while walking. Tracking the hero
+      // during a patrol made enemies visibly moonwalk away from the player.
+      // Stationary turrets and active attacks still aim at their target.
+      const walking=travel>.15 && travel<90;
+      const aiming=foe.turret || firing;
+      const faceLeft=walking && !aiming ? displacement<0
+        : aiming || (nearby && ['turret','charge','pursuit'].includes(enemyPattern))
+          ? player.x<at.x
+          : (foe.faceLeft??player.x<at.x);
       foe.faceLeft=faceLeft;
       foe._drawX=at.x;
       const elapsed=Math.max(0,clock-(foe.gaitTime??clock));
