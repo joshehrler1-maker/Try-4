@@ -1774,7 +1774,9 @@
     }
     if(foe.reefEnemy!==undefined){
       const [reach,rise,tempo]=reefMotion[foe.reefEnemy];
-      const phase=clock*tempo+foe.offset;
+      // Reef swimmers gain tempo as the courier reaches deeper chapters.
+      const reefPressure=1+Math.min(5,Math.max(0,chapter))*.045;
+      const phase=clock*tempo*reefPressure+foe.offset;
       return {x:foe.x+Math.sin(phase)*reach,y:foe.y+Math.cos(phase*(foe.reefEnemy%2?2:1))*rise};
     }
     if (foe.turret) return {x:foe.x,y:foe.y};
