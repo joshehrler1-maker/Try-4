@@ -850,12 +850,23 @@
       {gaps:[0,258,212],widths:[214,158,190],rises:[0,-34,16]}  // 25 Starship: cargo decks
     ];
     const profile=traversalProfiles[index]||traversalProfiles[0];
+    // Stage-specific arrangement changes the route silhouette without
+    // altering the base movement vocabulary of the individual game.
+    // Keep adjustments modest so optional ledges stay within familiar
+    // jump ranges; the collision-clearance check still owns placement.
+    const chapterVariant=(stage+index)%4;
+    const stageGapOffsets=[0,12,-8,18];
+    const stageHeightOffsets=[0,-12,10,-18];
+    const stageWidthOffsets=[0,-6,10,-4];
     let cx=challengeX;
     for(let part=0;part<3;part++){
-      cx+=profile.gaps[part];
+      const gapAdjustment=part===0?0:
+        stageGapOffsets[(chapterVariant+part)%4];
+      cx+=profile.gaps[part]+gapAdjustment;
       const cy=Math.max(110,challengeHeights[(stage+index)%6]+
-        profile.rises[part]+((stage%3)-1)*8);
-      const cw=profile.widths[part]+(part===1?12:0);
+        profile.rises[part]+stageHeightOffsets[(chapterVariant+part)%4]);
+      const cw=Math.max(70,profile.widths[part]+
+        stageWidthOffsets[(chapterVariant+part)%4]+(part===1?12:0));
       if(!clearLane && addOptionalLanding(cx,cy,cw,challengeKinds[part]) &&
          part===1) crystals.push({x:cx+cw/2,y:cy-45});
     }
