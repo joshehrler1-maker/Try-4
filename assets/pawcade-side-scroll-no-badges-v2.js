@@ -7120,8 +7120,11 @@
       // Smooth the velocity and facing transitions so a patrol reversal
       // transfers body weight rather than snapping from one lean to another.
       // Visual-only springs: collision, enemy speed and attack AI are intact.
+      // Animation-only: discard stale and teleport-sized samples so a
+      // resumed phone tab cannot make enemies snap into a false sprint.
+      const stableMotionSample=elapsed>0 && elapsed<=.15 && travel<90;
       const motionDt=Math.min(.05,Math.max(0,elapsed));
-      const signedVelocity=elapsed>0 && travel<90?displacement/elapsed:0;
+      const signedVelocity=stableMotionSample?displacement/elapsed:0;
       const velocityTarget=reducedMotion?0:Math.max(-1,Math.min(1,signedVelocity/135));
       foe._bodyVelocity=(foe._bodyVelocity||0)+
         (velocityTarget-(foe._bodyVelocity||0))*(1-Math.exp(-7*motionDt));
@@ -7173,11 +7176,15 @@
       // Height-following spring adds a soft touchdown and recovery to jumping
       // foes; the pose is cosmetic and cannot alter their collision geometry.
       const previousY=foe._previousDrawY;
-      const verticalSpeed=previousY===undefined||blendDt<=0?0:
+      // Ignore vertical samples across tab suspends and large teleports:
+      // these should not trigger a leap, landing or artificial body squash.
+      const stableVerticalSample=previousY!==undefined && elapsed>0 &&
+        elapsed<=.15 && Math.abs(at.y-previousY)<90 && blendDt>0;
+      const verticalSpeed=!stableVerticalSample?0:
         Math.max(-650,Math.min(650,(at.y-previousY)/Math.max(.008,blendDt)));
       foe._previousDrawY=at.y;
       const previousFall=foe._lastVerticalSpeed||0;
-      const touchingDown=!airborne && elapsed>0 && elapsed<=.05 &&
+      const touchingDown=!airborne && stableVerticalSample && elapsed<=.05 &&
         travel<90 && previousFall>55 && verticalSpeed<=12;
       if(elapsed>0) foe._lastVerticalSpeed=verticalSpeed;
       if(touchingDown) foe._landingPose=Math.max(foe._landingPose||0,Math.min(.085,previousFall/4800));
