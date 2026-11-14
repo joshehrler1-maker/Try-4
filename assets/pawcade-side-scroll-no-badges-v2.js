@@ -1225,8 +1225,8 @@
     let nearest=null;
     let distance=Infinity;
     for(const candidate of candidates){
-      if(!eligible(candidate)) continue;
       const at=position(candidate);
+      if(!eligible(candidate,at)) continue;
       if(!close(player,at,reachX,reachY)) continue;
       const gap=Math.hypot(player.x-at.x,player.y-at.y);
       if(gap<distance){
@@ -1245,7 +1245,8 @@
     p.techCooldown=.32;
     const before=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,p.ledgeGrip,p.pogo,attacks.length];
     let activated=false;
-    const nearby=range=>closestTarget(p,enemies,foePosition,foe=>!foe.dead,range,65);
+    const nearby=range=>closestTarget(p,enemies,foePosition,
+      (foe,at)=>!foe.dead && (index!==10 || (at.x-p.x)*p.facing>=0),range,65);
     const shot=extra=>attacks.push({x:p.x,y:p.y,v:p.facing*330,life:.55,...extra});
     switch(technique) {
       case 'sweep': shot({v:0,radius:strength-20,life:.13}); break;
