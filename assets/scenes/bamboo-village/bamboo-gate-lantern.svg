@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Bamboo Gate — original hanging lantern and bamboo gateway"><defs><linearGradient id="bamboo" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#76d8a0"/><stop offset=".27" stop-color="#166149"/><stop offset=".65" stop-color="#1c2b3e"/><stop offset="1" stop-color="#166149"/></linearGradient><linearGradient id="lantern" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#fff9d6"/><stop offset=".48" stop-color="#e8d47e"/><stop offset="1" stop-color="#be6b37"/></linearGradient><radialGradient id="aura"><stop stop-color="#76d8a0" stop-opacity=".9"/><stop offset=".44" stop-color="#e8d47e" stop-opacity=".33"/><stop offset="1" stop-color="#76d8a0" stop-opacity="0"/></radialGradient></defs><ellipse cx="90" cy="79" rx="61" ry="57" fill="url(#aura)" opacity=".52"/>
+<path d="M24 157V23q-1-11 10-12 12 1 11 12v134" fill="url(#bamboo)" stroke="#174a37" stroke-width="4"/>
+<path d="M135 157V23q0-12 11-12 11 0 11 12v134" fill="url(#bamboo)" stroke="#174a37" stroke-width="4"/>
+<path d="M18 24Q90 5 162 24l-6 17Q90 23 24 41Z" fill="#3a7055" stroke="#f0c789" stroke-width="4"/>
+<path d="M32 54h116" stroke="#e9d092" stroke-width="5"/>
+<path d="M90 34v26" stroke="#ebdcab" stroke-width="3"/>
+<path d="M69 59h42l9 19-8 34-23 17-22-17-8-34z" fill="url(#lantern)" stroke="#f8e8ae" stroke-width="5"/>
+<path d="M74 73h33l4 20-21 22-19-22z" fill="#ffe4a3" opacity=".78"/>
+<path d="M88 128v13m-12-1h25" stroke="#eacf84" stroke-width="4"/>
+<path d="M31 69h7m-7 28h7m104-28h7m-7 28h7" stroke="#e6d393" stroke-width="3"/>
+<path d="M52 157q-4-38 21-53-3 23-21 53M128 157q-18-45-32-41 13 19 32 41" fill="#52a774" stroke="#1e6b48" stroke-width="3"/>
+<path d="M10 159h160" stroke="#254b37" stroke-width="8"/></svg>
