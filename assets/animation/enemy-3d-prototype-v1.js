@@ -103,8 +103,10 @@ return {game:m.game,enemy:m.enemy,parts:out,hit,fall};
 const VSH='attribute vec3 aPos;attribute vec3 aNormal;uniform mat4 uMvp;uniform mat4 uModel;varying vec3 vNorm;varying vec3 vWorld;void main(){vec4 p=uModel*vec4(aPos,1.0);vWorld=p.xyz;vNorm=normalize(mat3(uModel)*aNormal);gl_Position=uMvp*vec4(aPos,1.0);}';
 const FSH='precision mediump float;uniform vec3 uColor;varying vec3 vNorm;varying vec3 vWorld;void main(){vec3 n=normalize(vNorm);vec3 l=normalize(vec3(-0.43,0.8,1.1));float d=max(0.0,dot(n,l));vec3 v=normalize(vec3(0.0,1.0,8.0)-vWorld);float rim=pow(1.0-max(0.0,dot(n,v)),2.0);vec3 color=uColor*(0.36+0.64*d)+vec3(0.20)*rim*0.23;gl_FragColor=vec4(sqrt(color),1.0);}';
 function compile(gl,type,src){const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)){const msg=gl.getShaderInfoLog(sh);throw Error('WebGL shader failed: '+msg);}return sh;}
-function init(canvas){
-const gl=canvas.getContext('webgl',{antialias:true,alpha:false,depth:true})||canvas.getContext('experimental-webgl',{antialias:true,alpha:false,depth:true});
+function init(canvas,options={}){
+const sprite=Boolean(options.sprite);
+const settings={antialias:!sprite,alpha:sprite,depth:true,preserveDrawingBuffer:sprite};
+const gl=canvas.getContext('webgl',settings)||canvas.getContext('experimental-webgl',settings);
 if(!gl)throw Error('WebGL unavailable. The regular 2D Games Room is unaffected.');
 const program=gl.createProgram(),v=compile(gl,gl.VERTEX_SHADER,VSH),f=compile(gl,gl.FRAGMENT_SHADER,FSH);
 gl.attachShader(program,v);gl.attachShader(program,f);gl.linkProgram(program);
@@ -121,7 +123,7 @@ gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,idx);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER
 gpu[key]={p,n,idx,count:mesh.idx.length};
 }
 gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);
-gl.clearColor(.04,.08,.16,1.0);
+gl.clearColor(sprite?0:.04,sprite?0:.08,sprite?0:.16,sprite?0:1.0);
 const drawPart=(v,view)=>{
 const world=mul(pos(...v.position),mul(rz(v.tilt||0),size(...v.scale)));
 const g=gpu[v.type];
@@ -131,13 +133,15 @@ gl.bindBuffer(gl.ARRAY_BUFFER,g.n);gl.enableVertexAttribArray(loc.n);gl.vertexAt
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,g.idx);gl.drawElements(gl.TRIANGLES,g.count,gl.UNSIGNED_SHORT,0);
 };
 function render(index,mode='idle',time=0,angle=-.3,reduced=false){
-const sizeX=Math.max(1,Math.min(1200,Math.round((canvas.clientWidth||800)*Math.min(2,root.devicePixelRatio||1))));
-const sizeY=Math.round(sizeX*.6);
+const sizeX=sprite?160:Math.max(1,Math.min(1200,Math.round((canvas.clientWidth||800)*Math.min(2,root.devicePixelRatio||1))));
+const sizeY=sprite?160:Math.round(sizeX*.6);
 if(canvas.width!==sizeX||canvas.height!==sizeY){canvas.width=sizeX;canvas.height=sizeY;}
 gl.viewport(0,0,sizeX,sizeY);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
-const view=mul(perspective(sizeX/sizeY),mul(pos(0,-.07,-8),mul(ry(angle),rx(-.08))));
-drawPart({type:'box',position:[0,-1.37,0],scale:[2,.12,1.2],color:'#293a55',tilt:0},view);
-drawPart({type:'orb',position:[0,-1.21,-.1],scale:[.93,.02,.55],color:'#172b40',tilt:0},view);
+const view=mul(perspective(sizeX/sizeY),mul(pos(0,sprite?-.06:-.07,sprite?-4.7:-8),mul(ry(angle),rx(-.08))));
+if(!sprite){
+  drawPart({type:'box',position:[0,-1.37,0],scale:[2,.12,1.2],color:'#293a55',tilt:0},view);
+  drawPart({type:'orb',position:[0,-1.21,-.1],scale:[.93,.02,.55],color:'#172b40',tilt:0},view);
+}
 const sample=build(index,mode,time,reduced);
 for(const p of sample.parts){const v={...p,position:[p.position[0],p.position[1]-sample.fall*.23,p.position[2]],
 tilt:p.tilt+(mode==='defeat'?sample.fall*.33:0),scale:p.scale.map((x,i)=>x*(1-sample.fall*(i===1?.35:.1)))};
