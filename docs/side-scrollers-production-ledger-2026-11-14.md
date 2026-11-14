@@ -1,5 +1,32 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
+
+## Batch 6 — all six stage-scene props for each of games 21–25
+
+**Repository integration:** 20 original SVG scenery props created and installed for Stages 3, 4, 5 and 6 of Neon Circuit, Marble Temple, Swamp Ferry, Sunflower Flight and Starship Cargo. These add to their first two stage props already installed. Each game now has one **game- and stage-specific 2D-painted scenery prop in each of its six stages**. They are not 3D models or rendered movie frames.
+
+| Game | Stage 3 art | Stage 4 art | Stage 5 art | Stage 6 art |
+| --- | --- | --- | --- | --- |
+| Neon Circuit | Western Run turbo sign | Haunted Circuit ghost mirror | Factory Dash power-lane meter | Tower Reset finish clock |
+| Marble Temple | Marble Chapel moon window | Inner Halls pendulum | Phantom Ship moon lantern | Silver Gallery key throne |
+| Swamp Ferry | Gem Mines crystal winch | Snowbound Pass ferry marker | Moon Outpost signal | Return to the Manor lighthouse |
+| Sunflower Flight | Threaded Treats ribbon wheel | Felt Ocean petal buoy | Snowy Seams warmth stitch | Patchwork Orbit final bloom |
+| Starship Cargo | River Crossing coolant valve | City Siege defense repeater | Factory Assault safety keypad | Cargo Stronghold rescue pod launch |
+
+**Current exact placement registry:** `docs/side-scrollers-current-asset-placement.md`. **Full stage audit:** `docs/side-scrollers-full-stage-art-audit.md`.
+
+### Up-to-date authoritative totals
+
+- **25 games** retain their individually assigned reference mechanics and current world geometry.
+- **162 stage slots** in the actual current source stage definitions.
+- **50 unique original static scene images integrated into the playable canvas** (25 Stage 1 images plus Stages 2–6 in the last five games).
+- **112 additional stage-specific render slots not yet produced** (proposed WebP paths are only a plan).
+- **25 full 3D animated movies unfinished.** Five written beat drafts are preparation only, with no rendered animation, voice track, captioned final video or soundtrack.
+- Source tests verify unique paths, world positions on authored support tops, stage offsets, cache registration and JavaScript syntax. Actual camera composition, device FPS, landings, enemy animation and movie playback are **not verified by these source checks**.
+
+**Implementation commits:** Stage 3/4 `2fcc14c5`, Stage 5/6 `04e0683e`; HTML and service-worker cache versions updated. Unit tests extended and the discovered room-name parsing error fixed at `dd9767a9`. GitHub Pages workflow outcome and full Android compilation must be checked separately before any claim that this final batch is live and production-safe. No paid services used.
+
+
 ## Batch 5 — all 25 games have individually authored first-stage scenery
 
 **Verified in GitHub source:** Games 21–25 each have an original Stage 1 SVG scenery prop and a different Stage 2 SVG art prop. All 10 are actually wired into the existing canvas runtime, selected by game index and rendered behind gameplay geometry with stage-appropriate world positions. No gameplay collision changes were made. The active runtime and HTML cache version are `assets/pawcade-side-scroll-no-badges-v2.js?v=stage1and2-art-31e6f5e`; all 30 active new assets are precached by `sw.js`.
