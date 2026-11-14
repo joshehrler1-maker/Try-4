@@ -4921,12 +4921,31 @@
     new Path2D('M-8-5H8V5H-8ZM-3-5V5M3-5V5M-3 0H3'), // cargo latch
   ];
   const platformPlaqueFrames = [
-    new Path2D('M-13-7H13V7H-13Z'),
-    new Path2D('M-15 0L-11-7H11L15 0 11 7H-11Z'),
-    new Path2D('M-14 7V-2Q-14-8 0-8Q14-8 14-2V7Z'),
-    new Path2D('M-15-5H-10V-8H10V-5H15V5H10V8H-10V5H-15Z'),
-    new Path2D('M-14-7H14L11 7H-11Z'),
-    new Path2D('M0-9L15-5V5L0 9-15 5V-5Z'),
+    new Path2D('M-14-7H14V7H-14Z'), // Forge block
+    new Path2D('M-15-5H-8V-8H8V-5H15V6H-15Z'), // Highway joint
+    new Path2D('M-14 6Q-16-7 0-8Q16-7 14 6Z'), // Reef shell
+    new Path2D('M-15 6L-6-7H15L8 7Z'), // Banked track
+    new Path2D('M-14-6L0-8 14-6 11 7H-11Z'), // Deck lashing
+    new Path2D('M-15-6H15Q10 6 5 6Q0 1-5 6Q-10 6-15-6Z'), // Cascade lip
+    new Path2D('M-14 7V-1Q-14-8 0-8Q14-8 14-1V7Z'), // Float canopy
+    new Path2D('M-15-4H-9V-8H9V-4H15V4H9V8H-9V4H-15Z'), // Gravity contact
+    new Path2D('M-15 7L-8-7H8L15 7Z'), // Beat wedge
+    new Path2D('M-15-7H15L10 1H6V7H-6V1H-10Z'), // Grapple bracket
+    new Path2D('M-15 1L-8-8 14-4 10 7H-10Z'), // Wind vane
+    new Path2D('M-15-7H15L11 4Q0 9-11 4Z'), // Suspension cradle
+    new Path2D('M-13-7H13L15-3 12 7H-12L-15-3Z'), // Pogo plate
+    new Path2D('M-15-4L-10-8-4-6 2-8 8-6 15-8 13 7H-13Z'), // Turf shelf
+    new Path2D('M-15 0L-10-7H10L15 0 10 7H-10Z'), // Pressure hatch
+    new Path2D('M-15-5Q-6-9 0-6Q6-9 15-5Q7 7 0 7Q-7 7-15-5Z'), // Root cradle
+    new Path2D('M-15-6H15V2H11V7H5V2H-5V7H-11V2H-15Z'), // Catwalk foot
+    new Path2D('M-14-7H14L15 2Q10 9 5 3Q0 9-5 3Q-10 9-15 2Z'), // Awning hem
+    new Path2D('M-15 7V-2H-7V-5H1V-8H15V7Z'), // Bridge step
+    new Path2D('M-15-3Q-15-8-9-8H9Q15-8 15-3V4Q15 8 9 8H-9Q-15 8-15 4Z'), // Dock gasket
+    new Path2D('M-15-7H7L15 0 7 7H-15L-10 0Z'), // Sprint chevron
+    new Path2D('M-14 7V0L0-9 14 0V7Z'), // Chapel arch
+    new Path2D('M-15-7H15V-3L11 1 14 7H-14L-11 1-15-3Z'), // Ferry spring seat
+    new Path2D('M-15 0Q-9-8 0-6Q9-8 15 0Q9 8 0 6Q-9 8-15 0Z'), // Stitched petal
+    new Path2D('M-15-7H-7V-4H7V-7H15V7H7V4H-7V7H-15Z'), // Cargo cleat
   ];
   const platformEndProfiles = [
     new Path2D('M0 0H14L9 8H0Z'),
@@ -5211,8 +5230,7 @@
         const center=x+24+panel*spacing;
         ctx.save();
         ctx.translate(center,y+19);
-        const stage=Math.min(platformPlaqueFrames.length-1,stageAt(center));
-        const frame=platformPlaqueFrames[stage];
+        const frame=platformPlaqueFrames[index];
         ctx.fillStyle='#161423';
         ctx.fill(frame);
         ctx.globalAlpha=.48;
