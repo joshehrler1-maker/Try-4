@@ -7029,7 +7029,7 @@
       status('This checkpoint is no longer available.');
     }
   };
-  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:power==='swim'||movement==='airdash'||[9,13,15,18].includes(index)?'up':'jump',KeyW:power==='swim'||movement==='airdash'||[9,13,15,18].includes(index)?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
+  const codes={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:fourWayStick && index!==3?'up':'jump',KeyW:fourWayStick && index!==3?'up':'jump',ArrowDown:'down',KeyS:'down',Space:'jump',KeyX:'action',KeyC:'technique'};
   addEventListener('keydown',event=>{
     if(storyDialog?.open || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey ||
        event.target?.closest?.('input,select,textarea,[contenteditable]')) return;
@@ -7038,7 +7038,7 @@
     if(!control || phase!=='playing' || event.target?.closest?.('button,a')) return;
     event.preventDefault();
     if(event.repeat && !pressedCodes.has(event.code)) return;
-    const alreadyHeld=keys.has(control);
+    const alreadyHeld=held(control);
     pressedCodes.add(event.code);
     keys.add(control);
     if(!alreadyHeld && !event.repeat) {
@@ -7069,11 +7069,13 @@
     });
     button.onpointerdown=event=>{
       if(pointer!==null || phase!=='playing' || event.button!==0) return;
+      const alreadyHeld=held(control);
       pointer=event.pointerId;
-      event.preventDefault();button.setPointerCapture(event.pointerId);mobile.add(control);activate();
+      event.preventDefault();button.setPointerCapture(event.pointerId);mobile.add(control);
+      if(!alreadyHeld) activate();
     };
     for(const event of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(event,e=>{if(e.pointerId!==pointer)return;pointer=null;mobile.delete(control);if(control==='action')releaseAction(event==='pointerup');});
-    button.onclick=event=>{if(event.detail===0){activate();if(control==='action')releaseAction(true);}};
+    button.onclick=event=>{if(event.detail===0 && phase==='playing' && !held(control)){activate();if(control==='action')releaseAction(true);}};
   });
   for (const image of [sprites,poster,backdrop,enemyArt,heroArt,terrainArt,baronArt,propArt,stagePropArt,combatArt,energyFxArt]) image.onload=()=>{if(phase!=='playing') draw();};
   reset();
