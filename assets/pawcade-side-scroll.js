@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>7)return;
-    const spacing=[230,188,205,178,226,196,218,174][index];
-    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29][index]);
+    if(index<0 || index>9)return;
+    const spacing=[230,188,205,178,226,196,218,174,156,232][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29,.31,.17][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -1762,6 +1762,47 @@
           ctx.lineTo(sx,sy+12);ctx.lineTo(sx-7,sy);ctx.closePath();ctx.fill();
         }
         ctx.globalAlpha=1;
+      }else if(index===8){
+        // Stage Beat: rhythmic light towers, equalizer bars and neon trims.
+        const base=281, bx=x+24;
+        ctx.fillStyle='#272340';
+        ctx.fillRect(bx,135+variation*9,118,base-135-variation*9);
+        for(let bar=0;bar<6;bar++){
+          const h=28+((bar*23+variation*17)%72);
+          ctx.fillStyle=bar%2?'#ef78c6':'#7ce4ef';
+          ctx.globalAlpha=.65;
+          ctx.fillRect(bx+8+bar*18,base-18-h,10,h);
+          ctx.globalAlpha=.22;
+          ctx.fillRect(bx+8+bar*18,base-18-h,10,4);
+        }
+        ctx.globalAlpha=1;
+        ctx.strokeStyle='#d98bfa';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(bx,base-12);ctx.lineTo(bx+118,base-12);ctx.stroke();
+        ctx.fillStyle='#f4b2ff';
+        for(let dot=0;dot<4;dot++){
+          ctx.beginPath();ctx.arc(bx+13+dot*31,151+variation*9,3,0,Math.PI*2);ctx.fill();
+        }
+      }else if(index===9){
+        // Quarry Rescue: cut-stone terraces, hoists, and suspended cargo.
+        const top=127+variation*11;
+        ctx.fillStyle='#514a4c';
+        ctx.beginPath();ctx.moveTo(x+16,286);ctx.lineTo(x+16,top+47);
+        ctx.lineTo(x+52,top+47);ctx.lineTo(x+52,top+20);
+        ctx.lineTo(x+155,top+20);ctx.lineTo(x+155,286);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#80726a';
+        for(let row=0;row<4;row++){
+          const yy=top+38+row*32;
+          ctx.fillRect(x+54,yy,95,3);
+          ctx.fillRect(x+75+(row%2)*21,yy+3,3,26);
+        }
+        ctx.strokeStyle='#c5a97b';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(x+176,top-14);ctx.lineTo(x+176,top+104);ctx.stroke();
+        ctx.fillStyle='#a68a64';
+        ctx.fillRect(x+163,top+104,26,19);
+        ctx.fillStyle='#d8c69d';
+        ctx.fillRect(x+165,top+106,22,3);
+        ctx.strokeStyle='#8f7b65';ctx.lineWidth=5;
+        ctx.beginPath();ctx.moveTo(x+125,top-18);ctx.lineTo(x+201,top-18);ctx.stroke();
       }
     }
     ctx.restore();
