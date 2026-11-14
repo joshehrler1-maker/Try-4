@@ -1358,7 +1358,7 @@
           upperShot.life=1.5;
           hazards.push(upperShot);
         }
-        if(foe.clockEnemy===5){
+        if(foe.clockEnemy===5 && hazards.length<28){
           const highShot=enemyRound({x:position.x,y:position.y-44},direction,false);
           hazards.push(highShot);
         }
