@@ -668,7 +668,7 @@
         stageWidths[stage]-signatureSpan-100,
         1510+stage%3*47));
       const signatureFits=stageWidths[stage]>=signatureSpan+320;
-      for(const [slot,[dx,sy,sw,kind]] of signature.entries()){
+      for(const [slot,[dx,sy,sw,kind]] of (signatureFits?signature:[]).entries()){
         const sx=signatureX+dx;
         const height=sy+((stage+slot)%3-1)*8;
         const width=sw+((stage+slot)%2)*10;
