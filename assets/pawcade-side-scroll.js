@@ -1067,7 +1067,7 @@
     if (oldY <= height && p.x>=finish && p.x-p.vx*dt<finish) {
       status(boss.health ? 'Baron Brasswhirl · '+guardian.hint : finaleExitHint);
     }
-    if (stage > chapter && p.on) {
+    if (stage > chapter && (p.on || (power==='swim' && p.x>=stageStarts[stage]+100))) {
       chapter=stage;
       syncControllerArt(chapter);
       chapterReveal=2;
