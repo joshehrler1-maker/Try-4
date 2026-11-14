@@ -4575,7 +4575,15 @@
       1.35,.95,1.05,.65,1.3,1.1,.8,1.25,.95,1.4,.75,1.15,1.05][index];
     const strikePhase=Math.min(1,reach*attackRhythm);
     // Brief body-level recoil for confirmed bash states; no overhead markers.
-    const hitRecoil=foe.bashed?Math.sin(clock*18+foe.offset)*.12:0;
+    // A hit reaction must decay; a persistent bashed flag must not make
+    // an enemy jitter forever. Advance only while the enemy is rendered.
+    const reactionDt=Math.min(.05,Math.max(0,clock-(foe._rigFrameAt??clock)));
+    foe._rigFrameAt=clock;
+    const hitEdge=Boolean(foe.bashed)&&!foe._rigWasBashed;
+    foe._rigWasBashed=Boolean(foe.bashed);
+    if(hitEdge)foe._rigHitReaction=1;
+    foe._rigHitReaction=(foe._rigHitReaction||0)*Math.exp(-10*reactionDt);
+    const hitRecoil=Math.sin(clock*18+foe.offset)*.12*(foe._rigHitReaction||0);
     // Each counterpart-inspired adventure gets its own animation silhouette:
     // stride length, arm follow-through, knee bend and body mass. These are
     // original Super Paw Heroes motions, not copied reference-game assets.
