@@ -419,6 +419,13 @@
             foe.patrolRight=start+x+w-26;
             clockEnemyPlaced=true;
           }
+          // Keep staggered enemies from spawning on top of one another.
+          // Compare only foes on the same walking surface; swimmers use
+          // their own authored vertical movement and must remain exempt.
+          const minimumGap=Math.min(60,Math.max(28,w/(count+1)*.45));
+          if(!foe.reefEnemy && enemies.some(other=>
+            !other.reefEnemy && Math.abs(other.y-foe.y)<8 &&
+            Math.abs(other.x-foe.x)<minimumGap)) continue;
           enemies.push(foe);
         }
       }
