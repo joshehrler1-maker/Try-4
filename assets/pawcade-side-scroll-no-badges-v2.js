@@ -2124,6 +2124,10 @@
       playCue(390,780);
       status('Amber switch activated. The upper bridge is open.');
     }
+    if(index===5){
+      const gliding=!p.on && held('jump') && p.vy>0;
+      p.canopyOpen=Math.max(0,Math.min(1,(p.canopyOpen??0)+dt*(gliding?12:-9)));
+    }
     const stage = stageAt(p.x);
     if (oldY <= height && p.x>=finish && oldX<finish) {
       status(boss.health ? 'Baron Brasswhirl · '+guardian.hint : finaleExitHint);
@@ -6558,11 +6562,13 @@
       ctx.fill();
       ctx.restore();
     }
-    if(index===5 && gliding){
+    if(index===5 && (reducedMotion?gliding:(p.canopyOpen??0)>0)){
+      const opening=reducedMotion?1:p.canopyOpen;
       const rotor=reducedMotion?1:.76+.24*Math.cos(clock*48);
       ctx.save();
       ctx.translate(p.x,p.y-28);
-      ctx.scale(rotor,1);
+      ctx.scale(rotor*(.25+.75*opening),.45+.55*opening);
+      ctx.globalAlpha*=opening;
       ctx.strokeStyle='#e1f9ff';
       ctx.lineWidth=2;
       ctx.fillStyle='#73afd6';
