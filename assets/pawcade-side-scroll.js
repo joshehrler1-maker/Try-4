@@ -1954,8 +1954,11 @@
     };
     let heroDrawn=false;
     if(running){
-      heroDrawn=drawHeroPose(1,1);
-      if(heroDrawn && blend>.03)drawHeroPose(2,blend);
+      // Weighted crossfade: total opacity stays at 1, preventing the
+      // doubled/ghosted silhouette caused by painting two opaque frames.
+      const secondary=blend;
+      heroDrawn=drawHeroPose(1,1-secondary);
+      if(heroDrawn && secondary>.03)drawHeroPose(2,secondary);
     } else if(rosterIndex>=0){
       heroDrawn=atlasSprite(heroArt,8,rosterIndex*4+pose,p.x,p.y-17-heroLift,heroSize,heroSize,p.facing<0,4);
     } else {
