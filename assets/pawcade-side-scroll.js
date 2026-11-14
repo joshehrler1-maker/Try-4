@@ -1789,7 +1789,11 @@
     // Later chapters accelerate ordinary patrol cycles without changing
     // each game's unique enemy motion family or the boss encounter.
     const chapterPressure=1+Math.min(5,Math.max(0,chapter))*0.065;
-    const t = clock * (2 * enemyTempo / cadence) * chapterPressure + foe.offset;
+    // Each archetype changes actual movement timing, not just its colors.
+    // Unique authored foundry/library/reef/clock motion remains prioritized.
+    const archetypeTempo=[1,.82,1.18,1.06][foe.archetype??0];
+    const t = clock * (2 * enemyTempo / cadence) * chapterPressure *
+      archetypeTempo + foe.offset;
     const chase = Math.sign(player.x-foe.x);
     const wave = Math.sin(t*2.1);
     if(foe.foundryEnemy!==undefined){
