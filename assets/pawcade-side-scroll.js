@@ -1663,6 +1663,33 @@
     ctx.fillStyle='#ffc17f';
     ctx.fillRect(x,y-6,w*(reducedMotion?1:remaining),3);
   }
+  const platformFaceArt = [
+    new Path2D('M-7 5V-1L0-6 7-1V5ZM-3 5V1L0-2 3 1V5'), // furnace
+    new Path2D('M-7 5V-4H-3V5M-1 5V-5H3V5M5 5L4-3 7-4 9 4'), // books
+    new Path2D('M-8 3Q-8-6 0-6Q8-6 8 3L0 5ZM0 4L-5-3M0 4V-5M0 4L5-3'), // shell
+    new Path2D('M-6 0A6 6 0 1 0 6 0A6 6 0 1 0-6 0M0-4V0L3 2'), // clock
+    new Path2D('M-8 4Q-4-7 7-5Q8 4-8 4ZM-8 4L4-3'), // seed
+    new Path2D('M-8-5H-2V4H3V0H8M-8-2H-5V6'), // cascade
+    new Path2D('M-5-4H5L7 0 5 4H-5L-7 0ZM0-6V-4M0 4V6'), // lantern
+    new Path2D('M0-6L7 0 0 6-7 0ZM0-6L3 0 0 6-3 0Z'), // crystal
+    new Path2D('M-8-5H8V5H-8ZM-4 0A2 2 0 1 0 0 0A2 2 0 1 0-4 0M3-2H6M3 2H6'), // speaker
+    new Path2D('M-8 5L-4-5H4L8 5ZM-5 0H5'), // stone braces
+    new Path2D('M0-6V5M0-5L8 3H0M-8 5H8'), // sail
+    new Path2D('M-8 4Q-11 0-5-1Q-4-7 2-4Q7-5 7 0Q11 4 5 4Z'), // cloud
+    new Path2D('M0-5V5M-4-2H4M-8 0Q-5 7 0 5Q5 7 8 0'), // anchor
+    new Path2D('M-8 4Q-4-6 7-5Q5 5-8 4ZM-8 4L5-4M0-1L-2-4'), // leaf
+    new Path2D('M-8 2Q-5-5 7-4Q12 0 1 4Q-8 7-8 2ZM0-5V5'), // orbit
+    new Path2D('M-8 5L-5-5M-2 5L1-5M4 5L7-5M-8 1H8'), // bamboo
+    new Path2D('M-8 5H8M-6 2Q-9 0-6-4M0 2Q-3 0 0-4M6 2Q3 0 6-4'), // steam vents
+    new Path2D('M0-6V6M-6-3L6 3M-6 3L6-3'), // snowflake
+    new Path2D('M-8-4L-3-5 2-3 8-4M-8 0L-1 2 8-1M-8 4L-1 5 8 3'), // strata
+    new Path2D('M-6 0A6 6 0 1 0 6 0A6 6 0 1 0-6 0M-8 0H-6M6 0H8M-3 2L2-3'), // porthole
+    new Path2D('M-8 4H-3V-3H3V3H8M-8-3H-5M5-3H8'), // circuit
+    new Path2D('M-8-5H8M-8 5H8M-5-5V5M0-5V5M5-5V5'), // temple columns
+    new Path2D('M-7 5L-4-5M0 5V-4M7 5L4-5M-8 3Q0 0 8 3'), // reeds
+    new Path2D('M0-5V5M-5 0H5M-4-4L4 4M-4 4L4-4M-8 5H8'), // sunflower
+    new Path2D('M-8-5H8V5H-8ZM-3-5V5M3-5V5M-3 0H3'), // cargo latch
+  ];
   function drawLandingEdge({x,y,w,kind}) {
     const rim=courseMaterials[index][2];
     // Two tones keep the landing line visible against both bright and dark scenery.
@@ -1747,6 +1774,24 @@
     // A narrow bevel and inset underside add a readable 2.5D profile
     // without painting over the actual collision surface. Limit drawing
     // to the viewport to keep long levels inexpensive on Android.
+    if(w>=48 && (kind==='floor')){
+      const spacing=64;
+      const first=Math.max(0,Math.floor((camera-x)/spacing));
+      const last=Math.min(Math.floor((w-48)/spacing),Math.floor((camera+width-x)/spacing));
+      ctx.save();
+      ctx.strokeStyle=rim;
+      ctx.lineWidth=1;
+      for(let panel=first;panel<=last;panel++){
+        const center=x+24+panel*spacing;
+        ctx.fillStyle='#161423';
+        ctx.fillRect(center-12,y+12,24,15);
+        ctx.save();
+        ctx.translate(center,y+19);
+        ctx.stroke(platformFaceArt[index]);
+        ctx.restore();
+      }
+      ctx.restore();
+    }
     const bevelDepth=Math.min(12,Math.max(5,topDepth+3));
     const bevelStart=Math.max(x,camera-8);
     const bevelEnd=Math.min(x+w,camera+width+8);
