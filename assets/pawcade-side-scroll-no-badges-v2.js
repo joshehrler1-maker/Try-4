@@ -3207,6 +3207,40 @@
       }
     }
     ctx.restore();
+    // Silhouette construction on the visible face gives platforms distinct
+    // physical profiles without changing their collision tops. Supports
+    // are clipped to the existing solid face so none float below a ledge.
+    if(faceDepth>=18 && w>=78){
+      const structure=['buttress','girder','rib','arch','panel'][
+        (index+stage+kindOffset+Math.floor(w/100))%5];
+      const beamCount=Math.min(9,Math.max(1,Math.floor(w/115)));
+      const beamGap=w/(beamCount+1);
+      ctx.save();
+      ctx.beginPath();ctx.rect(x+2,y+3,w-4,faceDepth-4);ctx.clip();
+      ctx.strokeStyle=rim;ctx.lineWidth=2;
+      ctx.globalAlpha=.36;
+      for(let beam=1;beam<=beamCount;beam++){
+        const bx=x+beam*beamGap;
+        ctx.beginPath();
+        if(structure==='buttress'){
+          ctx.moveTo(bx-17,y+faceDepth);ctx.lineTo(bx,y+5);
+          ctx.lineTo(bx+17,y+faceDepth);
+        }else if(structure==='girder'){
+          ctx.moveTo(bx-20,y+5);ctx.lineTo(bx+20,y+faceDepth);
+          ctx.moveTo(bx+20,y+5);ctx.lineTo(bx-20,y+faceDepth);
+        }else if(structure==='rib'){
+          ctx.moveTo(bx-10,y+4);ctx.lineTo(bx-10,y+faceDepth);
+          ctx.moveTo(bx+10,y+4);ctx.lineTo(bx+10,y+faceDepth);
+        }else if(structure==='arch'){
+          ctx.moveTo(bx-25,y+faceDepth);
+          ctx.quadraticCurveTo(bx,y+3,bx+25,y+faceDepth);
+        }else{
+          ctx.rect(bx-20,y+6,40,Math.max(7,faceDepth-12));
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
   }
   function drawDropWarning({x,y,w,dropAt}) {
     if(dropAt===undefined) return;
