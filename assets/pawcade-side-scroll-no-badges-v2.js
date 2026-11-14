@@ -2088,6 +2088,7 @@
           p.vx=p.facing*440;
           p.grapple=.35;
         }
+        if((index===12 || index===22) && (p.pogo || pogoLaunch)) p.pogoRebound=clock;
         if (springLaunch) {
           p.vy=-565;
           playSpring();
@@ -2420,6 +2421,7 @@
       burst(boss.x,boss.y,'#ffd08a',boss.health?12:22);
       if (attack) attack.life=0;
       if (stomp) {
+        if((index===12 || index===22) && p.pogo) p.pogoRebound=clock;
         p.vy=p.pogo?-510:-375;
         p.pogo=false;
         p.on=false;
