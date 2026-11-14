@@ -585,7 +585,11 @@
         add(30,292,90,'spring');add(270,227,150,'spring');add(515,178,165,'floor');
         break;
       case 'tower': case 'dash': case 'vines': case 'bash':
-        for(let n=0;n<4;n++) add(40+n*152,277-n*37,118,n===2?'lift':'floor');
+        for(let n=0;n<4;n++){
+          const rise=index===15 ? [0,33,76,125][n] : n*37;
+          const width=index===15 ? [134,116,118,100][n] : 118;
+          add(40+n*152,277-rise,width,n===2?'lift':'floor');
+        }
         break;
       case 'bridge': case 'yarn': case 'ring':
         add(80,252,140,'floor');add(255,230,130,'floor');add(415,250,165,'floor');
@@ -5689,6 +5693,13 @@
         ctx.lineWidth=2;
         ctx.beginPath();
         ctx.arc(at.x,at.y-12,37,0,Math.PI*2);
+        for(const side of [-1,1]){
+          const x=at.x+side*37;
+          const y=at.y-12;
+          ctx.moveTo(x-side*5,y-5);
+          ctx.lineTo(x,y);
+          ctx.lineTo(x-side*5,y+5);
+        }
         ctx.stroke();
         ctx.restore();
       }
