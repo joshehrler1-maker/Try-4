@@ -391,7 +391,7 @@
       // Counterpart-inspired pacing: fast runners get fewer, longer
       // platforms; climbers and aerial adventures get denser steps.
       const routeCount=fastRoute?(rw>=1250?2:1):
-        (aerialRoute||precisionRoute)?(rw>=1250?4:rw>=850?3:2):
+        (aerialRoute||precisionRoute)?(rw>=1250?4:rw>=850?3:1):
         rw>=1250?3:rw>=850?2:1;
       for(let route=0;route<routeCount;route++){
         // Speed courses use broad landing decks; aerial courses use
