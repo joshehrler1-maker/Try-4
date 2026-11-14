@@ -1302,6 +1302,9 @@
         // and raiders faster bolts. Preserve Steamworks parry behavior.
         const projectileTempo=[1.12,.82,1.02,1.22][foe.archetype??0];
         primaryShot.v*=projectileTempo;
+        // The sentry's heavier pulse stays visible longer; scout darts
+        // expire sooner. No new physics or projectile hitbox is required.
+        primaryShot.life*=[.8,1.2,1,.9][foe.archetype??0];
         hazards.push(primaryShot);
         // Late-stage raiders introduce a readable high/low lane choice.
         // Keep existing Clocktower double-shot behavior separate.
