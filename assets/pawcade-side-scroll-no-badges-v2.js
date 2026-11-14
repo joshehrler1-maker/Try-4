@@ -1142,6 +1142,7 @@
         projectile.vy=-285;
         projectile.gravity=570;
       }
+      if(index===19 || index===24) player.shotPose={time:clock,facing:player.facing};
       attacks.push(projectile);
       playCue(470,180,.085);
       if(player.altWeapon) for(const vy of [-105,105]) attacks.push({x:player.x,y:player.y,v:player.facing*speed,vy,life});
@@ -6583,6 +6584,30 @@
           ctx.moveTo(x+side*(5+progress*22),y-1);
           ctx.lineTo(x+side*(13+progress*32),y-4-progress*7);
           ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+    if((index===19 || index===24) && p.shotPose){
+      const age=clock-p.shotPose.time;
+      if(age>=0 && age<.22){
+        const dock=index===19;
+        const recoil=reducedMotion ? 0 : Math.max(0,1-age/.11)*(dock?4:7);
+        ctx.save();
+        ctx.translate(p.x,p.y-9);
+        ctx.scale(p.shotPose.facing,1);
+        ctx.translate(-recoil,0);
+        ctx.fillStyle=dock?'#235564':'#65463f';
+        ctx.fillRect(10,-5,dock?23:19,10);
+        ctx.fillStyle=dock?'#aef2ed':'#ffcb86';
+        ctx.fillRect(dock?28:24,-6,5,12);
+        if(age<.07 && !reducedMotion){
+          ctx.beginPath();
+          ctx.moveTo(31,-4);
+          ctx.lineTo(dock?46:50,0);
+          ctx.lineTo(31,4);
+          ctx.closePath();
+          ctx.fill();
         }
         ctx.restore();
       }
