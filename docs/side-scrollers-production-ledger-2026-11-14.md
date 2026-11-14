@@ -1,5 +1,25 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
+## Batch 5 — all 25 games have individually authored first-stage scenery
+
+**Verified in GitHub source:** Games 21–25 each have an original Stage 1 SVG scenery prop and a different Stage 2 SVG art prop. All 10 are actually wired into the existing canvas runtime, selected by game index and rendered behind gameplay geometry with stage-appropriate world positions. No gameplay collision changes were made. The active runtime and HTML cache version are `assets/pawcade-side-scroll-no-badges-v2.js?v=stage1and2-art-31e6f5e`; all 30 active new assets are precached by `sw.js`.
+
+| Game | Stage 1 integrated | Stage 2 integrated | Movie preparation |
+| --- | --- | --- | --- |
+| 21 Neon Circuit | Lobby Sprint photo-finish gate | Dungeon Heat overdrive coil | `docs/movie-preproduction/neon-circuit-screenplay-beats-v0.1.md` |
+| 22 Marble Temple | Ruined Village moon seal | Moon Gate key relief | `docs/movie-preproduction/marble-temple-screenplay-beats-v0.1.md` |
+| 23 Swamp Ferry | Jungle Relics firefly ferry post | Haunted Manor ghost lamp | `docs/movie-preproduction/swamp-ferry-screenplay-beats-v0.1.md` |
+| 24 Sunflower Flight | Grass Patch pollen vane | Stitched Desert thread spool | `docs/movie-preproduction/sunflower-flight-screenplay-beats-v0.1.md` |
+| 25 Starship Cargo | Outpost Landing rescue pod panel | Mountain Convoy supply uplink | `docs/movie-preproduction/starship-cargo-screenplay-beats-v0.1.md` |
+
+**30 exact installed placements across the 25 games:** `docs/side-scrollers-current-asset-placement.md`. **Full 162-stage source geometry audit and 132 still-missing original setpiece render slots:** `docs/side-scrollers-full-stage-art-audit.md`. All 162 proposed/installed locations were checked against the authored stage support surfaces in source.
+
+**Testing:** The repository's full source/Android compile workflow completed successfully at `0a6531a`; GitHub Pages deployment also passed that check. Those checks are not physical Android gameplay testing, nor proof that the website's latest doc-only update was visually inspected. Live HTML, photo-real 3D render fidelity, character/enemy motion, FPS, audio, captions, and finished 25 movies remain unverified/incomplete. The five movie files created in this batch are *written beat outlines*, not animatics, screenplays signed off for production or videos.
+
+**Only $0 tools and services used.** No game counterparts' proprietary textures, source code, levels or audio were copied.
+
+
+
 > **Current authoritative placement status (Batch 4, Nov 14):** The source later overrides some early chapter titles and room plans. The current stage names and placement table below supersede all earlier historical batch captions, stage labels, and fixed-position claims in this document. They are tested against the repository's live code configuration, **not live browser/device gameplay**. All currently integrated additions are SVG scenery, **not feature-film 3D**, and none of the 25 game movies is finished.
 
 ## Current 20-game Stage 1 asset registry and integration geometry
