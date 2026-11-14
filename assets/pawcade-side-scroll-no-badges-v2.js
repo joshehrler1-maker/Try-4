@@ -3134,7 +3134,9 @@
       return {x:patrolX(foe.x+wave*enemyReach*.8),y:foe.y-leap*leap*enemyRise*1.3};
     }
     if(index===7){ // Crystal Polarity: inverted gravity sentries
-      const polarity=Math.sin(t*.75)>0?1:-1;
+      // Continuous gravity inversion prevents a full-height teleport each
+      // time the polarity changes, keeping enemy hitboxes aligned with art.
+      const polarity=Math.sin(t*.75);
       return {x:patrolX(foe.x+wave*enemyReach*.65),
         y:foe.y-polarity*enemyRise*.65};
     }
