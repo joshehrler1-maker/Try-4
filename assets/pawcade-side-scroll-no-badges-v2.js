@@ -1304,7 +1304,10 @@
       shot.life-=dt;
       if (shot.life>0 && close(p,shot,18,22)) {shot.life=0;if (hit()) return;}
     }
-    hazards = hazards.filter(shot=>shot.life>0);
+    // Discard projectiles well beyond the playable view, freeing the
+    // shared projectile budget for enemies the player can actually see.
+    hazards = hazards.filter(shot=>shot.life>0 &&
+      shot.x>camera-240 && shot.x<camera+width+240);
     for (const foe of enemies) {
       if (foe.dead || Math.abs(foe.x-p.x)>360) continue;
       const position = foePosition(foe);
