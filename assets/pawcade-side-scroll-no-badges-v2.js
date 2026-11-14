@@ -4569,9 +4569,24 @@
     const phase=(foe._gait||0)*(0.8+(index%5)*.11);
     const swing=reducedMotion?0:Math.sin(phase)*Math.min(1,stride);
     const reach=reducedMotion?0:attackPose;
+    // Each counterpart-inspired adventure gets its own animation silhouette:
+    // stride length, arm follow-through, knee bend and body mass. These are
+    // original Super Paw Heroes motions, not copied reference-game assets.
+    const enemyRigProfiles=[
+      [1.0,1.0,1.0,1.0],[.75,1.25,.9,.85],[.45,1.5,.55,.8],
+      [1.55,.7,.7,.75],[.8,1.4,1.15,1.25],[1.15,.8,1.3,1.0],
+      [.6,1.5,.7,.75],[.95,.55,1.4,1.1],[1.7,.65,.6,.8],
+      [.7,1.25,1.5,.9],[.85,1.4,.85,.75],[1.2,.75,1.2,1.0],
+      [.8,.65,1.1,1.4],[1.0,1.3,1.0,.9],[.65,.85,1.55,.8],
+      [1.25,1.0,.85,1.2],[.8,.7,1.2,1.5],[.65,1.5,.8,.75],
+      [.95,1.15,1.3,.85],[.4,1.6,.65,.85],[1.6,.75,.65,1.1],
+      [1.0,1.2,1.0,1.2],[.75,1.45,.85,.85],[1.15,.9,1.25,1.0],
+      [.9,.8,1.4,1.35]
+    ];
+    const [strideScale,armScale,kneeScale,massScale]=enemyRigProfiles[index];
     const mechanical=[4,12,16,20,24].includes(index);
     const swimmer=[2,19].includes(index);
-    const radius=mechanical?5.4:4.3;
+    const radius=(mechanical?5.4:4.3)*massScale;
     const outline=mechanical?'#344052':'#3d3454';
     const armor=mechanical?'#9aaec8':swimmer?'#72c8ce':'#9476b4';
     const paw=mechanical?'#d9bd75':swimmer?'#9fe9d4':'#d8b9a0';
@@ -4581,9 +4596,9 @@
     // distinct enemy face, armor, silhouette, and hitbox.
     for(const side of [-1,1]){
       const hip=at.x+side*13,shoulder=at.x+side*20;
-      const legSwing=airborne?Math.sin(clock*5+side)*5:swing*side*9;
+      const legSwing=airborne?Math.sin(clock*5+side)*5:swing*side*9*strideScale;
       const kneeX=hip+legSwing*.65;
-      const kneeY=at.y+4+(airborne?-5:Math.abs(swing)*2);
+      const kneeY=at.y+4+(airborne?-5:Math.abs(swing)*2*kneeScale);
       const footX=kneeX+legSwing*.45+dir*3;
       const footY=at.y+18-(airborne?7:Math.max(0,side*swing)*5);
       ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
@@ -4591,7 +4606,7 @@
       ctx.strokeStyle=armor;ctx.lineWidth=radius;
       ctx.beginPath();ctx.moveTo(hip,at.y-6);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
       ctx.fillStyle=paw;ctx.beginPath();ctx.ellipse(footX+dir*2,footY,6,3.3,0,0,Math.PI*2);ctx.fill();
-      const armSwing=airborne?Math.sin(clock*6+side)*7:-side*swing*8;
+      const armSwing=airborne?Math.sin(clock*6+side)*7:-side*swing*8*armScale;
       const elbowX=shoulder+armSwing*.6+dir*reach*7;
       const elbowY=at.y-18+Math.abs(armSwing)*.3-reach*4;
       const handX=elbowX+armSwing*.5+dir*reach*13;
