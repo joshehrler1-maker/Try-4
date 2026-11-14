@@ -1627,6 +1627,8 @@
     9:[150,'#ffc178'], // Quarry Rescue warning shot
     16:[195,'#ffc562'], // Steamworks pressure pellet
     17:[165,'#dbf7ff'], // Snow Village frost pellet
+    19:[255,'#ffad83'], // Submarine Dock: fast Contra-inspired tracer
+    21:[175,'#d6b3ff'], // Marble Temple: deliberate temple projectile
     24:[245,'#ffe28e'] // Starship Cargo tracer
   };
   function enemyRound(position,direction,parryable) {
