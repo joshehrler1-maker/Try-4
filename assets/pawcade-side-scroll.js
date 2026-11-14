@@ -2518,6 +2518,18 @@
   }
   const beatPeriod = .65;
   const isOnBeat = position => position < .2 || position > .52;
+  function drawGravityStatus() {
+    if(index!==7 || power!=='flip' || phase!=='playing') return;
+    const ready=player.on && player.power<=0;
+    ctx.save();
+    ctx.fillStyle='#211832';
+    ctx.fillRect(13,12,148,25);
+    ctx.fillStyle=ready?'#f0cdff':'#e1d8ec';
+    ctx.font='bold 11px system-ui';
+    ctx.textAlign='left';
+    ctx.fillText((player.gravity<0?'↑':'↓')+' Gravity · '+(ready?'Flip ready':'Flip unavailable'),20,28);
+    ctx.restore();
+  }
   function drawBeatMeter() {
     if(index!==8 || movement!=='beat' || phase!=='playing') return;
     const position=clock%beatPeriod;
@@ -2533,10 +2545,9 @@
     ctx.fillStyle='#ffc779';
     ctx.fillRect(x,y,w*.2/beatPeriod,8);
     ctx.fillRect(x+w*.52/beatPeriod,y,w*(beatPeriod-.52)/beatPeriod,8);
-    if(!reducedMotion){
-      ctx.fillStyle='#fff';
-      ctx.fillRect(x+w*position/beatPeriod-1,y-2,2,12);
-    }
+    ctx.fillStyle='#fff';
+    const markerPosition=reducedMotion ? Math.floor(position/beatPeriod*8)/8 : position/beatPeriod;
+    ctx.fillRect(x+w*markerPosition-1,y-2,2,12);
     ctx.restore();
   }
   const enemyCueColors = ["#ffc282","#80dffe","#81ffe1","#ffd66d","#c8ed85","#c4f4ff","#ffe29a","#deb0ff","#ff91dd","#ffd18b","#ffbf98","#e6e2ff","#8aeaff","#ffbb76","#adbfff","#b9ff96","#ff9d62","#ddf4ff","#ffd1a2","#7affdc","#ff8ce1","#e0c5ff","#d1fb87","#ffeaa1","#a9d7ff"];
@@ -3257,6 +3268,7 @@
       ctx.fillText(phase==='paused'?'Paused':name,width/2,165);
       ctx.font='18px system-ui';ctx.fillText(phase==='paused'?'Resume when ready':opening,width/2,206);
     }
+    drawGravityStatus();
     drawBeatMeter();
   }
   const tick = 1/120;
