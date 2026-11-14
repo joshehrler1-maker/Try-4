@@ -638,3 +638,21 @@ Object.assign(window.pawtopiaRooms,{
 window.pawtopiaRoomPlans[0] += ' forgeKilnCanopy forgeSlagAqueduct';
 window.pawtopiaChapters[0].push('Kiln Canopy','Slag Aqueduct');
 window.pawtopiaSetPieces[0] += ' spring speed';
+
+const foundryExpansion = [
+  ["Cinder Orchard","blocks",[[0,326,400],[440,290,225],[730,246,180],[980,285,280],[1350,237,220],[1650,295,175],[1880,326,320]]],
+  ["Copper Viaduct","bridge",[[0,326,400],[490,304,185],[725,268,220],[1005,238,175],[1260,264,320],[1650,295,175],[1880,326,320]]],
+  ["Bellows Basin","spring",[[0,326,400],[490,300,200,"spring"],[765,246,215],[1050,195,215],[1340,251,270,"spring"],[1650,295,175],[1880,326,320]]],
+  ["Ashfall Galleries","lifts",[[0,326,400],[440,294,265],[770,267,148,"lift"],[985,220,200],[1285,266,265],[1650,295,175],[1880,326,320]]],
+  ["Clinker Cavern","steps",[[0,326,400],[460,278,170],[675,229,190],[930,259,300],[1310,289,290],[1650,295,175],[1880,326,320]]],
+  ["Rivet Rapids","current",[[0,326,400],[475,302,230,"current"],[775,252,205],[1035,296,230,"current"],[1330,249,275],[1650,295,175],[1880,326,320]]],
+  ["Sootspire Approach","tower",[[0,326,400],[440,295,200],[700,250,165],[925,212,180],[1190,267,385],[1650,295,175],[1880,326,320]]],
+  ["Furnace Crown","bridge",[[0,326,400],[465,279,210],[735,244,230],[1035,204,230],[1340,242,235],[1650,295,175],[1880,326,320]]]
+];
+for(const [offset,[title,feature,platforms]] of foundryExpansion.entries()){
+  const room='forgeExpansion'+offset;
+  window.pawtopiaRooms[room]=platforms;
+  window.pawtopiaRoomPlans[0]+=' '+room;
+  window.pawtopiaChapters[0].push(title);
+  window.pawtopiaSetPieces[0]+=' '+feature;
+}
