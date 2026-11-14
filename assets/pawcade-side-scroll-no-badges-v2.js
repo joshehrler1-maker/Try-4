@@ -1250,15 +1250,16 @@
     if (phase!=='playing' || player.techCooldown>0) return;
     const p=player;
     p.techCooldown=.32;
+    const facing=(Number(held('right'))-Number(held('left')))||p.facing;
     const before=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,p.ledgeGrip,p.pogo,attacks.length];
     let activated=false;
     const nearby=range=>closestTarget(p,enemies,foePosition,
-      (foe,at)=>!foe.dead && (index!==10 || (at.x-p.x)*p.facing>=0),range,65);
+      (foe,at)=>!foe.dead && (index!==10 || (at.x-p.x)*facing>=0),range,65);
     const shot=extra=>attacks.push({x:p.x,y:p.y,v:p.facing*330,life:.55,...extra});
     switch(technique) {
       case 'sweep': shot({v:0,radius:strength-20,life:.13}); break;
       case 'burst':
-      case 'roll': p.vx=p.facing*strength;p.grapple=.25;p.grace=Math.max(p.grace,.25);break;
+      case 'roll': p.vx=facing*strength;p.grapple=.25;p.grace=Math.max(p.grace,.25);break;
       case 'reveal':
         p.sonar=2;p.sonarOrigin={x:p.x,y:p.y};
         if(!reefCacheOpen && landmarks.some(prop=>prop.cell===4 && Math.hypot(p.x-prop.x,p.y-prop.y)<=160)){
@@ -1270,7 +1271,7 @@
       case 'launch': if(p.on){p.vy=-strength;p.vx=p.facing*350;p.grapple=.26;p.on=false;p.coyote=0;}break;
       case 'pull':
       case 'capture': {
-        if(p.carry){shot({v:p.facing*550,damage:2});p.carry=false;break;}
+        if(p.carry){shot({v:facing*550,damage:2});p.carry=false;break;}
         const foe=nearby(strength);
         if(foe){foe.dead=true;p.carry=true;status(index===10?'Enemy caught. Jump in midair for a boost, or use '+techniqueName+' again to throw.':'Enemy caught. Press '+techniqueName+' again to throw.');}
         break;
@@ -1281,8 +1282,8 @@
       case 'climb': break; // Held climb is resolved against the wall each tick.
       case 'drop': if(!p.on){p.vy=strength;p.pogo=true;p.coyote=0;p.jumpBuffer=0;p.jumpCut=false;}break;
       case 'lob':
-        shot({v:p.facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2,motionTrail:'lob'});
-        if(index===13) p.throwPose={time:clock,facing:p.facing,angle:Math.atan2(-260,strength)};
+        shot({v:facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2,motionTrail:'lob'});
+        if(index===13) p.throwPose={time:clock,facing,angle:Math.atan2(-260,strength)};
         break;
       case 'morph': {
         const nextBody=p.morphed?22:12;
@@ -1345,7 +1346,7 @@
       }
       case 'swap': p.altWeapon=!p.altWeapon;status(p.altWeapon?'Spread fire equipped. Hold Up to aim high.':'Straight fire equipped. Hold Up to aim high.');break;
       case 'taunt': if(p.crystalCombo>=3){shot({v:0,radius:strength,life:.2,damage:2});p.crystalCombo=0;}break;
-      case 'return': shot({v:p.facing*strength,returning:true,life:1.1,damage:2,motionTrail:'cross'});break;
+      case 'return': shot({v:facing*strength,returning:true,life:1.1,damage:2,motionTrail:'cross'});break;
     }
     const after=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,p.ledgeGrip,p.pogo,attacks.length];
     if(activated || technique==='reveal' || after.some((value,i)=>value!==before[i])){
