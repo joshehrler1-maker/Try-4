@@ -1441,11 +1441,25 @@
   const libraryEnemyArt=[["#9af1ff","#284576","M-25 11H22L17-8 7-8 4-21H-12L-16-8H-23Z","M-18 13h35m-29-18h17m6 4h11",36,0],["#ecf7ff","#365986","M-25 1L-15-15 -6-9 4-24 10-9 24-9 22 10 -7 16Z","M-17 2l11-6m10-7 9 9m-5 8h14",0,46],["#ddc7ff","#524283","M-28-6L-14-15 -2-8 7-19 17-12 29-3 12 1 3 13 -9 9Z","M-23-5l14 5 6 10m11-20 9 5",36,27],["#ffe495","#664835","M-20 14V-3L-11-10 -11-22 8-22 14-10 20-9 25 4 15 14Z","M-11-3h22m-17-13h12m8 9h11",0,0],["#f9a78e","#76394c","M-27 5L-22-10 -15-10 -7-19 5-16 10-8 25-6 27 9 -22 15Z","M-22 10h40m-26-19 11 3m12 0h10",54,0],["#b7ffda","#24646b","M-25 2Q-20-19-5-16L3-24 12-15Q29-11 24 7L12 14 -14 13Z","M-18 4q10 7 28 3m-14-20h13m4 6 8 4",30,20]].map(([light,dark,body,details,reach,rise])=>({
     light,dark,body:new Path2D(body),details:new Path2D(details),reach,rise
   }));
-  function drawLibraryEnemy(at,kind,faceLeft,firing){
+  function drawLibraryEnemy(at,foe,faceLeft,firing){
+    const kind=foe.libraryEnemy;
     const design=libraryEnemyArt[kind];
+    const phase=clock*2.5+foe.offset;
+    const wave=Math.sin(phase);
+    const hop=kind===1 ? Math.max(0,wave) : 0;
+    const compression=kind===1 ? Math.max(0,-wave)**4*.13 : 0;
+    const stretch=hop*Math.abs(Math.cos(phase))*.18;
+
     ctx.save();
     ctx.translate(at.x,at.y);
     if(faceLeft) ctx.scale(-1,1);
+    if(!reducedMotion){
+      ctx.translate(0,16);
+      ctx.rotate(kind===1 ? -hop*Math.cos(phase)*.16 :
+        design.reach ? Math.cos(phase)*.10 : 0);
+      ctx.scale(1+compression-stretch*.5,1-compression+stretch);
+      ctx.translate(0,-16);
+    }
     const shade=ctx.createRadialGradient(-9,-12,1,0,0,29);
     shade.addColorStop(0,design.light);shade.addColorStop(1,design.dark);
     ctx.fillStyle=shade;
@@ -3234,7 +3248,7 @@
         (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset);
-      else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe.libraryEnemy,faceLeft,firing);
+      else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing);
       else if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
       else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
