@@ -4156,6 +4156,57 @@
     new Path2D('M0 0H14L10 7L7 5L4 9H0Z'),
     new Path2D('M0 0H14L11 3V7L8 9H0Z'),
   ];
+  // Accent color, motif and spacing follow each course in catalog order.
+  const landingTrim=[
+    ['#ffc26a',0,25],
+    ['#74e2ff',1,33],
+    ['#79ffe8',2,28],
+    ['#ffe176',3,38],
+    ['#bff078',4,24],
+    ['#c3f0ff',2,32],
+    ['#ffafe4',4,30],
+    ['#f0b3ff',3,19],
+    ['#ff78d4',3,22],
+    ['#ffc577',1,36],
+    ['#a8ffdf',2,27],
+    ['#f2a3c3',0,28],
+    ['#98d7ff',1,31],
+    ['#ffbd68',4,23],
+    ['#80eedc',1,34],
+    ['#adffd0',2,26],
+    ['#fff1b5',4,29],
+    ['#e8f6ff',0,24],
+    ['#edc691',0,32],
+    ['#74d5d7',1,37],
+    ['#f5ed79',3,21],
+    ['#e0c7ff',0,35],
+    ['#f9d37a',2,29],
+    ['#ffd880',4,26],
+    ['#ffba83',1,32]
+  ];
+  function drawLandingTrim(x,y,w,depth){
+    const [color,motif,spacing]=landingTrim[index];
+    ctx.strokeStyle=color;
+    ctx.lineWidth=1;
+    ctx.globalAlpha*=.72;
+    for(let offset=spacing/2;offset<w-8;offset+=spacing){
+      const px=x+offset;
+      const py=y-depth/2;
+      ctx.beginPath();
+      if(motif===0) {
+        ctx.moveTo(px-5,py);ctx.lineTo(px+5,py);
+      } else if(motif===1) {
+        ctx.rect(px-2,py-1.5,4,3);
+      } else if(motif===2) {
+        ctx.moveTo(px-5,py+1);ctx.quadraticCurveTo(px,py-4,px+5,py+1);
+      } else if(motif===3) {
+        ctx.moveTo(px-4,py+2);ctx.lineTo(px,py-2);ctx.lineTo(px+4,py+2);
+      } else {
+        ctx.ellipse(px,py,4,1.8,-.25,0,Math.PI*2);
+      }
+      ctx.stroke();
+    }
+  }
   function drawLandingEdge({x,y,w,kind}) {
     const rim=courseMaterials[index][2];
     // Two tones keep the landing line visible against both bright and dark scenery.
@@ -4176,6 +4227,10 @@
     topLight.addColorStop(1,'#252037');
     ctx.fillStyle=topLight;
     ctx.fill();
+    ctx.save();
+    ctx.clip();
+    drawLandingTrim(x,y,w,topDepth);
+    ctx.restore();
     if(index===17 && kind==='shelf'){
       ctx.clip();
       ctx.fillStyle='#d5eff8';
