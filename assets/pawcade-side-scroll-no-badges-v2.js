@@ -1685,8 +1685,8 @@
         }
       }
     }
-    player = resetPlayer(escape ? finish+635 : stageStarts[chapter] + 100);
-    if (escape) {
+    player = resetPlayer(escape!==null ? finish+635 : stageStarts[chapter] + 100);
+    if (escape!==null) {
       escapeRetries++;
       escape=95;
     }
@@ -1696,7 +1696,7 @@
     looseRings.length=0;
     rings=0;
     camera=Math.max(0,Math.min(finish+70,player.x-238));
-    status(escape ? 'Back at the reset switch. Race to the entrance!' : 'Back at the stage checkpoint.');
+    status(escape!==null ? 'Back at the reset switch. Race to the entrance!' : 'Back at the stage checkpoint.');
     hud();
   }
   const close = (a,b,x,y) => Math.abs(a.x-b.x)<x && Math.abs(a.y-b.y)<y;
@@ -1725,9 +1725,9 @@
       if(spark.life<=0){particles.splice(i,1);continue;}
       spark.x+=spark.vx*dt;spark.y+=spark.vy*dt;spark.vy+=160*dt;
     }
-    if (escape) {
+    if (escape!==null) {
       escape-=dt;
-      if (escape<=0) {escape=95;respawn();return;}
+      if (escape<=0) {respawn();return;}
       if (player.x<115) {
         const rank = escapeRetries === 0 && escape >= 55 && escapeCrystals >= 3 ? 'S' :
           escapeRetries === 0 && escape >= 40 ? 'A' : escape >= 25 ? 'B' : 'C';
