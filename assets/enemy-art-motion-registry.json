@@ -1,0 +1,490 @@
+{
+  "schemaVersion": 1,
+  "status": "design-registry-not-integrated",
+  "note": "Original Super Paw Heroes enemy art/motion briefs. No rendered assets, 3D rigs or animations are implied by this file.",
+  "rules": {
+    "oneUniqueFamilyPerGame": true,
+    "baronFinalBoss": true,
+    "stageDifficulty": "increase health, reaction complexity and attack telegraphs with stage; add genuinely new variants only after art approval",
+    "motion": "anticipation, acceleration, contact, follow-through, recovery, grounded foot placement, readable telegraph",
+    "accessibility": "respect reduced-motion and avoid flash-heavy effects",
+    "performance": "mobile-first; capped particles; reuse rig mechanics but never repeat visual identity"
+  },
+  "games": [
+    {
+      "gameIndex": 0,
+      "game": "Ember Foundry",
+      "enemyFamily": "Cinder Tongs",
+      "silhouette": "molten clamp",
+      "signatureAttack": "clamp lunge",
+      "vfx": "heat vent",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 1,
+      "game": "Moonlit Library",
+      "enemyFamily": "Atlas Warden",
+      "silhouette": "folding book armor",
+      "signatureAttack": "page-blade sweep",
+      "vfx": "shelf shadow",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 2,
+      "game": "Coral Courier",
+      "enemyFamily": "Reef Skimmer",
+      "silhouette": "coral fins",
+      "signatureAttack": "spiral charge",
+      "vfx": "bubble wake",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 3,
+      "game": "Clocktower Relay",
+      "enemyFamily": "Pendulum Sentinel",
+      "silhouette": "brass clockwork",
+      "signatureAttack": "timed hammer arc",
+      "vfx": "gear sparks",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 4,
+      "game": "Seed Garden",
+      "enemyFamily": "Thorn Hopper",
+      "silhouette": "seedpod shell",
+      "signatureAttack": "spring pounce",
+      "vfx": "pollen burst",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 5,
+      "game": "Waterfall Climb",
+      "enemyFamily": "Mist Glider",
+      "silhouette": "water veil wings",
+      "signatureAttack": "dive swoop",
+      "vfx": "spray trail",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 6,
+      "game": "Lantern Festival",
+      "enemyFamily": "Lantern Juggler",
+      "silhouette": "silk and lanterns",
+      "signatureAttack": "triple toss",
+      "vfx": "ember ribbon",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 7,
+      "game": "Crystal Polarity",
+      "enemyFamily": "Flux Beetle",
+      "silhouette": "magnetic crystal plates",
+      "signatureAttack": "polarity dash",
+      "vfx": "ion trail",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 8,
+      "game": "Stage Beat",
+      "enemyFamily": "Bass Bouncer",
+      "silhouette": "resonant drum body",
+      "signatureAttack": "shockwave stomp",
+      "vfx": "sound rings",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 9,
+      "game": "Quarry Rescue",
+      "enemyFamily": "Slate Burrower",
+      "silhouette": "layered stone shell",
+      "signatureAttack": "ground eruption",
+      "vfx": "rock dust",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 10,
+      "game": "Sunset Wind Sail",
+      "enemyFamily": "Gale Kite",
+      "silhouette": "sailcloth fins",
+      "signatureAttack": "crosswind dive",
+      "vfx": "wind ribbon",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 11,
+      "game": "Cloud City",
+      "enemyFamily": "Nimbus Guard",
+      "silhouette": "cloudglass armor",
+      "signatureAttack": "hover slam",
+      "vfx": "vapor curls",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 12,
+      "game": "Thunder Harbor",
+      "enemyFamily": "Coil Ray",
+      "silhouette": "electric copper coils",
+      "signatureAttack": "arc discharge",
+      "vfx": "electric branching",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 13,
+      "game": "Autumn Trail",
+      "enemyFamily": "Bramble Stalker",
+      "silhouette": "leaf camo mantle",
+      "signatureAttack": "ambush swipe",
+      "vfx": "leaf scatter",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 14,
+      "game": "Inverted Observatory",
+      "enemyFamily": "Orbit Watcher",
+      "silhouette": "star-map rings",
+      "signatureAttack": "gravity pulse",
+      "vfx": "starlight orbit",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 15,
+      "game": "Bamboo Village",
+      "enemyFamily": "Cane Striker",
+      "silhouette": "bamboo pole armor",
+      "signatureAttack": "vault strike",
+      "vfx": "leaf gust",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 16,
+      "game": "Steamworks",
+      "enemyFamily": "Pressure Piston",
+      "silhouette": "iron pressure chambers",
+      "signatureAttack": "piston jab",
+      "vfx": "steam jet",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 17,
+      "game": "Snow Village",
+      "enemyFamily": "Frost Lantern",
+      "silhouette": "iceglass lantern",
+      "signatureAttack": "frost cone",
+      "vfx": "snow glitter",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 18,
+      "game": "Canyon Crossing",
+      "enemyFamily": "Dust Runner",
+      "silhouette": "sandstone runner plates",
+      "signatureAttack": "dash feint",
+      "vfx": "dust wake",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 19,
+      "game": "Submarine Dock",
+      "enemyFamily": "Abyss Probe",
+      "silhouette": "submersible fins",
+      "signatureAttack": "sonar bolt",
+      "vfx": "sonar rings",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 20,
+      "game": "Neon Circuit",
+      "enemyFamily": "Pixel Phantom",
+      "silhouette": "neon glass shell",
+      "signatureAttack": "blink strike",
+      "vfx": "pixel smear",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 21,
+      "game": "Marble Temple",
+      "enemyFamily": "Mosaic Golem",
+      "silhouette": "inlaid marble",
+      "signatureAttack": "rolling crush",
+      "vfx": "tile shards",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 22,
+      "game": "Swamp Ferry",
+      "enemyFamily": "Bog Lantern",
+      "silhouette": "mossy glow body",
+      "signatureAttack": "lure burst",
+      "vfx": "spore cloud",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 23,
+      "game": "Sunflower Flight",
+      "enemyFamily": "Pollen Drifter",
+      "silhouette": "petal rotor",
+      "signatureAttack": "swoop spiral",
+      "vfx": "gold pollen",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    },
+    {
+      "gameIndex": 24,
+      "game": "Starship Cargo",
+      "enemyFamily": "Cargo Mimic",
+      "silhouette": "folding alloy crates",
+      "signatureAttack": "grapple snap",
+      "vfx": "thruster sparks",
+      "animationStates": [
+        "idle",
+        "anticipate",
+        "move",
+        "attack",
+        "recover",
+        "hit",
+        "defeat"
+      ],
+      "artStatus": "needs-original-art",
+      "implementationStatus": "pending"
+    }
+  ]
+}
