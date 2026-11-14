@@ -1636,7 +1636,7 @@
     ctx.fillStyle='#ffc17f';
     ctx.fillRect(x,y-6,w*(reducedMotion?1:remaining),3);
   }
-  function drawLandingEdge({x,y,w}) {
+  function drawLandingEdge({x,y,w,kind}) {
     const rim=courseMaterials[index][2];
     // Two tones keep the landing line visible against both bright and dark scenery.
     ctx.fillStyle='#10101d';
@@ -1679,6 +1679,23 @@
     }
     ctx.fillStyle=rim;
     ctx.fillRect(x,y,w,3);
+    if(kind==='belt' || kind==='current'){
+      const direction=kind==='belt'?1:-1;
+      const start=Math.max(0,Math.floor((camera-x)/28));
+      const end=Math.min(Math.floor((w-12)/28),Math.ceil((camera+width-x)/28));
+      ctx.save();
+      ctx.strokeStyle='#fff2ce';
+      ctx.lineWidth=1.5;
+      ctx.beginPath();
+      for(let mark=start;mark<=end;mark++){
+        const center=x+8+mark*28;
+        ctx.moveTo(center-3*direction,y-7);
+        ctx.lineTo(center+3*direction,y-4);
+        ctx.lineTo(center-3*direction,y-1);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
     // World-specific top-surface detailing makes the playable platform
     // visibly different from its side wall. Five material families combine
     // with each world's palette and six chapter construction patterns.
