@@ -1999,7 +1999,11 @@
         return {x:patrolX(foe.x+flight*enemyReach),
           y:foe.y-50-Math.cos(t*1.6)*enemyRise+dive*enemyRise*.35};
       }
-      case 'school': return {x:foe.x+wave*enemyReach,y:foe.y-33-Math.sin(t*3)*enemyRise};
+      case 'school': { // Coral and submarine routes: looping swim paths
+        const swim=Math.sin(t*1.35);
+        return {x:patrolX(foe.x+swim*enemyReach),
+          y:foe.y-33-Math.sin(t*2.7+foe.offset*.3)*enemyRise*.8};
+      }
       case 'pursuit': { // Celeste-inspired chase: approach, pause, retreat
         const cycle=(t*.42)%3;
         const advance=cycle<1 ? cycle : cycle<1.7 ? 1 :
