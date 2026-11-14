@@ -353,6 +353,28 @@
       enemies.push({x:guardX,y:ground-23,offset:stage+index+31,turret:movement==='shooter'||movement==='buster'});
       crystals.push({x:challengeX+340,y:190});
     }
+    // Each game's six chapters now carry a different collectible trail.
+    // These are optional visual wayfinding rewards, not required jumps:
+    // arcs reward aerial control, zigzags reward exploration, and straight
+    // trails guide faster action games without altering existing terrain.
+    const trailStyles=[
+      'arc','zigzag','line','line','arc','arc','zigzag','zigzag','line',
+      'arc','arc','zigzag','line','arc','zigzag','arc','line','arc',
+      'zigzag','line','line','zigzag','arc','arc','line'
+    ];
+    const trailStyle=trailStyles[index];
+    const trailBase=start+Math.min(sectionSize-490,630+((index*29+stage*41)%6)*44);
+    const trailCount=stage>=4?6:4;
+    for(let gem=0;gem<trailCount;gem++){
+      const fraction=gem/(trailCount-1);
+      const tx=trailBase+gem*57;
+      const ty=trailStyle==='arc'
+        ? 238-Math.sin(fraction*Math.PI)*(48+stage*4)
+        : trailStyle==='zigzag'
+          ? 208+((gem+stage)%2?32:-23)
+          : 218-stage*5;
+      crystals.push({x:tx,y:ty});
+    }
     if(index===0 && stage===1){
       landmarks.push({cell:0,x:start+610,y:223,w:66,h:39});
       for(let i=0;i<4;i++) platforms.push({x:start+735+i*115,y:210-i*19,w:94,kind:'floor',switchBridge:true});
