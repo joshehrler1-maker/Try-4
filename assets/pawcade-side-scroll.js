@@ -543,7 +543,12 @@
       }
     }
     if (power === 'flip' && player.on) {player.gravity *= -1; player.on = false;}
-    if (power === 'vine') player.vy = -590;
+    if (power === 'vine') {
+      player.vy = -590;
+      if (index === 4 && !reducedMotion) {
+        burst(player.x,player.y+17,'#a7f08b',8);
+      }
+    }
     if (power === 'grapple') {
       const anchor = platforms.reduce((nearest, ledge) => {
         if(ledge.kind!=='rail') return nearest;
