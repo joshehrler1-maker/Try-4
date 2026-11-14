@@ -710,10 +710,6 @@
         ['shelf','belt','lift','floor','shelf']
       ];
       const beatOrder=worldBeatOrders[index];
-      // World mechanics palette batch 1.
-      // World mechanics palette batch 2.
-      // World mechanics palette batch 3.
-      // World mechanics palette batch 4.
       const chapterBeat=beatOrder[stage%beatOrder.length];
       for(const [slot,[dx,sy,sw,kind]] of (signatureFits?signature:[]).entries()){
         const sx=signatureX+dx;
@@ -729,8 +725,15 @@
           ? 'current':selectedKind;
         // Do not append a ledge past the chapter's right boundary.
         if(sx+width>start+stageWidths[stage]-75) continue;
-        if(addOptionalLanding(sx,height,width,swimKind) && slot===1)
-          crystals.push({x:sx+width/2,y:height-37});
+        if(addOptionalLanding(sx,height,width,swimKind)){
+          // Exploration-focused worlds place optional rewards on alternate
+          // landings; speed worlds mark the center of a flowing route.
+          const exploration=[2,4,6,13,15,17,22,23].includes(index);
+          const speed=[3,8,20].includes(index);
+          const rewardSlot=exploration?2:speed?0:1;
+          if(slot===rewardSlot)
+            crystals.push({x:sx+width/2,y:height-37});
+        }
       }
     }
     // A guarded optional reward on the alternate route. Existing enemy AI
