@@ -175,7 +175,17 @@
   byId('side-player').hidden = false;
   if (power==='swim') byId('touch-stick').setAttribute('aria-label','Drag in four directions to swim');
   byId('side-title').textContent = hero + ' · ' + name;
-  byId('side-rules').textContent = (movementGuide[movement] || descriptions[power] + '.') + ' ' + prologue;
+  const controlsGuide = [
+    'Keyboard: A/D or arrows to move, Space for '+(power==='flip'?'Flip':'Jump')+'.',
+    powerButton.hidden || index===3 ? '' : powerButton.textContent+' uses X.',
+    techniqueButton && !techniqueButton.hidden ? techniqueName+' uses C.' : '',
+    'On touch, use the joystick and the labeled buttons.'
+  ].filter(Boolean).join(' ');
+  const rules=byId('side-rules');
+  rules.textContent=(movementGuide[movement] || descriptions[power]+'.')+' '+prologue;
+  const controlHelp=document.createElement('p');
+  controlHelp.textContent=controlsGuide;
+  rules.after(controlHelp);
   const platforms = [];
   const enemies = [];
   const crystals = [];
