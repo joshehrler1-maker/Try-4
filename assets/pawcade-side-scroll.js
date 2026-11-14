@@ -1543,69 +1543,62 @@
     [44,18,0], [65,23,1], [34,16,2],
     [76,26,3], [52,20,4], [88,30,5]
   ];
+  // Each course has its own deck cross section and surface markings.
+  const platformProfiles = [
+    [49,29,new Path2D('M0 0H48L43 18 28 26 9 21Z'),new Path2D('M6 7H39M12 14H32')],
+    [54,18,new Path2D('M0 0H54V12H46V18H8V12H0Z'),new Path2D('M6 5H46M15 11H39')],
+    [63,37,new Path2D('M0 0H63L55 12 59 21 46 23 40 34 26 29 17 37 10 22Z'),new Path2D('M9 9Q26 21 43 8M26 14L31 24')],
+    [48,22,new Path2D('M0 0H48L39 22H10Z'),new Path2D('M0 0H24V10H0ZM24 10H42V20H24Z')],
+    [62,32,new Path2D('M0 0H62V11L53 19 49 32 38 14 22 14 10 29 9 11H0Z'),new Path2D('M4 6H58M14 10L42 8')],
+    [60,36,new Path2D('M0 0H60L49 16 43 13 32 35 18 24 10 26Z'),new Path2D('M6 5L24 9 37 5 51 8')],
+    [52,27,new Path2D('M0 0H52Q46 25 27 27Q8 24 0 0Z'),new Path2D('M10 8H42M21 9L26 22 31 9')],
+    [58,24,new Path2D('M0 0H58L45 24H14Z'),new Path2D('M13 8H45L37 17H22Z')],
+    [42,20,new Path2D('M0 0H42V20H0Z'),new Path2D('M5 4H37V16H5Z')],
+    [64,27,new Path2D('M0 0H64V7L35 27H27L0 7Z'),new Path2D('M6 5L30 20 56 5')],
+    [55,30,new Path2D('M0 0H55Q50 13 37 16L29 30 19 16Q5 13 0 0Z'),new Path2D('M12 6Q28 22 43 6')],
+    [46,38,new Path2D('M0 0H46L42 11 30 15 22 38 11 20 5 21Z'),new Path2D('M6 5L16 13 29 7 40 8')],
+    [59,30,new Path2D('M0 0H59V19H51V30H10V21H0Z'),new Path2D('M5 10H54M17 10V28M40 10V28')],
+    [53,25,new Path2D('M0 0H53Q47 25 26 25Q9 24 0 0Z'),new Path2D('M5 8Q16 1 25 9T47 9')],
+    [62,26,new Path2D('M0 0H62V13H52L44 26H18L9 13H0Z'),new Path2D('M8 5H54M20 12H42V20H20Z')],
+    [64,42,new Path2D('M0 0H64Q56 13 46 15L32 40 34 18 19 25 23 12Q7 11 0 0Z'),new Path2D('M5 5Q30 19 57 5')],
+    null,
+    [59,33,new Path2D('M0 0H59V9H54Q49 33 29 33Q10 32 5 9H0Z'),new Path2D('M6 7H53M17 13Q29 28 42 13')],
+    [57,25,new Path2D('M0 0H57V11H48V17H40V25H17V17H8V11H0Z'),new Path2D('M8 6H49M17 14H40')],
+    [55,22,new Path2D('M0 0H55V16H44V22H11V16H0Z'),new Path2D('M4 5H51M13 7L19 15M26 7L32 15M39 7L45 15')],
+    [65,26,new Path2D('M0 0H65V22L53 26 42 20 23 26 12 21 0 23Z'),new Path2D('M0 8H65M8 15H56')],
+    [64,35,new Path2D('M0 0H64V35H49Q48 16 32 12Q16 16 15 35H0Z'),new Path2D('M6 7H58M9 12V28M55 12V28')],
+    [60,29,new Path2D('M0 0H60L52 15 42 29H18L8 15Z'),new Path2D('M11 6L49 18M49 6L11 18')],
+    [51,23,new Path2D('M0 0H51V14Q43 29 34 17Q26 30 17 17Q8 29 0 14Z'),new Path2D('M3 7H49M7 8v5m9-5v5m9-5v5m9-5v5m9-5v5')],
+    [68,30,new Path2D('M0 0H68V12H60L54 28H14L8 12H0Z'),new Path2D('M4 6H64M15 12H53M22 17H46V23H22Z')]
+  ];
   function drawCoursePlatform({x,y,w}) {
     const [face,recess,rim]=courseMaterials[index];
-    const stage=Math.min(chapterPanels.length-1,Math.floor(x/sectionSize));
-    const [spacing,thickness,pattern]=chapterPanels[stage];
-    const depth=y>=ground?height-y:thickness;
+    const [spacing,depth,edge,marking]=platformProfiles[index];
     const end=Math.min(x+w,camera+width);
     const first=x+Math.max(0,Math.floor((camera-x)/spacing))*spacing;
     ctx.save();
     ctx.beginPath();
     ctx.rect(x,y,w,height-y);
     ctx.clip();
-    if(y<ground) {
-      ctx.globalAlpha=.65;
-      for(let panel=first;panel<end;panel+=spacing) {
-        ctx.fillStyle=recess;
-        ctx.fillRect(panel+5,y+depth,10,height-y-depth);
-        ctx.fillStyle=face;
-        ctx.fillRect(panel+5,y+depth,3,height-y-depth);
-      }
-      ctx.globalAlpha=1;
+    if(y>=ground){
+      ctx.fillStyle=recess;
+      ctx.fillRect(x,y+depth*.6,w,height-y);
     }
-    const surface=ctx.createLinearGradient(0,y,0,y+depth);
+    const surface=ctx.createLinearGradient(0,0,0,depth);
     surface.addColorStop(0,face);
     surface.addColorStop(1,recess);
-    ctx.fillStyle=surface;
-    ctx.fillRect(x,y,w,depth);
+    for(let panel=first;panel<end;panel+=spacing){
+      ctx.save();
+      ctx.translate(panel,y);
+      ctx.fillStyle=surface;
+      ctx.fill(edge);
+      ctx.strokeStyle=rim;
+      ctx.globalAlpha=.72;
+      ctx.stroke(marking);
+      ctx.restore();
+    }
     ctx.fillStyle=rim;
     ctx.fillRect(x,y,w,2);
-    for(let panel=first;panel<end;panel+=spacing) {
-      const left=panel+6;
-      ctx.fillStyle=recess;
-      ctx.fillRect(left,y+6,spacing-12,depth-9);
-      ctx.fillStyle=rim;
-      ctx.strokeStyle=rim;
-      ctx.globalAlpha=.55;
-      switch(pattern) {
-        case 0:
-          ctx.fillRect(left+3,y+9,3,3);
-          ctx.fillRect(left+spacing-19,y+9,3,3);
-          break;
-        case 1:
-        case 3:
-          ctx.beginPath();
-          ctx.moveTo(left+3,y+depth-5);
-          ctx.lineTo(left+spacing/2-6,y+8);
-          ctx.lineTo(left+spacing-15,y+depth-5);
-          if(pattern===3) ctx.closePath();
-          ctx.stroke();
-          break;
-        case 2:
-          for(let rib=4;rib<spacing-13;rib+=5) ctx.fillRect(left+rib,y+8,2,depth-13);
-          break;
-        case 4:
-          ctx.fillRect(left+5,y+9,spacing-22,2);
-          ctx.fillRect(left+5,y+13,spacing-22,1);
-          break;
-        case 5:
-          ctx.strokeRect(left+6,y+9,spacing-24,depth-15);
-          ctx.fillRect(left+spacing/2-7,y+12,3,depth-21);
-          break;
-      }
-      ctx.globalAlpha=1;
-    }
     ctx.restore();
   }
   // Choose silhouette families in the same order as the game catalog.
