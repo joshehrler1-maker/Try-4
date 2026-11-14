@@ -81,3 +81,15 @@ test('enemy encounter caps progress safely across all 25 worlds', () => {
     assert.ok(stages.every((n, j) => j === 0 || n >= stages[j-1]), 'enemy pressure must not decline in game ' + i);
   }
 });
+
+
+test('all 25 games provide bounded enemy reaction distance', () => {
+  const runtime = fs.readFileSync(path.join(__dirname, '../assets/pawcade-side-scroll-no-badges-v2.js'), 'utf8');
+  const match = runtime.match(/const worldReactionDistances\s*=\s*(\[[\s\S]*?\]);/);
+  assert.ok(match, 'missing world-specific enemy reaction distances');
+  const distances = vm.runInNewContext(match[1], {}, {timeout:1000});
+  assert.equal(distances.length, count, 'reaction distances must cover every game');
+  assert.ok(distances.every(n => Number.isFinite(n) && n >= 100 && n <= 500),
+    'reaction distances must provide a safe, bounded approach corridor');
+  assert.ok(new Set(distances).size >= 8, 'enemy spacing must reflect different counterpart mechanics');
+});
