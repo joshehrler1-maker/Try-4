@@ -66,29 +66,41 @@ const choice=document.querySelector('#enemy'),action=document.querySelector('#ac
 const pause=document.querySelector('#pause'),spin=document.querySelector('#spin');
 const reduce=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches??false;
 let scene=null,playing=!reduce,autoSpin=false,last=0,time=0,angle=-.3,raf=0,dragX=null;
-try{scene=window.SuperPawEnemy3D.init(canvas);status.textContent='3D preview ready — five original low-detail meshes, not in the live game.';}
+let userEnabledMotion=false,dirty=true;
+try{scene=window.SuperPawEnemy3D.init(canvas);}
 catch(error){status.textContent='3D preview unavailable on this device: '+error.message;
  canvas.setAttribute('aria-label','WebGL preview unavailable. Regular 2D games are unaffected.');return;}
-const speedReduce=window.matchMedia?.('(prefers-reduced-motion: reduce)');
+function updateStatus(){
+ const p=window.SuperPawEnemy3D.build(Number(choice.value),action.value,time,reduce&&!userEnabledMotion);
+ status.textContent=p.enemy+' · '+p.parts.length+' actual lit 3D mesh pieces · preproduction only'
+   +(reduce&&!userEnabledMotion?' · paused for reduced-motion preference':'');
+}
 if(reduce){pause.textContent='Play';pause.setAttribute('aria-pressed','true');}
+updateStatus();
 function frame(now){
  raf=window.requestAnimationFrame(frame);
  const delta=last?Math.min(.05,(now-last)/1000):0;last=now;
  if(document.hidden)return;
  if(playing){time+=delta;if(autoSpin)angle+=delta*.35;}
- const current=scene.render(Number(choice.value),action.value,time,angle,reduce);
- if(now%500<17)status.textContent=current.enemy+' · '+current.meshes+' separate lit 3D mesh pieces · prototype only';
+ if(!playing&&!dirty)return; // keep paused state from draining phone GPU
+ scene.render(Number(choice.value),action.value,time,angle,reduce&&!userEnabledMotion);
+ dirty=false;
 }
-function reset(){time=0;last=0;}
+function reset(){time=0;last=0;dirty=true;updateStatus();}
 choice.onchange=reset;action.onchange=reset;
-pause.onclick=()=>{playing=!playing;pause.textContent=playing?'Pause':'Play';
- pause.setAttribute('aria-pressed',String(!playing));last=0;};
-spin.onclick=()=>{autoSpin=!autoSpin;spin.setAttribute('aria-pressed',String(autoSpin));};
-document.querySelector('#left').onclick=()=>{angle-=Math.PI/12;};
-document.querySelector('#right').onclick=()=>{angle+=Math.PI/12;};
+pause.onclick=()=>{playing=!playing;
+ if(playing)userEnabledMotion=true; // explicit opt-in can override OS reduced-motion setting
+ pause.textContent=playing?'Pause':'Play';
+ pause.setAttribute('aria-pressed',String(!playing));last=0;dirty=true;updateStatus();};
+spin.onclick=()=>{autoSpin=!autoSpin;spin.setAttribute('aria-pressed',String(autoSpin));
+ if(autoSpin&&!playing){playing=true;userEnabledMotion=true;
+   pause.textContent='Pause';pause.setAttribute('aria-pressed','false');}
+ dirty=true;updateStatus();};
+document.querySelector('#left').onclick=()=>{angle-=Math.PI/12;dirty=true;};
+document.querySelector('#right').onclick=()=>{angle+=Math.PI/12;dirty=true;};
 canvas.addEventListener('pointerdown',event=>{dragX=event.clientX;canvas.setPointerCapture?.(event.pointerId);});
 canvas.addEventListener('pointermove',event=>{if(dragX===null)return;
- angle+=Math.max(-.3,Math.min(.3,(event.clientX-dragX)*.009));dragX=event.clientX;});
+ angle+=Math.max(-.3,Math.min(.3,(event.clientX-dragX)*.009));dragX=event.clientX;dirty=true;});
 for(const type of ['pointerup','pointercancel','lostpointercapture'])
  canvas.addEventListener(type,()=>{dragX=null;});
 canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();
