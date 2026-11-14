@@ -7019,6 +7019,7 @@
         foe._footLiftWeight=0;
         foe._chargeCompression=0;
         foe._strideWeight=0;
+        foe._idleWeight=1;
         foe.gaitTime=clock;
       }
       const displacement=at.x-(foe._drawX??at.x);
@@ -7090,7 +7091,10 @@
       foe._strideWeight=(foe._strideWeight||0)+(strideTarget-(foe._strideWeight||0))*(1-Math.exp(-11*motionDt));
       const strideCompression=airborne||reducedMotion?0:
         Math.max(0,footCycle)*.018*(foe._strideWeight||0);
-      const breathing=Math.sin(clock*(1.6+index%4*.23)+foe.offset)*.012*(1-movingWeight);
+      // Ease idle breathing out as the enemy walks, instead of abruptly changing amplitude.
+      const idleTarget=reducedMotion?0:1-Math.min(1,foe._strideWeight||0);
+      foe._idleWeight=(foe._idleWeight??idleTarget)+(idleTarget-(foe._idleWeight??idleTarget))*(1-Math.exp(-8*motionDt));
+      const breathing=Math.sin(clock*(1.6+index%4*.23)+foe.offset)*.012*(foe._idleWeight||0);
       const enemyLean=reducedMotion?0:
         footCycle*sway*movingWeight+velocityLean+breathing;
       const anticipation=!reducedMotion && enemyPattern==='charge' && nearby && !airborne;
