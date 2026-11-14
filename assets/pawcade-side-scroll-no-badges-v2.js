@@ -4233,6 +4233,47 @@
     }
     ctx.stroke();
   }
+  // Course-specific accessory silhouettes reference each game's movement style.
+  const motionAccessories=[0,3,2,3,1,2,0,3,3,3,2,0,3,1,3,1,0,0,0,3,3,0,1,2,3];
+  function drawMotionAccessory(x,y,facing,angle,length,color,opacity){
+    if(opacity<=0) return;
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.scale(facing,1);
+    ctx.rotate(angle);
+    ctx.globalAlpha*=opacity;
+    ctx.fillStyle=color;
+    ctx.strokeStyle='#191b30';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(3,-3);
+    switch(motionAccessories[index]){
+      case 0: // Cloth
+        ctx.quadraticCurveTo(-length*.6,-7,-length,0);
+        ctx.quadraticCurveTo(-length*.6,8,3,4);
+        break;
+      case 1: // Leaf or feather
+        ctx.quadraticCurveTo(-length*.7,-12,-length,1);
+        ctx.quadraticCurveTo(-length*.65,12,3,4);
+        break;
+      case 2: // Fin or vane
+        ctx.lineTo(-length,-8);
+        ctx.lineTo(-length*.72,1);
+        ctx.lineTo(-length,7);
+        ctx.lineTo(3,4);
+        break;
+      case 3: // Hinged metal plate
+        ctx.lineTo(-length*.56,-5);
+        ctx.lineTo(-length,0);
+        ctx.lineTo(-length*.75,5);
+        ctx.lineTo(3,4);
+        break;
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
   function drawLandingEdge({x,y,w,kind}) {
     const rim=courseMaterials[index][2];
     // Two tones keep the landing line visible against both bright and dark scenery.
@@ -6039,6 +6080,11 @@
       ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5,
         (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression);
       ctx.translate(-at.x,-at.y-19-footstep);
+      if(!reducedMotion && (movingWeight>.08 || airborne || attackPose>.1)){
+        const flex=airborne ? motion*.2 : footCycle*movingWeight*.22;
+        drawMotionAccessory(at.x+(faceLeft?14:-14),at.y-4,faceLeft?-1:1,
+          flex+attackPose*.14,9+index%5*2,courseMaterials[index][1],.95);
+      }
       drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing,attackPose);
@@ -6628,6 +6674,12 @@
     // Draw one opaque pose so the hero keeps a clear silhouette in motion.
     const strideFrame=!reducedMotion && Math.cos(p.gaitPhase||0)<0 ? 2 : 1;
     const visiblePose=running ? strideFrame : pose;
+    if(!reducedMotion && !rolling && !p.morphed && (stride>.14 || !p.on)){
+      const drag=Math.max(-.32,Math.min(.32,p.vy/1200));
+      const flex=Math.sin(gait)*.12*(p.on?stride:0);
+      drawMotionAccessory(p.x-p.facing*15,p.y-15,p.facing,
+        drag+flex,11+index%5*2+stride*7,landingTrim[index][0],.9);
+    }
     let heroDrawn=false;
     if(index===3 && rolling){
       ctx.restore();
