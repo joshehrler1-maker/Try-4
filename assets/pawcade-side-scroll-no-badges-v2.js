@@ -202,7 +202,9 @@
       movement==='airdash' ? 'Keyboard: A/D or Left/Right to move, Space to jump, W/S or Up/Down to aim your dash.' :
       'Keyboard: A/D or Left/Right to move, Space for '+(power==='flip'?'Flip':'Jump')+'.',
     powerButton.hidden || index===3 ? '' : powerButton.textContent+' uses X.',
-    techniqueButton && !techniqueButton.hidden ? techniqueName+' uses C.' : '',
+    index===11 ? 'Hold Climb (C) against a wall and steer up or down. Landing restores stamina.' :
+      index===16 ? 'Press Jump again near a pink shot while airborne to parry. The Parry button also works.' :
+      techniqueButton && !techniqueButton.hidden ? techniqueName+' uses C.' : '',
     'On touch, use the joystick and the labeled buttons.'
   ].filter(Boolean).join(' ');
   const rules=byId('side-rules');
@@ -973,7 +975,7 @@
   }
   const tunnels = index===14 ? plan.map((room,stage)=>({x:stageStarts[stage]+480,w:130,y:ground-33})) : [];
   const resetPlayer = (x = 100) => ({
-    x,y:ground-22,air:airCapacity,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0,spin:0,dashUsed:false,chargeStart:null,jumpBuffer:0,coyote:0,jumpCut:false
+    x,y:ground-22,air:airCapacity,vx:0,vy:0,facing:1,on:false,jumps:0,gravity:1,health:3,grace:0,power:0,spin:0,dashUsed:false,chargeStart:null,climbStamina:1.8,jumpBuffer:0,coyote:0,jumpCut:false
   });
   function reset() {
     amberSwitch=false;
@@ -1005,6 +1007,10 @@
   function jump(buffer = true) {
     if (phase !== 'playing') return;
     if (power==='flip') {if(buffer) action();return;}
+    if (buffer && index===16 && !player.on && hazards.some(h=>h.parry && h.life>0 && close(player,h,55,55))) {
+      if (player.techCooldown<=0) useTechnique();
+      return;
+    }
     // Use the selected course's input forgiveness window on the initial
     // button press, not only after the simulation starts counting it down.
     if (buffer) player.jumpBuffer=[.115,.095,.11,.075,.11,.12,.13,.075,.05,.095,
@@ -1148,7 +1154,7 @@
       case 'flip': action();break;
       case 'retry': respawn();activated=true;break;
       case 'release': if(p.cable){p.cable=null;p.grapple=.18;}break;
-      case 'climb': if(p.wall){p.vy=-strength;p.wallLock=.08;}break;
+      case 'climb': break; // Held climb is resolved against the wall each tick.
       case 'drop': if(!p.on){p.vy=strength;p.pogo=true;}break;
       case 'lob': shot({v:p.facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2,motionTrail:'lob'});break;
       case 'morph': {
@@ -1535,12 +1541,22 @@
       if (p.y+18<=wall.top || p.y>=ground) continue;
       if (oldX<=wall.x-14 && p.x>=wall.x-14) {p.x=wall.x-14;p.wall=1;}
       else if (oldX>=wall.x+34 && p.x<=wall.x+34) {p.x=wall.x+34;p.wall=-1;}
+      if(index===11 && held('technique') && !p.wall){
+        if(Math.abs(p.x-(wall.x-14))<.01) p.wall=1;
+        else if(Math.abs(p.x-(wall.x+34))<.01) p.wall=-1;
+      }
       if (p.wall) {p.vx=0;p.vy=Math.min(78,p.vy);break;}
     }
     const body = p.morphed || (power === 'slide' && held('action')) ? 12 : 22;
 
+    if(index===11 && wasGrounded) p.climbStamina=1.8;
+    const climbing=index===11 && p.wall && !wasGrounded && held('technique') && p.climbStamina>0 && p.power<=.22;
     const floating = power === 'glide' && held('jump');
-    if (power==='swim') {
+    if (climbing) {
+      const climbDirection=Number(held('down'))-Number(held('up'));
+      p.vy=climbDirection*118;
+      p.climbStamina=Math.max(0,p.climbStamina-dt*(climbDirection<0?1:.45));
+    } else if (power==='swim') {
       // Swimming near a reef current pulls the hero along its channel,
       // including while floating above the current's surface.
       const inCurrent=index===2 && platforms.some(ledge=>ledge.kind==='current' &&
