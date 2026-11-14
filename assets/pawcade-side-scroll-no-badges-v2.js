@@ -4084,8 +4084,13 @@
     ctx.save();
     ctx.globalAlpha=.74;
     const cap=ctx.createLinearGradient(0,y-8,0,y+2);
-    cap.addColorStop(0,rim);
-    cap.addColorStop(.52,face);
+    // Preserve the counterpart-inspired identity of each course:
+    // industrial, aquatic, aerial, speedway and temple platforms should
+    // have different reflected-light profiles, not one universal gloss.
+    const reflective=[0,1,4,8,9,16,19,20,24].includes(index);
+    const softSurface=[2,5,6,10,13,17,23].includes(index);
+    cap.addColorStop(0,reflective?rim:softSurface?face:rim);
+    cap.addColorStop(.52,reflective?face:softSurface?rim:face);
     cap.addColorStop(1,recess);
     ctx.fillStyle=cap;
     ctx.beginPath();
