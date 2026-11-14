@@ -1149,7 +1149,7 @@
       case 'release': if(p.cable){p.cable=null;p.grapple=.18;}break;
       case 'climb': if(p.wall){p.vy=-strength;p.wallLock=.08;}break;
       case 'drop': if(!p.on){p.vy=strength;p.pogo=true;}break;
-      case 'lob': shot({v:p.facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2});break;
+      case 'lob': shot({v:p.facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2,motionTrail:'lob'});break;
       case 'morph': {
         const nextBody=p.morphed?22:12;
         if(nextBody===22 && tunnels.some(t=>p.x>t.x-12 && p.x<t.x+t.w+12)){
@@ -1192,7 +1192,7 @@
       }
       case 'swap': p.altWeapon=!p.altWeapon;status(p.altWeapon?'Spread fire equipped.':'Straight fire equipped.');break;
       case 'taunt': if(p.crystalCombo>=3){shot({v:0,radius:strength,life:.2,damage:2});p.crystalCombo=0;}break;
-      case 'return': shot({v:p.facing*strength,returning:true,life:1.1,damage:2});break;
+      case 'return': shot({v:p.facing*strength,returning:true,life:1.1,damage:2,motionTrail:'cross'});break;
     }
     const after=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,attacks.length];
     if(activated || technique==='reveal' || after.some((value,i)=>value!==before[i])){
@@ -1717,6 +1717,13 @@
       }
     }
     for (const attack of attacks) {
+      if(attack.motionTrail && !reducedMotion){
+        attack.trail ??= [];
+        if(!attack.trail.length || clock-attack.trail.at(-1).at>=.025){
+          attack.trail.push({x:attack.x,y:attack.y,at:clock});
+          if(attack.trail.length>9) attack.trail.shift();
+        }
+      }
       if(attack.returning && attack.life<.55) attack.v=Math.sign(p.x-attack.x)*420;
       attack.x+=attack.v*dt;
       if(attack.vy!==undefined){attack.y+=attack.vy*dt;attack.vy+=(attack.gravity||0)*dt;}
@@ -4878,6 +4885,27 @@
     if(finale==='summit') return 'UPPER EXIT';
     return index===20?'RESET':'EXIT';
   }
+  function drawTechniqueTrails() {
+    for(const attack of attacks){
+      if(!attack.trail?.length) continue;
+      ctx.save();
+      ctx.strokeStyle=signatureEffects[index][0];
+      ctx.lineCap='round';
+      let x=attack.x,y=attack.y;
+      for(let i=attack.trail.length-1;i>=0;i--){
+        const point=attack.trail[i];
+        const strength=Math.max(0,1-(clock-point.at)/.26);
+        ctx.globalAlpha=strength*.72;
+        ctx.lineWidth=1+strength*(attack.motionTrail==='cross'?3:6);
+        ctx.beginPath();
+        ctx.moveTo(x,y);
+        ctx.lineTo(point.x,point.y);
+        ctx.stroke();
+        x=point.x;y=point.y;
+      }
+      ctx.restore();
+    }
+  }
   function drawSignatureEffect() {
     if(!signatureEffect) return;
     const [color,shape,reach,duration]=signatureEffects[index];
@@ -5356,6 +5384,7 @@
       }
       ctx.restore();
     }
+    drawTechniqueTrails();
     drawSignatureEffect();
     for(const spark of particles) {
       ctx.globalAlpha=Math.min(1,spark.life/.23);
