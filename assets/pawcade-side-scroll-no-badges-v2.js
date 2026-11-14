@@ -83,6 +83,17 @@
     catalog.before(notice);
     return;
   }
+  // Five individually authored stage-1 set pieces (not collision geometry).
+  // Images are deliberately lazy: no other game requests these five files.
+  const firstStageLandmarkPaths = [
+    'assets/scenes/ember-foundry/cold-intake-beacon.svg',
+    'assets/scenes/moonlit-library/atlas-lectern.svg',
+    'assets/scenes/coral-courier/pearl-vent.svg',
+    'assets/scenes/clocktower-relay/sunrise-gear.svg',
+    'assets/scenes/seed-garden/seed-lantern.svg'
+  ];
+  const firstStageLandmark = index < firstStageLandmarkPaths.length ? new Image() : null;
+  if (firstStageLandmark) firstStageLandmark.src = firstStageLandmarkPaths[index];
   const backdrop = new Image();
   backdrop.src = scenery;
   const sprites = new Image();
@@ -6870,6 +6881,11 @@
     }
     ctx.save();
     ctx.translate(-camera,0);
+    // Painted depth-plane landmark only: platform tops, hitboxes and hazard
+    // positions remain governed by the per-game world collision data.
+    if (firstStageLandmark?.naturalWidth && camera < 820 && camera + width > 590) {
+      ctx.drawImage(firstStageLandmark, 590, ground - 170, 180, 170);
+    }
     for (const wall of walls) {
       if (wall.x<camera-20 || wall.x>camera+width) continue;
       if(atlasSprite(terrainArt,4,15,wall.x+10,(wall.top+ground)/2,20,ground-wall.top)) continue;
