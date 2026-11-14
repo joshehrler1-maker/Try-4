@@ -1622,13 +1622,16 @@
       const firing=(foe.turret || enemyPattern==='turret' || index===16) &&
         nearby && Math.abs(player.y-at.y)<105 && foe.shotAt>clock;
       const motion=reducedMotion?0:Math.sin(clock*(airborne?9:6)+foe.offset);
+      const footstep=reducedMotion||airborne?0:Math.abs(Math.sin(clock*8+foe.offset))*1.5;
+      const enemyLean=reducedMotion?0:Math.sin(clock*5+foe.offset)*.025;
       ctx.save();
       // A distinct animation state for patrolling, hopping, flying and firing.
       ctx.translate(at.x,at.y+19);
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
+      else ctx.rotate(enemyLean);
       ctx.scale(firing?1.09:1+motion*.025,firing?.94:1-motion*.025);
-      ctx.translate(-at.x,-at.y-19);
+      ctx.translate(-at.x,-at.y-19-footstep);
       if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
       }
@@ -1801,6 +1804,15 @@
     const cell = power==='slide' && held('action') ? 13 :
       light && !p.on && (power==='double' || power==='vine') ? 14 : (light?4:0)+pose;
     const squash=reducedMotion ? 0 : (p.landingPose||0)*1.05;
+    // Secondary motion gives existing sprite poses some life without
+    // altering collisions or gameplay timing.
+    const stride=Math.min(1,Math.abs(p.vx)/Math.max(1,runSpeed));
+    const gait=clock*(6+stride*11);
+    const breath=reducedMotion?0:Math.sin(clock*2.9)*.012;
+    const footBob=reducedMotion||!p.on?0:
+      stride>.12 ? Math.abs(Math.sin(gait))*(1.2+stride*2.4) : Math.sin(clock*2.9)*.55;
+    const bodySway=reducedMotion?0:
+      p.on && stride>.12 ? Math.sin(gait)*stride*.035 : Math.sin(clock*1.8)*.008;
     if(p.gravity<0){
       ctx.translate(0,p.y*2);ctx.scale(1,-1);
     }
@@ -1809,6 +1821,12 @@
       ctx.translate(p.x,feet);
       ctx.scale(1+squash*.65,p.morphed ? .64 : 1-squash);
       ctx.translate(-p.x,-feet);
+    }
+    if(!reducedMotion){
+      ctx.translate(p.x,p.y+22);
+      ctx.rotate(bodySway);
+      ctx.scale(1-breath,1+breath);
+      ctx.translate(-p.x,-p.y-22-footBob);
     }
     // The actual character pose now responds to the performed move, not
     // just a decorative effect drawn over an idle/running sprite.
