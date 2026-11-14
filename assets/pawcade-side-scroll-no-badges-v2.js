@@ -637,6 +637,8 @@
       const firstDeckY=326-(stage%4===1?14:stage%4===3?9:0);
       platforms.push({x:start+2170,y:firstDeckY,w:span,kind:'floor'});
       platforms.push({x:middle,y:326-rise,w:span,kind:'floor'});
+      // The recovery landing is intentionally broader and lower than the
+      // preceding challenge, so a missed upper route does not force a reset.
       platforms.push({x:middle+span+gap,y:326,w:remaining-2*(span+gap),kind:'floor'});
       platforms.push({x:middle,y:220-stage%3*10,w:Math.min(span,105),kind:'floor'});
       // Distinct optional upper landing in the wide Foundry exit section.
@@ -3993,6 +3995,17 @@
           ctx.arc(px+5,y+7,2,0,Math.PI*2);ctx.arc(px+cell-5,y+7,2,0,Math.PI*2);ctx.fill();
           // Each foundry chapter alternates forged panels, inset vents,
           // and heat-tempered plates. Keep decoration behind the top lip.
+          // Thin diagonal braces give the forged deck a load-bearing
+          // silhouette. These are visual only and never alter collisions.
+          if((k+stage)%4===1){
+            ctx.strokeStyle='rgba(255,199,143,.42)';
+            ctx.lineWidth=1.2;
+            ctx.beginPath();
+            ctx.moveTo(px+cell*.18,y+7);
+            ctx.lineTo(px+cell*.48,y+16);
+            ctx.lineTo(px+cell*.82,y+7);
+            ctx.stroke();
+          }
           if((k+stage)%3===0 && cell>=48){
             const ventX=px+cell*.31;
             const ventY=y+10;
