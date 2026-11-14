@@ -2101,8 +2101,8 @@
   // Original platform silhouettes for three distinct reference-inspired
   // worlds. All decorative elements remain outside the collision system.
   function drawSignaturePlatformArt(x,y,w,stage){
-    if(index>11 || w<70)return;
-    const interval=[90,115,130,105,112,124,120,108,88,102,132,116][index];
+    if(index>14 || w<70)return;
+    const interval=[90,115,130,105,112,124,120,108,88,102,132,116,106,122,118][index];
     const first=Math.max(0,Math.floor((camera-x)/interval)-1);
     const last=Math.min(Math.ceil(w/interval),Math.ceil((camera+width-x)/interval)+1);
     ctx.save();ctx.lineJoin='round';
@@ -2248,6 +2248,47 @@
         ctx.strokeStyle='#f4faff';ctx.lineWidth=1.5;
         ctx.beginPath();ctx.moveTo(px-15,y+9);ctx.lineTo(px-10,y+9);
         ctx.moveTo(px+10,y+9);ctx.lineTo(px+15,y+9);ctx.stroke();
+      }else if(index===12){
+        // Thunder Harbor: lightning-grounded mooring plates and copper coils.
+        ctx.fillStyle='#344c65';ctx.strokeStyle='#f0c879';ctx.lineWidth=2.5;
+        ctx.beginPath();ctx.moveTo(px-27,y+4);ctx.lineTo(px+27,y+4);
+        ctx.lineTo(px+19,y+25);ctx.lineTo(px-19,y+25);ctx.closePath();
+        ctx.fill();ctx.stroke();
+        for(const side of [-1,1]){
+          ctx.strokeStyle='#d3a16b';ctx.lineWidth=3;
+          ctx.beginPath();ctx.moveTo(px+side*16,y+7);
+          ctx.lineTo(px+side*16,y+22);ctx.stroke();
+          ctx.fillStyle='#ffe9a4';ctx.beginPath();
+          ctx.arc(px+side*16,y+10,3,0,Math.PI*2);ctx.fill();
+        }
+        ctx.strokeStyle='#aeeaff';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-5,y+7);ctx.lineTo(px+3,y+12);
+        ctx.lineTo(px-3,y+17);ctx.lineTo(px+6,y+22);ctx.stroke();
+      }else if(index===13){
+        // Autumn Trail: layered timber beams, acorn bolts and fall leaves.
+        ctx.strokeStyle='#7d4b34';ctx.lineWidth=5;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(px-25,y+5);ctx.lineTo(px+25,y+5);
+        ctx.moveTo(px-18,y+6);ctx.lineTo(px-11,y+26);
+        ctx.moveTo(px+18,y+6);ctx.lineTo(px+11,y+26);ctx.stroke();
+        for(const side of [-1,1]){
+          ctx.fillStyle='#d6a25b';ctx.beginPath();
+          ctx.ellipse(px+side*17,y+8,4,5,0,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle=side<0?'#f5a44b':'#d96848';
+          ctx.beginPath();ctx.moveTo(px+side*9,y+15);
+          ctx.quadraticCurveTo(px+side*27,y+8,px+side*24,y+25);
+          ctx.quadraticCurveTo(px+side*11,y+26,px+side*9,y+15);
+          ctx.fill();
+        }
+      }else if(index===14){
+        // Inverted Observatory: mirrored gravity pylons and orbital rings.
+        ctx.fillStyle='#393956';ctx.strokeStyle='#a5c5ff';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(px-24,y+4);ctx.lineTo(px+24,y+4);
+        ctx.lineTo(px+15,y+27);ctx.lineTo(px-15,y+27);
+        ctx.closePath();ctx.fill();ctx.stroke();
+        ctx.strokeStyle='#e0d4ff';ctx.lineWidth=1.6;
+        ctx.beginPath();ctx.ellipse(px,y+15,16,7,-.25,0,Math.PI*2);ctx.stroke();
+        ctx.beginPath();ctx.ellipse(px,y+15,16,7,.25,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle='#9af2ed';ctx.beginPath();ctx.arc(px,y+15,4,0,Math.PI*2);ctx.fill();
       }else{
         // Coral Courier: fan-shaped reef ledges and layered shell supports.
         ctx.fillStyle='#3c8794';ctx.strokeStyle='#a7e9d9';ctx.lineWidth=2;
