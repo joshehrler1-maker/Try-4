@@ -3249,7 +3249,13 @@
     }
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
-      case 'charge': return {x:patrolX(foe.x+chase*Math.max(0,wave)*enemyReach),y:foe.y};
+      case 'charge': { // Accelerate into a charge, then brake before turning.
+        // A smooth cubic lunge avoids sharp velocity changes at launch and
+        // recovery while retaining the original grounded attack lane.
+        const lunge=Math.max(0,Math.sin(t*2.1));
+        const eased=lunge*lunge*(3-2*lunge);
+        return {x:patrolX(foe.x+chase*eased*enemyReach),y:foe.y};
+      }
       case 'hopper': { // Distinct jumping arcs with a grounded landing phase
         const hop=Math.max(0,Math.sin(t*3.5));
         return {x:patrolX(foe.x+wave*enemyReach),y:foe.y-hop*hop*enemyRise};
