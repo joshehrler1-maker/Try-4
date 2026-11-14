@@ -1566,9 +1566,9 @@
   // Individually authored environmental silhouettes for the first two games.
   // Decorative only: no collision, spawn, or camera changes.
   function drawSignatureBackdrop(){
-    if(index<0 || index>5)return;
-    const spacing=[230,188,205,178,226,196][index];
-    const shift=camera*([.22,.16,.19,.27,.14,.24][index]);
+    if(index<0 || index>7)return;
+    const spacing=[230,188,205,178,226,196,218,174][index];
+    const shift=camera*([.22,.16,.19,.27,.14,.24,.18,.29][index]);
     const start=Math.floor(shift/spacing)-1;
     ctx.save();
     for(let n=start;n<start+Math.ceil(width/spacing)+3;n++){
@@ -1714,6 +1714,53 @@
         }
         ctx.globalAlpha=.45;
         ctx.beginPath();ctx.ellipse(streamX+9,287,29,7,0,0,Math.PI*2);ctx.fill();
+        ctx.globalAlpha=1;
+      }else if(index===6){
+        // Lantern Festival: suspended lanterns, curved festival roofs, and strings.
+        const roofY=194+variation*12;
+        ctx.fillStyle='#4c3154';
+        ctx.fillRect(x+36,roofY+20,120,96);
+        ctx.fillStyle='#ae6382';
+        ctx.beginPath();ctx.moveTo(x+22,roofY+25);
+        ctx.quadraticCurveTo(x+95,roofY-38,x+168,roofY+25);
+        ctx.quadraticCurveTo(x+100,roofY+6,x+22,roofY+25);ctx.fill();
+        ctx.strokeStyle='#d8a17d';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(x+4,110+variation*3);
+        ctx.quadraticCurveTo(x+105,136,x+212,105+variation*3);ctx.stroke();
+        for(let lamp=0;lamp<3;lamp++){
+          const lx=x+38+lamp*63,ly=124+variation*3+lamp%2*8;
+          ctx.strokeStyle='#e2b997';ctx.beginPath();ctx.moveTo(lx,ly-10);ctx.lineTo(lx,ly);ctx.stroke();
+          ctx.fillStyle='#e5a95e';ctx.globalAlpha=.22;
+          ctx.beginPath();ctx.arc(lx,ly+10,18,0,Math.PI*2);ctx.fill();
+          ctx.globalAlpha=1;ctx.fillStyle=lamp%2?'#f4b961':'#f08d94';
+          ctx.beginPath();ctx.ellipse(lx,ly+8,8,12,0,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle='#ffe4a0';ctx.fillRect(lx-3,ly+3,6,10);
+          ctx.fillStyle='#b85465';ctx.fillRect(lx-5,ly+19,10,2);
+        }
+      }else if(index===7){
+        // Crystal Polarity: opposing crystalline spires and electric bridges.
+        const cx=x+84,top=89+variation*14;
+        ctx.fillStyle='#39335e';
+        ctx.beginPath();ctx.moveTo(cx-43,278);ctx.lineTo(cx-32,top+34);
+        ctx.lineTo(cx,top);ctx.lineTo(cx+34,top+34);
+        ctx.lineTo(cx+44,278);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#8e83ce';ctx.globalAlpha=.67;
+        ctx.beginPath();ctx.moveTo(cx,top);ctx.lineTo(cx+34,top+34);
+        ctx.lineTo(cx+44,278);ctx.lineTo(cx+6,260);ctx.closePath();ctx.fill();
+        ctx.globalAlpha=1;
+        ctx.strokeStyle='#9de8f4';ctx.lineWidth=2;
+        for(let band=0;band<3;band++){
+          const by=top+58+band*46;
+          ctx.beginPath();ctx.moveTo(cx-32,by);
+          ctx.lineTo(cx-10,by-7);ctx.lineTo(cx+12,by+6);
+          ctx.lineTo(cx+35,by-2);ctx.stroke();
+        }
+        ctx.fillStyle='#c6b8f5';ctx.globalAlpha=.7;
+        for(let shard=0;shard<4;shard++){
+          const sx=x+16+shard*47,sy=208+(shard%2)*30;
+          ctx.beginPath();ctx.moveTo(sx,sy-17);ctx.lineTo(sx+8,sy);
+          ctx.lineTo(sx,sy+12);ctx.lineTo(sx-7,sy);ctx.closePath();ctx.fill();
+        }
         ctx.globalAlpha=1;
       }
     }
