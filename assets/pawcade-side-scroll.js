@@ -1296,7 +1296,10 @@
       );
       if ((foe.turret || foe.clockEnemy>=3 || enemyPattern==='turret' || index===16) &&
           clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
-        const parryable=index===16 && foe.shotsFired++%3===0;
+        // Count all enemy shots consistently; the Steamworks parry cycle
+        // continues to mark every third shot as parryable.
+        const firedCount=foe.shotsFired++;
+        const parryable=index===16 && firedCount%3===0;
         const primaryShot=enemyRound(position,direction,parryable);
         // Scouts fire quick tracers, sentries slower heavy-looking shots,
         // and raiders faster bolts. Preserve Steamworks parry behavior.
@@ -1309,7 +1312,7 @@
         // Veteran skirmishers alternate between the standard and a higher
         // firing lane. Only one projectile is spawned per attack cycle.
         if(foe.archetype===2 && (foe.spawnChapter??chapter)>=2 &&
-           foe.shotsFired%2===0){
+           firedCount%2===0){
           primaryShot.y-=24;
         }
         // Late-stage raiders introduce a readable high/low lane choice.
