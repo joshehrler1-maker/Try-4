@@ -6245,7 +6245,11 @@
     const gaitBlend=Math.min(1,Math.max(0,stride||0))*(1-attackPlant);
     // Smooth attack-driven gait suppression across consecutive rendered frames.
     // A shot should not snap both feet to their planted poses in one frame.
-    const gaitDt=Math.min(.05,Math.max(0,clock-(foe._plantFrameAt??clock)));
+    // Long frame gaps (tab restore, checkpoint or respawn) should reset pose
+    // springs rather than retain a stale attack stance on the next frame.
+    const rawGaitDt=Math.max(0,clock-(foe._plantFrameAt??clock));
+    if(rawGaitDt>.15)foe._attackGaitBlend=gaitBlend;
+    const gaitDt=Math.min(.05,rawGaitDt);
     foe._plantFrameAt=clock;
     foe._attackGaitBlend=(foe._attackGaitBlend??gaitBlend)+
       (gaitBlend-(foe._attackGaitBlend??gaitBlend))*(1-Math.exp(-13*gaitDt));
