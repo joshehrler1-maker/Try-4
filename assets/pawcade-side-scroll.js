@@ -129,6 +129,20 @@
     [1.04,1.1,1.02,1] // Starship: action run-and-gun
   ];
   const [speedFactor,controlFactor,gravityFactor,airFactor]=motionProfiles[index];
+  // Game-by-game jump arcs: [jump impulse, held-jump gravity, released-jump
+  // gravity, falling gravity]. No borrowed animation or copyrighted assets.
+  const jumpProfiles=[
+    [1,.76,1.42,1.12],[1.03,.91,1.2,1.14],[.85,.82,1, .78],
+    [1.04,.88,1.18,1.06],[.98,.84,1.28,1.2],[1.06,.67,1.2,.86],
+    [.98,.62,1.22,.82],[1,.95,1.05,1],[1,.96,1.04,1.02],
+    [1.03,.9,1.12,1.07],[1.08,.74,1.19,.88],[1.03,.9,1.1,1.15],
+    [1,.88,1.16,1.1],[1.02,.72,1.26,1.03],[1.02,.9,1.18,1.02],
+    [1.06,.72,1.18,.86],[1.01,.89,1.2,1.12],[1,.81,1.22,1.04],
+    [1.01,.92,1.12,1.15],[.9,.82,1,.8],[1.03,.84,1.22,1.1],
+    [1,.9,1.18,1.12],[.98,.71,1.22,.9],[1.06,.65,1.18,.83],
+    [1.01,.9,1.16,1.08]
+  ];
+  const [jumpFactor,holdGravity,releaseGravity,fallGravity]=jumpProfiles[index];
   const sections = 6;
   const sectionSize = index===0 ? 3020 : 2200;
   const finish = sections * sectionSize;
@@ -431,7 +445,7 @@
       return;
     }
     if (player.on || player.coyote>0 || power === 'swim' || (power === 'double' && player.jumps < 2)) {
-      player.vy = -jumpSpeed * player.gravity;
+      player.vy = -jumpSpeed * jumpFactor * player.gravity;
       player.on = false;
       player.jumps++;
       playCue(220,390,.09);
@@ -729,7 +743,12 @@
     if (power==='swim') p.vy += (vertical*230-p.vy)*Math.min(1,dt*5);
     else if (power==='bubble' && held('action') && p.y>55) p.vy += (-160-p.vy)*Math.min(1,dt*5);
     else if (floating && p.vy>0) p.vy=Math.min(72,p.vy+dt*90);
-    else if (!(movement==='airdash' && p.power>.22)) p.vy+=dt*(movement==='precision'?1210:1050)*gravityFactor*p.gravity;
+    else if (!(movement==='airdash' && p.power>.22)) {
+      const arcFactor=p.vy*p.gravity<0
+        ? (held('jump') ? holdGravity : releaseGravity)
+        : fallGravity;
+      p.vy+=dt*(movement==='precision'?1210:1050)*gravityFactor*arcFactor*p.gravity;
+    }
     p.y += p.vy*dt;
     if(index===11){
       const prism=landmarks.find(prop=>prop.cell===5);
