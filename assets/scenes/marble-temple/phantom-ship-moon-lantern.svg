@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Phantom Ship original spectral moon lantern"><defs><linearGradient id="surface" x1=".02" y1=".04" x2=".98" y2=".95"><stop stop-color="#fff7e7"/><stop offset=".25" stop-color="#edf5e9"/><stop offset=".69" stop-color="#919dce"/><stop offset="1" stop-color="#30385e"/></linearGradient><radialGradient id="light"><stop stop-color="#d6fff8" stop-opacity=".8"/><stop offset=".45" stop-color="#edf5e9" stop-opacity=".27"/><stop offset="1" stop-color="#edf5e9" stop-opacity="0"/></radialGradient></defs><ellipse cx="89" cy="83" rx="72" ry="70" fill="url(#light)" opacity=".65"/>
+<path d="M87 161V33" stroke="#e2e5d6" stroke-width="6"/><path d="M88 42 122 65 88 86z" fill="#b8b6dc" stroke="#f8f0e0" stroke-width="4"/>
+<path d="M49 162V56h82v106" fill="#3e4669" stroke="#e1dfd0" stroke-width="5"/>
+<path d="M53 51q38-56 74 0" fill="none" stroke="#e3eff6" stroke-width="7"/>
+<path d="M65 67h51v69H65z" fill="url(#surface)" stroke="#f4f3df" stroke-width="4"/>
+<path d="M75 82q19-24 34 0l-17 36z" fill="#f2f6d7"/>
+<circle cx="90" cy="100" r="13" fill="#def9ed" stroke="#c8d2f0" stroke-width="3"/>
+<path d="M42 151h97l15 13H27z" fill="#666986" stroke="#e2e5db" stroke-width="5"/>
+<path d="M57 53h66" stroke="#c6d9f3" stroke-width="3"/></svg>
