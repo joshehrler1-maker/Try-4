@@ -1390,7 +1390,7 @@
   }));
   const foundryEnemyDetails=["M-18 8l-5 10m13-9-3 12m20-12 5 10m-8-24 4-4 4 4","M-15 8q-9 11 5 12h23q10-4 4-12m-9-15h8","M-24 4l12-4-5 11m23-18 11 3-11 3","M-16 8v11h-7m36-11v13h8m-29-27h14v5h-14z","M-18 9l-10 7m18-6-5 12m26-13 11 5m-9-19h6","M-23 3l-9-8v16zM-5 8l9 10 8-11m4-12h6","M-16 7q-17 8-9 14m26-13q-3 11 10 10m-1-25h8","M-17 9l-5 10m12-10v14m15-15 12 11m-10-27 9 5","M-18 9v12h9m21-12 9 9h7m-23-26h12l-4 6z"].map(shape=>new Path2D(shape));
   const foundryEarlyDetails=[["M-15 8l-6 8 5 2m8-8-1 9m10-9 5 8m5-9 8 5","M-13-3q8-8 16-4m9 4h4"],["M-14 8q-11 4-9 10h13l7-7m10 0 6 9h10","M-2-17v12m6-10v12m6-8v8m3 3h5"],["M-17 7q-9 12 4 13q9 0 7-10m14 0q0 13 10 9q7-3 2-12","M4-8l13 4m-28-2h9"],["M-20 4q-9 0-11-9m10 15 7 7m14-8 7 5","M1-3q5-4 9 0m-22 3 6-5"],["M-15 8l-10 9h9m6-6 7 7m11-9 11 9","M-6 0l6-5 7 5m8-4 3 4"],["M-16 7l-9 5 1 7m10-8 3 10m22-11 9 4 4 6","M-11-9l8-3 6 3m5-3 8 4-5 4"],["M-14 7l-6 11h8m18-8 2 8h8","M13-16l5-7 2 12m-8 8 6 2"],["M-24 4q-7 9-12 4m23 3 11 5m10-7 10 4","M-11-6q9-5 20-2m4 3 4 2"],["M-12 0l-13-13m40 13 12-12m-27 22-8 6m12-6 7 6","M-4-8l3 3m7-3-2 3"]].map(paths=>paths.map(path=>new Path2D(path)));
-  function drawFoundryEnemy(at,kind,faceLeft,offset,attackPose=0,recoil=0) {
+  function drawFoundryEnemy(at,kind,faceLeft,offset,attackPose=0,recoil=0,gait=0,landing=0,hit=0) {
     const design=foundryLateEnemies[kind-9];
     const colors=design?.colors ?? [['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c'],['#f0a271','#754021'],['#acf0dc','#285b6b'],['#e8d1ff','#583e83']][kind];
     ctx.save();
@@ -1447,13 +1447,14 @@
     // Both limbs use pivoted transforms and move with the existing animation
     // clock. All geometry is visual-only, with no collision changes.
     if(kind===0){
-      const swing=reducedMotion?0:Math.sin(phase*.58)*.22;
+      const swing=reducedMotion?0:Math.sin(phase*.58)*.22+Math.sin(gait)*.14;
+      const stagger=reducedMotion?0:Math.max(0,Math.min(1,hit));
       const strike=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
       const impact=reducedMotion?0:Math.max(0,Math.min(1,recoil));
       for(const side of [-1,1]){
         ctx.save();
         ctx.translate(side*13,-3);
-        ctx.rotate(side*(.15+swing-strike*.46));
+        ctx.rotate(side*(.15+swing-strike*.46+stagger*.24));
         const arm=ctx.createLinearGradient(0,-3,side*24,-18);
         arm.addColorStop(0,'#7a3541');arm.addColorStop(.48,'#ffca82');arm.addColorStop(1,'#8c4052');
         ctx.fillStyle=arm;ctx.strokeStyle='#4a293e';ctx.lineWidth=2;
@@ -1461,7 +1462,7 @@
         ctx.lineTo(side*24,-9);ctx.lineTo(side*9,4);ctx.closePath();
         ctx.fill();ctx.stroke();
         ctx.translate(side*23,-10);
-        ctx.rotate(side*(.18+Math.sin(phase*.85+side)*.13+strike*.55));
+        ctx.rotate(side*(.18+Math.sin(phase*.85+side)*.13+strike*.55-stagger*.2));
         ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(side*11,-11);
         ctx.lineTo(side*16,-12);ctx.lineTo(side*13,-3);
         ctx.lineTo(side*6,5);ctx.closePath();ctx.fill();ctx.stroke();
@@ -1474,7 +1475,11 @@
       ctx.beginPath();ctx.moveTo(-9,-5);ctx.lineTo(8,-5);
       ctx.lineTo(11,5);ctx.lineTo(0,10);ctx.lineTo(-10,5);
       ctx.closePath();ctx.fill();ctx.stroke();
-      ctx.fillStyle='#fff6c6';ctx.beginPath();ctx.arc(0,1,2.7+impact*1.8,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=stagger>.05?'#ffedfb':'#fff6c6';ctx.beginPath();ctx.arc(0,1,2.7+impact*1.8+stagger,0,Math.PI*2);ctx.fill();
+      if(landing>.002){
+        ctx.save();ctx.globalAlpha=Math.min(.7,landing*8);ctx.strokeStyle='#ffc78c';ctx.lineWidth=2;
+        ctx.beginPath();ctx.ellipse(0,16,16+landing*100,3,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+      }
       if(impact>.04){
         ctx.save();ctx.globalAlpha=impact*.85;ctx.strokeStyle='#ffeaa4';ctx.lineWidth=2;
         for(const side of [-1,1]){
@@ -3545,7 +3550,7 @@
       ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose,
         (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose);
       ctx.translate(-at.x,-at.y-19-footstep);
-      if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil);
+      if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing);
       else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft);
       else if(foe.clockEnemy!==undefined) drawClockEnemy(at,foe,faceLeft);
