@@ -1996,10 +1996,12 @@
       const sx=fxCell===0?0:fxCell===1?174:340;
       const sw=fxCell===2?172:174;
       const extent=fxCell===2?76:104;
-      const alpha=Math.min(1,Math.max(0,p.power/.48));
-      ctx.globalAlpha=.35+.65*alpha;
+      const alpha=attacking ? .82 : Math.min(1,Math.max(0,p.power/.48));
+      ctx.globalAlpha=.25+.65*alpha;
       ctx.translate(p.x+p.facing*33,p.y-15);
       if(p.facing<0)ctx.scale(-1,1);
+      const flicker=attacking?1+Math.sin(clock*21)*.09:1;
+      ctx.scale(flicker,flicker);
       ctx.drawImage(energyFxArt,sx,0,sw,128,-extent*.3,-extent*.5,extent,extent*.8);
       ctx.restore();
     }
