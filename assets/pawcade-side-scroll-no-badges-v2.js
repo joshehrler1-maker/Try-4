@@ -6287,7 +6287,9 @@
     const light=['Luna','Ivy','Frost','Melody','Spark'].includes(hero);
     const blasterAge=clock-(p.blasterRecoil?.time??-Infinity);
     const blasterFiring=index===1 && blasterAge>=0 && blasterAge<.24;
-    const attacking=blasterFiring || (p.power>.22 && power!=='dash');
+    const shotAge=clock-(p.shotPose?.time??-Infinity);
+    const firing=(index===19 || index===24) && shotAge>=0 && shotAge<.22;
+    const attacking=firing || blasterFiring || (p.power>.22 && power!=='dash');
     const rolling=(index===3 && (p.spin>0 || p.power>.22 || p.spinJump)) || (movement==='roll' && p.power>.22);
     const rushing=p.grapple>0 || (power==='dash' && p.power>.22);
     const braking=p.on && Math.abs(p.vx)>runSpeed*.42 &&
@@ -6382,6 +6384,11 @@
           ? p.facing*Math.atan2(p.vy,Math.abs(p.vx))*.34
           : -p.facing*.22;
         scaleX=1.12;scaleY=.88;
+      } else if(firing){
+        const recoil=(1-shotAge/.22)**2;
+        const {facing,angle}=p.shotPose;
+        tilt=-facing*Math.cos(angle)*recoil*(index===24?.22:.13);
+        scaleY=1-recoil*(index===24?.09:.05);
       } else if(blasterFiring){
         const recoil=(1-blasterAge/.24)**2;
         tilt=-p.blasterRecoil.facing*recoil*(p.blasterRecoil.charged?.23:.12);
