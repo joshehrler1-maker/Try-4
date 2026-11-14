@@ -635,11 +635,11 @@
     // remains intact. Chapter rotation varies the sequence without copying
     // counterpart maps or using the same layout across different games.
     const signatureRoutes=[
-      [[0,286,150,'floor'],[185,242,92,'spring'],[315,216,130,'floor']],
-      [[0,278,164,'shelf'],[202,218,102,'lift'],[352,258,150,'shelf']],
-      [[0,235,210,'current'],[252,266,180,'current'],[475,223,125,'floor']],
-      [[0,285,260,'belt'],[295,245,125,'spring'],[465,278,230,'belt']],
-      [[0,281,146,'barrel'],[178,242,118,'floor'],[337,206,140,'barrel']],
+      [[0,286,170,'floor'],[198,238,96,'spring'],[348,210,142,'floor']],
+      [[0,278,182,'shelf'],[225,209,112,'lift'],[393,252,168,'shelf']],
+      [[0,224,220,'current'],[270,275,190,'current'],[516,205,142,'floor']],
+      [[0,285,298,'belt'],[337,233,133,'spring'],[516,278,256,'belt']],
+      [[0,281,155,'barrel'],[192,233,127,'floor'],[370,199,150,'barrel']],
       [[0,284,125,'floor'],[169,229,115,'lift'],[330,183,115,'floor']],
       [[0,283,122,'spring'],[167,249,142,'floor'],[353,210,112,'spring']],
       [[0,274,105,'floor'],[150,220,88,'shelf'],[283,268,105,'floor']],
