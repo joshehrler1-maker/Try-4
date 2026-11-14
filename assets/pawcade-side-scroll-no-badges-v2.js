@@ -1106,7 +1106,11 @@
         player.vy=dy*660/length;
       }
     }
-    if (power === 'flip' && player.on) {player.gravity *= -1; player.on = false;}
+    if (power === 'flip' && player.on) {
+      player.gravity *= -1;
+      player.on = false;
+      player.flipTime=clock;
+    }
     if (power === 'vine') {
       player.vy = -590;
       if (index === 4 && !reducedMotion) {
@@ -6112,6 +6116,11 @@
       ctx.translate(0,p.y*2);ctx.scale(1,-1);
     }
     const feet=p.y+(p.morphed?12:22);
+    if(index===6 && !p.on && floatHasLift(p)){
+      ctx.translate(p.x,p.y);
+      ctx.scale(1.19,.94);
+      ctx.translate(-p.x,-p.y);
+    }
     if(p.morphed || squash){
       ctx.translate(p.x,feet);
       ctx.scale(1+squash*.65,p.morphed ? .64 : 1-squash);
@@ -6459,6 +6468,22 @@
         ctx.beginPath();
         ctx.moveTo(-24,trail*8);
         ctx.quadraticCurveTo(-42,trail*10,-58+Math.abs(trail)*9,trail*13);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    if(index===7 && !reducedMotion && clock-(p.flipTime??-Infinity)<.2){
+      ctx.save();
+      ctx.translate(p.x,p.y-p.gravity*31);
+      ctx.scale(1,p.gravity);
+      ctx.globalAlpha=1-(clock-p.flipTime)/.2;
+      ctx.strokeStyle='#e7beff';
+      ctx.lineWidth=2;
+      for(const y of [-6,2]){
+        ctx.beginPath();
+        ctx.moveTo(-7,y+4);
+        ctx.lineTo(0,y-2);
+        ctx.lineTo(7,y+4);
         ctx.stroke();
       }
       ctx.restore();
