@@ -561,7 +561,25 @@
       vine:['spring','floor','spring'],
       bubble:['current','floor','current']
     };
-    const challengeKinds=challengeTypes[movement]||['floor','shelf','floor'];
+    // Give action-heavy adventures their own interactive challenge surfaces,
+    // not just generic ledges. Reuse existing collision/physics behaviors.
+    const gameChallengeKinds={
+      0:['floor','spring','floor'], 1:['shelf','lift','shelf'],
+      2:['current','current','current'], 3:['belt','spring','belt'],
+      4:['barrel','spring','barrel'], 5:['lift','floor','lift'],
+      6:['spring','floor','spring'], 7:['floor','ceiling','floor'],
+      8:['spring','floor','spring'], 9:['rail','lift','rail'],
+      10:['current','lift','current'], 11:['lift','floor','lift'],
+      12:['pogo','floor','pogo'], 13:['shelf','spring','shelf'],
+      14:['shelf','lift','shelf'], 15:['lift','spring','lift'],
+      16:['shelf','belt','shelf'], 17:['ice','shelf','ice'],
+      18:['shelf','floor','shelf'], 19:['current','lift','current'],
+      20:['belt','spring','belt'], 21:['shelf','floor','shelf'],
+      22:['pogo','spring','pogo'], 23:['spring','lift','spring'],
+      24:['shelf','lift','shelf']
+    };
+    const challengeKinds=gameChallengeKinds[index]||
+      challengeTypes[movement]||['floor','shelf','floor'];
     const challengeHeights=[277,249,223,258,234,267];
     // Platform rhythm is based on the counterpart's movement vocabulary:
     // rapid runways, staggered aerial landings, tight climbing steps,
