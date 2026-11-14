@@ -1361,6 +1361,7 @@
   const foundryLateEnemies=[["#b8d8a3","#385539","M-25 9L-20-9 -11-6 -8-21 0-12 9-20 13-7 23-3 18 11Z",0,28],["#ffac62","#7d3724","M-24 9Q-27-9-12-13L-6-25 3-12 15-13 24 4 13 12Z",24,20],["#cfe6f2","#405a70","M-26 1L-15-12 -5-8 0-22 8-9 24-8 19 9 -11 12Z",12,38],["#fbe0a0","#906036","M-22 12L-24-7 -11-19 12-19 23-9 19 13 9 9 -9 9Z",51,4],["#dcc3f1","#533c73","M-23 10Q-24-10-12-13L-7-25 -1-14 8-24 15-8 24 0 15 13Z",31,18],["#84e8f5","#305870","M-27 2L-18-9 -6-9 4-19 15-9 26-4 18 8 -7 10 -25 14Z",43,14],["#f0d779","#746036","M-24 12L-17-1 -19-15 -8-20 0-10 9-18 19-12 25 4 15 13Z",20,49],["#f1a8bf","#703349","M-26 7L-18-11 -7-4 1-22 10-8 22-14 26 4 14 13 -13 13Z",37,24],["#ffdf96","#95462e","M-25 12L-18-9 -12-6 -8-23 0-13 9-24 15-7 23-10 25 12Z",57,10]].map(([light,dark,shape,reach,rise])=>({
     colors:[light,dark], shape:new Path2D(shape), reach,rise
   }));
+  const foundryEnemyDetails=["M-18 8l-5 10m13-9-3 12m20-12 5 10m-8-24 4-4 4 4","M-15 8q-9 11 5 12h23q10-4 4-12m-9-15h8","M-24 4l12-4-5 11m23-18 11 3-11 3","M-16 8v11h-7m36-11v13h8m-29-27h14v5h-14z","M-18 9l-10 7m18-6-5 12m26-13 11 5m-9-19h6","M-23 3l-9-8v16zM-5 8l9 10 8-11m4-12h6","M-16 7q-17 8-9 14m26-13q-3 11 10 10m-1-25h8","M-17 9l-5 10m12-10v14m15-15 12 11m-10-27 9 5","M-18 9v12h9m21-12 9 9h7m-23-26h12l-4 6z"].map(shape=>new Path2D(shape));
   function drawFoundryEnemy(at,kind,faceLeft,offset) {
     const design=foundryLateEnemies[kind-9];
     const colors=design?.colors ?? [['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c'],['#f0a271','#754021'],['#acf0dc','#285b6b'],['#e8d1ff','#583e83']][kind];
@@ -1368,7 +1369,7 @@
     ctx.translate(at.x,at.y);
     if(faceLeft) ctx.scale(-1,1);
     const phase=reducedMotion?0:clock*13+offset;
-    for(let i=0;i<4;i++){
+    if(!design) for(let i=0;i<4;i++){
       const x=-13+i*8;
       ctx.fillStyle='#38212a';
       ctx.beginPath();
@@ -1411,6 +1412,14 @@
       ctx.lineTo(19,-8);ctx.lineTo(23,12);
     }
     ctx.closePath();ctx.fill();
+    if(design){
+      ctx.strokeStyle=colors[0];
+      ctx.lineWidth=2.5;
+      ctx.lineJoin='round';
+      ctx.stroke(foundryEnemyDetails[kind-9]);
+      ctx.restore();
+      return;
+    }
     ctx.fillStyle='#362632';ctx.fillRect(5,-5,13,8);
     ctx.fillStyle='#fff2c4';ctx.fillRect(13,-4,3,5);
     ctx.restore();
