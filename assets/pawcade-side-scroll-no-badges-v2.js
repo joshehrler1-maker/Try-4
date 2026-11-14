@@ -1201,7 +1201,7 @@
         player.shotPose={time:clock,facing,angle:Math.atan2(projectile.vy||0,Math.abs(projectile.v))};
       }
       if(index===13 || index===17){
-        player.throwPose={time:clock,angle:Math.atan2(projectile.vy||0,projectile.v)};
+        player.throwPose={time:clock,facing:player.facing,angle:Math.atan2(projectile.vy||0,Math.abs(projectile.v))};
       }
       attacks.push(projectile);
       playCue(470,180,.085);
@@ -1258,7 +1258,10 @@
       case 'release': if(p.cable){p.cable=null;p.grapple=.18;}break;
       case 'climb': break; // Held climb is resolved against the wall each tick.
       case 'drop': if(!p.on){p.vy=strength;p.pogo=true;p.coyote=0;p.jumpBuffer=0;p.jumpCut=false;}break;
-      case 'lob': shot({v:p.facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2,motionTrail:'lob'});break;
+      case 'lob':
+        shot({v:p.facing*strength,vy:-260,gravity:700,life:.9,radius:13,damage:2,motionTrail:'lob'});
+        if(index===13) p.throwPose={time:clock,facing:p.facing,angle:Math.atan2(-260,strength)};
+        break;
       case 'morph': {
         const nextBody=p.morphed?22:12;
         if(nextBody===22 && tunnels.some(t=>p.x>t.x-12 && p.x<t.x+t.w+12)){
@@ -6709,6 +6712,7 @@
       if(progress>=0 && progress<1){
         ctx.save();
         ctx.translate(p.x,p.y-5);
+        ctx.scale(p.throwPose.facing,1);
         ctx.rotate(p.throwPose.angle);
         ctx.globalAlpha=1-progress;
         ctx.strokeStyle=index===13?'#ffe2a5':'#ff9c68';
