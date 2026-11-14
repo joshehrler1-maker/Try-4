@@ -177,3 +177,10 @@ a{color:#ffdb99}h1,h2{font-family:Georgia,serif;color:#ffe7b5}
   #side-player .side-controls button{min-height:50px}
   #side-player .side-hud{margin:.2rem 0}
 }
+
+/* Keep the gamepad unobstructed: no character poster behind touch buttons. */
+#side-player .side-controls,
+#side-player:is(:fullscreen,.game-fullscreen-expanded) .side-controls{
+  background-image:none!important;
+  background:linear-gradient(110deg,#14264e 0%,#312052 55%,#142c50 100%)!important;
+}
