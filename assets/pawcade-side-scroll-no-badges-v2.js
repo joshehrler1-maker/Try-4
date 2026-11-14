@@ -6229,7 +6229,14 @@
   // Unlike detached motion badges, paws and arms remain connected to the foe.
   function drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,stride,attackPose){
     const dir=faceLeft?-1:1;
-    const phase=(foe._gait||0)*(0.8+(index%5)*.11);
+    // Distinct stride timing for every adventure, keeping step phase driven
+    // by distance traveled rather than elapsed wall-clock time.
+    const worldStrideRates=[
+      .86,.69,.58,1.02,.91,.62,.78,1.08,1.19,.73,
+      .64,.83,.88,.76,.67,.98,1.12,.72,1.15,.55,
+      1.27,.81,.70,.61,.94
+    ];
+    const phase=(foe._gait||0)*(worldStrideRates[index]??.8);
     // Clamp the animation speed when the simulation skips frames. This
     // protects Android browsers from a huge limb snap after tab switching.
     // Plant the feet during a strike, then blend back into the world-specific
