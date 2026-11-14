@@ -5837,11 +5837,14 @@
         ctx.lineWidth=3;
         ctx.strokeStyle='#e4be8f';
         ctx.beginPath();
+        const recovery=Math.max(0,Math.min(1,(.12-a.life)/.12));
+        const tipX=a.x+(a.originX-a.x)*recovery*.6;
+        const tipY=a.y-recovery*7;
         ctx.moveTo(a.originX,a.originY);
-        ctx.quadraticCurveTo((a.originX+a.x)/2,a.y-12,a.x,a.y);
+        ctx.quadraticCurveTo((a.originX+tipX)/2,a.y-12+recovery*20,tipX,tipY);
         ctx.stroke();
         ctx.fillStyle='#fff0cb';
-        ctx.fillRect(a.x-3,a.y-2,6,4);
+        ctx.fillRect(tipX-3,tipY-2,6,4);
         ctx.restore();
         continue;
       }
