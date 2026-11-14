@@ -992,3 +992,8 @@ window.pawtopiaRooms.forgeExpansion2 = [
 // Ember Foundry: stagger the climb and give each conveyor a stable runout.
 window.pawtopiaRooms.forgeSwitchbacks = [[0,326,390],[443,291,205],[703,246,180],[936,205,235],[1228,245,188],[1474,282,277],[1806,326,394]];
 window.pawtopiaRooms.forgeSlagAqueduct = [[0,326,465],[515,300,196,"belt"],[770,266,219],[1046,226,184],[1285,264,221,"belt"],[1564,292,205],[1826,326,374]];
+
+// Ember Foundry castle approaches pair uphill conveyors with solid landings.
+window.pawtopiaRooms.forgeKeep = [[0,326,500],[553,294,268,"belt"],[869,254,320],[1242,218,356],[1654,326,546],[1840,285,65,"hazard"]];
+window.pawtopiaRooms.forgeExpansion6 = [[0,326,400],[445,292,190,"belt"],[688,254,187],[927,213,196],[1180,183,209],[1445,251,257],[1756,293,202],[2008,326,192]];
+window.pawtopiaRooms.forgeExpansion7 = [[0,326,420],[464,288,201],[719,249,225,"belt"],[999,215,245],[1300,242,242],[1590,280,214],[1858,326,342]];
