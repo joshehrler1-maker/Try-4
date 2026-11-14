@@ -513,7 +513,7 @@
     reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
-    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;});
+    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;e.faceLeft=undefined;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
@@ -2956,14 +2956,18 @@
       // Airborne opponents cast a shadow on the floor, not in mid-air.
       castShadow(at.x,airborne?ground:at.y+20,airborne?16:20);
       const cell=index;
-      const faceLeft=player.x<at.x;
       const nearby=Math.abs(player.x-at.x)<250;
       const recoil=Math.max(0,1-(clock-(foe.lastShotAt??-Infinity))/.16);
       const firing=recoil>0;
       const motion=reducedMotion?0:Math.sin(clock*(airborne?9:6)+foe.offset);
       // Enemy gait follows visible world travel, not elapsed time. Reset on
       // large position changes so teleports and respawns never spin the gait.
-      const travel=foe._drawX===undefined?0:Math.abs(at.x-foe._drawX);
+      const displacement=at.x-(foe._drawX??at.x);
+      const travel=Math.abs(displacement);
+      const faceLeft=foe.turret || firing || (nearby && ['turret','charge','pursuit'].includes(enemyPattern))
+        ? player.x<at.x
+        : travel>.15 && travel<90 ? displacement<0 : (foe.faceLeft??player.x<at.x);
+      foe.faceLeft=faceLeft;
       foe._drawX=at.x;
       const elapsed=Math.max(0,clock-(foe.gaitTime??clock));
       foe.gaitTime=clock;
@@ -3337,9 +3341,20 @@
         scaleY=1-stride*[.012,.019,.015,.026,.017][motionStyle];
       }
       if(p.morphed){scaleX*=1.18;scaleY*=.77;}
+      const elapsed=Math.max(0,clock-(p.poseTime??clock));
+      const blend=1-Math.exp(-22*elapsed);
+      const previous=p.bodyPose;
+      const ease=previous && !rolling && !previous.rolling;
+      p.bodyPose={
+        tilt:ease?previous.tilt+(tilt-previous.tilt)*blend:tilt,
+        x:ease?previous.x+(scaleX-previous.x)*blend:scaleX,
+        y:ease?previous.y+(scaleY-previous.y)*blend:scaleY,
+        rolling
+      };
+      p.poseTime=clock;
       ctx.translate(p.x,pivotY);
-      ctx.rotate(tilt);
-      ctx.scale(scaleX,scaleY);
+      ctx.rotate(p.bodyPose.tilt);
+      ctx.scale(p.bodyPose.x,p.bodyPose.y);
       ctx.translate(-p.x,-pivotY);
     }
     ctx.globalAlpha=p.grace && Math.floor(clock*12)%2?.55:1;
