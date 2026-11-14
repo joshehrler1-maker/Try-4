@@ -231,6 +231,34 @@
   let escapeRetries = 0;
   let escapeCrystals = 0;
   // Color, silhouette, reach and duration for each adventure's signature move.
+  // Technique pose by game: lean, horizontal scale, vertical scale.
+  const techniquePoses = [
+    [0.12, 1.12, 0.88],
+    [0.12, 0.98, 1.05],
+    [-0.09, 1.12, 0.94],
+    [0.19, 0.9, 1.03],
+    [0.21, 1.07, 0.87],
+    [0.06, 1.16, 0.91],
+    [-0.12, 1.09, 1.03],
+    [-0.14, 0.92, 1.08],
+    [0.13, 1.1, 0.93],
+    [-0.17, 0.96, 1.11],
+    [-0.08, 1.07, 1.02],
+    [0.19, 1.12, 0.91],
+    [0.03, 0.91, 1.16],
+    [0.15, 1.06, 0.95],
+    [-0.05, 1.07, 0.92],
+    [0.19, 1.13, 0.9],
+    [-0.16, 1.04, 0.97],
+    [0.19, 1.08, 0.93],
+    [-0.12, 0.94, 1.12],
+    [-0.1, 0.99, 1.08],
+    [0.24, 1.14, 0.88],
+    [0.2, 1.11, 0.92],
+    [0.04, 0.9, 1.18],
+    [0.03, 1.16, 0.91],
+    [-0.19, 1.02, 1.07]
+  ];
   const signatureEffects=[
     ['#ffbe69','arc',82,.32], // Cape sweep
     ['#6ceaff','trail',114,.27], // Dash exhaust
@@ -6210,6 +6238,17 @@
         // the feet or altering collision dimensions.
         scaleX=1+stride*[.014,.025,.018,.035,.022][motionStyle];
         scaleY=1-stride*[.012,.019,.015,.026,.017][motionStyle];
+      }
+      if(signatureEffect && !rolling && !p.morphed){
+        const duration=signatureEffects[index][3];
+        const progress=(clock-signatureEffect.at)/duration;
+        if(progress>=0 && progress<1){
+          const weight=Math.sin(progress*Math.PI)*(1-progress*.35);
+          const [lean,widthScale,heightScale]=techniquePoses[index];
+          tilt+=lean*signatureEffect.facing*weight;
+          scaleX*=1+(widthScale-1)*weight;
+          scaleY*=1+(heightScale-1)*weight;
+        }
       }
       if(p.morphed){scaleX*=1.18;scaleY*=.77;}
       const elapsed=Math.max(0,clock-(p.poseTime??clock));
