@@ -1297,7 +1297,12 @@
       if ((foe.turret || foe.clockEnemy>=3 || enemyPattern==='turret' || index===16) &&
           clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
         const parryable=index===16 && foe.shotsFired++%3===0;
-        hazards.push(enemyRound(position,direction,parryable));
+        const primaryShot=enemyRound(position,direction,parryable);
+        // Scouts fire quick tracers, sentries slower heavy-looking shots,
+        // and raiders faster bolts. Preserve Steamworks parry behavior.
+        const projectileTempo=[1.12,.82,1.02,1.22][foe.archetype??0];
+        primaryShot.v*=projectileTempo;
+        hazards.push(primaryShot);
         if(foe.clockEnemy===5){
           const highShot=enemyRound({x:position.x,y:position.y-44},direction,false);
           hazards.push(highShot);
