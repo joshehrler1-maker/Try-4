@@ -326,7 +326,7 @@
       platforms.push({x:middle,y:220-stage%3*10,w:Math.min(span,105),kind:'floor'});
       crystals.push({x:middle+span*.3,y:286-rise});
       enemies.push({x:middle+span*.7,y:303-rise,offset:stage+8,
-        foundryEnemy:stage<9?stage:undefined, patrolLeft:middle+12, patrolRight:middle+span-12});
+        foundryEnemy:stage<18?stage:undefined, patrolLeft:middle+12, patrolRight:middle+span-12});
     }
     const feature=setPieces[stage];
     const anchor=start+1050;
@@ -1358,8 +1358,12 @@
     ctx.fillRect(0,-10,8,5);
     ctx.restore();
   }
+  const foundryLateEnemies=[["#b8d8a3","#385539","M-25 9L-20-9 -11-6 -8-21 0-12 9-20 13-7 23-3 18 11Z",0,28],["#ffac62","#7d3724","M-24 9Q-27-9-12-13L-6-25 3-12 15-13 24 4 13 12Z",24,20],["#cfe6f2","#405a70","M-26 1L-15-12 -5-8 0-22 8-9 24-8 19 9 -11 12Z",12,38],["#fbe0a0","#906036","M-22 12L-24-7 -11-19 12-19 23-9 19 13 9 9 -9 9Z",51,4],["#dcc3f1","#533c73","M-23 10Q-24-10-12-13L-7-25 -1-14 8-24 15-8 24 0 15 13Z",31,18],["#84e8f5","#305870","M-27 2L-18-9 -6-9 4-19 15-9 26-4 18 8 -7 10 -25 14Z",43,14],["#f0d779","#746036","M-24 12L-17-1 -19-15 -8-20 0-10 9-18 19-12 25 4 15 13Z",20,49],["#f1a8bf","#703349","M-26 7L-18-11 -7-4 1-22 10-8 22-14 26 4 14 13 -13 13Z",37,24],["#ffdf96","#95462e","M-25 12L-18-9 -12-6 -8-23 0-13 9-24 15-7 23-10 25 12Z",57,10]].map(([light,dark,shape,reach,rise])=>({
+    colors:[light,dark], shape:new Path2D(shape), reach,rise
+  }));
   function drawFoundryEnemy(at,kind,faceLeft,offset) {
-    const colors=[['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c'],['#f0a271','#754021'],['#acf0dc','#285b6b'],['#e8d1ff','#583e83']][kind];
+    const design=foundryLateEnemies[kind-9];
+    const colors=design?.colors ?? [['#ffac68','#8b3b32'],['#ffe495','#805036'],['#c4a7e1','#493851'],['#9fe3e1','#305968'],['#ffcd8d','#823724'],['#e8b3e1','#55294c'],['#f0a271','#754021'],['#acf0dc','#285b6b'],['#e8d1ff','#583e83']][kind];
     ctx.save();
     ctx.translate(at.x,at.y);
     if(faceLeft) ctx.scale(-1,1);
@@ -1375,7 +1379,9 @@
     shell.addColorStop(0,colors[0]);shell.addColorStop(1,colors[1]);
     ctx.fillStyle=shell;
     ctx.beginPath();
-    if(kind===0){
+    if(design){
+      ctx.fill(design.shape);
+    }else if(kind===0){
       ctx.ellipse(-3,2,20,14,0,0,Math.PI*2);
     }else if(kind===1){
       ctx.moveTo(-18,11);ctx.quadraticCurveTo(-22,-11,-7,-19);
@@ -1430,6 +1436,15 @@
       if(foe.foundryEnemy===6) return {x:patrolX(foe.x+Math.sin(cycle*Math.PI/1.2)**3*39),y:foe.y};
       if(foe.foundryEnemy===7) return {x:patrolX(foe.x+Math.sin(cycle*Math.PI/1.2)*38),y:foe.y-8-6*Math.cos(cycle*Math.PI/1.2)};
       if(foe.foundryEnemy===8) return {x:patrolX(foe.x+Math.sin(cycle*Math.PI/1.2)*30),y:foe.y-26-13*Math.cos(cycle*Math.PI/1.2)};
+      const design=foundryLateEnemies[foe.foundryEnemy-9];
+      if(design){
+        const airborne=foe.foundryEnemy===11 || foe.foundryEnemy===14;
+        const dx=airborne ? Math.sin(cycle*Math.PI/1.2)*design.reach :
+          chase*surge**2*design.reach;
+        const lift=airborne ? (.65+.35*Math.cos(cycle*Math.PI/1.2))*design.rise :
+          hop*(2-hop)*design.rise;
+        return {x:patrolX(foe.x+dx),y:foe.y-lift};
+      }
       const shift=foe.foundryEnemy===1?0:foe.foundryEnemy===2?chase*surge**2*46:wave*24;
       return {x:patrolX(foe.x+shift),y:foe.y-(foe.foundryEnemy===1?hop*(2-hop)*49:0)};
     }
