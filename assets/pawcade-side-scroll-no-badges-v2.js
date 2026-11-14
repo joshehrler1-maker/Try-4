@@ -7018,6 +7018,7 @@
         foe.gaitWeight=0;
         foe._footLiftWeight=0;
         foe._chargeCompression=0;
+        foe._strideWeight=0;
         foe.gaitTime=clock;
       }
       const displacement=at.x-(foe._drawX??at.x);
@@ -7079,18 +7080,21 @@
         (velocityTarget-(foe._bodyVelocity||0))*(1-Math.exp(-7*motionDt));
       const velocityLean=(foe._bodyVelocity||0)*(.035+sway*.65);
       // Smooth stance-to-stride lift to prevent sudden foot pops on patrol starts and stops.
-       const liftTarget=airborne||reducedMotion?0:movingWeight;
-       foe._footLiftWeight=(foe._footLiftWeight||0)+(liftTarget-(foe._footLiftWeight||0))*(1-Math.exp(-10*motionDt));
-       const footstep=airborne||reducedMotion?0:Math.abs(footCycle)*lift*(foe._footLiftWeight||0);
+      const liftTarget=airborne||reducedMotion?0:movingWeight;
+      foe._footLiftWeight=(foe._footLiftWeight||0)+(liftTarget-(foe._footLiftWeight||0))*(1-Math.exp(-10*motionDt));
+      const footstep=airborne||reducedMotion?0:Math.abs(footCycle)*lift*(foe._footLiftWeight||0);
       // The stride's support phase compresses the torso, while idle breathing
       // fades out as the foe starts moving. Never animate a walking foe in place.
-      const strideCompression=airborne?0:
-        Math.max(0,footCycle)*.018*movingWeight;
+      // Blend stance support into locomotion so body compression does not pop.
+      const strideTarget=airborne||reducedMotion?0:movingWeight;
+      foe._strideWeight=(foe._strideWeight||0)+(strideTarget-(foe._strideWeight||0))*(1-Math.exp(-11*motionDt));
+      const strideCompression=airborne||reducedMotion?0:
+        Math.max(0,footCycle)*.018*(foe._strideWeight||0);
       const breathing=Math.sin(clock*(1.6+index%4*.23)+foe.offset)*.012*(1-movingWeight);
       const enemyLean=reducedMotion?0:
         footCycle*sway*movingWeight+velocityLean+breathing;
       const anticipation=!reducedMotion && enemyPattern==='charge' && nearby && !airborne;
-      const bodyStretch=movingWeight*(.018+.012*(index%3))*footCycle;
+      const bodyStretch=reducedMotion?0:(foe._strideWeight||0)*(.018+.012*(index%3))*footCycle;
       // Ease the charge crouch in and out, avoiding an instantaneous squash.
        const chargeTarget=anticipation?.07:0;
        foe._chargeCompression=(foe._chargeCompression||0)+(chargeTarget-(foe._chargeCompression||0))*(1-Math.exp(-9*motionDt));
