@@ -2401,6 +2401,12 @@
         rock.speed=Math.max(rock.speed,Math.min(210,Math.max(0,p.vx)*.85));
       }
       rock.x=Math.min(rock.limit,rock.x+rock.speed*dt);
+      // Keep a grounded player behind the rock while pushing into it.
+      if (oldX<rock.x && p.x>rock.x-contact && steer>0 &&
+          Math.abs(p.y-(ground-rock.radius))<32) {
+        p.x=rock.x-contact;
+        p.vx=Math.min(p.vx,rock.speed);
+      }
       rock.speed=rock.x===rock.limit ? 0 : Math.max(0,rock.speed-140*dt);
     }
     for (const c of crystals) {
