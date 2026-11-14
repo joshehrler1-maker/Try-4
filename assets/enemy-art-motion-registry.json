@@ -27,8 +27,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
+      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
       "motionDesign": {
         "profile": "grounded-clamp",
         "attackSequence": "plant rear foot, compress shoulders, close jaws, recoil",
@@ -46,7 +46,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 1,
@@ -64,8 +65,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
+      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
       "motionDesign": {
         "profile": "guard-sweep",
         "attackSequence": "brace spine, unfold page armor, sweep, refold",
@@ -83,7 +84,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 2,
@@ -101,8 +103,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
+      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
       "motionDesign": {
         "profile": "swim-spiral",
         "attackSequence": "bank fins, coil torso, spiral, glide out",
@@ -120,7 +122,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 3,
@@ -138,8 +141,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
+      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
       "motionDesign": {
         "profile": "pendulum-arc",
         "attackSequence": "wind up against swing, release at beat, damp oscillation",
@@ -157,7 +160,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 4,
@@ -175,8 +179,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "needs-original-art",
-      "implementationStatus": "pending",
+      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
+      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
       "motionDesign": {
         "profile": "spring-pounce",
         "attackSequence": "squat, load hind legs, leap, absorb landing",
@@ -194,7 +198,8 @@
           "verify no sliding or floating on intended ground contacts",
           "verify Android landscape frame pacing"
         ]
-      }
+      },
+      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
     },
     {
       "gameIndex": 5,
