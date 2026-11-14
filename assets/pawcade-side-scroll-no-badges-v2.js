@@ -1165,6 +1165,10 @@
     }
     if (power === 'vine') {
       player.vy = -590;
+      player.on=false;
+      player.coyote=0;
+      player.jumpBuffer=0;
+      player.jumpCut=false;
       if (index === 4 && !reducedMotion) {
         burst(player.x,player.y+17,'#a7f08b',8);
       }
@@ -1255,7 +1259,7 @@
     let activated=false;
     const nearby=range=>closestTarget(p,enemies,foePosition,
       (foe,at)=>!foe.dead && (index!==10 || (at.x-p.x)*facing>=0),range,65);
-    const shot=extra=>attacks.push({x:p.x,y:p.y,v:p.facing*330,life:.55,...extra});
+    const shot=extra=>attacks.push({x:p.x,y:p.y,v:facing*330,life:.55,...extra});
     switch(technique) {
       case 'sweep': shot({v:0,radius:strength-20,life:.13}); break;
       case 'burst':
@@ -1268,7 +1272,7 @@
           status('Sonar revealed a hidden crystal trail. Follow it upward.');
         }
         break;
-      case 'launch': if(p.on){p.vy=-strength;p.vx=facing*350;p.grapple=.26;p.on=false;p.coyote=0;}break;
+      case 'launch': if(p.on){p.vy=-strength;p.vx=facing*350;p.grapple=.26;p.on=false;p.coyote=0;p.jumpBuffer=0;p.jumpCut=false;}break;
       case 'pull':
       case 'capture': {
         if(p.carry){shot({v:facing*550,damage:2});p.carry=false;break;}
@@ -1305,6 +1309,10 @@
         p.vx=(dx || (dy ? 0 : p.facing*.65))*strength/length;
         p.vy=(dy || (dx ? 0 : -1))*strength/length;
         p.grapple=.27;
+        p.on=false;
+        p.coyote=0;
+        p.jumpBuffer=0;
+        p.jumpCut=false;
         p.bashPose={time:clock,angle:Math.atan2(p.vy,p.vx)};
         target.bashed={x:position.x,y:position.y,vx:-p.vx*.75,vy:-p.vy*.75,until:clock+.48};
         burst(position.x,position.y,'#a8ffd9',12);
