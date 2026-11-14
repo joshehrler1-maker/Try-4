@@ -3326,11 +3326,11 @@
         // Rising compresses the silhouette; falling extends it. Cap both
         // responses so fast falls never distort the approved character art.
         const airborneSpeed=Math.min(1,Math.abs(p.vy)/650);
-        tilt=p.facing*(p.vy<0?-.065:.07)*(1+airborneSpeed*.65);
-        scaleX=p.vy<0?1-.035*airborneSpeed:1+.045*airborneSpeed;
+        tilt=p.facing*Math.max(-.105,Math.min(.115,p.vy/3700));
+        scaleX=1+(p.vy<0?-.035:.045)*airborneSpeed;
         scaleY=p.vy<0?1+.055*airborneSpeed:1-.035*airborneSpeed;
       } else if(Math.abs(p.vx)>45){
-        tilt=p.facing*Math.min(.13,Math.abs(p.vx)/4200);
+        tilt=Math.max(-.13,Math.min(.13,p.vx/4200));
         // Distinct run silhouette: sprint-forward energy without moving
         // the feet or altering collision dimensions.
         scaleX=1+stride*[.014,.025,.018,.035,.022][motionStyle];
