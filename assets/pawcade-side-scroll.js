@@ -230,6 +230,34 @@
   }
   const plan = window.pawtopiaRoomPlans[index].split(' ');
   const setPieces = window.pawtopiaSetPieces[index].split(' ');
+  // Optional routes in catalog order. Coordinates are local to the chapter.
+  const optionalRoutes = [
+    [[1345,269,116],[1498,225,108],[1646,186,106]],
+    [[1210,274,132],[1430,215,115],[1640,157,121]],
+    [[1190,202,172],[1430,117,132],[1650,172,158]],
+    [[1185,277,215],[1420,237,190],[1640,203,160]],
+    [[1240,255,108],[1440,192,95],[1650,151,114]],
+    [[1210,180,125],[1410,221,130],[1630,268,140]],
+    [[1200,254,140],[1400,173,150],[1650,112,130]],
+    null,
+    null,
+    [[1200,270,130],[1370,128,164],[1580,232,160]],
+    [[1190,265,116],[1370,208,100],[1555,154,120]],
+    [[1230,266,104],[1430,204,100],[1640,140,110]],
+    [[1200,279,102],[1400,217,116],[1590,178,126]],
+    [[1190,267,138],[1400,214,105],[1610,247,142]],
+    null,
+    [[1200,276,104],[1390,221,112],[1580,154,135]],
+    null,
+    [[1215,279,148],[1420,235,135],[1610,193,142]],
+    null,
+    [[1190,257,175],[1405,224,145],[1600,255,180]],
+    null,
+    [[1200,277,138],[1370,236,125],[1540,194,135]],
+    [[1180,271,116],[1370,217,120],[1565,170,124]],
+    [[1190,196,145],[1410,228,155],[1630,264,155]],
+    [[1200,274,178],[1430,239,156],[1635,210,148]]
+  ];
   for (const [stage, room] of plan.entries()) {
     const start = stage * sectionSize;
     if(index===16){
@@ -357,14 +385,11 @@
         photo:['shelf','floor','shelf']
       };
       const route=(routeKinds[movement]||['floor','floor','lift']);
-      const seed=(index*13+stage*7)%5;
-      const routeX=start+Math.min(sectionSize-660,1330+seed*45);
-      const heights=[245,211,239,203,228];
+      const courseRoute=optionalRoutes[index];
       for(let branch=0;branch<3;branch++){
-        const bx=routeX+branch*(155+seed*3);
-        const by=heights[(branch+stage+index)%heights.length];
-        const bw=92+(branch%2)*20;
-        // Only add a short, optional elevated chain; never remove floor paths.
+        const [x,y,bw]=courseRoute?.[branch] ?? [1330+branch*155,230,92];
+        const bx=start+x+(stage%3)*12;
+        const by=y+(stage%2)*5;
         if(!clearLane) addOptionalLanding(bx,by,bw,route[branch]);
         crystals.push({x:bx+bw/2,y:by-35});
       }
