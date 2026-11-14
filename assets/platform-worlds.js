@@ -988,3 +988,7 @@ window.pawtopiaRooms.forgeExpansion2 = [
   [1038,216,155,'spring'],[1250,166,218],[1521,225,232],
   [1810,280,156],[2015,326,185],
 ];
+
+// Ember Foundry: stagger the climb and give each conveyor a stable runout.
+window.pawtopiaRooms.forgeSwitchbacks = [[0,326,390],[443,291,205],[703,246,180],[936,205,235],[1228,245,188],[1474,282,277],[1806,326,394]];
+window.pawtopiaRooms.forgeSlagAqueduct = [[0,326,465],[515,300,196,"belt"],[770,266,219],[1046,226,184],[1285,264,221,"belt"],[1564,292,205],[1826,326,374]];
