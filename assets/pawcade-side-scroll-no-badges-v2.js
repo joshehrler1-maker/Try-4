@@ -1107,6 +1107,7 @@
       if (anchor && !player.cable) {
           player.cable={x:anchor.x,y:anchor.y,length:anchor.distance,maxLength:Math.max(240,anchor.distance)};
           player.vx+=player.facing*130;
+          playCue(180,620,.14);
       }
     }
     if (power === 'throw' || power === 'pulse' || power === 'photo') {
@@ -1121,6 +1122,7 @@
         projectile.gravity=570;
       }
       attacks.push(projectile);
+      playCue(470,180,.085);
       if(player.altWeapon) for(const vy of [-105,105]) attacks.push({x:player.x,y:player.y,v:player.facing*speed,vy,life});
     }
   }
@@ -1129,9 +1131,12 @@
     if (movement!=='buster' || player.chargeStart===null || held('action')) return;
     const charged=clock-player.chargeStart>=fullChargeTime;
     player.chargeStart=null;
-    if (fire && phase==='playing') attacks.push({
+    if (fire && phase==='playing') {
+      playCue(charged?610:420,charged?160:245,charged?.21:.09);
+      attacks.push({
       x:player.x,y:player.y,v:player.facing*(charged?850:680),life:.85,radius:charged?22:8,damage:charged?2:1,blasterShot:true
-    });
+      });
+    }
   }
   function bashTarget(p) {
     return enemies.find(foe=>!foe.dead && close(p,foePosition(foe),125,65));
@@ -1229,6 +1234,9 @@
     const after=[p.x,p.y,p.vx,p.vy,p.gravity,p.cable,p.carry,p.morphed,p.altWeapon,p.sonar,attacks.length];
     if(activated || technique==='reveal' || after.some((value,i)=>value!==before[i])){
       signatureEffect={x:player.x,y:player.y,facing:player.facing,at:clock};
+      if(technique==='parry' || technique==='reveal') playCue(520,1020,.16);
+      else if(technique==='drop' || technique==='retry') playCue(325,96,.17);
+      else playCue(240,510,.13);
     }
   }
   const pauseButton=byId('side-pause');
@@ -1246,17 +1254,41 @@
       playCue(440,660);
     } catch {sound=false;}
   };
+  // Original synthesized voices in catalog order. Each voice sets a wave,
+  // pitch multiplier and overtone ratio for the course's event cues.
+  const soundProfiles=[
+    ['square',1.10,2], ['sawtooth',.92,2], ['sine',.72,1.5],
+    ['triangle',1.25,2], ['triangle',.60,1.5], ['sine',1.16,2],
+    ['triangle',1.30,1.5], ['square',.78,2], ['square',1.48,2],
+    ['sawtooth',.67,1.5], ['sine',.98,2], ['sine',1.42,1.5],
+    ['triangle',.68,2], ['sine',1.26,2], ['triangle',.54,1.5],
+    ['sine',.87,3], ['triangle',1.12,3], ['triangle',.88,2],
+    ['sine',.56,2], ['square',.66,1.5], ['sawtooth',1.24,2],
+    ['triangle',.77,3], ['square',1.32,1.5], ['sine',1.10,3],
+    ['sawtooth',.50,2]
+  ];
+  let nextCueAt=0;
   function playCue(from,to,length=.12) {
     if(!sound || audio?.state!=='running') return;
     const now=audio.currentTime;
-    const tone=audio.createOscillator();
+    if(now<nextCueAt) return;
+    nextCueAt=now+.025;
+    const [wave,pitch,harmonic]=soundProfiles[index];
     const volume=audio.createGain();
-    tone.frequency.setValueAtTime(from,now);
-    tone.frequency.exponentialRampToValueAtTime(to,now+length);
-    volume.gain.setValueAtTime(.045,now);
+    volume.gain.setValueAtTime(.001,now);
+    volume.gain.exponentialRampToValueAtTime(.035,now+.008);
     volume.gain.exponentialRampToValueAtTime(.001,now+length);
-    tone.connect(volume);volume.connect(audio.destination);
-    tone.start(now);tone.stop(now+length);
+    volume.connect(audio.destination);
+    for(const [type,ratio] of [[wave,1],['sine',harmonic]]){
+      const tone=audio.createOscillator();
+      tone.type=type;
+      tone.frequency.setValueAtTime(from*pitch*ratio,now);
+      tone.frequency.exponentialRampToValueAtTime(to*pitch*ratio,now+length);
+      tone.connect(volume);
+      tone.start(now);
+      tone.stop(now+length);
+      if(ratio===harmonic) tone.onended=()=>volume.disconnect();
+    }
   }
   const resetActionPointers=[];
   function clearInput() {
@@ -1733,7 +1765,7 @@
         p.onIce=p.on && ledge.kind==='ice';
         if(p.on && ledge.kind==='barrel' && held('technique')) {p.vx=p.facing*440;p.vy=-610;p.grapple=.35;p.on=false;}
         if(p.on && ledge.kind==='pogo' && (held('technique') || held('jump'))) {p.vy=-590;p.on=false;}
-        if (ledge.kind === 'spring') {p.vy=-565;p.on=false;}
+        if (ledge.kind === 'spring') {p.vy=-565;p.on=false;playCue(160,570,.17);}
         if (p.on && ledge.kind === 'belt') p.surfaceDrift=index===3 ? 120 : index===20 ? 95 : 75;
         if (p.on && ledge.kind === 'current' && index!==2) p.surfaceDrift=-65;
         if (p.on && ledge.kind === 'lift' && held('jump')) {p.vy=-560;p.on=false;}
@@ -2029,6 +2061,7 @@
     if (!shielded && !boss.grace && (attack || stomp || rush)) {
       boss.health=Math.max(0,boss.health-(attack?.damage||1));
       boss.grace=.65;
+      playCue(boss.health?180:330,boss.health?65:740,.19);
       burst(boss.x,boss.y,'#ffd08a',boss.health?12:22);
       if (attack) attack.life=0;
       if (stomp) {p.vy=p.pogo?-510:-375;p.pogo=false;p.on=false;}
