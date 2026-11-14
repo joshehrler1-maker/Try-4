@@ -661,14 +661,19 @@
       [[0,283,125,'spring'],[166,237,115,'lift'],[321,205,125,'spring']],
       [[0,283,180,'shelf'],[224,239,155,'lift'],[422,273,185,'shelf']]
     ];
-    if(!clearLane && index!==2 && index!==19){
+    if(!clearLane){
       const signature=signatureRoutes[index];
-      const signatureX=start+Math.min(sectionSize-860,1510+stage%3*47);
+      const signatureX=start+Math.max(240,Math.min(
+        stageWidths[stage]-850,sectionSize-860,1510+stage%3*47));
       for(const [slot,[dx,sy,sw,kind]] of signature.entries()){
         const sx=signatureX+dx;
         const height=sy+((stage+slot)%3-1)*8;
         const width=sw+((stage+slot)%2)*10;
-        if(addOptionalLanding(sx,height,width,kind) && slot===1)
+        // Underwater worlds use current-assisted stepping routes; retain
+        // the existing water physics and leave ample swim-through space.
+        const swimKind=(index===2||index===19) && kind==='lift'
+          ? 'current':kind;
+        if(addOptionalLanding(sx,height,width,swimKind) && slot===1)
           crystals.push({x:sx+width/2,y:height-37});
       }
     }
