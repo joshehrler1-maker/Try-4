@@ -242,7 +242,8 @@
       ctx.lineJoin='round';ctx.lineCap='round';
       // A quick on-body hit response from the existing bash state. Reduced
       // motion users retain fully static poses and unmodified collisions.
-      ctx.globalAlpha=1-m.hit*.22;
+      const priorAlpha=Number.isFinite(ctx.globalAlpha)?ctx.globalAlpha:1;
+      ctx.globalAlpha=priorAlpha*(1-m.hit*.22);
       ctx.translate(m.hit*-1.5,0);
       design(ctx,m);
     }finally{
