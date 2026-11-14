@@ -955,7 +955,21 @@
     const oldX=p.x;
     const surfaceDrift=p.on ? p.surfaceDrift||0 : 0;
     p.grapple=Math.max(0,(p.grapple||0)-dt);
-    if (!(power === 'dash' && p.power > .22) && !p.grapple && !p.wallLock) p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
+    if (!(power === 'dash' && p.power > .22) && !p.grapple && !p.wallLock) {
+      if(index===3){
+        // Clocktower Relay's Sonic-inspired identity: momentum is earned,
+        // braking is deliberate, and airborne steering has less authority.
+        // Spin launches remain governed by the existing spin logic above.
+        const current=Math.abs(p.vx);
+        const sameDirection=steer && Math.sign(p.vx)===steer;
+        const sonicTarget=steer*topSpeed*(sameDirection && current>topSpeed*.72?1.12:1);
+        const traction=p.on?(steer?(sameDirection?3.3:7.6):1.75)
+          :(steer?1.8:.12);
+        p.vx+=(sonicTarget-p.vx)*Math.min(1,dt*traction*controlFactor);
+      }else{
+        p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
+      }
+    }
     p.x = Math.max(30,Math.min(finish+770,p.x+(p.vx+surfaceDrift)*dt));
     if(index===14 && !p.morphed) for(const t of tunnels) {
       if(p.y+22<t.y) continue;
