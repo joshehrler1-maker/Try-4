@@ -1007,6 +1007,21 @@
         // velocity changes to preserve rhythmic obstacle timing.
         const beatTarget=Math.max(topSpeed*.85,topSpeed);
         p.vx+=(beatTarget-p.vx)*Math.min(1,dt*acceleration*1.35);
+      }else if(index===9){
+        // Quarry Rescue: grounded cable-platformer with intentional
+        // takeoff and restrained air steering while grappling.
+        const cableGrip=p.grapple?0.38:(p.on?1.2:.67);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*cableGrip);
+      }else if(index===10){
+        // Sunset Wind Sail: floaty wind-assisted platforming, retaining
+        // horizontal drift between airborne course corrections.
+        const sailGrip=p.on?1.08:(steer?.64:.3);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*sailGrip);
+      }else if(index===12){
+        // Thunder Harbor: committed, weighty action-platforming movement
+        // and less forgiving mid-jump direction changes.
+        const harborGrip=p.on?(reversing?1.12:1.2):(reversing?.54:.76);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*harborGrip);
       }else{
         p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
       }
