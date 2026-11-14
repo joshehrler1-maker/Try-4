@@ -5289,8 +5289,17 @@
     // arrangement for each world; this is visual, not extra hit points.
     const plates=basePlates+variantPlate+(armorChapter>=3?1:0);
     ctx.save();
-    ctx.translate(at.x,at.y-17);
+    // Foundry enemies breathe, brace, and recoil as articulated armor units.
+    // The movement is visual-only: collision positions and gameplay stay fixed.
+    const foundryMotion=index===0 && !reducedMotion;
+    const motionTime=foundryMotion?performance.now()/1000:0;
+    const motionPhase=motionTime*5+(Number(foe.x)||0)*.035;
+    const groundedMotion=foundryMotion && !airborne;
+    const motionBob=groundedMotion?Math.sin(motionPhase)*1.4:0;
+    const motionLean=foundryMotion?Math.sin(motionPhase*.65)*.035:0;
+    ctx.translate(at.x,at.y-17+motionBob);
     ctx.scale(faceLeft?-1:1,1);
+    if(foundryMotion)ctx.rotate(motionLean);
     ctx.lineJoin='round';
     ctx.lineWidth=1.2;
     ctx.strokeStyle=enemyCueColors[index];
@@ -5551,8 +5560,63 @@
           4+stride*4,1.2,0,0,Math.PI*2);ctx.fill();
       }
     }
-    // No detached overhead circles, arches or U-shaped motion ornaments.
-    // All new limb art is anchored directly to the enemy body.
+    // Distinct secondary motion families: flicker, sweep, orbit, pulse, sparkle.
+    if(index===0 && !airborne){
+      // Ember Foundry: paired piston legs remain connected to the chassis.
+      // Gait is driven by the enemy's existing distance-based foot cycle.
+      const gait=foe._gait||0;
+      ctx.globalAlpha=.78;
+      ctx.lineWidth=3.2;
+      for(let leg=0;leg<2;leg++){
+        const side=leg===0?-1:1;
+        const swing=Math.sin(gait+leg*Math.PI)*stride*5;
+        const lift=Math.max(0,Math.cos(gait+leg*Math.PI))*stride*4;
+        // Bracing spreads the feet before firing; both legs stay grounded.
+        const brace=firing?side*3:0;
+        ctx.beginPath();
+        ctx.moveTo(side*12,-16);
+        ctx.quadraticCurveTo(side*15+swing*.55+brace*.5,-9,side*14+swing+brace,-2-lift);
+        ctx.lineTo(side*14+swing+brace+direction*5,-2-lift);
+        ctx.stroke();
+      }
+      // Articulated forge-claw attack: shoulder, elbow and claw sweep
+      // follow the enemy's firing state rather than looping continuously.
+      // Blend between locomotion and striking instead of snapping the arm.
+      // Clamp elapsed time so a background-tab resume cannot jump the pose.
+      const poseNow=performance.now();
+      const poseDelta=Math.min(.05,Math.max(0,(poseNow-(foe._foundryPoseAt||poseNow))/1000));
+      foe._foundryPoseAt=poseNow;
+      const targetAttack=firing?1:0;
+      const previousAttack=Number.isFinite(foe._foundryAttackBlend)?foe._foundryAttackBlend:0;
+      foe._foundryAttackBlend=previousAttack+(targetAttack-previousAttack)*(1-Math.exp(-poseDelta*(firing?18:9)));
+      const attackBlend=foe._foundryAttackBlend;
+      const attackReach=2+stride*2+attackBlend*(7+Math.sin(phase*2)*3);
+      const shoulderX=direction*14;
+      ctx.lineWidth=3.6;
+      ctx.beginPath();
+      ctx.moveTo(shoulderX,-28);
+      ctx.quadraticCurveTo(direction*(19+attackReach*.45),-24,
+        direction*(22+attackReach),-17);
+      ctx.stroke();
+      ctx.lineWidth=2.5;
+      ctx.beginPath();
+      ctx.moveTo(direction*(22+attackReach),-17);
+      ctx.lineTo(direction*(28+attackReach),-22);
+      ctx.moveTo(direction*(22+attackReach),-17);
+      ctx.lineTo(direction*(29+attackReach),-13);
+      ctx.stroke();
+    }else if(family===0){
+      ctx.beginPath();ctx.moveTo(-8,-38);ctx.quadraticCurveTo(-15+Math.sin(phase)*4,-48,-4,-54);ctx.stroke();
+    }else if(family===1){
+      ctx.beginPath();ctx.moveTo(-20,-30);ctx.quadraticCurveTo(0,-43+Math.sin(phase)*5,20,-30);ctx.stroke();
+    }else if(family===2){
+      ctx.beginPath();ctx.ellipse(0,-26,24,6+Math.sin(phase)*2,0,0,Math.PI*2);ctx.stroke();
+    }else if(family===3){
+      ctx.beginPath();ctx.arc(0,-26,19+Math.sin(phase)*2,Math.PI*1.12,Math.PI*1.88);ctx.stroke();
+    }else{
+      for(let n=0;n<3;n++){const a=phase+n*2.094;ctx.beginPath();
+        ctx.arc(Math.cos(a)*22,-27+Math.sin(a)*14,1.5,0,Math.PI*2);ctx.fill();}
+    }
     ctx.restore();
   }
   function drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing){
