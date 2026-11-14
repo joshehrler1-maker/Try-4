@@ -5508,16 +5508,24 @@
     for(const side of [-1,1]){
       const hip=at.x+side*13,shoulder=at.x+side*20;
       const flightCycle=Math.sin(animTime*(4.2+index%5*.55)+foe.offset+side);
+      // A stance/swing gait uses the travel phase rather than a second
+      // wall-clock oscillator. This keeps the feet synchronized to the
+      // enemy's actual speed, with smooth lift and a longer planted phase.
+      const legPhase=phase+(side===1?Math.PI:0);
+      const cycle=(legPhase/(Math.PI*2)%1+1)%1;
+      const inSwing=cycle>=.60;
+      const progress=inSwing?(cycle-.60)/.40:cycle/.60;
+      const ease=progress*progress*(3-2*progress);
+      const footTravel=inSwing?(-1+2*ease):(1-2*ease);
+      const footLift=inSwing?Math.sin(Math.PI*progress)*5.5*poseKnee*gaitBlend:0;
       const legSwing=airborne?flightCycle*(aerialWorld?7:5):
-        swing*side*9*poseStride*chapterWeight;
+        footTravel*9*poseStride*chapterWeight*gaitBlend;
       const kneeX=hip+legSwing*.65;
-      const kneeY=at.y+4+(airborne?-5:Math.abs(swing)*2*poseKnee);
-      const footX=kneeX+legSwing*.45+dir*3-
-        (!airborne && Math.max(0,-side*swing)>.25?legSwing*.2:0);
-      // Plant the support foot while the opposite paw lifts; preserve a
-      // steady contact point rather than making both feet skate together.
-      const support=Math.max(0,side*gaitContact);
-      const footY=at.y+18-(airborne?7+Math.max(0,flightCycle)*3:support*5*poseKnee);
+      const kneeY=at.y+4+(airborne?-5:footLift*.45);
+      const footX=kneeX+legSwing*.45+dir*3;
+      // One paw supports the body while the other lifts; easing removes
+      // abrupt snaps at the start and end of every step.
+      const footY=at.y+18-(airborne?7+Math.max(0,flightCycle)*3:footLift);
       ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
       ctx.beginPath();ctx.moveTo(hip,at.y-6);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
       ctx.strokeStyle=armor;ctx.lineWidth=radius;
