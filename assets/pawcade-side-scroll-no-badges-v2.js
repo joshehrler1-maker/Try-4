@@ -3332,16 +3332,20 @@
     const count=foreground?9:17;
     for(let i=0;i<count;i++){
       const seed=i+(foreground?19:0);
-      const x=((seed*137+clock*drift-camera*(foreground ? .72 : .36))%width+width)%width;
-      const y=((seed*73+clock*rise)%height+height)%height;
+      // Wrap with a small overscan margin to keep large wisps, leaves and
+      // wind streaks from visibly popping at the screen edge.
+      const margin=12;
+      const spanX=width+margin*2;
+      const spanY=height+margin*2;
+      const x=((seed*137+clock*drift-camera*(foreground ? .72 : .36))%spanX+spanX)%spanX-margin;
+      const y=((seed*73+clock*rise)%spanY+spanY)%spanY-margin;
       const radius=foreground?2+seed%3:1+seed%2;
       ctx.globalAlpha=(foreground ? .18 : .34)*(.65+.35*Math.sin(clock*1.8+seed));
-      // First five worlds have distinct low-cost atmospheric silhouettes:
-      // Foundry embers, Library dust, Coral bubbles, Clocktower sparks, Garden pollen.
-      // Use the existing particle budget and keep these visuals non-collidable.
+      // All 25 worlds have low-cost, theme-specific atmosphere silhouettes.
+      // Reuse the existing particle budget; visuals never affect collisions.
       ctx.beginPath();
       if(index===0){ // drifting cinders rise and taper
-        const emberY=((y-clock*(foreground?10:6))%height+height)%height;
+        const emberY=((y-clock*(foreground?10:6)+margin)%spanY+spanY)%spanY-margin;
         ctx.moveTo(x,emberY-radius*2);
         ctx.lineTo(x+radius*.75,emberY+radius);
         ctx.lineTo(x-radius*.75,emberY+radius);
