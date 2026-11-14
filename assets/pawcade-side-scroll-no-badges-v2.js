@@ -5804,15 +5804,18 @@
     ctx.save();
     // Foundry enemies breathe, brace, and recoil as articulated armor units.
     // The movement is visual-only: collision positions and gameplay stay fixed.
-    const foundryMotion=index===0 && !reducedMotion;
-    const motionTime=foundryMotion?clock:0;
-    const motionPhase=motionTime*5+(Number(foe.x)||0)*.035;
-    const groundedMotion=foundryMotion && !airborne;
-    const motionBob=groundedMotion?Math.sin(motionPhase)*1.4:0;
-    const motionLean=foundryMotion?Math.sin(motionPhase*.65)*.035:0;
+    // Shared articulated armor motion with a different cadence in each world.
+    // Animation is cosmetic and follows the simulation clock (including pause).
+    const armorMotion=!reducedMotion;
+    const motionTime=armorMotion?clock:0;
+    const worldCadence=3.4+(index%5)*.48;
+    const motionPhase=motionTime*worldCadence+(Number(foe.x)||0)*.035;
+    const groundedMotion=armorMotion && !airborne;
+    const motionBob=groundedMotion?Math.sin(motionPhase)*(0.65+(index%4)*.22):0;
+    const motionLean=armorMotion?Math.sin(motionPhase*.65)*(.018+(index%3)*.006):0;
     ctx.translate(at.x,at.y-17+motionBob);
     ctx.scale(faceLeft?-1:1,1);
-    if(foundryMotion)ctx.rotate(motionLean);
+    if(armorMotion)ctx.rotate(motionLean);
     ctx.lineJoin='round';
     ctx.lineWidth=1.2;
     ctx.strokeStyle=enemyCueColors[index];
