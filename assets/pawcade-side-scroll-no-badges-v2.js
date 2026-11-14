@@ -2391,7 +2391,7 @@
       const nextBeat=stage===sections-1 ? ending : (stage%2===0 ? epilogue : prologue);
       status(chapters[stage] + ' · ' + nextBeat + (checkpointSaved ? ' · Checkpoint saved.' : ' · Could not save this checkpoint.'));
       hud();
-      if(index===0 && stage<foundryStory.length-1 && showFoundryStory(stage)) return;
+      if(index===0 && (stage<6 || stage===sections-1) && showFoundryStory(stage<6 ? stage : 7)) return;
     }
     if (roundstone && chapter===2) {
       const rock=roundstone;
@@ -8479,13 +8479,14 @@
     ['Tracks in the ash','Boot prints cross the cinder hills. The bell keeper made it this far before the furnace crab broke loose.'],
     ['A bridge above the fire','A voice calls from beyond the suspended bridges. Whisker answers and takes the high route.'],
     ['The cooling banks','Whisker spots the keeper’s dropped wrench beside a cooling channel. The furnace controls are close.'],
-    ['Into Furnace Keep','The keeper is trapped behind the bell platform. Whisker braces as the furnace crab blocks the last crossing.'],
-    ['The all-clear','The keeper rings the bell again. Across the foundry, the crew answers with a cheer.']
+    ['Into Furnace Keep','A brass panel in Furnace Keep shows a maintenance route to the bell. Whisker heads deeper into the foundry.'],
+    ['The all-clear','The keeper rings the bell again. Across the foundry, the crew answers with a cheer.'],
+    ['The furnace crown','At the last crossing, Whisker hears the keeper behind the bell platform. The foundry’s final guard stands between them.']
   ];
   let storyDialog, storyFrame;
   const foundryShots=[
     [0,.20,.28,'#ffad65'],[1,.64,.32,'#ffd189'],[2,.35,.58,'#ec8b65'],
-    [3,.78,.34,'#ffae73'],[4,.42,.63,'#a9ddd9'],[5,.70,.24,'#ff754b'],[6,.51,.31,'#ffdb8c']
+    [3,.78,.34,'#ffae73'],[4,.42,.63,'#a9ddd9'],[5,.70,.24,'#ff754b'],[6,.51,.31,'#ffdb8c'],[7,.66,.39,'#ff9360']
   ];
   function playFoundryShot(scene) {
     const [,focusX,focusY,tint]=foundryShots[scene];
