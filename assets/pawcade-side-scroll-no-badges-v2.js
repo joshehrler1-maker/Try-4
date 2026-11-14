@@ -4610,6 +4610,11 @@
       [.9,.8,1.4,1.35]
     ];
     const [strideScale,armScale,kneeScale,massScale]=enemyRigProfiles[index];
+    // Stage-specific silhouettes progress without reusing the same cadence
+    // throughout six chapters of any individual adventure.
+    const chapterRigScale=1+Math.min(5,Math.max(0,chapter))*.035;
+    const foePhase=((foe.offset||0)%6.283+6.283)%6.283;
+    const enemyStrideVariant=.88+foePhase/6.283*.24;
     // Reference-inspired animation families: fast ground threats emphasize
     // acceleration, shooters brace their arms, underwater foes paddle, and
     // aerial foes tuck their legs. All remain original game artwork.
@@ -4618,7 +4623,7 @@
     const aerialWorld=[5,6,10,15,23].includes(index);
     const combatWorld=[0,4,12,16,21,24].includes(index);
     const chapterWeight=1+Math.min(5,Math.max(0,chapter))*.045;
-    const poseStride=strideScale*(speedWorld?1.22:waterWorld?.55:1);
+    const poseStride=strideScale*chapterRigScale*enemyStrideVariant*(speedWorld?1.22:waterWorld?.55:1);
     const poseArm=armScale*(combatWorld?1.22:waterWorld?1.4:1);
     const poseKnee=kneeScale*(aerialWorld?.55:1);
     const mechanical=[4,12,16,20,24].includes(index);
