@@ -2394,6 +2394,18 @@
       return {x:patrolX(foe.x+drift*enemyReach*.7),
         y:foe.y-enemyRise*(.45+.35*float)};
     }
+    if(index===1 && foe.libraryEnemy===undefined){ // Moonlit Library: deliberate sentry pauses
+      const aim=Math.sin(t*.8);
+      return {x:patrolX(foe.x+Math.sign(aim)*Math.max(0,Math.abs(aim)-.3)*enemyReach*.65),y:foe.y};
+    }
+    if(index===2 && foe.reefEnemy===undefined){ // Coral Courier: reef schools swim in waves
+      return {x:patrolX(foe.x+Math.sin(t*.9)*enemyReach*.75),
+        y:foe.y+Math.sin(t*1.3+foe.offset)*enemyRise*.55};
+    }
+    if(index===3 && foe.clockEnemy===undefined){ // Clocktower Relay: accelerating patrol arcs
+      const burst=Math.sin(t*1.4);
+      return {x:patrolX(foe.x+Math.sign(burst)*Math.abs(burst)**.6*enemyReach),y:foe.y};
+    }
     // More course-specific enemy traversal, inspired by each game's
     // pacing rather than copying any counterpart's character or map.
     if(index===6){ // Lantern Festival: grounded hoppers return to their platforms
