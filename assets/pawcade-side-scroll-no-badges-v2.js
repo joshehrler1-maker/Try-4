@@ -712,6 +712,7 @@
       const beatOrder=worldBeatOrders[index];
       // World mechanics palette batch 1.
       // World mechanics palette batch 2.
+      // World mechanics palette batch 3.
       const chapterBeat=beatOrder[stage%beatOrder.length];
       for(const [slot,[dx,sy,sw,kind]] of (signatureFits?signature:[]).entries()){
         const sx=signatureX+dx;
