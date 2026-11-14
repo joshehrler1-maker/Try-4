@@ -566,9 +566,10 @@
       if(player.altWeapon) for(const vy of [-105,105]) attacks.push({x:player.x,y:player.y,v:player.facing*speed,vy,life});
     }
   }
+  const fullChargeTime = .65;
   function releaseAction(fire) {
     if (movement!=='buster' || player.chargeStart===null || held('action')) return;
-    const charged=clock-player.chargeStart>=.65;
+    const charged=clock-player.chargeStart>=fullChargeTime;
     player.chargeStart=null;
     if (fire && phase==='playing') attacks.push({
       x:player.x,y:player.y,v:player.facing*(charged?850:680),life:.85,radius:charged?22:8,damage:charged?2:1
@@ -2641,7 +2642,7 @@
       ctx.restore();
     }
     if(p.chargeStart!==null){
-      const charge=Math.min(1,(clock-p.chargeStart)/.65);
+      const charge=Math.min(1,(clock-p.chargeStart)/fullChargeTime);
       const x=p.x+p.facing*22;
       const y=p.y-7;
       const radius=6+charge*10;
@@ -2652,6 +2653,16 @@
       ctx.shadowBlur=0;
       ctx.strokeStyle='#c6f5ff';
       ctx.beginPath();ctx.arc(x,y,radius,-Math.PI/2,-Math.PI/2+charge*Math.PI*2);ctx.stroke();
+      if(index===1){
+        const meterX=p.x-16;
+        const meterY=p.y-40;
+        ctx.fillStyle='#12182c';
+        ctx.fillRect(meterX-2,meterY-2,36,9);
+        ctx.fillStyle='#40536e';
+        ctx.fillRect(meterX,meterY,32,5);
+        ctx.fillStyle=charge===1?'#fff1b5':'#85dcff';
+        ctx.fillRect(meterX,meterY,32*charge,5);
+      }
       ctx.restore();
     }
 
