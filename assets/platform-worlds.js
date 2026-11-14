@@ -1044,3 +1044,6 @@ window.pawtopiaRooms.seedTopsail = [[0,326,330],[377,287,165,"spring"],[590,237,
 
 // A stable recovery deck breaks up the two chains of falling lifts.
 window.pawtopiaRooms.eggDonuts = [[0,326,385],[415,284,164,"drop"],[604,251,150,"drop"],[778,228,194,"drop"],[1010,255,165],[1208,285,205,"drop"],[1450,263,205,"drop"],[1705,326,495]];
+
+// Stilt Patrol climbs above its floor route before descending to the exit.
+window.pawtopiaRooms.eggStilts = [[0,326,2200],[350,282,245],[651,236,228],[935,189,260],[1252,144,236],[1544,203,232],[1830,268,225]];
