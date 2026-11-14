@@ -1108,7 +1108,7 @@
       playCue(220,390,.09);
       player.coyote=0;
       player.jumpBuffer=0;
-      player.jumpCut=power!=='swim';
+      player.jumpCut=power!=='swim' && movement!=='beat';
       player.jumpAge=0;
     }
   }
@@ -1176,12 +1176,21 @@
       const life = movement==='whip' ? .24 : movement==='beat' && onBeat ? .72 : power==='throw' ? .8 : .36;
       const projectile={x:player.x,y:player.y,v:player.facing*speed,life};
       if(index===8) projectile.accent=onBeat;
+      if(index===19 && held('up')){
+        projectile.v*=.7;
+        projectile.vy=-speed*.7;
+      }
       if(index===21 && movement==='whip'){
         projectile.whip=true;
         projectile.originX=player.x;
         projectile.originY=player.y;
       }
       if(index===13 && power==='throw') projectile.motionTrail='lob';
+      if(index===17 && power==='throw'){
+        projectile.v=player.facing*490;
+        projectile.vy=-140;
+        projectile.gravity=380;
+      }
       if(index===13 && power==='throw' && held('up')){
         projectile.v=player.facing*460;
         projectile.vy=-285;
@@ -1193,7 +1202,9 @@
       }
       attacks.push(projectile);
       playCue(470,180,.085);
-      if(player.altWeapon) for(const vy of [-105,105]) attacks.push({x:player.x,y:player.y,v:player.facing*speed,vy,life});
+      if(player.altWeapon) for(const offset of [-105,105]) {
+        attacks.push({x:player.x,y:player.y,v:projectile.v,vy:(projectile.vy||0)+offset,life});
+      }
     }
   }
   const fullChargeTime = .65;
@@ -1915,7 +1926,7 @@
     if(p.cable){
       if(index===9){
         const reel=Number(held('down'))-Number(held('up'));
-        p.cable.length=Math.max(42,Math.min(p.cable.maxLength,p.cable.length+reel*150*dt));
+        p.cable.length=Math.max(42,Math.min(p.cable.maxLength,p.cable.length+reel*(reel<0?185:150)*dt));
       }
       const dx=p.x-p.cable.x,dy=p.y-p.cable.y;
       const distance=Math.hypot(dx,dy);
