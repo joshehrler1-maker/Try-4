@@ -1,6 +1,28 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
 
+## Batch 14 — ten original 3D mesh enemy families playable on opt-in
+
+**Expansion:** The 3D mesh engine now includes **10 separate original low-detail 3D enemy model/pose assemblies**, one for each adventure 1–10. They are real shaded WebGL triangles and can be sampled in `enemy-3d-prototype.html`; each model keeps its own appearance, proportions, dimensional parts and motion. Five newly created variants in this batch:
+
+| Game | 3D low-detail prototype | Movement/shape distinction |
+| --- | --- | --- |
+| 06 Waterfall Climb | Mist Glider | Water body, two animated airfoils and trailing droplets, no artificial walking legs |
+| 07 Lantern Festival | Lantern Juggler | Dimensional silk sleeves, hopping legs and three suspended lanterns |
+| 08 Crystal Polarity | Flux Beetle | Four separately articulated magnetic feet, shield plates and protruding polarity actuator |
+| 09 Stage Beat | Bass Bouncer | Layered resonant drum face, planted foot pads and paired beat hammers |
+| 10 Quarry Rescue | Slate Burrower | Heavy stacked quarry plates, fixed turret base and two short drill mechanisms |
+
+**Live game feature:** The **3D enemy preview** HUD button is now offered for games **1–10**. It remains **off by default**, so touch controls and the previously authored individually styled 2.5D enemies remain the baseline. When enabled on a WebGL-capable phone, one low-resolution transparent offscreen WebGL renderer renders up to **two original game-specific 3D base enemies per gameplay frame** (including visual-only attack/recoil/locomotion), composited into the existing Canvas world at the original enemy world coordinates. Existing collision, enemy AI, stage geometry, player movement, hitboxes, checkpoints and score are **not modified**.
+
+**Performance/safety controls:** The renderer allocates only a 160×160 offscreen buffer, never a full-frame 3D context. It automatically disables itself and restores original 2D art after sustained slow frame timing, an exception, unsupported WebGL, or toggle-off/page exit. Original first-four-game specialist enemies stay with their individually authored sprite/rig art. Reduced-motion users receive static poses. There is no network dependency, cloud GPU call or paid service.
+
+**QA gates:** Source regression checks cover 10 individual mesh families and model pose samples, finite triangle coordinates, alpha compositing, site script load order, no overlay floor textures, maximum sprite budget, original per-game art fallback and WebGL buffer cleanup. **Automated checks alone cannot demonstrate good appearance or FPS on the user's Android.** No device capture, screenshot, visual counterpart-by-counterpart review or performance benchmark was completed by this work. The models are **not** finished feature-film-quality/approved 3D rigs or movie assets; replacing the art for every enemy variant and moving full 3D environments into the games is still a large outstanding effort.
+
+**Versioned artifacts:** `assets/animation/enemy-3d-prototype-v1.js?v=3d-ten-79f7903`, `assets/pawcade-side-scroll-no-badges-v2.js?v=live-3d-10-944aa48`, `enemy-3d-prototype.html`, `pawcade-side-scroll.html`, and matching `sw.js` cache. Source changes were pushed; latest GitHub Pages deployment status should be consulted separately before claiming this specific batch is visible to every device.
+
+
+
 ## Batch 13 — opt-in real 3D enemies inside playable games (games 1–5)
 
 **Source changes:** The first five 2.5D games can now opt into *actual 3D-rendered enemy models inside the gameplay canvas*, not just the separate studio. This is a **low-detail original-model preview**, not production-quality feature-film 3D art, and does **not** change any game mechanics. The site now has a **3D enemy preview: Off/On** HUD switch, visible only while playing games 1–5; **off by default**.
