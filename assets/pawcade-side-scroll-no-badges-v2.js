@@ -61,7 +61,7 @@
   const descriptions = {
     stomp:index===0?'Land on enemies to bounce. Hold Jump for a higher rebound.':'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim. Charge into enemies from the front. Surface or visit a bubbling vent for air',
     dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
-    throw:index===13?'Throw a crystal with Action. Hold the joystick up or use W/Up to arc the throw':'Press Action to throw a crystal', flip:index===7?'Press Flip (X or Space on keyboard) while on the floor or ceiling to reverse gravity':'Press Action to reverse gravity',
+    throw:index===13?'Throw a crystal with Action. Hold the joystick up or use W/Up to arc the throw':'Press Action to throw a crystal', flip:index===7?'Press Flip (X or Space on keyboard) while on the floor or ceiling to reverse gravity. Floor and ceiling spikes send you back to the chapter checkpoint':'Press Action to reverse gravity',
     pulse:'Press Action to release a shockwave', grapple:'Press Action below an overhead rail to attach. Steer to swing. In Quarry Rescue, steer up to reel in or down to extend the cable. Press Release Cable to let go',
     double:'Jump again in midair', shield:'Hold Action to deflect hazards',
     photo:'Press Action to stun enemies with a flash', bubble:'Hold Action to float'
@@ -1879,7 +1879,7 @@
       }
       if (ledge.kind==='hazard') {
         if (p.y+body>ledge.y && p.y-body<ground) {
-          if(movement==='beat'){respawn();return;}
+          if(movement==='beat' || index===7){respawn();return;}
           if (hit()) return;
         }
         continue;
