@@ -1727,6 +1727,37 @@
       ctx.scale(1+squash*.65,p.morphed ? .64 : 1-squash);
       ctx.translate(-p.x,-feet);
     }
+    // The actual character pose now responds to the performed move, not
+    // just a decorative effect drawn over an idle/running sprite.
+    // Transform around the feet to keep landing alignment and hitboxes intact.
+    if(!reducedMotion){
+      const pivotY=p.y+22;
+      let tilt=0,scaleX=1,scaleY=1;
+      if(rolling){
+        tilt=clock*(index===3?17:12)*p.facing;
+        scaleX=.84;scaleY=.84;
+      } else if(rushing){
+        tilt=-p.facing*(movement==='airdash'?.34:.22);
+        scaleX=1.12;scaleY=.88;
+      } else if(attacking){
+        const strike=Math.sin(clock*22);
+        tilt=p.facing*(.11+strike*.16);
+        scaleX=1.06;scaleY=.96;
+      } else if(p.cable && !p.on){
+        tilt=Math.max(-.32,Math.min(.32,p.vx/900));
+      } else if(!p.on){
+        tilt=p.vy<0 ? -p.facing*.09 : p.facing*.1;
+        scaleX=p.vy<0?.94:1.04;
+        scaleY=p.vy<0?1.06:.97;
+      } else if(Math.abs(p.vx)>45){
+        tilt=p.facing*Math.min(.13,Math.abs(p.vx)/4200);
+      }
+      if(p.morphed){scaleX*=1.18;scaleY*=.77;}
+      ctx.translate(p.x,pivotY);
+      ctx.rotate(tilt);
+      ctx.scale(scaleX,scaleY);
+      ctx.translate(-p.x,-pivotY);
+    }
     ctx.globalAlpha=p.grace && Math.floor(clock*12)%2?.55:1;
     const roster = ['Bolt','Ivy','Frost','Melody','Stone','Spark','Shadow'];
     const rosterIndex = roster.indexOf(hero);
