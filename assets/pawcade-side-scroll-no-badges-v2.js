@@ -560,13 +560,19 @@
           // Compare only foes on the same walking surface; swimmers use
           // their own authored vertical movement and must remain exempt.
           const minimumGap=Math.min(60,Math.max(28,w/(count+1)*.45));
-          if(!foe.reefEnemy && enemies.some(other=>
-            !other.reefEnemy && Math.abs(other.y-foe.y)<8 &&
+          if(foe.reefEnemy===undefined && enemies.some(other=>
+            other.reefEnemy===undefined && Math.abs(other.y-foe.y)<8 &&
             Math.abs(other.x-foe.x)<minimumGap)) continue;
           enemies.push(foe);
         }
       }
-      if(x>0) crystals.push({x:start+x+w*.58,y:y-35});
+      if(x>0) {
+        // Keep pickup order stable for existing checkpoint saves.
+        const overhead=kind==='ceiling' || kind==='rail';
+        const danger=kind==='hazard' || kind==='ceilingSpikes';
+        const pickupHeight=overhead ? y+35 : danger ? y-52 : y-35;
+        crystals.push({x:start+x+w*.58,y:pickupHeight});
+      }
     }
     // Optional elevated routes above long, safe ground runs. Each game uses
     // its own width, cadence and elevation profile, inspired by its traversal
