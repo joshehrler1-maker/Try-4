@@ -3819,6 +3819,26 @@
       ctx.moveTo(16,-14);ctx.lineTo(24,-29);ctx.lineTo(5,-19);
     }
     ctx.stroke();
+    // World-specific silhouette hardware: the outline is different in
+    // each of the 25 games, with no image download or extra draw calls.
+    const motif=index%5;
+    ctx.beginPath();
+    if(motif===0){ // foundry / volcanic: vent stacks
+      ctx.rect(-14,-27,6,11);ctx.rect(8,-30,6,14);
+    }else if(motif===1){ // library / mechanical: sensor halo
+      ctx.arc(0,-24,12,Math.PI*1.1,Math.PI*1.9);
+      ctx.moveTo(0,-37);ctx.lineTo(0,-30);
+    }else if(motif===2){ // reef / wind: curved fins
+      ctx.moveTo(-16,-8);ctx.quadraticCurveTo(-29,-24,-24,-33);
+      ctx.moveTo(16,-8);ctx.quadraticCurveTo(29,-24,24,-33);
+    }else if(motif===3){ // clock / geometry: forked prongs
+      ctx.moveTo(-13,-20);ctx.lineTo(-13,-34);ctx.lineTo(-19,-38);
+      ctx.moveTo(13,-20);ctx.lineTo(13,-34);ctx.lineTo(19,-38);
+    }else{ // garden / cargo: shield ridges
+      ctx.moveTo(-18,-12);ctx.lineTo(-24,-22);ctx.lineTo(-17,-29);
+      ctx.moveTo(18,-12);ctx.lineTo(24,-22);ctx.lineTo(17,-29);
+    }
+    ctx.stroke();
     // Each world has its own arrangement of layered, shaded armor panels.
     for(let n=0;n<plates;n++){
       const angle=Math.PI*(1.07+n*.86/Math.max(1,plates-1));
