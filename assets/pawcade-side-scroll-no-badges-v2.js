@@ -1223,7 +1223,19 @@
     }
   }
   function bashTarget(p) {
-    return enemies.find(foe=>!foe.dead && close(p,foePosition(foe),125,65));
+    let nearest=null;
+    let distance=Infinity;
+    for(const foe of enemies){
+      if(foe.dead) continue;
+      const at=foePosition(foe);
+      if(!close(p,at,125,65)) continue;
+      const gap=Math.hypot(p.x-at.x,p.y-at.y);
+      if(gap<distance){
+        nearest=foe;
+        distance=gap;
+      }
+    }
+    return nearest;
   }
   function useTechnique() {
     if (phase!=='playing' || player.techCooldown>0) return;
