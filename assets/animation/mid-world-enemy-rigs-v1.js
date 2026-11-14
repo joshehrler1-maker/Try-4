@@ -36,12 +36,21 @@
     const moving=m.move*(1-m.attack*.72), vault=m.attack*.42;
     const foot1=Math.max(0,m.step)*moving*5;
     const foot2=Math.max(0,-m.step)*moving*5;
-    stroke(ctx,[[-12,-5],[-13+m.step*5*moving,8-foot1],[-13+m.step*8*moving,17-foot1]],
-      '#285943',5);
-    stroke(ctx,[[12,-5],[12-m.step*5*moving,7-foot2],[13-m.step*6*moving,17-foot2]],
-      '#285943',5);
-    ellipse(ctx,-14+m.step*8*moving,18-foot1,8,3,'#8ca56b','#305741');
-    ellipse(ctx,14-m.step*6*moving,18-foot2,8,3,'#8ca56b','#305741');
+    if(m.airborne){
+      // In this game the assigned enemy pattern is a swoop, so tuck both
+      // lower legs in flight instead of drawing a walking contact cycle.
+      stroke(ctx,[[-12,-5],[-19,4],[-14,9]],'#285943',5);
+      stroke(ctx,[[12,-5],[17,5],[11,10]],'#285943',5);
+      ellipse(ctx,-14,10,7,3,'#8ca56b','#305741');
+      ellipse(ctx,11,11,7,3,'#8ca56b','#305741');
+    } else {
+      stroke(ctx,[[-12,-5],[-13+m.step*5*moving,8-foot1],[-13+m.step*8*moving,17-foot1]],
+        '#285943',5);
+      stroke(ctx,[[12,-5],[12-m.step*5*moving,7-foot2],[13-m.step*6*moving,17-foot2]],
+        '#285943',5);
+      ellipse(ctx,-14+m.step*8*moving,18-foot1,8,3,'#8ca56b','#305741');
+      ellipse(ctx,14-m.step*6*moving,18-foot2,8,3,'#8ca56b','#305741');
+    }
     // Pole foot remains planted when striking; angular change is at the hands.
     ctx.save();ctx.translate(20,11);ctx.rotate(-vault);
     ctx.fillStyle='#d2c98b';ctx.fillRect(-3,-42,6,52);
@@ -222,13 +231,19 @@
       t:reduced?0:Number(pose.clock)||0,
       offset:Number(foe.offset)||0,
       step:reduced?0:Math.sin(gait*([15,16,17,18,19].indexOf(index)*.13+.83)),
-      turret:Boolean(foe.turret)
+      turret:Boolean(foe.turret),
+      airborne:Boolean(pose.airborne),
+      hit:reduced?0:clamp(pose.hit)
     };
     ctx.save();
     try {
       ctx.translate(at.x,at.y);
       if(pose.faceLeft)ctx.scale(-1,1);
       ctx.lineJoin='round';ctx.lineCap='round';
+      // A quick on-body hit response from the existing bash state. Reduced
+      // motion users retain fully static poses and unmodified collisions.
+      ctx.globalAlpha=1-m.hit*.22;
+      ctx.translate(m.hit*-1.5,0);
       design(ctx,m);
     }finally{
       ctx.restore();
