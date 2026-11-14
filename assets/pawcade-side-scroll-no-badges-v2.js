@@ -4235,14 +4235,15 @@
   }
   // Course-specific accessory silhouettes reference each game's movement style.
   const motionAccessories=[0,3,2,3,1,2,0,3,3,3,2,0,3,1,3,1,0,0,0,3,3,0,1,2,3];
-  function settleAccessory(actor, clock, angle, weight){
+  function settleAccessory(actor, clock, angle, weight, facing){
     const previous=actor.accessoryPose;
     if(!previous || clock<previous.time || clock-previous.time>.15){
-      return actor.accessoryPose={time:clock,angle,weight};
+      return actor.accessoryPose={time:clock,angle,weight,facing};
     }
     const blend=1-Math.exp(-(10+motionAccessories[index]*3)*(clock-previous.time));
     previous.angle+=(angle-previous.angle)*blend;
     previous.weight+=(weight-previous.weight)*blend;
+    previous.facing+=(facing-previous.facing)*blend;
     previous.time=clock;
     return previous;
   }
@@ -6094,8 +6095,8 @@
       if(!reducedMotion){
         const flex=airborne ? motion*.2 : footCycle*movingWeight*.22;
         const trim=settleAccessory(foe,clock,flex+attackPose*.14,
-          airborne?1:Math.min(1,movingWeight+attackPose));
-        drawMotionAccessory(at.x+(faceLeft?14:-14),at.y-4,faceLeft?-1:1,
+          airborne?1:Math.min(1,movingWeight+attackPose),faceLeft?-1:1);
+        drawMotionAccessory(at.x-trim.facing*14,at.y-4,trim.facing,
           trim.angle,9+index%5*2+trim.weight*4,courseMaterials[index][1],trim.weight<.02?0:trim.weight*.95);
       }
       drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
@@ -6690,8 +6691,8 @@
     if(!reducedMotion && !rolling && !p.morphed){
       const drag=Math.max(-.32,Math.min(.32,p.vy/1200));
       const flex=Math.sin(gait)*.12*(p.on?stride:0);
-      const trim=settleAccessory(p,clock,drag+flex,p.on?Math.min(1,stride*2):1);
-      drawMotionAccessory(p.x-p.facing*15,p.y-15,p.facing,
+      const trim=settleAccessory(p,clock,drag+flex,p.on?Math.min(1,stride*2):1,p.facing);
+      drawMotionAccessory(p.x-trim.facing*15,p.y-15,trim.facing,
         trim.angle,11+index%5*2+trim.weight*7,landingTrim[index][0],trim.weight<.02?0:trim.weight*.9);
     }
     let heroDrawn=false;
