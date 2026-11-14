@@ -456,3 +456,39 @@ pawcadeOpeningPlacements.forEach(([platform, x, y, width], index) => {
   const room = window.pawtopiaRoomPlans[index].split(' ')[0];
   window.pawtopiaRooms[room][platform].splice(0, 3, x, y, width);
 });
+
+// Second opening-room pass, in Game Room order. Preserve surface types and save indices.
+const pawcadeOpeningRouteEdits = [
+  [2,825,234,255],
+  [3,900,283,260],
+  [2,760,150,345],
+  [3,1080,193,335],
+  [3,870,211,225],
+  [2,870,197,265],
+  [2,1040,190,305],
+  [3,580,95,255],
+  [3,1060,286,58],
+  [3,1330,245,330],
+  [2,915,215,210],
+  [4,1320,206,325],
+  [2,885,229,290],
+  [2,705,211,170],
+  [2,900,223,310],
+  [2,880,199,300],
+  null,
+  [3,1230,257,310],
+  [2,840,247,270],
+  [2,680,226,285],
+  [3,1380,267,525],
+  [2,880,239,230],
+  [3,1010,256,240],
+  [3,1320,248,325],
+  [3,1205,269,305]
+];
+pawcadeOpeningRouteEdits.forEach((edit,index)=>{
+  // Steamworks uses its own longer catwalk layout in the game renderer.
+  if(!edit) return;
+  const [slot,x,y,width]=edit;
+  const room=window.pawtopiaRoomPlans[index].split(' ')[0];
+  window.pawtopiaRooms[room][slot].splice(0,3,x,y,width);
+});
