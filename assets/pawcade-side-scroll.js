@@ -1022,6 +1022,21 @@
         // and less forgiving mid-jump direction changes.
         const harborGrip=p.on?(reversing?1.12:1.2):(reversing?.54:.76);
         p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*harborGrip);
+      }else if(index===13){
+        // Autumn Trail: gentle, accurate airborne steering for careful
+        // platform landings while the separate egg-aim mechanic stays intact.
+        const trailGrip=p.on?1.18:(reversing?1.08:1.22);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*trailGrip);
+      }else if(index===14){
+        // Inverted Observatory: measured exploration movement and
+        // predictable braking in either gravity orientation.
+        const explorerGrip=p.on?(reversing?1.18:1.02):.82;
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*explorerGrip);
+      }else if(index===15){
+        // Bamboo Village: nimble, flowing traversal and agile aerial
+        // reversals, keeping bash and vine actions separately controlled.
+        const forestGrip=p.on?1.35:(reversing?1.22:1.15);
+        p.vx+=(steer*topSpeed-p.vx)*Math.min(1,dt*acceleration*forestGrip);
       }else{
         p.vx += (steer * topSpeed - p.vx) * Math.min(1,dt*acceleration);
       }
