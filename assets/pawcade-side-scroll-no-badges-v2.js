@@ -309,7 +309,7 @@
     null,
     [[1200,276,104],[1390,221,112],[1580,154,135]],
     null,
-    [[1215,279,148],[1420,235,135],[1610,193,142]],
+    [[1215,279,166],[1420,230,119],[1610,187,158]],
     null,
     [[1190,257,175],[1405,224,145],[1600,255,180]],
     null,
@@ -3923,6 +3923,15 @@
     topLight.addColorStop(1,'#252037');
     ctx.fillStyle=topLight;
     ctx.fill();
+    if(index===17 && kind==='shelf'){
+      ctx.clip();
+      ctx.fillStyle='#d5eff8';
+      ctx.fillRect(x,y-topDepth,w,3);
+      ctx.fillStyle='#8eb9d2';
+      for(let seam=14;seam<w;seam+=18){
+        ctx.fillRect(x+seam,y-topDepth+3,2,topDepth);
+      }
+    }
     ctx.restore();
     // Subtle moving specular highlights give polished materials a sense
     // of volume while keeping the landing line stable and easy to read.
