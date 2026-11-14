@@ -334,7 +334,10 @@
           // can use tighter encounter spacing without changing platforms.
           const spacing=fastCourse?18:combatCourse?6:8;
           const stagger=((index*11+stage*7+slot*3)%5-2)*spacing;
-          const offset=Math.max(30,Math.min(w-30,
+          // Reserve a full body-width at each edge so foes do not spawn
+          // with their feet hanging over narrow or staggered ledges.
+          const edgeMargin=Math.min(38,Math.max(16,w*.2));
+          const offset=Math.max(edgeMargin,Math.min(w-edgeMargin,
             Math.round(w*(encounter+1)/(count+1))+stagger));
           // Deterministic encounter archetypes: different patrol rhythms
           // within each stage, without randomizing checkpoint resumes.
@@ -1589,8 +1592,10 @@
       foe.patrolRight=ledge.x+ledge.w-safeInset;
     } else if(Math.abs(foe.y-(ground-23))<35){
       foe.y=ground-23;
+      // The fallback ground is continuous, but never patrol past a stage
+      // boundary or off the playable course into the exit buffer.
       foe.patrolLeft=Math.max(30,foe.x-48);
-      foe.patrolRight=Math.min(finish+770,foe.x+48);
+      foe.patrolRight=Math.max(foe.patrolLeft,Math.min(finish,foe.x+48));
     }
   }
   // Enemy tempo, horizontal reach, and vertical travel in course order.
