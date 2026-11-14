@@ -7184,14 +7184,19 @@
       foe._landingPose=(foe._landingPose||0)*Math.exp(-9*blendDt);
       const landingPose=reducedMotion?0:foe._landingPose;
       const verticalLean=reducedMotion?0:Math.max(-.045,Math.min(.045,verticalSpeed/9000));
+      // Seed Garden only: springing canopy beetles stretch on ascent and
+      // compress on descent, while preserving their original hitbox/path.
+      const seedLeap=index===4 && enemyPattern==='hopper' && !reducedMotion;
+      const seedAscent=seedLeap?Math.max(0,Math.min(1,-verticalSpeed/280))*.055:0;
+      const seedDescent=seedLeap?Math.max(0,Math.min(1,verticalSpeed/330))*.045:0;
       ctx.save();
       // A distinct animation state for patrolling, hopping, flying and firing.
       ctx.translate(at.x,at.y+19);
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
       else ctx.rotate(enemyLean+attackTilt+verticalLean);
-      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5,
-        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression);
+      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5-seedAscent*.5+seedDescent,
+        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression+seedAscent-seedDescent);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(!reducedMotion){
         const flex=airborne ? motion*.2 : footCycle*movingWeight*.22;
