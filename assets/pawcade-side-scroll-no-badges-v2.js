@@ -3330,13 +3330,13 @@
     ctx.save();
     ctx.fillStyle=color;
     const count=foreground?9:17;
+    // Compute the wrap bounds once per layer, not for every particle.
+    const margin=12;
+    const spanX=width+margin*2;
+    const spanY=height+margin*2;
     for(let i=0;i<count;i++){
       const seed=i+(foreground?19:0);
-      // Wrap with a small overscan margin to keep large wisps, leaves and
-      // wind streaks from visibly popping at the screen edge.
-      const margin=12;
-      const spanX=width+margin*2;
-      const spanY=height+margin*2;
+      // Wrap with overscan to avoid edge popping on mobile screens.
       const x=((seed*137+clock*drift-camera*(foreground ? .72 : .36))%spanX+spanX)%spanX-margin;
       const y=((seed*73+clock*rise)%spanY+spanY)%spanY-margin;
       const radius=foreground?2+seed%3:1+seed%2;
@@ -3373,7 +3373,8 @@
       }else if(index===5){ // Waterfall Climb: mist droplets stretched by falling water
         ctx.ellipse(x,y,radius*.65,radius*1.9,0,0,Math.PI*2);
       }else if(index===6){ // Lantern Festival: glowing lantern motes
-        ctx.roundRect(x-radius,y-radius*1.3,radius*2,radius*2.6,radius*.5);
+        // Basic path geometry works on older Android Canvas implementations.
+        ctx.rect(x-radius,y-radius*1.3,radius*2,radius*2.6);
       }else if(index===7){ // Crystal Polarity: angular charged fragments
         ctx.moveTo(x,y-radius*2);
         ctx.lineTo(x+radius,y);
