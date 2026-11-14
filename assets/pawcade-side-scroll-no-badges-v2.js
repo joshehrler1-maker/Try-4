@@ -683,7 +683,8 @@
       const chapterBeat=beatOrder[stage%beatOrder.length];
       for(const [slot,[dx,sy,sw,kind]] of (signatureFits?signature:[]).entries()){
         const sx=signatureX+dx;
-        const height=sy+((stage+slot)%3-1)*8;
+        const height=sy+((stage+slot)%3-1)*8+
+          (chapterBeat===2?-12:chapterBeat===4?8:0);
         const width=sw+((stage+slot)%2)*10;
         // Underwater worlds use current-assisted stepping routes; retain
         // the existing water physics and leave ample swim-through space.
