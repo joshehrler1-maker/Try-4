@@ -1274,10 +1274,7 @@
       }
       case 'bash': {
         const target=bashTarget(p);
-        if(!target){
-          p.techCooldown=0;
-          break;
-        }
+        if(!target) break;
         const dx=Number(held('right'))-Number(held('left'));
         const dy=Number(held('down'))-Number(held('up'));
         const length=Math.hypot(dx,dy)||1;
@@ -1302,8 +1299,6 @@
           p.jumpCut=false;
           p.grace=Math.max(p.grace,.35);
           if(!reducedMotion) burst(target.x,target.y,'#ff86dc',10);
-        } else {
-          p.techCooldown=0;
         }
         break;
       }
@@ -1334,6 +1329,8 @@
       if(technique==='parry' || technique==='reveal') playCue(520,1020,.16);
       else if(technique==='drop' || technique==='retry') playCue(325,96,.17);
       else playCue(240,510,.13);
+    } else {
+      p.techCooldown=0;
     }
   }
   const pauseButton=byId('side-pause');
