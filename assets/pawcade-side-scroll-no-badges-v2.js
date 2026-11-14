@@ -3266,7 +3266,10 @@
         // The dive is steepest at the center of the flight arc, with a
         // distinct climb afterward rather than a flat sine-wave patrol.
         const flight=Math.sin(t*1.6);
-        const dive=Math.max(0,1-Math.abs(flight));
+        // Smooth the center of each dive to avoid a velocity cusp when
+        // airborne foes pass their lowest point.
+        const center=1-flight*flight;
+        const dive=center*center;
         return {x:patrolX(foe.x+flight*enemyReach),
           y:foe.y-50-Math.cos(t*1.6)*enemyRise+dive*enemyRise*.35};
       }
