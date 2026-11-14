@@ -7070,7 +7070,10 @@
       foe._bodyVelocity=(foe._bodyVelocity||0)+
         (velocityTarget-(foe._bodyVelocity||0))*(1-Math.exp(-7*motionDt));
       const velocityLean=(foe._bodyVelocity||0)*(.035+sway*.65);
-      const footstep=airborne?0:Math.abs(footCycle)*lift*movingWeight;
+      // Smooth stance-to-stride lift to prevent sudden foot pops on patrol starts and stops.
+       const liftTarget=airborne?0:movingWeight;
+       foe._footLiftWeight=(foe._footLiftWeight||0)+(liftTarget-(foe._footLiftWeight||0))*(1-Math.exp(-10*motionDt));
+       const footstep=airborne?0:Math.abs(footCycle)*lift*(foe._footLiftWeight||0);
       // The stride's support phase compresses the torso, while idle breathing
       // fades out as the foe starts moving. Never animate a walking foe in place.
       const strideCompression=airborne?0:
@@ -7080,7 +7083,10 @@
         footCycle*sway*movingWeight+velocityLean+breathing;
       const anticipation=!reducedMotion && enemyPattern==='charge' && nearby && !airborne;
       const bodyStretch=movingWeight*(.018+.012*(index%3))*footCycle;
-      const chargeCompression=anticipation?.07:0;
+      // Ease the charge crouch in and out, avoiding an instantaneous squash.
+       const chargeTarget=anticipation?.07:0;
+       foe._chargeCompression=(foe._chargeCompression||0)+(chargeTarget-(foe._chargeCompression||0))*(1-Math.exp(-9*motionDt));
+       const chargeCompression=reducedMotion?0:foe._chargeCompression;
       // Critically damped pose layers smooth attack anticipation and recovery.
       // Visual-only; enemy AI, hitboxes, timing and damage remain untouched.
       const blendDt=Math.min(.05,Math.max(0,elapsed));
