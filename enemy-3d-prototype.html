@@ -22,13 +22,14 @@ touch-action:pan-y}
 footer{margin:20px 0;color:#a8bad5;font-size:.9rem}
 </style></head>
 <body><main><a href="pawcade-side-scroll.html">← Back to Games Room</a>
-<h1>First Five Enemies — Real 3D Prototype Studio</h1>
-<p class="warning"><strong>Experimental models, not completed game art.</strong>
-These are actual shaded 3D triangle meshes with articulated body pieces for the first
-five Super Paw Heroes enemy families. They are separate concept prototypes,
-<strong>not installed in the 2.5D games</strong>, not feature-film-quality,
-and not yet matched to the approved master visual reference. The existing games
-continue using their original game-specific animated 2.5D artwork.</p>
+<h1>First Ten Enemies — Real 3D Prototype Studio</h1>
+<p class="warning"><strong>Experimental low-detail models, not completed film-quality game art.</strong>
+These are actual shaded 3D triangle meshes with separately moving pieces for ten
+original Super Paw Heroes enemy families. Games 1–10 now offer a <strong>3D enemy preview</strong>
+toggle inside the playable 2.5D Games Room; it is off by default, draws at most two
+eligible enemies per frame and falls back to their original 2D art whenever needed.
+Existing special enemies keep their own designs. The models are not yet approved
+against the master visual reference, are not full 3D environments and are not movies.</p>
 <div class="controls"><label for="enemy">Enemy model:</label>
 <select id="enemy" aria-label="Select experimental 3D enemy model">
 <option value="0">1 · Ember Foundry — Cinder Tongs</option>
@@ -36,6 +37,11 @@ continue using their original game-specific animated 2.5D artwork.</p>
 <option value="2">3 · Coral Courier — Reef Skimmer</option>
 <option value="3">4 · Clocktower Relay — Pendulum Sentinel</option>
 <option value="4">5 · Seed Garden — Thorn Hopper</option>
+<option value="5">6 · Waterfall Climb — Mist Glider</option>
+<option value="6">7 · Lantern Festival — Lantern Juggler</option>
+<option value="7">8 · Crystal Polarity — Flux Beetle</option>
+<option value="8">9 · Stage Beat — Bass Bouncer</option>
+<option value="9">10 · Quarry Rescue — Slate Burrower</option>
 </select>
 <label for="action">Motion:</label><select id="action" aria-label="Choose 3D animation state">
 <option value="idle">Idle</option><option value="move">Travel</option>
@@ -57,7 +63,7 @@ resolution automatically to keep the demonstration inexpensive.</p>
 No imported game models, copyrighted counterpart sprites or downloaded shaders.
 For the playable enemy body illustrations, see
 <a href="enemy-motion-lab.html">Enemy Motion Lab</a>.</footer></main>
-<script src="assets/animation/enemy-3d-prototype-v1.js?v=3d-sprite-5c90e29"></script>
+<script src="assets/animation/enemy-3d-prototype-v1.js?v=3d-ten-79f7903"></script>
 <script>
 (()=>{
 'use strict';
