@@ -929,3 +929,21 @@ for (const [room, slot, x, y, width] of [
 ]) {
   window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
 }
+
+// Submarine Dock and Starship Cargo firing lanes and crossing landings.
+for (const [room, slot, x, y, width] of [
+  ["course19Stage1",2,625,248,355],
+  ["course19Stage2",2,861,216,270],
+  ["course19Stage3",3,1129,189,302],
+  ["course19Stage4",2,853,258,305],
+  ["course19Stage5",3,1215,251,355],
+  ["course19Stage6",3,1280,252,281],
+  ["course24Stage1",2,710,246,350],
+  ["course24Stage2",2,849,239,300],
+  ["course24Stage3",2,815,244,318],
+  ["course24Stage4",3,1139,236,359],
+  ["course24Stage5",3,853,229,315],
+  ["course24Stage6",3,1206,172,323],
+]) {
+  window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+}
