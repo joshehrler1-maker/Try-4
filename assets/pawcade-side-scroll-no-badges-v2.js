@@ -6142,7 +6142,10 @@
       // Stationary turrets and active attacks still aim at their target.
       const walking=travel>.15 && travel<90;
       const aiming=foe.turret || firing;
-      const faceLeft=walking && !aiming ? displacement<0
+      // Foundry crabs must face their walking direction even when attacking.
+      // Their old target-facing override could make moving crabs moonwalk.
+      const foundryCrab=index===0 && foe.foundryEnemy===0;
+      const faceLeft=walking && (foundryCrab || !aiming) ? displacement<0
         : aiming || (nearby && ['turret','charge','pursuit'].includes(enemyPattern))
           ? player.x<at.x
           : (foe.faceLeft??player.x<at.x);
