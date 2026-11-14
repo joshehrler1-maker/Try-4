@@ -1274,7 +1274,10 @@
       }
       case 'bash': {
         const target=bashTarget(p);
-        if(!target) break;
+        if(!target){
+          p.techCooldown=0;
+          break;
+        }
         const dx=Number(held('right'))-Number(held('left'));
         const dy=Number(held('down'))-Number(held('up'));
         const length=Math.hypot(dx,dy)||1;
