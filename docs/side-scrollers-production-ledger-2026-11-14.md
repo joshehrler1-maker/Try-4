@@ -1,6 +1,20 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
 
+## Batch 13 — opt-in real 3D enemies inside playable games (games 1–5)
+
+**Source changes:** The first five 2.5D games can now opt into *actual 3D-rendered enemy models inside the gameplay canvas*, not just the separate studio. This is a **low-detail original-model preview**, not production-quality feature-film 3D art, and does **not** change any game mechanics. The site now has a **3D enemy preview: Off/On** HUD switch, visible only while playing games 1–5; **off by default**.
+
+**Technical integration:** `assets/animation/enemy-3d-prototype-v1.js` gained an opt-in transparent WebGL drawing mode with a fixed **160×160** texture and no ground or opaque rectangular background. `assets/pawcade-side-scroll-no-badges-v2.js` creates one small offscreen GPU renderer only after the user activates the HUD switch. It renders up to **two regular foes per frame**, then composites their 3D mesh image at each foe's existing world position. The hero, 2.5D backgrounds/platforms, combat/collision geometry, spawn times, attack timing and checkpoints are otherwise untouched. No use of a paid API or outside asset CDN.
+
+**Critical independent-art safeguard:** Foundry, Library, Reef and Clock *specialist* enemies continue using the game's prior individually authored stage-enemy art. Only ordinary foes with `usesOriginRig(foe)` are eligible for the 3D experimental preview, keeping enemy variants original rather than replacing them with a generic base. For a GPU-unavailable or overloaded browser, or if the user leaves the preview off, the previously integrated game-specific illustrated 2.5D rig draws instead. On any exception the game auto-restores 2D artwork and the Canvas transform stack. 3D rendering is automatically disabled when frame timing repeatedly exceeds approximately **42 ms**; tab-resume gaps are ignored. The GPU renderer is disposed on toggle-off or pagehide. Original grounded shadows and enemy hitboxes are retained. No game other than indices 0–4 enables WebGL.
+
+**Quality/QA:** A new Node regression test verifies the HUD is opt-in, scripts load in order, the transparent sprite requires `alpha:true` and `preserveDrawingBuffer:true`, all five game-specific 3D mesh builds draw without the standalone preview studio floor, max sprites/frame and low-FPS fallback are bounded, per-enemy specialist art is preserved, and WebGL buffers are disposed on toggle off. Prior two legacy tests had to be updated for the new overlay-specific art guard and the changed asset query version, then CI returned to green. GitHub Pages Actions reported successful deployment through `1690b9179`; subsequent compact Android HUD tweak is pending its own run at the time of this entry.
+
+**Current limits:** The new meshes are basic lit WebGL primitives, **not** the poster-approved feature-film-stylized 3D models; there is no full skinned rig/face system, and not every specialist enemy has a 3D replacement. Only two regular enemies per frame are drawn in 3D to protect phone performance; others use their unique 2D art. This is why the toggle remains **preview/opt-in**. The environment/platforms remain current 2.5D Canvas scenery, not fully modeled 3D. The 25 movies are not finished. Real Android FPS, on-device WebGL output, visual art approval and stage-by-stage collision playthrough are **not verified** by tests or deployments.
+
+
+
 ## Batch 12 — first genuine 3D mesh prototypes for five original enemies
 
 **Real progress:** A separate **WebGL 1 3D enemy prototype studio** was added at `enemy-3d-prototype.html`. It renders actual index-based 3D triangle meshes with vertex normals and directional light — **not flat vector sprites or simulated 3D**. The five different scene descriptions and articulated pose samplers are authored locally in `assets/animation/enemy-3d-prototype-v1.js`. Each enemy has its own fully original parametric primitive assembly, surface colors and animation offsets; no imported or copied counterpart asset or paid dependency.
