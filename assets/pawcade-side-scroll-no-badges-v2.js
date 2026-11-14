@@ -4574,6 +4574,8 @@
     const attackRhythm=[1.0,.75,1.3,1.2,.85,1.1,.7,1.4,1.25,.9,1.15,.8,
       1.35,.95,1.05,.65,1.3,1.1,.8,1.25,.95,1.4,.75,1.15,1.05][index];
     const strikePhase=Math.min(1,reach*attackRhythm);
+    // Brief body-level recoil for confirmed bash states; no overhead markers.
+    const hitRecoil=foe.bashed?Math.sin(clock*18+foe.offset)*.12:0;
     // Each counterpart-inspired adventure gets its own animation silhouette:
     // stride length, arm follow-through, knee bend and body mass. These are
     // original Super Paw Heroes motions, not copied reference-game assets.
@@ -4635,9 +4637,9 @@
       const armSwing=airborne?Math.sin(clock*6+side)*7:
         waterWorld?Math.sin(clock*3.6+side*Math.PI)*6*poseArm:
         -side*swing*8*poseArm*chapterWeight;
-      const elbowX=shoulder+armSwing*.6+dir*strike*7;
+      const elbowX=shoulder+armSwing*.6+dir*strike*7-dir*hitRecoil*10;
       const elbowY=at.y-18+Math.abs(armSwing)*.3-strike*4;
-      const handX=elbowX+armSwing*.5+dir*strike*13;
+      const handX=elbowX+armSwing*.5+dir*strike*13-dir*hitRecoil*14;
       const handY=at.y-6-strike*13;
       ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
       ctx.beginPath();ctx.moveTo(shoulder,at.y-28);ctx.lineTo(elbowX,elbowY);ctx.lineTo(handX,handY);ctx.stroke();
