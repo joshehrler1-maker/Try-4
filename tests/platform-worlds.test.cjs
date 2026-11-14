@@ -673,3 +673,55 @@ test('first-five real WebGL mesh prototypes have unique 3D parts and safe lifecy
   stage.dispose();
   assert.equal(deletes,buffers,'WebGL buffers should be disposed on page exit');
 });
+
+test('opt-in gameplay WebGL enemies preserve the original 2D fallback', () => {
+  const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const runtime=fs.readFileSync(path.join(__dirname,'../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const sw=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  const js=fs.readFileSync(path.join(__dirname,'../assets/animation/enemy-3d-prototype-v1.js'),'utf8');
+  assert.ok(html.includes('id="side-3d-enemies" aria-pressed="false" hidden'));
+  assert.ok(html.indexOf('src="assets/animation/enemy-3d-prototype-v1.js') <
+    html.indexOf('src="assets/pawcade-side-scroll-no-badges-v2.js'));
+  assert.ok(sw.includes('enemy-3d-prototype-v1.js?v=3d-sprite-'));
+  assert.ok(sw.includes('pawcade-side-scroll-no-badges-v2.js?v=live-3d-foes-'));
+  assert.ok(runtime.includes('enemy3dAvailable=index>=0 && index<=4'));
+  assert.ok(runtime.includes('enemy3dDraws>=2'));
+  assert.ok(runtime.includes('enemy3dSlowFrames>=12'));
+  assert.ok(runtime.includes('!usesOriginRig(foe)'));
+  assert.ok(runtime.includes('else if(originWorldRig && window.pawtopiaOriginEnemyRigs.draw('));
+  assert.ok(runtime.includes('finally{ctx.restore();}'));
+  const sandbox={window:{devicePixelRatio:3}};
+  vm.runInNewContext(js,sandbox,{timeout:2000});
+  const art=sandbox.window.SuperPawEnemy3D;
+  let alpha=null,drawn=0,buffers=0,deleted=0,settings=null;
+  const gl=new Proxy({}, {get(target,k){
+    if(k==='getShaderParameter'||k==='getProgramParameter')return()=>true;
+    if(k==='getAttribLocation')return()=>0;
+    if(k==='getUniformLocation'||k==='createShader'||k==='createProgram')return()=>({});
+    if(k==='createBuffer')return()=>{buffers++;return{};};
+    if(k==='deleteBuffer')return()=>{deleted++;};
+    if(k==='getShaderInfoLog'||k==='getProgramInfoLog')return()=>'';
+    if(k==='clearColor')return(...args)=>{alpha=args[3];};
+    if(k==='drawElements')return()=>{drawn++;};
+    if(typeof k==='string'&&k.toUpperCase()===k)return 1;
+    return (...args)=>assert.ok(args.every(a=>typeof a!=='number'||Number.isFinite(a)),
+      'non-finite WebGL numeric argument: '+k);
+  }});
+  const canvas={width:160,height:160,clientWidth:0,getContext:(kind,opts)=>{
+    settings=opts;return gl;
+  }};
+  const view=art.init(canvas,{sprite:true});
+  assert.equal(settings.alpha,true);
+  assert.equal(settings.preserveDrawingBuffer,true);
+  assert.equal(alpha,0);
+  for(let i=0;i<5;i++){
+    const before=drawn;
+    const current=view.render(i,'move',1.5,.2,false);
+    assert.equal(canvas.width,160);
+    assert.equal(canvas.height,160);
+    assert.equal(drawn-before,current.meshes,
+      'transparent 3D sprites must omit preview-only floor and shadow meshes');
+  }
+  view.dispose();
+  assert.equal(deleted,buffers);
+});
