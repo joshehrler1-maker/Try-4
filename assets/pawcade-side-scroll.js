@@ -513,7 +513,7 @@
     reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
-    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;});
+    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
@@ -1056,6 +1056,7 @@
           clock>=foe.shotAt && inLane && inRange && direction && !shotBlocked) {
         const parryable=index===16 && foe.shotsFired++%3===0;
         hazards.push(enemyRound(position,direction,parryable));
+        foe.lastShotAt=clock;
         const shotDelay=index===16 ? (foe.turret ? 1.35 : 2.25) : 1;
         foe.shotAt=clock+cadence/enemyTempo*shotDelay;
       }
@@ -2720,7 +2721,7 @@
   }
   const enemyCueColors = ["#ffc282","#80dffe","#81ffe1","#ffd66d","#c8ed85","#c4f4ff","#ffe29a","#deb0ff","#ff91dd","#ffd18b","#ffbf98","#e6e2ff","#8aeaff","#ffbb76","#adbfff","#b9ff96","#ff9d62","#ddf4ff","#ffd1a2","#7affdc","#ff8ce1","#e0c5ff","#d1fb87","#ffeaa1","#a9d7ff"];
   function drawEnemyCue(at,foe,faceLeft,nearby,airborne,firing){
-    const recoveringShot=firing && foe.shotAt-clock>cadence/enemyTempo-.16;
+    const recoveringShot=firing;
     const diving=airborne && at.y>foe.y-(enemyPattern==='school'?33:50);
     const hopping=enemyPattern==='hopper' && foe.y-at.y>enemyRise*.7;
     const charging=enemyPattern==='charge' && Math.abs(at.x-foe.x)>enemyReach*.45;
@@ -2957,8 +2958,8 @@
       const cell=index;
       const faceLeft=player.x<at.x;
       const nearby=Math.abs(player.x-at.x)<250;
-      const firing=(foe.turret || enemyPattern==='turret' || index===16) &&
-        nearby && Math.abs(player.y-at.y)<105 && foe.shotAt>clock;
+      const recoil=Math.max(0,1-(clock-(foe.lastShotAt??-Infinity))/.16);
+      const firing=recoil>0;
       const motion=reducedMotion?0:Math.sin(clock*(airborne?9:6)+foe.offset);
       // Enemy gait follows visible world travel, not elapsed time. Reset on
       // large position changes so teleports and respawns never spin the gait.
@@ -2987,8 +2988,8 @@
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
       else ctx.rotate(enemyLean);
-      ctx.scale((firing?1.09:1+motion*.025)+bodyStretch+chargeCompression,
-        (firing?.94:1-motion*.025)-bodyStretch*.7-chargeCompression);
+      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression,
+        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
       else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
@@ -3266,7 +3267,7 @@
       Math.abs(p.vx)>15 ? 1+Math.floor(clock*(7+Math.min(9,Math.abs(p.vx)/75)))%2 : 0;
     const cell = power==='slide' && held('action') ? 13 :
       light && !p.on && (power==='double' || power==='vine') ? 14 : (light?4:0)+pose;
-    const squash=reducedMotion ? 0 : (p.landingPose||0)*1.05;
+    const squash=reducedMotion ? 0 : (p.landingPose||0)**2*8;
     // Secondary motion gives existing sprite poses some life without
     // altering collisions or gameplay timing.
     const stride=Math.min(1,Math.abs(p.vx)/Math.max(1,runSpeed));
