@@ -85,6 +85,8 @@
   terrainArt.src='assets/scenes/platform-terrain.webp';
   const stagePropArt=new Image();
   stagePropArt.src='assets/scenes/platform-stage-props.webp';
+  const energyFxArt=new Image();
+  energyFxArt.src='assets/animation/super-paw-effects-v1.svg';
   const combatArt=new Image();
   combatArt.src='assets/scenes/platform-combat.webp';
   const propArt=new Image();
@@ -1878,6 +1880,22 @@
       ctx.drawImage(poster,light?sw:0,0,sw,poster.naturalHeight,p.x-24,p.y-35,48,57);
     }
     ctx.restore();
+    // Render the versioned, repository-backed original energy art in gameplay.
+    // The first two sections of the SVG are slash arcs; the third is a paw.
+    if(energyFxArt.complete && energyFxArt.naturalWidth && !reducedMotion &&
+       (attacking || (p.power>.22 && power==='dash'))){
+      ctx.save();
+      const fxCell=power==='dash'?2:(light?1:0);
+      const sx=fxCell===0?0:fxCell===1?174:340;
+      const sw=fxCell===2?172:174;
+      const extent=fxCell===2?76:104;
+      const alpha=Math.min(1,Math.max(0,p.power/.48));
+      ctx.globalAlpha=.35+.65*alpha;
+      ctx.translate(p.x+p.facing*33,p.y-15);
+      if(p.facing<0)ctx.scale(-1,1);
+      ctx.drawImage(energyFxArt,sx,0,sw,128,-extent*.3,-extent*.5,extent,extent*.8);
+      ctx.restore();
+    }
     // Move-specific silhouette and effects overlay the existing approved
     // character art; the promotional concept sheet is not a sprite atlas.
     if(!reducedMotion && (rolling || rushing || attacking || p.pogo || p.cable || p.morphed || braking || gliding || wallSliding || swimming)){
@@ -2123,6 +2141,6 @@
     for(const event of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(event,e=>{if(e.pointerId!==pointer)return;pointer=null;mobile.delete(control);if(control==='action')releaseAction(event==='pointerup');});
     button.onclick=event=>{if(event.detail===0){activate();if(control==='action')releaseAction(true);}};
   });
-  for (const image of [sprites,poster,backdrop,enemyArt,heroArt,terrainArt,guardianArt,propArt,stagePropArt,combatArt]) image.onload=()=>{if(phase!=='playing') draw();};
+  for (const image of [sprites,poster,backdrop,enemyArt,heroArt,terrainArt,guardianArt,propArt,stagePropArt,combatArt,energyFxArt]) image.onload=()=>{if(phase!=='playing') draw();};
   reset();
 })();
