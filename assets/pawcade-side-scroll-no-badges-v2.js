@@ -8495,6 +8495,32 @@
     [3,.78,.34,'#ffae73'],[4,.42,.63,'#a9ddd9'],[5,.70,.24,'#ff754b'],[6,.51,.31,'#ffdb8c'],[7,.66,.39,'#ff9360'],
     [8,.74,.55,'#e79a5c'],[9,.41,.24,'#c8a996']
   ];
+  // Optional original cinematic stills. Existing procedural backdrop remains
+  // the fallback until each independently authored scene image is available.
+  const foundryStoryImagePaths = {
+    8: 'assets/scenes/ember-foundry/08-slag-aqueduct.webp',
+    9: 'assets/scenes/ember-foundry/09-ashfall-galleries.webp'
+  };
+  const foundryStoryImages = {};
+  function foundryStoryImage(scene) {
+    const path = foundryStoryImagePaths[scene];
+    if (!path) return null;
+    if (!foundryStoryImages[scene]) {
+      const img = new Image();
+      foundryStoryImages[scene] = img;
+      img.src = path;
+    }
+    const img = foundryStoryImages[scene];
+    return img.complete && img.naturalWidth > 0 ? img : null;
+  }
+  function drawFoundryStoryImage(img, focusX, focusY, zoom) {
+    // Fill the entire 800 x 380 canvas with a landscape crop; pan/zoom around
+    // the art handoff's focal point rather than stretching the source image.
+    const cover = Math.max(width / img.naturalWidth, height / img.naturalHeight);
+    const w = img.naturalWidth * cover * zoom;
+    const h = img.naturalHeight * cover * zoom;
+    ctx.drawImage(img, (width - w) * focusX, (height - h) * focusY, w, h);
+  }
   function playFoundryShot(scene) {
     const [,focusX,focusY,tint]=foundryShots[scene];
     const started=performance.now();
@@ -8504,7 +8530,10 @@
       const zoom=reducedMotion?1.13:1.10+Math.min(t,8)*.024;
       const w=width*zoom,h=height*zoom;
       draw();
-      if(backdrop.naturalWidth){
+      const shotImage = foundryStoryImage(scene);
+      if (shotImage) {
+        drawFoundryStoryImage(shotImage, focusX, focusY, zoom);
+      } else if(backdrop.naturalWidth){
         const tile=backdrop.naturalWidth/5;
         ctx.drawImage(backdrop,0,0,tile,tile,(width-w)*focusX,(height-h)*focusY,w,h);
       }
