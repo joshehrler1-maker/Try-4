@@ -328,7 +328,10 @@
         for(let encounter=0;encounter<count;encounter++) {
           // Alternate staggered encounter positions without changing the
           // underlying level geometry or pushing foes off a platform.
-          const stagger=((index*11+stage*7+slot*3)%5-2)*8;
+          // Speed courses need more room to accelerate; combat courses
+          // can use tighter encounter spacing without changing platforms.
+          const spacing=fastCourse?18:combatCourse?6:8;
+          const stagger=((index*11+stage*7+slot*3)%5-2)*spacing;
           const offset=Math.max(30,Math.min(w-30,
             Math.round(w*(encounter+1)/(count+1))+stagger));
           // Deterministic encounter archetypes: different patrol rhythms
