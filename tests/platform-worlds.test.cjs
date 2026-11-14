@@ -311,3 +311,66 @@ test('defeated late-world enemies retain only a short visual after their hitboxe
   assert.ok(runtime.includes('e._defeatAt=undefined'),
     'restart must reset defeated enemy visual state');
 });
+
+test('five mid-world enemy rigs preserve game-specific silhouettes and safe render state', () => {
+  const artFile=path.join(__dirname,'../assets/animation/mid-world-enemy-rigs-v1.js');
+  const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const runtime=fs.readFileSync(path.join(__dirname,'../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const worker=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  const registry=JSON.parse(fs.readFileSync(path.join(__dirname,'../assets/enemy-art-motion-registry.json'),'utf8'));
+  assert.ok(fs.existsSync(artFile),'missing actual 2.5D art source for games 16–20');
+  const sandbox={window:{}};
+  vm.runInNewContext(fs.readFileSync(artFile,'utf8'),sandbox,{timeout:1000});
+  const art=sandbox.window.pawtopiaMidEnemyRigs;
+  assert.equal(typeof art?.draw,'function');
+  const kinds=Object.values(art.families);
+  assert.equal(kinds.length,5);
+  assert.equal(new Set(kinds).size,5,'each adventure requires unique enemy art');
+  assert.ok(html.includes('src="assets/animation/mid-world-enemy-rigs-v1.js?'));
+  assert.ok(html.indexOf('src="assets/animation/mid-world-enemy-rigs-v1.js') <
+            html.indexOf('src="assets/pawcade-side-scroll-no-badges-v2.js'),
+    'the enemy rig module must initialize before the playable game');
+  assert.ok(worker.includes("'assets/animation/mid-world-enemy-rigs-v1.js?"),
+    'offline cache must contain new enemy rig art module');
+  assert.ok(runtime.includes("index>=15 && index<=19"),
+    'the playable game must select only the correct five enemies');
+  assert.ok(runtime.includes('window.pawtopiaMidEnemyRigs.draw('),
+    'the enemy render path must actually draw the new artwork');
+  assert.ok(runtime.includes('foe._defeatAt=clock'),
+    'defeat must bind to actual gameplay collision removal');
+
+  for(let i=15;i<=19;i++){
+    assert.equal(kinds[i-15],registry.games[i].enemyFamily);
+    let saved=0,draws=0,scales=0;
+    const context=new Proxy({},{
+      get(target,method){
+        if(Object.hasOwn(target,method))return target[method];
+        return(...args)=>{
+          if(method==='save')saved++;
+          if(method==='restore')saved--;
+          if(method==='scale')scales++;
+          if(method==='fill')draws++;
+          assert.ok(args.every(x=>typeof x!=='number'||Number.isFinite(x)),
+            'non-finite canvas coordinate in game '+(i+1)+': '+String(method));
+        };
+      },set(target,key,value){target[key]=value;return true;}
+    });
+    for(const pose of [
+      {stride:0,attack:0,recoil:0,landing:0,clock:0,reduced:true},
+      {stride:1,attack:0,recoil:0,landing:0,clock:1.3,reduced:false},
+      {stride:.4,attack:.6,recoil:0,landing:.1,clock:2.4,reduced:false},
+      {stride:0,attack:1,recoil:1,landing:.5,clock:3.2,
+        reduced:false,faceLeft:true,hit:1,airborne:i===15||i===19}
+    ]){
+      assert.equal(art.draw(context,i,{x:280,y:270},
+        {offset:i+1,_gait:2.8,turret:i===16},pose),true);
+      assert.equal(saved,0,'unrestored canvas state in game '+(i+1));
+    }
+    assert.ok(draws>20,'rig must render multiple distinct parts');
+    assert.ok(scales>=1,'rig must support facing reversal');
+    assert.match(registry.games[i].implementationStatus,/partial/,
+      'do not mislabel unfinished 3D enemy art as finished');
+  }
+  assert.equal(art.draw({},20,{x:0,y:0},{},{}),false,
+    'other adventure enemies must retain their own designs');
+});
