@@ -7125,11 +7125,12 @@
       // Animation-only: discard stale and teleport-sized samples so a
       // resumed phone tab cannot make enemies snap into a false sprint.
       const stableMotionSample=elapsed>0 && elapsed<=.15 && travel<90;
-      const motionDt=Math.min(.05,Math.max(0,elapsed));
+      const motionDt=stableMotionSample?Math.min(.05,elapsed):0;
       const signedVelocity=stableMotionSample?displacement/elapsed:0;
       const velocityTarget=reducedMotion?0:Math.max(-1,Math.min(1,signedVelocity/135));
-      foe._bodyVelocity=(foe._bodyVelocity||0)+
-        (velocityTarget-(foe._bodyVelocity||0))*(1-Math.exp(-7*motionDt));
+      foe._bodyVelocity=stableMotionSample
+        ?(foe._bodyVelocity||0)+(velocityTarget-(foe._bodyVelocity||0))*(1-Math.exp(-7*motionDt))
+        :0;
       const velocityLean=(foe._bodyVelocity||0)*(.035+sway*.65);
       // Smooth stance-to-stride lift to prevent sudden foot pops on patrol starts and stops.
       const liftTarget=airborne||reducedMotion?0:movingWeight;
@@ -7191,7 +7192,7 @@
       const previousFall=foe._lastVerticalSpeed||0;
       const touchingDown=!airborne && stableVerticalSample && elapsed<=.05 &&
         travel<90 && previousFall>55 && verticalSpeed<=12;
-      if(elapsed>0) foe._lastVerticalSpeed=verticalSpeed;
+      foe._lastVerticalSpeed=stableVerticalSample?verticalSpeed:0;
       if(touchingDown) foe._landingPose=Math.max(foe._landingPose||0,Math.min(.085,previousFall/4800));
       foe._landingPose=(foe._landingPose||0)*Math.exp(-9*blendDt);
       const landingPose=reducedMotion?0:foe._landingPose;
