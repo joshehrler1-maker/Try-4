@@ -4,11 +4,15 @@
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#08132c;color:#f4f6ff;font:16px/1.5 system-ui,sans-serif}main{max-width:950px;margin:auto;padding:20px}a{color:#8feaff}h1{margin-bottom:4px}.note{color:#cbd9f7}label{display:block;margin:15px 0}select,button{font:inherit;padding:10px;border:1px solid #9ab5eb;border-radius:9px;background:#20365c;color:white}canvas{display:block;width:100%;height:auto;border:2px solid #688fd0;border-radius:18px;background:#14233f}#info{min-height:5em}.controls{display:flex;gap:10px;flex-wrap:wrap}button:focus-visible,select:focus-visible{outline:3px solid #ffe27e}footer{margin-top:25px;color:#b9c8e6}
 </style></head><body><main><a href="pawcade-side-scroll.html">← Back to games</a><h1>Enemy Motion Lab</h1>
-<p class="note">Original animated vector concept prototypes for 25 games. Twenty separate <strong>procedural 2.5D enemy rigs</strong> for games 6–25 are now connected to their playable builds; the preview artwork remains concept-only. These are <strong>not</strong> final 3D models, films, or completed motion libraries.</p>
+<p class="note">Original animated vector concept prototypes for 25 games. Twenty separate <strong>procedural 2.5D enemy rigs</strong> for games 6–25 are now connected to their playable builds; choose <strong>Show playable rig</strong> to preview the actual vector bodies installed in games 6–25. Games 1–5 retain concept previews here. These are <strong>not</strong> final 3D models, films, or completed motion libraries.</p>
 <label for="game">Choose a game</label><select id="game"></select>
 <canvas id="scene" width="800" height="400" role="img" aria-label="Animated enemy concept on a platform"></canvas>
-<div class="controls"><button id="idle">Idle</button><button id="move">Move</button><button id="attack">Attack</button><button id="hit">Hit</button><button id="defeat">Defeat</button><button id="pause" aria-pressed="false">Pause animation</button><label for="speed">Playback speed <output id="speed-value">1.0×</output></label><input id="speed" type="range" min="0.25" max="1.5" step="0.05" value="1"></div>
+<div class="controls"><button id="render-mode" type="button" aria-pressed="false">Show playable rig</button><button id="idle">Idle</button><button id="move">Move</button><button id="attack">Attack</button><button id="hit">Hit</button><button id="defeat">Defeat</button><button id="pause" aria-pressed="false">Pause animation</button><label for="speed">Playback speed <output id="speed-value">1.0×</output></label><input id="speed" type="range" min="0.25" max="1.5" step="0.05" value="1"></div>
 <p id="info" aria-live="polite"></p><footer>Motion prototype: anticipation → attack → recovery; reduced-motion preference supported. No paid services.</footer></main>
+<script src="assets/animation/five-world-enemy-rigs-v1.js?v=five-rigs-a1c28cd"></script>
+<script src="assets/animation/cloud-trail-enemy-rigs-v1.js?v=cloud-rigs-c646b96"></script>
+<script src="assets/animation/mid-world-enemy-rigs-v1.js?v=mid-rigs-6bc18e4"></script>
+<script src="assets/animation/late-world-enemy-rigs-v1.js?v=enemy-rigs-fbe47754"></script>
 <script>
 (async()=>{
 const select=document.querySelector('#game'),info=document.querySelector('#info'),canvas=document.querySelector('canvas'),ctx=canvas.getContext('2d');
@@ -16,12 +20,32 @@ let registry;
 try{const response=await fetch('assets/enemy-art-motion-registry.json');if(!response.ok)throw Error('Registry unavailable');registry=await response.json()}catch(e){info.textContent='Could not load enemy designs: '+e.message;return}
 for(const item of registry.games){const option=document.createElement('option');option.value=item.gameIndex;option.textContent=(item.gameIndex+1)+'. '+item.game+' — '+item.enemyFamily;select.append(option)}
 const palettes=[['#ff9a4d','#743529'],['#c6a6ff','#413466'],['#67f5e0','#246e8d'],['#eac978','#5b4d3b'],['#a6e868','#34694a'],['#a5edff','#396d9c'],['#ffcd69','#85446b'],['#f5a9ff','#543d9c'],['#ff85a6','#61346a'],['#d3d8e6','#596477'],['#a3f5ec','#39748d'],['#e7f4ff','#647caa'],['#ffde73','#386b98'],['#e8b36e','#685b32'],['#b3b4ff','#383f86'],['#b0ef83','#487d4b'],['#ff9e69','#805b4c'],['#d8f4ff','#6799bc'],['#e8bd84','#8c6945'],['#8ae6eb','#37618a'],['#ff79e3','#4942a5'],['#e8e2d6','#8b7792'],['#b6ed88','#506b58'],['#f8df70','#9e7435'],['#9ad8ff','#485f95']];
-let mode='idle',started=performance.now(),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,paused=false,pausedAt=0,speed=1;
+let mode='idle',started=performance.now(),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,paused=false,pausedAt=0,speed=1,showPlayable=false;
+const rigToggle=document.querySelector('#render-mode');
+const actualRig=index=>index>=5&&index<=9?window.pawtopiaFiveEnemyRigs:
+  index>=10&&index<=14?window.pawtopiaCloudEnemyRigs:
+  index>=15&&index<=19?window.pawtopiaMidEnemyRigs:
+  index>=20&&index<=24?window.pawtopiaLateEnemyRigs:null;
+const updateRigToggle=()=>{
+  const rig=actualRig(Number(select.value));
+  rigToggle.disabled=typeof rig?.draw!=='function';
+  if(rigToggle.disabled)showPlayable=false;
+  rigToggle.textContent=showPlayable?'Show concept preview':'Show playable rig';
+  rigToggle.setAttribute('aria-pressed',String(showPlayable));
+};
+rigToggle.onclick=()=>{
+  if(!actualRig(Number(select.value))?.draw)return;
+  showPlayable=!showPlayable;
+  started=performance.now();
+  if(paused)pausedAt=started;
+  updateRigToggle();describe();
+};
+updateRigToggle();
 const pauseButton=document.querySelector('#pause'),speedInput=document.querySelector('#speed');
 pauseButton.onclick=()=>{paused=!paused;if(paused){pausedAt=performance.now()}else{started+=performance.now()-pausedAt}pauseButton.textContent=paused?'Resume animation':'Pause animation';pauseButton.setAttribute('aria-pressed',String(paused))};
 speedInput.oninput=()=>{const now=paused?pausedAt:performance.now();const elapsed=(now-started)*speed;speed=Number(speedInput.value);started=now-elapsed/speed;document.querySelector('#speed-value').textContent=speed.toFixed(2)+'×'};
-function describe(){const e=registry.games[Number(select.value)];info.textContent=e.enemyFamily+' — '+e.silhouette+'. Attack: '+e.signatureAttack+'. Effect: '+e.vfx+'. Current motion: '+mode+'.'}
-select.onchange=()=>{started=performance.now();describe()};for(const state of ['idle','move','attack','hit','defeat'])document.querySelector('#'+state).onclick=()=>{mode=state;started=performance.now();if(paused)pausedAt=started;describe()};describe();
+function describe(){const e=registry.games[Number(select.value)];info.textContent=e.enemyFamily+' — '+e.silhouette+'. Attack: '+e.signatureAttack+'. Effect: '+e.vfx+'. Current motion: '+mode+'. Display: '+(showPlayable?'actual integrated 2D body rig (preview pose)':'illustrated concept prototype')+'.'}
+select.onchange=()=>{started=performance.now();updateRigToggle();describe()};for(const state of ['idle','move','attack','hit','defeat'])document.querySelector('#'+state).onclick=()=>{mode=state;started=performance.now();if(paused)pausedAt=started;describe()};describe();
 function frame(now){
 const index=Number(select.value),t=reduced?0:((paused?pausedAt:now)-started)/1000*speed,colors=palettes[index],p=mode==='attack'?Math.min(t/1.3,1):0;
 const smooth=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};
@@ -33,6 +57,34 @@ ctx.clearRect(0,0,800,400);
 const sky=ctx.createLinearGradient(0,0,0,400);sky.addColorStop(0,colors[1]);sky.addColorStop(1,'#09172c');ctx.fillStyle=sky;ctx.fillRect(0,0,800,400);
 for(let j=0;j<12;j++){ctx.fillStyle='#ffffff13';ctx.beginPath();ctx.arc((j*89+index*13)%800,50+(j*43)%220,2+(j%4),0,7);ctx.fill()}
 ctx.fillStyle='#31465e';ctx.fillRect(0,324,800,76);ctx.fillStyle=colors[0];ctx.fillRect(0,324,800,6);
+const rig=showPlayable?actualRig(index):null;
+if(rig?.draw){
+  const travel=mode==='move'&&!reduced?Math.sin(t*1.4)*115:0;
+  const defeat=mode==='defeat'?Math.min(1,Math.max(0,t)):0;
+  const hit=mode==='hit'?Math.max(0,1-t/.6):0;
+  const isAirborne=[5,10,19,23].includes(index);
+  ctx.save();
+  ctx.translate(400+travel,263+defeat*12);
+  ctx.globalAlpha=Math.max(0,1-defeat);
+  ctx.rotate(defeat*.26);
+  ctx.scale(3*(1-defeat*.2),3*(1-defeat*.4));
+  // This is the real authored 2D game body and its state-driven motion,
+  // not a pre-rendered counterpart recording or 3D animation export.
+  rig.draw(ctx,index,{x:0,y:0},{_gait:t*7,offset:index*.7,
+    turret:index===9||index===17},{
+    stride:mode==='move'?1:0,
+    attack:mode==='attack'?Math.max(anticipation*.9,impact*.8):0,
+    recoil:mode==='attack'?impact:0,
+    landing:mode==='move'?Math.abs(walk)*.2:0,
+    reduced,clock:t,hit,airborne:isAirborne,
+    faceLeft:mode==='move'&&!reduced&&Math.cos(t*1.4)<0
+  });
+  ctx.restore();
+  ctx.fillStyle='#fff';ctx.font='bold 18px system-ui';
+  ctx.fillText(registry.games[index].enemyFamily+' · playable 2D body art',20,32);
+  requestAnimationFrame(frame);
+  return;
+}
 const x=400+(mode==='move'?Math.sin(t*1.4)*115:0)+(mode==='attack'?impact*65:0);
 ctx.save();ctx.translate(x,302+bob+(mode==='move'?Math.abs(walk)*-3:0)+(mode==='hit'?Math.sin(Math.min(t,1)*25)*7:0));ctx.scale(mode==='defeat'?Math.max(.1,1-Math.min(t,1)) :1,1);
 ctx.fillStyle='#0008';ctx.beginPath();ctx.ellipse(0,23,75,12,0,0,7);ctx.fill();
