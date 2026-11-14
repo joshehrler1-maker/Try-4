@@ -1301,7 +1301,10 @@
         foe.lastShotAt=clock;
         const shotDelay=foe.clockEnemy>=3 ? [1.65,1.35,1.15][foe.clockEnemy-3] :
           index===16 ? (foe.turret ? 1.35 : 2.25) : 1;
-        foe.shotAt=clock+cadence/enemyTempo*shotDelay;
+        // Escalate ranged threats chapter by chapter, capped to keep
+        // dodge windows readable on touchscreen and avoid bullet spam.
+        const rangedPressure=1+Math.min(5,Math.max(0,chapter))*0.075;
+        foe.shotAt=clock+cadence/enemyTempo*shotDelay/rangedPressure;
       }
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
       if(impact){
