@@ -1242,7 +1242,7 @@
   const pauseButton=byId('side-pause');
   const soundButton=byId('side-sound');
   const soundPreference='pawcade-side-scroll-sound';
-  let audio, sound=false;
+  let audio, masterGain, sound=false;
   try {sound=localStorage.getItem(soundPreference)==='on';} catch {}
   const Audio=window.AudioContext || window.webkitAudioContext;
   function syncSoundButton() {
@@ -1253,7 +1253,12 @@
   function unlockAudio() {
     if(!Audio) return Promise.resolve();
     try {
-      audio ??= new Audio();
+      if(!audio){
+        audio=new Audio();
+        masterGain=audio.createGain();
+        masterGain.gain.value=Number(sound);
+        masterGain.connect(audio.destination);
+      }
       return audio.resume().catch(()=>{});
     } catch {return Promise.resolve();}
   }
@@ -1262,6 +1267,7 @@
     sound=!sound;
     try {localStorage.setItem(soundPreference,sound?'on':'off');} catch {}
     syncSoundButton();
+    if(masterGain) masterGain.gain.setTargetAtTime(Number(sound),audio.currentTime,.008);
     if(sound) unlockAudio().then(()=>playCue(440,660));
     else stopMusic();
   };
@@ -1278,7 +1284,7 @@
     ['triangle',.77,3], ['square',1.32,1.5], ['sine',1.10,3],
     ['sawtooth',.50,2]
   ];
-  let nextCueAt=0;
+  let nextCueAt=0, lastCueAt=-Infinity;
   function playCue(from,to,length=.12) {
     if(!sound || audio?.state!=='running') return;
     const now=audio.currentTime;
@@ -1289,7 +1295,12 @@
     volume.gain.setValueAtTime(.001,now);
     volume.gain.exponentialRampToValueAtTime(.035,now+.008);
     volume.gain.exponentialRampToValueAtTime(.001,now+length);
-    volume.connect(audio.destination);
+    volume.connect(masterGain);
+    lastCueAt=now;
+    if(musicBus){
+      musicBus.gain.setTargetAtTime(.28,now,.012);
+      musicDucked=true;
+    }
     for(const [type,ratio] of [[wave,1],['sine',harmonic]]){
       const tone=audio.createOscillator();
       tone.type=type;
@@ -1320,7 +1331,7 @@
   const [musicTempo,musicRoot,musicPattern]=musicScores[index];
   const musicNotes=musicPattern.split(' ');
   const musicInterval=30/musicTempo;
-  let musicBus, nextMusicAt=0, musicStep=0;
+  let musicBus, musicDucked=false, nextMusicAt=0, musicStep=0;
 
   function stopMusic() {
     if(!musicBus) return;
@@ -1347,7 +1358,7 @@
     if(!sound || audio?.state!=='running') return;
     const now=audio.currentTime;
     for(const [beat,offset] of [0,4,7,12].entries()){
-      musicNote(musicRoot+offset,now+beat*.105,beat===3?.32:.15,.035,'triangle',audio.destination);
+      musicNote(musicRoot+offset,now+beat*.105,beat===3?.32:.15,.035,'triangle',masterGain);
     }
   }
 
@@ -1357,7 +1368,11 @@
     if(!musicBus){
       musicBus=audio.createGain();
       musicBus.gain.value=.55;
-      musicBus.connect(audio.destination);
+      musicBus.connect(masterGain);
+    }
+    if(now-lastCueAt>=.18 && musicDucked){
+      musicBus.gain.setTargetAtTime(.55,now,.08);
+      musicDucked=false;
     }
     if(nextMusicAt<now) nextMusicAt=now+.02;
     const bossFight=player.x>finish && boss.health>0;
