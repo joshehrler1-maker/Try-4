@@ -25,13 +25,28 @@ These are **original vector-painted scenery assets, not 3D renders or character 
 
 **Still missing in these five games:** detailed stage-by-stage asset placement for the rest of each level; approved poster-matched 3D hero renders; individual enemy meshes and motion clips; platform-specific art revisions; 3D environments; stage-specific film assets; dialogue/audio/captioned film exports; real-device performance and controls checks.
 
-## Other 20 games — unchanged in this batch
 
-- 06 Waterfall Climb: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
-- 07 Lantern Festival: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
-- 08 Crystal Polarity: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
-- 09 Stage Beat: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
-- 10 Quarry Rescue: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
+## Batch 2 — five additional original Stage 1 environment set pieces
+
+All 5 are **vector-painted concepts integrated as passive scene props**. They are not 3D assets, colliders, animated character clips, or cinematic footage. Drawn at world upper-left (590,156), 180 × 170 world units, bottom-center pivot (680,326), no collision, behind walls/tunnels/platforms; visible on entering world x590–770, with no animation trigger. Each asset is requested only by its own game index.
+
+| Game | Stage | Original integrated art path | Subject | Source check | Live/device check |
+| --- | --- | --- | --- | --- | --- |
+| 06 Waterfall Climb | 1 Spray Bridge | `assets/scenes/waterfall-climb/spray-bridge-icefall.svg` | Frozen falling-water bridge accent | Created and wired | Pending |
+| 07 Lantern Festival | 1 Parade Gate | `assets/scenes/lantern-festival/parade-gate-lantern.svg` | Festival lantern arch | Created and wired | Pending |
+| 08 Crystal Polarity | 1 Inverted Intake | `assets/scenes/crystal-polarity/inverted-intake-core.svg` | Inverted-gravity crystal machine | Created and wired | Pending |
+| 09 Stage Beat | 1 Sound Check | `assets/scenes/stage-beat/sound-check-resonator.svg` | Rhythm resonator stack | Created and wired | Pending |
+| 10 Quarry Rescue | 1 Lift House | `assets/scenes/quarry-rescue/lift-house-winch.svg` | Lift and rescue winch | Created and wired | Pending |
+
+**Integration commit:** `19510f1`. **HTML cache-bust commit:** `606583c`. Source JS syntax passed. Two live GitHub Pages GET attempts through the available web tool returned inaccessible/internal error; this is **not proof of either success or failure of the real deployment**. Android/collision/enemy-performance testing is still outstanding. For each of these five games, detailed stage-by-stage placements beyond the first-stage marker, film production, 3D art, attack clips, and finished movie delivery remain to do.
+
+## Other games — not changed in batches 1–2
+
+- 06 Waterfall Climb: Stage 1 prop integrated in Batch 2; Stage 2+ audit, 3D animation and movie pending.
+- 07 Lantern Festival: Stage 1 prop integrated in Batch 2; Stage 2+ audit, 3D animation and movie pending.
+- 08 Crystal Polarity: Stage 1 prop integrated in Batch 2; Stage 2+ audit, 3D animation and movie pending.
+- 09 Stage Beat: Stage 1 prop integrated in Batch 2; Stage 2+ audit, 3D animation and movie pending.
+- 10 Quarry Rescue: Stage 1 prop integrated in Batch 2; Stage 2+ audit, 3D animation and movie pending.
 - 11 Sunset Wind Sail: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
 - 12 Cloud City: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
 - 13 Thunder Harbor: counterpart assignment and source stages available; per-stage art/collision audit and original assets not completed in this batch; new 3D movie not rendered.
