@@ -7232,7 +7232,7 @@
       const snowBrace=index===17 && firing && !reducedMotion
         ?attackPose*.035:0;
       const canyonPatrol=index===18 && enemyPattern==='patrol' && !reducedMotion
-        ?(foe._bodyVelocity||0)*.03:0;
+        ?Math.max(-.03,Math.min(.03,(foe._bodyVelocity||0)*.03)):0;
       const submarineFin=index===19 && enemyPattern==='school' && !reducedMotion
         ?Math.sin(clock*2.3+foe.offset)*.018:0;
       // Games 21–25: keep arcade, temple, swamp, flight and cargo distinct.
