@@ -1160,6 +1160,13 @@
         : fallGravity;
       p.vy+=dt*(movement==='precision'?1210:1050)*gravityFactor*arcFactor*p.gravity;
     }
+    // Terminal speeds are tuned by gameplay family. Keep high-speed
+    // descents readable and collision-safe on the fixed 60 Hz step.
+    const terminalFall=[720,760,390,820,720,560,480,700,880,730,
+      530,690,790,610,720,620,780,690,740,450,850,750,650,500,800][index];
+    const terminalRise=[780,820,410,850,760,620,540,750,920,770,
+      610,790,830,680,770,700,840,760,780,480,880,810,710,560,860][index];
+    p.vy=Math.max(-terminalRise,Math.min(terminalFall,p.vy));
     p.y += p.vy*dt;
     if(index===11){
       const prism=landmarks.find(prop=>prop.cell===5);
