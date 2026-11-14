@@ -303,6 +303,7 @@
     }
     let libraryEnemyPlaced=false;
     let reefEnemyPlaced=false;
+    let clockEnemyPlaced=false;
     const pieces = window.pawtopiaRooms[room];
     for (const [slot, [x, y, w, kind = 'floor']] of pieces.entries()) {
       platforms.push({x:start+x,y,w,kind});
@@ -323,6 +324,12 @@
             foe.x=start+(x===0?410:Math.round(x+w*.5));
             foe.y=[198,154,204,124,181,148][stage];
             reefEnemyPlaced=true;
+          }
+          if(index===3 && !clockEnemyPlaced && x>=250 && w>=120){
+            foe.clockEnemy=stage;
+            foe.patrolLeft=start+x+26;
+            foe.patrolRight=start+x+w-26;
+            clockEnemyPlaced=true;
           }
           enemies.push(foe);
         }
@@ -1507,6 +1514,28 @@
     ctx.ellipse(kind===1?4:12,kind===2?0:-4,3,2.5,0,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }
+  const clockBodies=["M-22 9L-13-12H10L24 4V14H-22Z","M-24 3L-14-15 8-18 23-7 16 12H-17Z","M-19 12V-13L0-23 20-12V12Z","M-26 0L-10-8 0-20 11-8 26 0 11 9 0 15Z","M-24 12L-18-6 -8-6 -3-22 15-16 24 12Z","M-25 8L-21-13 -10-8 0-24 12-7 23-13 26 11Z"].map(shape=>new Path2D(shape));
+  const clockTravel=[34,53,23,58,31,46];
+  const clockRise=[0,17,40,26,0,19];
+  function drawClockEnemy(at,foe,faceLeft){
+    const kind=foe.clockEnemy;
+    const phase=clock*(2+kind*.16)+foe.offset;
+    ctx.save();
+    ctx.translate(at.x,at.y);
+    if(faceLeft)ctx.scale(-1,1);
+    if(!reducedMotion)ctx.rotate(Math.cos(phase)*.12);
+    const shade=ctx.createRadialGradient(-8,-10,2,0,0,28);
+    shade.addColorStop(0,['#ffe1a0','#b4e8f2','#f7c789','#c4d2ff','#ffd4b3','#f6b276'][kind]);
+    shade.addColorStop(1,'#443243');
+    ctx.fillStyle=shade;ctx.fill(clockBodies[kind]);
+    ctx.strokeStyle='#fff3cb';ctx.lineWidth=2;
+    if(!reducedMotion)ctx.rotate(phase*(kind%2?-1:1));
+    ctx.beginPath();
+    ctx.arc(0,0,4+kind,0,Math.PI*2);
+    ctx.moveTo(-7-kind,0);ctx.lineTo(7+kind,0);
+    ctx.stroke();
+    ctx.restore();
+  }
   function foePosition(foe) {
     if(foe.bashed && clock<foe.bashed.until){
       const t=.48-(foe.bashed.until-clock);
@@ -1551,6 +1580,14 @@
       const travel=foe.libraryEnemy===4?chase*Math.max(0,Math.sin(phase))**3:Math.sin(phase);
       const lift=foe.libraryEnemy===1?Math.max(0,Math.sin(phase))**2:(1+Math.cos(phase))/2;
       return {x:patrolX(foe.x+travel*design.reach),y:foe.y-lift*design.rise};
+    }
+    if(foe.clockEnemy!==undefined){
+      const kind=foe.clockEnemy;
+      const phase=clock*(2+kind*.16)+foe.offset;
+      const wave=Math.sin(phase);
+      const travel=kind===4?chase*Math.max(0,wave)**3:wave;
+      const lift=kind===3?(1+Math.cos(phase))/2:Math.max(0,wave)**2;
+      return {x:patrolX(foe.x+travel*clockTravel[kind]),y:foe.y-lift*clockRise[kind]};
     }
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
@@ -3292,6 +3329,7 @@
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing);
       else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft);
+      else if(foe.clockEnemy!==undefined) drawClockEnemy(at,foe,faceLeft);
       else if(index===16) drawSteamworksEnemy(at,foe,faceLeft,firing);
       else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)){
         ctx.fillStyle='#bd664e';ctx.fillRect(at.x-18,at.y-17,36,34);
