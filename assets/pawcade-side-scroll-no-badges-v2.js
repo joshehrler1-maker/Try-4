@@ -2058,7 +2058,10 @@
       if(index===0 && stage<foundryStory.length-1 && showFoundryStory(stage)) return;
     }
     for (const c of crystals) {
-      if (!c.taken && (!c.reefCache || reefCacheOpen) && close(p,c,24,29)) {if(c.refill) p.dashUsed=false;c.taken=true;burst(c.x,c.y,c.refill?'#82ffe6':'#ffdb80',9);playPickup();taken++;if(index===3)rings++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
+      if (!c.taken && (!c.reefCache || reefCacheOpen) && close(p,c,24,29)) {if(c.refill){
+          if(p.dashUsed) status('Dash recharged.');
+          p.dashUsed=false;
+        }c.taken=true;burst(c.x,c.y,c.refill?'#82ffe6':'#ffdb80',9);playPickup();taken++;if(index===3)rings++;p.crystalCombo=(p.crystalCombo||0)+1;hud();}
     }
     for(let i=looseRings.length-1;i>=0;i--){
       const ring=looseRings[i];
