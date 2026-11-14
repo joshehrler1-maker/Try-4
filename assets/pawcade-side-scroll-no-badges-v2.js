@@ -2066,7 +2066,10 @@
     switch (enemyPattern) {
       case 'turret': return {x:foe.x,y:foe.y};
       case 'charge': return {x:patrolX(foe.x+chase*Math.max(0,wave)*enemyReach),y:foe.y};
-      case 'hopper': return {x:patrolX(foe.x+wave*enemyReach),y:foe.y-Math.max(0,Math.sin(t*3.5))*enemyRise};
+      case 'hopper': { // Distinct jumping arcs with a grounded landing phase
+        const hop=Math.max(0,Math.sin(t*3.5));
+        return {x:patrolX(foe.x+wave*enemyReach),y:foe.y-hop*hop*enemyRise};
+      }
       case 'swoop': { // Rayman / Klonoa / Ori: readable aerial swoops
         // The dive is steepest at the center of the flight arc, with a
         // distinct climb afterward rather than a flat sine-wave patrol.
@@ -2084,8 +2087,9 @@
         const cycle=(t*.42)%3;
         const advance=cycle<1 ? cycle : cycle<1.7 ? 1 :
           Math.max(.3,1-(cycle-1.7)*.5);
-        return {x:patrolX(foe.x+chase*enemyReach*advance),
-          y:foe.y-enemyRise};
+        // Chasers on ordinary platforms stay grounded; only explicitly
+        // airborne course enemies use vertical flight paths.
+        return {x:patrolX(foe.x+chase*enemyReach*advance),y:foe.y};
       }
       case 'rhythm': { // Geometry Dash-inspired predictable beat timing
         const beat=Math.floor(t*1.5);
