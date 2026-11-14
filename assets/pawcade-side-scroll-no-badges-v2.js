@@ -679,6 +679,36 @@
         [1,2,3,0,4],[0,1,3,4,2],[2,1,3,0,4],[1,3,2,0,4],[0,2,4,1,3],
         [0,3,1,4,2],[1,0,4,2,3],[2,1,0,4,3],[0,2,3,4,1],[1,3,0,4,2]
       ];
+      // Original, individually authored mechanical palettes for all 25
+      // adventures. Chapter beats select an interaction rather than merely
+      // changing geometry, preserving each world's distinct movement rules.
+      const worldMechanicPalettes=[
+        ['floor','spring','floor','shelf','spring'],
+        ['shelf','lift','shelf','floor','lift'],
+        ['current','floor','current','current','floor'],
+        ['belt','spring','belt','floor','belt'],
+        ['barrel','floor','barrel','spring','barrel'],
+        ['floor','lift','spring','lift','floor'],
+        ['spring','floor','spring','lift','spring'],
+        ['floor','shelf','floor','shelf','floor'],
+        ['floor','spring','floor','spring','floor'],
+        ['floor','rail','lift','rail','floor'],
+        ['floor','lift','current','lift','floor'],
+        ['lift','floor','lift','spring','lift'],
+        ['pogo','floor','pogo','spring','pogo'],
+        ['floor','spring','shelf','spring','floor'],
+        ['shelf','floor','lift','floor','shelf'],
+        ['lift','spring','lift','floor','lift'],
+        ['shelf','belt','shelf','belt','shelf'],
+        ['ice','shelf','ice','floor','ice'],
+        ['shelf','floor','shelf','floor','shelf'],
+        ['current','lift','current','floor','current'],
+        ['belt','spring','belt','spring','belt'],
+        ['shelf','floor','shelf','floor','shelf'],
+        ['pogo','spring','pogo','floor','pogo'],
+        ['spring','lift','spring','floor','spring'],
+        ['shelf','lift','shelf','belt','shelf']
+      ];
       const beatOrder=worldBeatOrders[index];
       const chapterBeat=beatOrder[stage%beatOrder.length];
       for(const [slot,[dx,sy,sw,kind]] of (signatureFits?signature:[]).entries()){
