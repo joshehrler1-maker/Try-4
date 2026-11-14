@@ -6520,6 +6520,35 @@
         ctx.restore();
       }
     }
+    if(index===18 && p.ledgeGrip){
+      const {edge,left}=p.ledgeGrip;
+      const handX=left?edge.x:edge.x+edge.w;
+      ctx.save();
+      ctx.strokeStyle='#a96b45';
+      ctx.lineWidth=5;
+      ctx.lineCap='round';
+      ctx.beginPath();
+      ctx.moveTo(p.x,p.y-13);
+      ctx.lineTo(handX,edge.y+2);
+      ctx.stroke();
+      ctx.fillStyle='#f4cc94';
+      ctx.fillRect(handX-5,edge.y-2,10,6);
+      ctx.restore();
+    }
+    if(index===20 && p.on && Math.abs(p.vx)>runSpeed*.83 && !reducedMotion){
+      ctx.save();
+      ctx.translate(p.x,p.y+17);
+      ctx.scale(Math.sign(p.vx),1);
+      ctx.strokeStyle='#ffd87a';
+      ctx.lineWidth=2;
+      for(let streak=0;streak<3;streak++){
+        ctx.beginPath();
+        ctx.moveTo(-19,streak*4-8);
+        ctx.lineTo(-40-streak*6,streak*4-6);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
     drawAtmosphere(true);
     if(chapterReveal>0 && phase==='playing') {
       ctx.save();
