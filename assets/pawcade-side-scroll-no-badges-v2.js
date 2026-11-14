@@ -3186,7 +3186,12 @@
     }
     if(index===8){ // Stage Beat: enemies move on predictable musical counts
       const beat=t*1.45;
-      const step=Math.round(Math.sin(beat)*3)/3;
+      // Blend quantized rhythm poses with the continuous beat trajectory.
+      // Pure rounding teleports enemies between positions, producing visible
+      // stutter and sudden collision jumps on high-refresh mobile screens.
+      const flowingStep=Math.sin(beat);
+      const markedStep=Math.round(flowingStep*3)/3;
+      const step=flowingStep*.72+markedStep*.28;
       const pulse=Math.max(0,Math.sin(beat*2));
       return {x:patrolX(foe.x+step*enemyReach*.65),
         y:foe.y-pulse*pulse*enemyRise*.55};
