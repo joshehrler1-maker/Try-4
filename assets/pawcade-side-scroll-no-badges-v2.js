@@ -318,6 +318,12 @@
         // Encounter density follows each course's traversal identity:
         // fast courses keep wider reaction gaps, while combat-oriented
         // courses use more sustained pressure on safe, wide platforms.
+        // Individual enemy spacing in each world, based on its traversal
+        // demands: speed routes need longer reaction time, while
+        // precision and combat courses can support closer encounters.
+        const worldEncounterMargins=[
+          22,15,26,34,18,24,20,12,32,18,23,19,16,21,14,25,13,18,11,16,36,14,20,23,17
+        ];
         const fastCourse=[3,7,8,11,20,23].includes(index);
         const combatCourse=[1,12,16,19,21,24].includes(index);
         const extraEncounter=stage>=3 && w>=720 &&
