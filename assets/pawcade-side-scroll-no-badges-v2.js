@@ -83,8 +83,8 @@
     catalog.before(notice);
     return;
   }
-  // Twenty individually authored stage-1 set pieces (not collision geometry).
-  // Images are per-game: no other game requests these twenty files.
+  // Twenty-five individually authored stage-1 set pieces (not collision geometry).
+  // Images are per-game: no other game requests these 25 files.
   const firstStageLandmarkPaths = [
     'assets/scenes/ember-foundry/cold-intake-beacon.svg',
     'assets/scenes/moonlit-library/atlas-lectern.svg',
@@ -105,7 +105,12 @@
     'assets/scenes/steamworks/intake-valve-pressure-console.svg',
     'assets/scenes/snow-village/hearth-trail-ember-marker.svg',
     'assets/scenes/canyon-crossing/rope-bridge-winch.svg',
-    'assets/scenes/submarine-dock/street-insertion-comms-post.svg'
+    'assets/scenes/submarine-dock/street-insertion-comms-post.svg',
+    'assets/scenes/neon-circuit/lobby-sprint-photofinish-gate.svg',
+    'assets/scenes/marble-temple/ruined-village-moon-seal.svg',
+    'assets/scenes/swamp-ferry/jungle-relics-firefly-ferry-post.svg',
+    'assets/scenes/sunflower-flight/grass-patch-pollen-vane.svg',
+    'assets/scenes/starship-cargo/outpost-landing-rescue-pod-panel.svg'
   ];
   // Surveyed against the CURRENT first room in each platform-world plan.
   // Art placement is decorative; no new hitboxes or platform collision edits.
@@ -130,8 +135,32 @@
     [560, 95,170,170], // 16 Root Cellar: course16Stage1 x530..750 top265
     [590,114,170,170], // 17 Market Rooftops: course17Stage1 x560..835 top284
     [565,114,170,170], // 18 Prison Steps: course18Stage1 x550..780 top284
-    [340,105,170,170]  // 19 Street Insertion: course19Stage1 x300..540 top275
+    [340,105,170,170], // 19 Street Insertion: course19Stage1 x300..540 top275
+    [800, 84,160,170], // 20 Lobby Sprint: course20Stage1 x772..1295 top254
+    [590,124,170,170], // 21 Ruined Village: moonVillage x552..820 top294
+    [465,123,170,170], // 22 Jungle Relics: ferryJungle x442..662 pogo top293
+    [625,117,170,170], // 23 Grass Patch: course23Stage1 x600..910 top287
+    [765, 76,180,170]  // 24 Outpost Landing: course24Stage1 x710..1060 top246
   ];
+  // Batch 5 includes the first individually authored second-stage art.
+  // Coordinates are STAGE-LOCAL, translated by stageStarts[1] at render.
+  // Keep loading limited to the five games that own these assets.
+  const secondStageLandmarkPaths = [
+    'assets/scenes/neon-circuit/dungeon-heat-overdrive-coil.svg',
+    'assets/scenes/marble-temple/moon-gate-key-relief.svg',
+    'assets/scenes/swamp-ferry/haunted-manor-ghost-ferry-lamp.svg',
+    'assets/scenes/sunflower-flight/stitched-desert-thread-spool.svg',
+    'assets/scenes/starship-cargo/mountain-convoy-supply-uplink.svg'
+  ];
+  const secondStageLandmarkPositions = [
+    [585,131,170,170], // 20 Dungeon Heat x548..830 top301
+    [635, 62,170,170], // 21 Moon Gate x613..834 top232
+    [320, 81,170,170], // 22 Haunted Manor x280..510 top251
+    [545,106,170,170], // 23 Stitched Desert x507..759 spring top276
+    [877, 69,170,170]  // 24 Mountain Convoy x849..1149 top239
+  ];
+  const secondStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
+  if (secondStageLandmark) secondStageLandmark.src = secondStageLandmarkPaths[index - 20];
   const firstStageLandmark = index < firstStageLandmarkPaths.length ? new Image() : null;
   if (firstStageLandmark) firstStageLandmark.src = firstStageLandmarkPaths[index];
   const backdrop = new Image();
@@ -6927,6 +6956,13 @@
       const [artX,artY,artW,artH] = firstStageLandmarkPositions[index];
       if (artX + artW >= camera && artX <= camera + width) {
         ctx.drawImage(firstStageLandmark, artX, artY, artW, artH);
+      }
+    }
+    if (secondStageLandmark?.naturalWidth && sections >= 2) {
+      const [localX,artY,artW,artH] = secondStageLandmarkPositions[index - 20];
+      const artX = stageStarts[1] + localX;
+      if (artX + artW >= camera && artX <= camera + width) {
+        ctx.drawImage(secondStageLandmark, artX, artY, artW, artH);
       }
     }
     for (const wall of walls) {
