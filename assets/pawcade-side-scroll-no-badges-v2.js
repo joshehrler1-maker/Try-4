@@ -7043,6 +7043,13 @@
         foe._chargeCompression=0;
         foe._strideWeight=0;
         foe._idleWeight=1;
+        // Reset secondary rig springs after a teleport or long render gap.
+        // Otherwise an old attack/impact pose can survive a respawn.
+        foe._attackGaitBlend=undefined;
+        foe._plantFrameAt=clock;
+        foe._rigFrameAt=clock;
+        foe._rigHitReaction=0;
+        foe._rigWasBashed=Boolean(foe.bashed);
         foe.gaitTime=clock;
       }
       const displacement=at.x-(foe._drawX??at.x);
