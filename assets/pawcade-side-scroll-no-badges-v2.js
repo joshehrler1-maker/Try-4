@@ -2124,9 +2124,9 @@
       playCue(390,780);
       status('Amber switch activated. The upper bridge is open.');
     }
-    if(index===5){
+    if(index===5 || index===23){
       const gliding=!p.on && held('jump') && p.vy>0;
-      p.canopyOpen=Math.max(0,Math.min(1,(p.canopyOpen??0)+dt*(gliding?12:-9)));
+      p.canopyOpen=Math.max(0,Math.min(1,(p.canopyOpen??0)+dt*(index===23?(gliding?8:-12):(gliding?12:-9))));
     }
     const stage = stageAt(p.x);
     if (oldY <= height && p.x>=finish && oldX<finish) {
@@ -6583,9 +6583,13 @@
       ctx.stroke();
       ctx.restore();
     }
-    if(index===23 && gliding){
+    if(index===23 && (reducedMotion?gliding:(p.canopyOpen??0)>0)){
+      const opening=reducedMotion?1:p.canopyOpen;
+      const bloom=opening*(2-opening);
       ctx.save();
-      ctx.translate(p.x,p.y-25);
+      ctx.translate(p.x,p.y-25+7*(1-bloom));
+      ctx.scale(.18+.82*bloom,.55+.45*bloom);
+      ctx.globalAlpha*=opening;
       ctx.strokeStyle='#674460';
       ctx.fillStyle='#ffe08a';
       ctx.lineWidth=2;
