@@ -243,7 +243,7 @@
     ['#f89ce4','pull',78,.44], // Yarn draw
     ['#ff9f72','lob',121,.48] // Grenade trail
   ];
-  let signatureEffect;
+  let signatureEffect, landingEffect;
   const particles=[];
   let rings=0;
   let amberSwitch=false;
@@ -987,6 +987,7 @@
     escape = null;
     particles.length=0;
     signatureEffect=null;
+    landingEffect=null;
     looseRings.length=0;
     rings=0;
     amberSwitch=false;
@@ -1289,6 +1290,7 @@
   function respawn() {
     clearInput();
     signatureEffect=null;
+    landingEffect=null;
     for(const ledge of platforms) if(ledge.kind==='drop') ledge.dropAt=undefined;
     if(index===11){
       const start=stageStarts[chapter];
@@ -1642,7 +1644,10 @@
         p.y=ledge.y+20+body;p.vy=0;
       }
       if (!landed && p.vy >= 0 && oldY+body <= ledge.y && p.y+body >= ledge.y) {
-        if(!wasGrounded && p.vy>190) p.landingPose=.13;
+        if(!wasGrounded && p.vy>190) {
+          p.landingPose=.13;
+          landingEffect={x:p.x,y:ledge.y,at:clock,speed:p.vy,kind:ledge.kind};
+        }
         p.y = ledge.y-body;p.vy = 0;p.on = true;p.jumps = 0;p.dashUsed=false;
         // Consume the buffered jump on the landing tick instead of
         // requiring the player to wait until the next simulation frame.
@@ -4885,6 +4890,44 @@
     if(finale==='summit') return 'UPPER EXIT';
     return index===20?'RESET':'EXIT';
   }
+  function drawLandingEffect() {
+    if(!landingEffect) return;
+    const {x,y,at,speed,kind}=landingEffect;
+    const t=(clock-at)/.27;
+    if(t>=1) return;
+    const [color,shape,reach]=signatureEffects[index];
+    const distance=reducedMotion ? .25 : t;
+    const radius=(8+distance*(13+reach*.16))*Math.min(1.4,speed/280);
+    ctx.save();
+    ctx.translate(x,y-2);
+    ctx.globalAlpha=(1-t)*.65;
+    ctx.strokeStyle=color;
+    ctx.fillStyle=color;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    if(kind==='current' || shape==='wave' || shape==='spiral'){
+      ctx.ellipse(0,0,radius,radius*.21,0,Math.PI,2*Math.PI);
+      ctx.moveTo(radius*.72,0);
+      ctx.ellipse(0,0,radius*.72,radius*.13,0,0,Math.PI);
+      ctx.stroke();
+    } else {
+      const height=kind==='spring' ? 24 : shape==='drop' ? 16 : 9;
+      for(const side of [-1,1]){
+        for(let k=0;k<4;k++){
+          const px=side*radius*(.45+k*.28);
+          const py=-Math.sin(Math.PI*distance)*height*(1-k*.17);
+          if(shape==='tiles' || kind==='ice') ctx.rect(px-1.5,py-1.5,3,3);
+          else {
+            ctx.moveTo(px,py);
+            ctx.lineTo(px+side*(3+k),py-3);
+          }
+        }
+      }
+      if(shape==='tiles' || kind==='ice') ctx.fill();
+      else ctx.stroke();
+    }
+    ctx.restore();
+  }
   function drawTechniqueTrails() {
     for(const attack of attacks){
       if(!attack.trail?.length) continue;
@@ -5384,6 +5427,7 @@
       }
       ctx.restore();
     }
+    drawLandingEffect();
     drawTechniqueTrails();
     drawSignatureEffect();
     for(const spark of particles) {
