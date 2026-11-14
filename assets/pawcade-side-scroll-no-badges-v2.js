@@ -5841,10 +5841,15 @@
       // Recoil is anchored to the facing side; radius and arc spacing vary
       // by world instead of applying one generic muzzle effect everywhere.
       const recoilRadius=8+index%4*2;
+      const recoilWobble=Math.sin(phase)*.15;
+      // Mirror the actual arc as well as its origin. Previously left-facing
+      // enemies still emitted right-facing arcs despite moving the origin.
+      const recoilCenter=direction<0?Math.PI:0;
       for(let n=0;n<2;n++){
         ctx.beginPath();ctx.arc(direction*(21+index%3),-13,
           recoilRadius+n*(5+index%3),
-          -.9+Math.sin(phase)*.15,.9+Math.sin(phase)*.15);ctx.stroke();
+          recoilCenter-.9+recoilWobble,recoilCenter+.9+recoilWobble);
+        ctx.stroke();
       }
     }else if(stride>.12){
       // Distance-based ground contacts scale with movement and fade as the
