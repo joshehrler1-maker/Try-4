@@ -1308,7 +1308,11 @@
         // Escalate ranged threats chapter by chapter, capped to keep
         // dodge windows readable on touchscreen and avoid bullet spam.
         const rangedPressure=1+Math.min(5,Math.max(0,chapter))*0.075;
-        foe.shotAt=clock+cadence/enemyTempo*shotDelay/rangedPressure;
+        // Distinct ranged archetypes: sentries shoot more deliberately,
+        // raiders press harder, while the existing chapter cap applies.
+        const attackRhythm=[1,1.22,.92,.83][foe.archetype??0];
+        foe.shotAt=clock+cadence/enemyTempo*shotDelay*
+          attackRhythm/rangedPressure;
       }
       const impact=attacks.find(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)));
       if(impact){
