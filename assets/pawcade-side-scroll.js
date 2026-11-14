@@ -56,7 +56,7 @@
     airdash:'dash',pogo:'stomp',blaster:'throw',shooter:'throw',whip:'pulse',momentum:'dash'};
   const power = special[movement] || (movement in {stomp:1,swim:1,glide:1,flip:1,grapple:1,throw:1} ? movement : coursePower);
   const descriptions = {
-    stomp:'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim. Surface or visit a bubbling vent for air',
+    stomp:index===0?'Land on enemies to bounce. Hold Jump for a higher rebound.':'Bounce off enemies', slide:'Hold Action to slide under low shelves', swim:'Steer in four directions to swim. Surface or visit a bubbling vent for air',
     dash:'Press Action to dash', vine:'Press Action to climb into a high route', glide:'Hold Jump to glide',
     throw:'Press Action to throw a crystal', flip:index===7?'Press Flip (X or Space on keyboard) while on the floor or ceiling to reverse gravity':'Press Action to reverse gravity',
     pulse:'Press Action to release a shockwave', grapple:'Press Action below an overhead rail to attach. Steer to swing, then press Release Cable to let go',
@@ -976,7 +976,10 @@
       if (attacks.some(a => a.life>0 && close(a,position,20+(a.radius||8),20+(a.radius||8)))) foe.dead=true;
       if (!foe.dead && !(foe.bashed && clock<foe.bashed.until) && close(p,position,29,34)) {
         if ((p.vy>65 && oldY<position.y-17) || (power==='dash' && p.power>.22)) {
-          foe.dead=true;p.vy=p.pogo || (movement==='pogo' && held('jump')) ? -560 : -320;p.pogo=false;p.on=false;
+          foe.dead=true;
+          p.vy=p.pogo || (movement==='pogo' && held('jump')) ? -560 :
+            index===0 && held('jump') ? -440 : -320;
+          p.pogo=false;p.on=false;
         } else if (hit()) return;
       }
     }
