@@ -6076,10 +6076,11 @@
       const verticalSpeed=previousY===undefined||blendDt<=0?0:
         Math.max(-650,Math.min(650,(at.y-previousY)/Math.max(.008,blendDt)));
       foe._previousDrawY=at.y;
-      const touchingDown=!airborne && verticalSpeed>55 &&
-        (foe._lastVerticalSpeed||0)<=0;
-      foe._lastVerticalSpeed=verticalSpeed;
-      if(touchingDown) foe._landingPose=Math.max(foe._landingPose||0,Math.min(.085,verticalSpeed/4800));
+      const previousFall=foe._lastVerticalSpeed||0;
+      const touchingDown=!airborne && elapsed>0 && elapsed<=.05 &&
+        travel<90 && previousFall>55 && verticalSpeed<=12;
+      if(elapsed>0) foe._lastVerticalSpeed=verticalSpeed;
+      if(touchingDown) foe._landingPose=Math.max(foe._landingPose||0,Math.min(.085,previousFall/4800));
       foe._landingPose=(foe._landingPose||0)*Math.exp(-9*blendDt);
       const landingPose=reducedMotion?0:foe._landingPose;
       const verticalLean=reducedMotion?0:Math.max(-.045,Math.min(.045,verticalSpeed/9000));
