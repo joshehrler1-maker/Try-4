@@ -7120,7 +7120,13 @@
       syncControllerArt(chapter);
       amberSwitch=saved.amberSwitch===true;
       reefCacheOpen=saved.reefCacheOpen===true;
-      for(const i of saved.crystals) if(crystals[i]) crystals[i].taken=true;
+      for(const i of saved.crystals){
+        const crystal=crystals[i];
+        if(!crystal) continue;
+        // Resume at the chapter start with its traversal refills available.
+        if(crystal.refill && crystal.x>=stageStarts[chapter] && crystal.x<stageStarts[chapter+1]) continue;
+        crystal.taken=true;
+      }
       for(const i of saved.enemies) if(enemies[i]) enemies[i].dead=true;
       taken=crystals.filter(c=>c.taken).length;
       player=resetPlayer(stageStarts[chapter]+100);
