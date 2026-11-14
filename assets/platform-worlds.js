@@ -769,3 +769,21 @@ for (const [room, placements] of Object.entries(chapterPlatformPlacements)) {
     window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
   }
 }
+
+// Thunder Harbor and Swamp Ferry room-specific landing placements.
+for (const [room, slot, x, y, width] of [
+  ["course12Stage1",2,880,242,290],
+  ["course12Stage2",2,720,226,280],
+  ["course12Stage3",2,752,246,282],
+  ["course12Stage4",2,828,237,234],
+  ["course12Stage5",2,808,226,309],
+  ["course12Stage6",3,1128,181,302],
+  ["ferryJungle",2,716,250,231],
+  ["ferryManor",3,923,236,286],
+  ["ferryMine",2,848,244,240],
+  ["ferrySnow",2,814,257,286],
+  ["ferryMoon",3,932,168,283],
+  ["ferryReturn",3,981,240,280],
+]) {
+  window.pawtopiaRooms[room][slot].splice(0, 3, x, y, width);
+}
