@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Intake Valve — original pressure-regulator assembly"><defs><linearGradient id="bamboo" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a6f2e0"/><stop offset=".27" stop-color="#416571"/><stop offset=".65" stop-color="#1c2b3e"/><stop offset="1" stop-color="#416571"/></linearGradient><linearGradient id="lantern" x1="0" y1="0" x2="0.8" y2="1"><stop stop-color="#fff9d6"/><stop offset=".48" stop-color="#e4c18b"/><stop offset="1" stop-color="#7d463a"/></linearGradient><radialGradient id="aura"><stop stop-color="#a6f2e0" stop-opacity=".9"/><stop offset=".44" stop-color="#e4c18b" stop-opacity=".33"/><stop offset="1" stop-color="#a6f2e0" stop-opacity="0"/></radialGradient></defs><ellipse cx="90" cy="79" rx="73" ry="60" fill="url(#aura)" opacity=".35"/>
+<path d="M33 157V91l24-20h66l24 20v66" fill="url(#bamboo)" stroke="#a1bec1" stroke-width="5"/>
+<path d="M44 157V99h92v58" fill="#243f4b" stroke="#7c9fa7" stroke-width="4"/>
+<path d="M22 119h28v19H22zm110 0h26v19h-26" fill="#7a6153" stroke="#d4b28b" stroke-width="4"/>
+<circle cx="90" cy="80" r="46" fill="#1f3945" stroke="#dca76e" stroke-width="7"/>
+<circle cx="90" cy="80" r="34" fill="url(#bamboo)" stroke="#b7d4d5" stroke-width="4"/>
+<circle cx="90" cy="80" r="28" fill="#f4dfb2" stroke="#5e8496" stroke-width="3"/>
+<path d="M90 80L114 63" stroke="#c94b3e" stroke-width="6" stroke-linecap="round"/>
+<circle cx="90" cy="80" r="7" fill="#384b56"/>
+<path d="M64 65l6 3m41-2-5 3M62 94l7-3m40 0 8 3" stroke="#39556b" stroke-width="3"/>
+<path d="M90 34V13m-30 14 30-14 30 14" stroke="#91a8af" stroke-width="6" fill="none"/>
+<path d="M90 13v18" stroke="#d8eaf0" stroke-width="4"/>
+<path d="M66 149h48" stroke="#ecb470" stroke-width="6"/><path d="M15 158h150" stroke="#8e6759" stroke-width="8"/></svg>
