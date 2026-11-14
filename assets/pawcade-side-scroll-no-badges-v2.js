@@ -7189,14 +7189,26 @@
       const seedLeap=index===4 && enemyPattern==='hopper' && !reducedMotion;
       const seedAscent=seedLeap?Math.max(0,Math.min(1,-verticalSpeed/280))*.055:0;
       const seedDescent=seedLeap?Math.max(0,Math.min(1,verticalSpeed/330))*.045:0;
+      // Separate visual response for games 6–10; no mechanics or assets are
+      // shared between their counterpart-specific action signatures.
+      const waterfallDive=index===5 && enemyPattern==='swoop' && !reducedMotion
+        ?Math.max(0,Math.min(1,verticalSpeed/420))*.045:0;
+      const lanternFloat=index===6 && !reducedMotion
+        ?Math.sin(clock*2.1+foe.offset)*.018:0;
+      const polarityTurn=index===7 && !reducedMotion
+        ?Math.max(-.055,Math.min(.055,verticalSpeed/4800)):0;
+      const stagePulse=index===8 && enemyPattern==='rhythm' && !reducedMotion
+        ?Math.max(0,Math.sin(clock*6+foe.offset))*.028:0;
+      const quarryBrace=index===9 && firing && !reducedMotion
+        ?attackPose*.035:0;
       ctx.save();
       // A distinct animation state for patrolling, hopping, flying and firing.
       ctx.translate(at.x,at.y+19);
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
-      else ctx.rotate(enemyLean+attackTilt+verticalLean);
-      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5-seedAscent*.5+seedDescent,
-        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression+seedAscent-seedDescent);
+      else ctx.rotate(enemyLean+attackTilt+verticalLean+polarityTurn);
+      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5-seedAscent*.5+seedDescent+stagePulse+quarryBrace-waterfallDive*.4,
+        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression+seedAscent-seedDescent+waterfallDive+lanternFloat-stagePulse-quarryBrace);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(!reducedMotion){
         const flex=airborne ? motion*.2 : footCycle*movingWeight*.22;
