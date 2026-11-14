@@ -592,7 +592,7 @@
     reefCacheOpen=false;
     player = resetPlayer();
     boss = {x:finish+465,y:ground-41,health:finale==='guardian'?5:0,grace:0,time:0,nextShot:1};
-    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;e.faceLeft=undefined;e._attackPose=0;});
+    enemies.forEach(e => {e.dead = false;e.shotAt=0;e.lastShotAt=undefined;e.shotsFired=0;e.bashed=null;e._drawX=undefined;e._gait=0;e.gaitWeight=0;e.gaitTime=undefined;e.faceLeft=undefined;e._attackPose=0;e._previousDrawY=undefined;e._lastVerticalSpeed=0;e._landingPose=0;});
     platforms.forEach(ledge=>{ledge.dropAt=undefined;});
     crystals.forEach(c => {c.taken = false;});
     camera = chapter = taken = clock = 0;
@@ -3427,14 +3427,26 @@
       const attackPose=reducedMotion?0:foe._attackPose;
       const squash=attackPose*.045;
       const attackTilt=(faceLeft?-1:1)*attackPose*.055;
+      // Height-following spring adds a soft touchdown and recovery to jumping
+      // foes; the pose is cosmetic and cannot alter their collision geometry.
+      const previousY=foe._previousDrawY;
+      const verticalSpeed=previousY===undefined||blendDt<=0?0:
+        Math.max(-650,Math.min(650,(at.y-previousY)/Math.max(.008,blendDt)));
+      foe._previousDrawY=at.y;
+      const touchingDown=!airborne && verticalSpeed>55 && (foe._lastVerticalSpeed||0)<verticalSpeed;
+      foe._lastVerticalSpeed=verticalSpeed;
+      if(touchingDown) foe._landingPose=Math.max(foe._landingPose||0,Math.min(.085,verticalSpeed/4800));
+      foe._landingPose=(foe._landingPose||0)*Math.exp(-9*blendDt);
+      const landingPose=reducedMotion?0:foe._landingPose;
+      const verticalLean=reducedMotion?0:Math.max(-.045,Math.min(.045,verticalSpeed/9000));
       ctx.save();
       // A distinct animation state for patrolling, hopping, flying and firing.
       ctx.translate(at.x,at.y+19);
       if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
       if(airborne) ctx.rotate(motion*.065);
-      else ctx.rotate(enemyLean+attackTilt);
-      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash,
-        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash);
+      else ctx.rotate(enemyLean+attackTilt+verticalLean);
+      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose,
+        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose);
       ctx.translate(-at.x,-at.y-19-footstep);
       if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing);
