@@ -6282,6 +6282,8 @@
       ctx.stroke();
       ctx.restore();
     }
+    const blasterAge=clock-(p.blasterRecoil?.time??-Infinity);
+    const blasterFiring=index===1 && blasterAge>=0 && blasterAge<.24;
     if(index===1 && (p.chargeStart!==null || blasterFiring || p.power>.13)){
       ctx.save();
       ctx.translate(p.x,p.y-7);
@@ -6334,8 +6336,6 @@
       for(let i=1;i<=3;i++) ctx.fillRect(p.x-p.facing*(22+i*12),p.y-9+i*4,12,2);
     }
     const light=['Luna','Ivy','Frost','Melody','Spark'].includes(hero);
-    const blasterAge=clock-(p.blasterRecoil?.time??-Infinity);
-    const blasterFiring=index===1 && blasterAge>=0 && blasterAge<.24;
     const shotAge=clock-(p.shotPose?.time??-Infinity);
     const firing=(index===19 || index===24) && shotAge>=0 && shotAge<.22;
     const attacking=firing || blasterFiring || (p.power>.22 && power!=='dash');
