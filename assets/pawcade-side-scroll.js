@@ -1268,6 +1268,33 @@
     ctx.restore();
   }
   // Base material, recess, and edge highlight for each catalog entry.
+  const platformInlays = [
+    new Path2D('M-8 3 L-4 -2 L0 3 L4 -2 L8 3'), // Ember Foundry
+    new Path2D('M-8 4 L-8 0 L-4 -4 L0 0 L4 -4 L8 0 L8 4'), // Moonlit Library
+    new Path2D('M-7 3 L0 -4 L7 3 M0 -4 L0 4'), // Coral Courier
+    new Path2D('M-8 3 L-8 -3 L8 -3 L8 3 M-3 -3 L-3 3 M3 -3 L3 3'), // Clocktower Relay
+    new Path2D('M-8 3 L0 -4 L8 3 L0 1 L-8 3'), // Seed Garden
+    new Path2D('M-8 -3 L0 4 L8 -3 M-4 -3 L0 0 L4 -3'), // Waterfall Climb
+    new Path2D('M-8 0 L0 -4 L8 0 L0 4 Z M0 -4 L0 4'), // Lantern Festival
+    new Path2D('M-8 0 L-4 -4 L4 -4 L8 0 L4 4 L-4 4 Z'), // Crystal Polarity
+    new Path2D('M-8 2 L-5 2 L-5 -2 L-1 -2 L-1 4 L3 4 L3 -4 L7 -4'), // Stage Beat
+    new Path2D('M-8 3 L-4 -4 L0 1 L4 -2 L8 3'), // Quarry Rescue
+    new Path2D('M-8 4 L0 -4 L8 4 Z M0 -4 L0 4'), // Sunset Wind Sail
+    new Path2D('M-8 2 L-4 -1 L0 2 L4 -1 L8 2 M-4 -1 L-2 -4 L2 -4 L4 -1'), // Cloud City
+    new Path2D('M-8 -3 L1 -3 L-2 1 L8 1 L1 4'), // Thunder Harbor
+    new Path2D('M-8 -3 L0 -1 L8 4 M0 -1 L3 -4 M0 -1 L-3 3'), // Autumn Trail
+    new Path2D('M-8 0 L8 0 M0 -4 L0 4 M-4 -3 L4 3'), // Inverted Observatory
+    new Path2D('M-8 -4 L-8 4 M0 -4 L0 4 M8 -4 L8 4 M-8 0 L8 0'), // Bamboo Village
+    new Path2D('M-8 4 L-3 -4 L3 -4 L8 4 M-5 0 L5 0'), // Steamworks
+    new Path2D('M-8 -3 L0 3 L8 -3 M-8 3 L0 -3 L8 3'), // Snow Village
+    new Path2D('M-8 4 L-8 1 L-3 1 L-3 -2 L2 -2 L2 -4 L8 -4'), // Canyon Crossing
+    new Path2D('M-8 -4 L8 -4 L8 4 L-8 4 Z M-4 0 L4 0'), // Submarine Dock
+    new Path2D('M-8 3 L-4 3 L-4 -3 L4 -3 L4 3 L8 3'), // Neon Circuit
+    new Path2D('M-8 4 L-8 -4 L8 -4 L8 4 M-4 4 L-4 0 L4 0 L4 4'), // Marble Temple
+    new Path2D('M-8 2 L-3 -1 L1 1 L8 -3 M-3 -1 L-1 -4'), // Swamp Ferry
+    new Path2D('M-8 0 L0 -4 L8 0 L0 4 Z M-5 0 L5 0'), // Sunflower Flight
+    new Path2D('M-8 -4 L-4 0 L-8 4 M8 -4 L4 0 L8 4 M-2 0 L2 0')  // Starship Cargo
+  ];
   const courseMaterials = [
     ['#59404a','#21151e','#dda973'], // Ember Foundry
     ['#32475b','#182638','#94c6d4'], // Moonlit Library
@@ -1700,35 +1727,23 @@
     // visibly different from its side wall. Five material families combine
     // with each world's palette and six chapter construction patterns.
     // Keep accents inset so the collision edge remains visually unambiguous.
-    const materialFamily=[0,2,3,1,4,3,2,0,2,1,4,3,1,4,0,4,1,3,4,3,2,0,4,4,1][index];
-    const segment=materialFamily===1?23:materialFamily===2?17:materialFamily===3?31:27;
-    // Clamp decoration loops to the actual ledge bounds. A long level's
-    // camera can be far past this ledge; negative iteration counts otherwise
-    // create unnecessary work and off-platform pattern marks.
-    const left=Math.max(0,Math.floor((camera-x)/segment)-1);
-    const right=Math.max(left,Math.min(Math.ceil(w/segment),Math.ceil((camera+width-x)/segment)+1));
-    ctx.save();
-    ctx.beginPath();ctx.rect(x+2,y-topDepth+1,Math.max(0,w-4),topDepth-1);ctx.clip();
-    ctx.strokeStyle=rim;ctx.fillStyle=rim;ctx.globalAlpha=.66;ctx.lineWidth=1.5;
-    for(let tile=left;tile<right;tile++){
-      const px=x+tile*segment+segment*.5;
-      if(materialFamily===0){ // polished crystal facets
-        ctx.beginPath();ctx.moveTo(px-5,y-2);ctx.lineTo(px,y-topDepth+2);
-        ctx.lineTo(px+5,y-2);ctx.stroke();
-      }else if(materialFamily===1){ // riveted metal decking
-        ctx.beginPath();ctx.arc(px,y-3,1.5,0,Math.PI*2);ctx.fill();
-        ctx.fillRect(px-7,y-topDepth+2,14,1);
-      }else if(materialFamily===2){ // carved stone tiles
-        ctx.beginPath();ctx.moveTo(px-7,y-2);ctx.lineTo(px-2,y-topDepth+2);
-        ctx.moveTo(px+5,y-2);ctx.lineTo(px+9,y-topDepth+2);ctx.stroke();
-      }else if(materialFamily===3){ // rolling water and ice ripples
-        ctx.beginPath();ctx.moveTo(px-10,y-4);ctx.quadraticCurveTo(px-5,y-topDepth+1,px,y-4);
-        ctx.quadraticCurveTo(px+5,y-1,px+10,y-4);ctx.stroke();
-      }else{ // organic leaf and wooden grain
-        ctx.beginPath();ctx.ellipse(px,y-4,6,2.1,-.3,0,Math.PI*2);ctx.stroke();
+    if(kind!=='belt' && kind!=='current' && kind!=='drop' && topDepth>=7){
+      const segment=28;
+      const left=Math.max(0,Math.floor((camera-x)/segment));
+      const right=Math.min(Math.floor(w/segment),Math.ceil((camera+width-x)/segment));
+      ctx.save();
+      ctx.strokeStyle=rim;
+      ctx.globalAlpha=.78;
+      ctx.lineWidth=.85;
+      for(let tile=left;tile<right;tile++){
+        ctx.save();
+        ctx.translate(x+(tile+.5)*segment,y-topDepth*.5);
+        ctx.scale(1,(topDepth-3)/8);
+        ctx.stroke(platformInlays[index]);
+        ctx.restore();
       }
+      ctx.restore();
     }
-    ctx.restore();
     // A narrow bevel and inset underside add a readable 2.5D profile
     // without painting over the actual collision surface. Limit drawing
     // to the viewport to keep long levels inexpensive on Android.
