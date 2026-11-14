@@ -1,5 +1,45 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
+> **Current authoritative placement status (Batch 4, Nov 14):** The source later overrides some early chapter titles and room plans. The current stage names and placement table below supersede all earlier historical batch captions, stage labels, and fixed-position claims in this document. They are tested against the repository's live code configuration, **not live browser/device gameplay**. All currently integrated additions are SVG scenery, **not feature-film 3D**, and none of the 25 game movies is finished.
+
+## Current 20-game Stage 1 asset registry and integration geometry
+
+| Game | Actual current Stage 1 | Integrated asset | World top-left | Draw scale | Bottom-center pivot (world x,y) | Collision surface | Layer / trigger |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 01 Ember Foundry | Foundry Trail | `assets/scenes/ember-foundry/cold-intake-beacon.svg` | (575, 131) | 160×170 | (655, 301) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 02 Moonlit Library | Convoy Ambush | `assets/scenes/moonlit-library/atlas-lectern.svg` | (535, 146) | 170×170 | (620, 316) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 03 Coral Courier | Home Reef | `assets/scenes/coral-courier/pearl-vent.svg` | (590, 156) | 180×170 | (680, 326) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 04 Clocktower Relay | Coastal Run | `assets/scenes/clocktower-relay/sunrise-gear.svg` | (620, 156) | 170×170 | (705, 326) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 05 Seed Garden | Seedship Deck | `assets/scenes/seed-garden/seed-lantern.svg` | (730, 156) | 160×170 | (810, 326) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 06 Waterfall Climb | Forest Rescue | `assets/scenes/waterfall-climb/spray-bridge-icefall.svg` | (605, 97) | 170×170 | (690, 267) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 07 Lantern Festival | Spring Breeze | `assets/scenes/lantern-festival/parade-gate-lantern.svg` | (725, 112) | 170×170 | (810, 282) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 08 Crystal Polarity | Transporter Deck | `assets/scenes/crystal-polarity/inverted-intake-core.svg` | (865, 156) | 170×170 | (950, 326) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 09 Stage Beat | Stereo Steps | `assets/scenes/stage-beat/sound-check-resonator.svg` | (520, 156) | 170×170 | (605, 326) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 10 Quarry Rescue | Landing Gantry | `assets/scenes/quarry-rescue/lift-house-winch.svg` | (535, 118) | 170×170 | (620, 288) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 11 Sunset Wind Sail | Windmill Village | `assets/scenes/sunset-wind-sail/sunset-pier-wind-sock.svg` | (650, 104) | 170×170 | (735, 274) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 12 Cloud City | Forsaken Towers | `assets/scenes/cloud-city/cloud-ferry-beacon.svg` | (490, 108) | 165×170 | (572.5, 278) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 13 Thunder Harbor | Plains Approach | `assets/scenes/thunder-harbor/breakwater-lightning-rod.svg` | (570, 125) | 170×170 | (655, 295) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 14 Autumn Trail | Egg-Toss Meadow | `assets/scenes/autumn-trail/feather-trail-marker.svg` | (625, 77) | 170×170 | (710, 247) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 15 Inverted Observatory | Surface Approach | `assets/scenes/inverted-observatory/lower-dome-star-lens.svg` | (610, 112) | 170×170 | (695, 282) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 16 Bamboo Village | Spirit Glade | `assets/scenes/bamboo-village/bamboo-gate-lantern.svg` | (610, 109) | 160×170 | (690, 279) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 17 Steamworks | Root Cellar | `assets/scenes/steamworks/intake-valve-pressure-console.svg` | (560, 95) | 170×170 | (645, 265) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 18 Snow Village | Market Rooftops | `assets/scenes/snow-village/hearth-trail-ember-marker.svg` | (590, 114) | 170×170 | (675, 284) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 19 Canyon Crossing | Prison Steps | `assets/scenes/canyon-crossing/rope-bridge-winch.svg` | (565, 114) | 170×170 | (650, 284) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+| 20 Submarine Dock | Street Insertion | `assets/scenes/submarine-dock/street-insertion-comms-post.svg` | (340, 105) | 170×170 | (425, 275) | Existing Stage 1 support, visual only | Passive rear world plane; no clip |
+
+All Stage 1 placements have 0 gameplay collision of their own. Each prop's visual base is aligned with the authored room's walkable top at its center in `assets/platform-worlds.js`, with collision geometry owned by the platform runtime. Draw after parallax layers but before gameplay walls, tunnels and platforms; no motion trigger yet. Because these are static painted illustrations, motion clips, attack impact frames, cape/tail deformation, and 3D lighting are **pending**.
+
+## Batch 4 — games 16–20
+
+- **16 Bamboo Village:** Spirit Glade, original bamboo lantern gateway integrated; future 3D Ivy motion and stage art pending.
+- **17 Steamworks:** Root Cellar, original industrial pressure console integrated; future Bolt and enemy 3D motion pending.
+- **18 Snow Village:** Market Rooftops, original ember-marker sign integrated; future Frost 3D motion and environments pending.
+- **19 Canyon Crossing:** Prison Steps, original canyon rope-winch scene prop integrated; future Stone 3D motion and level-specific threats pending.
+- **20 Submarine Dock:** Street Insertion, original street comms post integrated; older uninstalled sonar buoy retained as concept art (not part of playable Stage 1).
+
+**Source verification:** All twenty placement bottoms match at least one first-room support top using the current overridden source room plans; all active SVG paths are distinct and listed for offline caching; runtime JS syntax is valid. Automated regression test at `tests/platform-worlds.test.cjs`. **Live Pages, Android, enemy collision/animation and all movie/audio/caption checks remain not verified**.
+
+
 Updated 2026-11-14, GitHub default branch `main`. This is a production-status record, **not** a claim of Android playtesting, cinematic 3D assets, or completed movies.
 
 ## Reference authority
