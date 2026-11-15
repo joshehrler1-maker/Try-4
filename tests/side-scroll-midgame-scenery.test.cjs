@@ -114,5 +114,6 @@ assert(src.includes('middleStageSetpieces[index - 5]'),'No cross-game setpiece s
 assert(src.includes('stageStarts[slot.stage] + slot.x'),'Stage-local art offset lost');
 assert(src.includes('if (sections <= slot.stage || !slot.image.naturalWidth) continue;'),'Missing asset guard lost');
 assert(src.includes('if (artX + slot.w >= camera && artX <= camera + width)'),'Culling lost');
-assert(html.includes('v=live-3d-10-middle-23-20261114')&&sw.includes('v=live-3d-10-middle-23-20261114'),'Cache-buster mismatch');
+const assetVersion = html.split('pawcade-side-scroll-no-badges-v2.js?v=')[1]?.split('"')[0];
+assert(assetVersion && sw.includes('pawcade-side-scroll-no-badges-v2.js?v='+assetVersion),'Cache-buster mismatch');
 console.log('PASS: five distinct games, ten original stage 2/3 illustrated landmarks with correct art placements');

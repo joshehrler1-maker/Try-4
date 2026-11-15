@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="135" viewBox="0 0 150 135" role="img" aria-label="Storm Lodge — stormproof sky tower, radiant lightning shield">
+<defs>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eff6ff"/><stop offset=".33" stop-color="#9db5d9"/><stop offset=".68" stop-color="#657cad"/><stop offset="1" stop-color="#273d70"/></linearGradient>
+ <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fcf5c6"/><stop offset=".43" stop-color="#9db5d9"/><stop offset="1" stop-color="#273d70"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#fcf5c6"/><stop offset="1" stop-color="#8ed9ff"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#ffffff" stop-opacity=".9"/><stop offset=".26" stop-color="#fcf5c6" stop-opacity=".8"/><stop offset=".7" stop-color="#8ed9ff" stop-opacity=".3"/><stop offset="1" stop-color="#8ed9ff" stop-opacity="0"/></radialGradient>
+</defs>
+<path d="m14 120 25-12h85l15 12-23 9H29Z" fill="url(#metal)" stroke="#2e4876" stroke-width="2"/>
+<path d="M31 110V49L46 29h58l17 19v62Z" fill="url(#metal)" stroke="#3a4875" stroke-width="3"/>
+<path d="m23 49 22-24 29-16 30 16 24 24-14 9-40-25-39 25Z" fill="url(#shine)" stroke="#ddeeff" stroke-width="2"/>
+<path d="M49 108V58h51v50Z" fill="#223861" stroke="#a9c2e8" stroke-width="2"/>
+<path d="M57 67h34v29H57Z" fill="url(#glass)" stroke="#e6efff" stroke-width="2"/>
+<path d="M74 61q-15 13-3 22l9 5q-5 12-16 11" fill="none" stroke="#f7fcff" stroke-width="3"/>
+<path d="M72 51V22m0 0 17-11m-17 11L56 10" fill="none" stroke="#f2f1c5" stroke-width="4"/>
+<path d="m77 23-10 28 13-7-7 26 24-35-16 5 6-17Z" fill="#fff5c4" stroke="#ffffff" stroke-width="2"/>
+<ellipse cx="77" cy="46" rx="35" ry="40" fill="url(#aura)" opacity=".6"/>
+<path d="M16 93q15 10 24-3m66-3q16 11 30-3" fill="none" stroke="#bbf0ff" stroke-width="3"/>
+<path d="M43 111h63" stroke="#e5f9ff" stroke-width="3"/>
+<circle cx="16" cy="36" r="3" fill="#fff8cc"/><circle cx="133" cy="17" r="4" fill="#faffff"/>
+</svg>

@@ -303,6 +303,36 @@
         return {stage, image, x, y, w, h};
       })
     : [];
+  // Unique painted 3D-depth landmarks per world and stage, adventures 11-15.
+  // Render-only: world geometry, inputs, collision, and existing enemy art are unchanged.
+  const twilightStageSetpieces = [
+    [
+      ['assets/scenes/sunset-wind-sail/stage-02-tree-village-glide.svg', 1, 554, 126, 150, 135],
+      ['assets/scenes/sunset-wind-sail/stage-03-sunken-palace-ring.svg', 2, 434, 100, 150, 135]
+    ],
+    [
+      ['assets/scenes/cloud-city/stage-02-dream-passage-dash.svg', 1, 545, 134, 150, 135],
+      ['assets/scenes/cloud-city/stage-03-storm-lodge-traps.svg', 2, 587, 141, 150, 135]
+    ],
+    [
+      ['assets/scenes/thunder-harbor/stage-02-sunken-treasure-bridge.svg', 1, 636, 107, 150, 135],
+      ['assets/scenes/thunder-harbor/stage-03-lava-yard-pogo.svg', 2, 484, 153, 150, 135]
+    ],
+    [
+      ['assets/scenes/autumn-trail/stage-02-falling-rock-ravine-traps.svg', 1, 560, 157, 150, 135],
+      ['assets/scenes/autumn-trail/stage-03-roundstone-cave-steps.svg', 2, 614, 99, 150, 135]
+    ],
+    [
+      ['assets/scenes/inverted-observatory/stage-02-burrow-network-crawl.svg', 1, 634, 115, 150, 135],
+      ['assets/scenes/inverted-observatory/stage-03-thermal-galleries-traps.svg', 2, 814, 191, 150, 135]
+    ]
+  ];
+  const twilightStageArt = index >= 10 && index <= 14
+    ? twilightStageSetpieces[index - 10].map(([url, stage, x, y, w, h]) => {
+        const image = new Image(); image.src = url;
+        return {stage, image, x, y, w, h};
+      })
+    : [];
   const earlySecondStage = index < 5 ? new Image() : null;
   if (earlySecondStage) earlySecondStage.src = earlySecondStagePaths[index];
   const secondStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
@@ -7232,6 +7262,14 @@
     }
     // Five fully independent adventures, two decorative stage-specific props each.
     for (const slot of middleStageArt) {
+      if (sections <= slot.stage || !slot.image.naturalWidth) continue;
+      const artX = stageStarts[slot.stage] + slot.x;
+      if (artX + slot.w >= camera && artX <= camera + width) {
+        ctx.drawImage(slot.image, artX, slot.y, slot.w, slot.h);
+      }
+    }
+    // Twilit traversal landmarks: stage-local placement with frustum culling.
+    for (const slot of twilightStageArt) {
       if (sections <= slot.stage || !slot.image.naturalWidth) continue;
       const artX = stageStarts[slot.stage] + slot.x;
       if (artX + slot.w >= camera && artX <= camera + width) {

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="135" viewBox="0 0 150 135" role="img" aria-label="Falling Rock Ravine — warning cairn and dramatic mossy falling stone">
+<defs>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4c5"/><stop offset=".33" stop-color="#d9a379"/><stop offset=".68" stop-color="#858062"/><stop offset="1" stop-color="#48575e"/></linearGradient>
+ <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffdba9"/><stop offset=".43" stop-color="#d9a379"/><stop offset="1" stop-color="#48575e"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#ffdba9"/><stop offset="1" stop-color="#b6cf9d"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#ffffff" stop-opacity=".9"/><stop offset=".26" stop-color="#ffdba9" stop-opacity=".8"/><stop offset=".7" stop-color="#b6cf9d" stop-opacity=".3"/><stop offset="1" stop-color="#b6cf9d" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="76" cy="128" rx="68" ry="7" fill="#3c4335" opacity=".38"/>
+<path d="m13 119 24-14h75l23 15-20 10H30Z" fill="url(#metal)" stroke="#595843" stroke-width="2"/>
+<path d="M28 110V63l12-11 24 11v47m35 0V64l23-12 8 14v44" fill="url(#metal)" stroke="#64715e" stroke-width="3"/>
+<path d="M42 104 56 79l23-9 24 13 11 21" fill="url(#shine)" stroke="#fff1bc" stroke-width="2"/>
+<path d="M52 48 46 16l30-12 28 18-7 32-27 13Z" fill="url(#metal)" stroke="#625e51" stroke-width="3"/>
+<path d="m46 16 30-12 5 31-28 13Zm35 19 23-13-7 32-27 13Z" fill="#c1af78" opacity=".65"/>
+<path d="M50 45 76 35l22 15-22 17Z" fill="#5d6657" opacity=".7"/>
+<path d="m18 33 19 4m75-9 21-7m-95 45-14 9" stroke="#e2c386" stroke-width="3" stroke-linecap="round"/>
+<path d="M41 80 75 66l31 14v30H41Z" fill="#7d8464" stroke="#bbbd82" stroke-width="2"/>
+<path d="M75 75 88 98H62Z" fill="#f9d48d" stroke="#624d44" stroke-width="2"/>
+<path d="M75 84v7" stroke="#764a3e" stroke-width="2"/>
+<ellipse cx="77" cy="42" rx="43" ry="39" fill="url(#aura)" opacity=".28"/>
+<path d="M27 113q16-10 31-2m42 1q13-6 27 1" stroke="#d9d2a2" stroke-width="3" fill="none"/>
+<circle cx="16" cy="14" r="3" fill="#fff0be"/><circle cx="133" cy="13" r="4" fill="#e3efc6"/>
+</svg>

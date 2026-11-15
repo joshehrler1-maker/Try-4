@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="135" viewBox="0 0 150 135" role="img" aria-label="Dream Passage — cloud-bound celestial dash gate with suspended crescents">
+<defs>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4faff"/><stop offset=".33" stop-color="#bdcaff"/><stop offset=".68" stop-color="#8d94dd"/><stop offset="1" stop-color="#434f99"/></linearGradient>
+ <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f9e7ff"/><stop offset=".43" stop-color="#bdcaff"/><stop offset="1" stop-color="#434f99"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#f9e7ff"/><stop offset="1" stop-color="#cad9ff"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#ffffff" stop-opacity=".9"/><stop offset=".26" stop-color="#f9e7ff" stop-opacity=".8"/><stop offset=".7" stop-color="#cad9ff" stop-opacity=".3"/><stop offset="1" stop-color="#cad9ff" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="75" cy="124" rx="68" ry="9" fill="url(#aura)" opacity=".6"/>
+<path d="M17 113q2-14 20-14 5-22 26-18 22-23 39 2 23-2 31 21l11 9-24 14H30Z" fill="url(#metal)" stroke="#6770ad" stroke-width="3"/>
+<path d="M38 109V42L55 23l20 18 21-18 17 19v66" fill="none" stroke="#6a79b0" stroke-width="12"/>
+<path d="M38 109V42L55 23l20 18 21-18 17 19v66" fill="none" stroke="#e1efff" stroke-width="4"/>
+<path d="M39 39 55 19l20 18 21-18 19 20" fill="none" stroke="#fff9ef" stroke-width="3"/>
+<path d="M57 48q33-18 37 14-6 30-36 25Q79 78 79 59T57 48Z" fill="#fff7e9" opacity=".8"/>
+<ellipse cx="76" cy="76" rx="37" ry="34" fill="url(#aura)" opacity=".7"/>
+<path d="M74 58 89 76 74 94 59 76Z" fill="url(#glass)" stroke="#f3faff" stroke-width="2"/>
+<path d="M75 61v30m-13-15h26" stroke="#fcfaff" stroke-width="2" opacity=".7"/>
+<path d="M17 67q16-14 29-3m69-1q12-10 23-6" fill="none" stroke="#faf5ff" stroke-width="3"/>
+<path d="m24 51-9-6m120-1-10 7M73 12V4" stroke="#fdf6ff" stroke-width="2"/>
+<circle cx="22" cy="18" r="4" fill="#f1f3ff"/><circle cx="130" cy="21" r="4" fill="#d9faff"/>
+</svg>

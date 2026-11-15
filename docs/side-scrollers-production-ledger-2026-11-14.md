@@ -1,5 +1,20 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
+## Batch 17 — games 11–15, stages 2–3: dimensional setpieces integrated
+
+**Source changes:** Ten scene-specific SVG depth illustrations have been created and registered in the existing playable games (two per game). Designs incorporate layered surface gradients, shaded side faces and focal lighting but are *small illustrated assets*, not full cinematic 3D worlds or finished feature-film renders. Each image belongs to only one stage and game, and is shown at its stage's supported platform position without changing original collision, enemy AI, player movement, or camera control. Existing stage 1 art, 3D enemy preview toggle, touch controls, and score remain untouched.
+
+| Game | Stage 2 original scenery (stage-local x, y; w×h) | Stage 3 original scenery (stage-local x, y; w×h) |
+|---|---|---|
+| Sunset Wind Sail | Tree Village golden wind lantern (554,126;150×135) | Sunken Palace sky ring pedestal (434,100;150×135) |
+| Cloud City | Dream Passage crescent dash gate (545,134;150×135) | Storm Lodge lightning shield tower (587,141;150×135) |
+| Thunder Harbor | Sunken Treasure salvage capsule (636,107;150×135) | Lava Yard storm anvil (484,153;150×135) |
+| Autumn Trail | Falling Rock Ravine warning cairn (560,157;150×135) | Roundstone Cave boulder rail cradle (614,99;150×135) |
+| Inverted Observatory | Burrow Network star survey drill (634,115;150×135) | Thermal Galleries star heat exchanger (814,191;150×135) |
+
+**QA:** Test registration in the standard free public-repository GitHub Actions source check, ten path and platform-placement assertions, offline cache list and asset version parity. Completion requires reviewing the workflow results independently; phone visual playback, art approval and frame-rate testing are still unverified.
+
+
 ## Batch 16 — stages 2 & 3 for games 6–10
 
 **Integrated 10 original stage-specific cinematic-depth SVG setpieces** in the playable 2.5D runtime, continuing the artwork rollout without reusing designs between counterparts or changing game mechanics. Each game loads only its own two illustrated assets. Images are camera culled and stage-offset correctly; there are no added hitboxes, platform surfaces or enemy AI changes. These remain painted, dimensional *concept-quality assets*, not full rendered film scenes, final 3D character rigs or verified Android footage.

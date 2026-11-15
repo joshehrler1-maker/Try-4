@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="135" viewBox="0 0 150 135" role="img" aria-label="Thermal Galleries — astronomical heat exchanger and projected star prism">
+<defs>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fbe5ca"/><stop offset=".33" stop-color="#c9a69d"/><stop offset=".68" stop-color="#887caa"/><stop offset="1" stop-color="#3e416c"/></linearGradient>
+ <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe7b4"/><stop offset=".43" stop-color="#c9a69d"/><stop offset="1" stop-color="#3e416c"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#ffe7b4"/><stop offset="1" stop-color="#c6c6fc"/></linearGradient>
+ <radialGradient id="aura"><stop stop-color="#ffffff" stop-opacity=".9"/><stop offset=".26" stop-color="#ffe7b4" stop-opacity=".8"/><stop offset=".7" stop-color="#c6c6fc" stop-opacity=".3"/><stop offset="1" stop-color="#c6c6fc" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="74" cy="128" rx="66" ry="7" fill="#302342" opacity=".54"/>
+<path d="m13 117 24-9h82l19 10-21 11H30Z" fill="url(#metal)" stroke="#4c4064" stroke-width="2"/>
+<path d="M22 111V52l12-17h21l9 18v58m30 0V53l9-18h20l9 17v59" fill="url(#metal)" stroke="#624b75" stroke-width="3"/>
+<path d="M36 34 47 18h58l11 16-11 11H46Z" fill="url(#shine)" stroke="#ffe4c2" stroke-width="2"/>
+<path d="M50 54h52v51H50Z" fill="#3d355d" stroke="#c9b1cd" stroke-width="2"/>
+<path d="M59 62v34m11-34v34m12-34v34m12-34v34" stroke="#e8ac9f" stroke-width="5"/>
+<path d="M77 8v39" stroke="#d3b4d5" stroke-width="4"/>
+<path d="m77 45 16 19-16 17-16-17Z" fill="url(#glass)" stroke="#fff9eb" stroke-width="2"/>
+<path d="M77 52v22m-10-10h20" stroke="#fff8f0" stroke-width="2"/>
+<path d="M40 77q-15-25-2-41m75 41q15-27 1-41" fill="none" stroke="#f6d4ae" stroke-width="3"/>
+<ellipse cx="76" cy="65" rx="48" ry="47" fill="url(#aura)" opacity=".35"/>
+<path d="M17 94q14 11 24 0m72 0q13 10 25-2" stroke="#fad6b7" stroke-width="2.5" fill="none"/>
+<circle cx="17" cy="18" r="3" fill="#ffdfb5"/><circle cx="131" cy="13" r="4" fill="#f3e4ff"/>
+<path d="M30 112h92" stroke="#f1c5b3" stroke-width="3"/>
+</svg>
