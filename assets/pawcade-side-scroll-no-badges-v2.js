@@ -405,8 +405,6 @@
   sprites.src = 'assets/scenes/platform-sprites.webp';
   const enemyArt = new Image();
   enemyArt.src = 'assets/scenes/platform-enemies.webp';
-  const companionEnemyArt = new Image();
-  if(index<15) companionEnemyArt.src = 'assets/scenes/platform-enemy-companions-v3.webp';
   const heroArt = new Image();
   heroArt.src = 'assets/scenes/platform-heroes.webp';
   const terrainArt=new Image();
@@ -1481,7 +1479,11 @@
           patrolRight:Math.max(guardX,
             Math.min(guardFloor.x+guardFloor.w-20,guardX+50)),
           turret:movement==='shooter'||movement==='buster'});
-        crystals.push({x:guardX+42,y:guardFloor.y-44});
+        // Keep the reward over the same ledge, even when the guard stands
+        // near its right edge. Approach from the left on very short ledges.
+        const rewardX=guardX+42<=guardFloor.x+guardFloor.w-12
+          ? guardX+42 : Math.max(guardFloor.x+12,guardX-42);
+        crystals.push({x:rewardX,y:guardFloor.y-44});
       }
     }
     // Each game's six chapters now carry a different collectible trail.
@@ -1603,16 +1605,6 @@
     }
     if (room==='rhythm') {
       for (let beat=0;beat<4;beat++) crystals.push({x:start+375+beat*415,y:225});
-    }
-  }
-  // Use one ordinary encounter in chapter three. Specialist foes retain
-  // their original slots and the rest of the roster still uses its atlas.
-  if(index<15){
-    const foe=enemies.find(enemy=>stageAt(enemy.x)===2 &&
-      (index>=5 || usesOriginRig(enemy)) && (index===1 || !enemy.turret));
-    if(foe){
-      foe.companionSprite=true;
-      if(index===1) foe.turret=true;
     }
   }
   if(power==='flip' && index!==7){
@@ -1928,7 +1920,6 @@
   function markFoeDefeated(foe) {
     if(foe.dead)return;
     const shouldAnimate=!reducedMotion && (
-      foe.companionSprite ||
       usesOriginRig(foe) && typeof window.pawtopiaOriginEnemyRigs?.draw === 'function' ||
       index>=5 && index<=9 && typeof window.pawtopiaFiveEnemyRigs?.draw === 'function' ||
       index>=10 && index<=14 && typeof window.pawtopiaCloudEnemyRigs?.draw === 'function' ||
@@ -3630,10 +3621,6 @@
     const baseWave=Math.sin(t*2.1);
     const wave=(foe.archetype===3 ?
       Math.sign(baseWave)*Math.pow(Math.abs(baseWave),3) : baseWave)*patrolSpan;
-    if(foe.companionSprite && index===0){
-      const hop=Math.max(0,Math.sin(t))**4;
-      return {x:patrolX(foe.x+wave*12),y:foe.y-hop*28};
-    }
     if(foe.foundryEnemy!==undefined){
       // Foundry enemies have authored hop/charge cycles; scale the entire
       // cycle rather than replacing their distinct attack motion.
@@ -3892,10 +3879,6 @@
     ctx.restore();
     return true;
   }
-  function drawCompanionEnemy(foe,x,y,faceLeft) {
-    return foe.companionSprite && atlasSprite(companionEnemyArt,5,index,
-      x,y-(index===2?16:14),76,76,faceLeft,3);
-  }
   const sprite = (...args) => atlasSprite(sprites,4,...args);
   const terrainCells={floor:0,ice:1,belt:2,shelf:3,hazard:4,spring:5,lift:6,barrel:7,rail:8,pogo:10,drop:11,ceiling:12,current:13};
   const stageSurfaces={
@@ -3953,13 +3936,21 @@
     22:['#d3ff96',7,-8],24:['#a5d7ff',-11,10]
   }[index];
   const reducedMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  const worldLight=ctx.createRadialGradient(236,78,30,236,78,440);
-  worldLight.addColorStop(0,atmosphere[0]+'32');
-  worldLight.addColorStop(1,atmosphere[0]+'00');
+  // Reuse each world's existing atmosphere palette and direction so the
+  // backdrop, effects and scenery share the same light.
+  const [sceneColor,sceneDrift,sceneRise]=atmosphere;
+  const lightX=width*(.5+sceneDrift/115);
+  const lightY=height*(.25-sceneRise/120);
+  const submerged=index===2 || index===19;
+  const worldLight=ctx.createRadialGradient(lightX,lightY,18,lightX,lightY,420);
+  worldLight.addColorStop(0,sceneColor+(submerged?'46':'39'));
+  worldLight.addColorStop(.45,sceneColor+'1b');
+  worldLight.addColorStop(1,sceneColor+'00');
   const sceneHaze=ctx.createLinearGradient(0,0,0,height);
-  sceneHaze.addColorStop(0,'#17133712');
-  sceneHaze.addColorStop(.67,'#10152a08');
-  sceneHaze.addColorStop(1,'#070b1c99');
+  sceneHaze.addColorStop(0,'#14132510');
+  sceneHaze.addColorStop(.44,sceneColor+(submerged?'24':'12'));
+  sceneHaze.addColorStop(.7,sceneColor+'05');
+  sceneHaze.addColorStop(1,submerged?'#081b3088':'#090c206e');
   function drawAtmosphere(foreground) {
     if(reducedMotion) return;
     const [color, drift, rise]=atmosphere;
@@ -4365,9 +4356,19 @@
     {speed:.24, baseline:310, spacing:118, scale:.72, opacity:.32},
     {speed:.49, baseline:372, spacing:150, scale:1, opacity:.64}
   ];
+  // Keep the painted landmarks visible around each opening's key route.
+  // Values are the nearest plane's opacity and vertical placement offset.
+  const openingScenery=[
+    [.40,18], // Foundry Trail: make the stomp lane clear against the vents
+    [.34,21], // Convoy Ambush: keep the wall and shot lanes readable
+    [.32,24], // Home Reef: give the swim passages room to read
+    [.31,22], // Coastal Run: open the horizon over the run-up
+    [.22,30]  // Seedship Deck: painted branches carry the canopy
+  ];
   function stageSceneryLayer(layer, plane) {
     const stage=Math.min(sections-1,Math.max(0,chapter));
     const seed=(index*37+stage*19+plane*11)%17;
+    const opening=stage===0 && plane===2 ? openingScenery[index] : undefined;
     return {
       ...layer,
       // Each chapter shifts the composition of all three parallax planes:
@@ -4375,9 +4376,9 @@
       // sightlines. Keep the closest plane slow enough for mobile readability.
       speed:layer.speed*(.92+(seed%5)*.035),
       spacing:layer.spacing+seed*3+(stage%3-1)*12,
-      baseline:layer.baseline+(seed%5-2)*4+(stage%4-1.5)*5,
+      baseline:layer.baseline+(seed%5-2)*4+(stage%4-1.5)*5+(opening?.[1]??0),
       scale:layer.scale*(.94+(seed%6)*.025)*(1+(stage%3-1)*.045),
-      opacity:layer.opacity*(.93+(seed%4)*.035)
+      opacity:(opening?.[0]??layer.opacity)*(.93+(seed%4)*.035)
     };
   }
   function drawSceneryLayer({speed,baseline,spacing,scale,opacity}) {
@@ -7670,10 +7671,10 @@
       : index>=10 && index<=14 ? window.pawtopiaCloudEnemyRigs
       : index>=15 && index<=19 ? window.pawtopiaMidEnemyRigs
       : index>=20 && index<=24 ? window.pawtopiaLateEnemyRigs : null;
-    if(!reducedMotion && (index<5 || typeof dyingEnemyArt?.draw === 'function')){
+    if(!reducedMotion && typeof dyingEnemyArt?.draw === 'function'){
       for(const foe of enemies){
         if(!foe.dead || !Number.isFinite(foe._defeatAt))continue;
-        if(index<=4 && !usesOriginRig(foe) && !foe.companionSprite)continue;
+        if(index<=4 && !usesOriginRig(foe))continue;
         const age=clock-foe._defeatAt;
         if(age<0 || age>=.42)continue;
         const x=foe._defeatX,y=foe._defeatY;
@@ -7688,9 +7689,7 @@
         ctx.translate(-x,-y);
         // Defeat must fade the SAME crab seen during play, not morph
         // back into the generic base enemy that was disliked.
-        if(drawCompanionEnemy(foe,x,y,Boolean(foe.faceLeft))){
-          // The same sprite fades at the defeat position.
-        }else if(usesFoundryCrab(foe)){
+        if(usesFoundryCrab(foe)){
           drawFoundryEnemy({x,y},0,Boolean(foe.faceLeft),foe.offset||0);
         }else if(useCrabEraArt){
           // Keep the *same pre-rig creature appearance* in hit/defeat frames.
@@ -7710,7 +7709,7 @@
             ctx.fillStyle='#bd664e';ctx.fillRect(x-18,y-17,36,34);
           }
         }else{
-          dyingEnemyArt?.draw(ctx,index,{x,y},foe,{
+          dyingEnemyArt.draw(ctx,index,{x,y},foe,{
             faceLeft:foe.faceLeft,reduced:true
           });
         }
@@ -7953,8 +7952,7 @@
         foe.clockEnemy!==undefined || index===16;
       const authoredEnemyArt=originWorldRig || fiveWorldRig ||
         cloudWorldRig || midWorldRig || lateWorldRig ||
-        (specialistArt && !useCrabEraArt) ||
-        (foe.companionSprite && companionEnemyArt.naturalWidth>0);
+        (specialistArt && !useCrabEraArt);
       ctx.save();
       // Keep authored proportions stable; their local articulation drives
       // locomotion and combat instead of the legacy global squash stack.
@@ -8040,9 +8038,6 @@
       // The previously approved original crab creature also represents
       // ordinary foundry foes. No prototype mesh, generic arm overlays or
       // floating ornaments should obscure its eyes, beak or pincers.
-      else if(drawCompanionEnemy(foe,at.x,at.y,faceLeft)){
-        // The companion sprite follows the existing encounter pose.
-      }
       else if(usesFoundryCrab(foe)) drawFoundryEnemy(at,0,faceLeft,foe.offset||0,attackPose,recoil,foe._gait||0,landingPose,hitPose);
       else if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing,attackPose);

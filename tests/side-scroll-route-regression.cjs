@@ -40,7 +40,8 @@ for (let game = 0; game < 25; game++) {
 }
 assert.equal(new Set(routes.map(JSON.stringify)).size, 25, 'Route layouts must be distinct');
 assert.equal(new Set(palettes.map(JSON.stringify)).size, 25, 'Mechanic palettes must be distinct');
-assert(src.includes('if(sx+width>start+stageWidths[stage]-75) continue;'), 'Missing stage boundary guard');
+assert.match(src, /if\(sx\+width>start\+stageWidths\[stage\]-75\)\s*\{\s*signatureConnected=false;\s*break;\s*\}/,
+  'Optional route must stop before crossing the stage boundary');
 // Animation safety checks: each game's visual-only cue must stay gated by
 // its own course index; do not silently share motions across counterparts.
 const isolatedCues = [
