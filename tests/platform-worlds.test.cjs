@@ -477,8 +477,8 @@ test('five distinctive games 6–10 enemy rigs render safely without changing ga
     'new five-world animated bodies must work in the offline cache');
   assert.ok(runtime.includes('fiveWorldRig = index>=5 && index<=9'));
   assert.ok(runtime.includes('window.pawtopiaFiveEnemyRigs.draw('));
-  assert.ok(runtime.includes('if(!rendered3D && !originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion'),
-    'obsolete motion accents must not overlap the new bespoke silhouettes');
+  assert.ok(runtime.includes('if(!rendered3D && !authoredEnemyArt) drawWorldSpecificEnemyMotion'),
+    'generic motion accents must never overlap any of the 25 bespoke silhouettes');
   assert.ok(runtime.includes('window.pawtopiaFiveEnemyRigs?.draw'),
     'visual-only defeat transition must use the same enemy body');
   for(let i=5;i<10;i++){
@@ -557,7 +557,7 @@ test('original base enemy rigs for games 1–5 preserve authored specialists and
   assert.ok(worker.includes("'assets/animation/origin-world-enemy-rigs-v1.js?"));
   assert.ok(runtime.includes('originWorldRig = usesOriginRig(foe)'));
   assert.ok(runtime.includes('window.pawtopiaOriginEnemyRigs.draw('));
-  assert.ok(runtime.includes('if(!rendered3D && !originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion'),
+  assert.ok(runtime.includes('if(!rendered3D && !authoredEnemyArt) drawWorldSpecificEnemyMotion'),
     'prevent duplicated seed-garden accessory art');
   assert.ok(runtime.includes('const dyingEnemyArt = index<=4 ? window.pawtopiaOriginEnemyRigs'),
     'the base enemy needs visual-only defeat pose');
