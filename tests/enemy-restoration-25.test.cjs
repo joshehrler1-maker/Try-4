@@ -80,8 +80,8 @@ for(const fn of [
 assert(source.includes('atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5)'),
   'lost per-game atlas cell render');
 assert(fs.existsSync(path.join(root,'assets/scenes/platform-enemies.webp')));
-const build='pawcade-side-scroll-no-badges-v2.js?v=creature-era-shapes-all25-20261114';
-assert(html.includes(build)&&offline.includes(build),'live HTML and worker script versions disagree');
+const build=html.match(/pawcade-side-scroll-no-badges-v2\.js\?v=[^"]+/)?.[0];
+assert(build && offline.includes(build),'live HTML and worker script versions disagree');
 const checklist=read('docs/ENEMY-RESTORATION-CHECKLIST-25.md');
 for(const g of manifest.games){
   assert(checklist.includes('## '+(g.index+1)+'. '+g.game+' — '+g.hero),
