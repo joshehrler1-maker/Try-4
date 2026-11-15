@@ -118,7 +118,7 @@ for (const slot of slots) {
   assert(image.includes('viewBox="0 0 '+slot.w+' '+slot.h+'"'), 'Artwork dimensions: '+slot.path);
   assert(image.includes('linearGradient') && image.includes('radialGradient'), 'Dimensional lighting: '+slot.path);
   assert(!/<script\b|<image\b|<foreignObject\b|<filter\b|(?:xlink:)?href=/i.test(image), 'Disallow external or active SVG: '+slot.path);
-  assert.equal(slot.y+slot.h,slot.top,'Prop must align with stage's documented floor: '+slot.path);
+  assert.equal(slot.y+slot.h,slot.top,'Prop must align with the documented stage floor: '+slot.path);
   assert(source.includes("'"+slot.path+"', "+slot.stage+", "+slot.x+", "+slot.y+", "+slot.w+", "+slot.h+"]"),'Source slot mapping: '+slot.path);
   assert(sw.includes("'"+slot.path+"'"),'Offline cache: '+slot.path);
 }
