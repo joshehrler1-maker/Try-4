@@ -16,3 +16,7 @@
 `tests/platform-worlds.test.cjs` includes a guard for the 25-game visual rollback; the specific corrected runtime and matching `sw.js`/HTML URLs are versioned. All five later procedural enemy rig modules are preserved as experiments but their playable render calls are gated off by the visual-era flag. Historical designs are restored via the rendering path, not by reverting later stage/world gameplay improvements.
 
 **Device verification remaining:** Inspect each game on Android in landscape, screenshot the creatures at idle/turn/move/attack/hit/death and confirm no overlays, pop-in or missing images. Live GitHub Pages deployment and frame-rate validation are separate checks.
+
+## Crab-era movement silhouette restoration — follow-up
+
+The original `drawEnemyArticulatedLimbs` and `drawEnemySecondaryMotion` art functions were copied from the verified historical `9768ec86ad` code and reinstalled **verbatim** in the playable source. This undoes later generic longer limbs, changed feet and bulkier flight decorations, without altering enemy AI, collision, level geometry or animation timing of the simulation. Source QA checks the original characteristic shapes. Page/worker/game versions advanced together for offline refresh. Device screenshots remain necessary for visual approval.
