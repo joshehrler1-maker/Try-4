@@ -630,7 +630,7 @@ test('first-ten real WebGL mesh prototypes have unique 3D parts and safe lifecyc
   assert.equal(new Set(art.models.map(m=>m.enemy)).size,10);
   assert.ok(source.includes('uNormalScale'),'scaled enemy shapes need corrected surface normals');
   assert.ok(source.includes('addSurface(index,m,P,t,bob,reduced,mode,step,strike)'),
-    'mesh details must track their own body's movement');
+    'mesh details must follow the enemy body during movement');
   assert.ok(source.includes('Math.pow(Math.sin('),
     'attacks must ease in and out rather than snap into strike poses');
   const unique3dFinishes=new Set();
