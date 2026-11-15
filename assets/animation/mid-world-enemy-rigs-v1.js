@@ -264,7 +264,9 @@
       land:reduced?0:clamp(pose.landing),
       t:reduced?0:Number(pose.clock)||0,
       offset:Number(foe.offset)||0,
-      step:reduced?0:Math.sin(gait*([15,16,17,18,19].indexOf(index)*.13+.83)),
+      // Multiply *whole* distinct cadence by traveled gait. Fixed .83 offset
+      // made stationary foe enter mid-step rather than a neutral foot plant.
+      step:reduced?0:Math.sin(gait*(.83+(index-15)*.13)),
       turret:Boolean(foe.turret),
       airborne:Boolean(pose.airborne),
       hit:reduced?0:clamp(pose.hit)
