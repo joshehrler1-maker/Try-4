@@ -386,6 +386,38 @@ test('five mid-world enemy rigs preserve game-specific silhouettes and safe rend
     'other adventure enemies must retain their own designs');
 });
 
+test('five middle-world enemy rigs start at grounded gait phase and use unique cadences', () => {
+  const source=fs.readFileSync(path.join(__dirname,
+    '../assets/animation/mid-world-enemy-rigs-v1.js'),'utf8');
+  const angles=[];
+  const spyMath=Object.create(Math);
+  spyMath.sin=x=>{angles.push(x);return Math.sin(x);};
+  const sandbox={window:{},Math:spyMath};
+  vm.runInNewContext(source,sandbox,{timeout:1000});
+  const rig=sandbox.window.pawtopiaMidEnemyRigs;
+  const ctx=new Proxy({globalAlpha:1},{
+    get(target,k){
+      if(Object.hasOwn(target,k))return target[k];
+      if(k==='createLinearGradient')return()=>({addColorStop(){}});
+      return (...args)=>{
+        for(const n of args)if(typeof n==='number')
+          assert.ok(Number.isFinite(n),'non-finite enemy drawing coordinate');
+      };
+    },set(target,k,v){target[k]=v;return true;}
+  });
+  for(let index=15;index<20;index++)for(const gait of [0,1,3]){
+    angles.length=0;
+    assert.equal(rig.draw(ctx,index,{x:210,y:260},
+      {_gait:gait,offset:0,turret:index===16},
+      {stride:1,attack:0,recoil:0,landing:0,clock:1.2,reduced:false}),true);
+    // The *first* sin() call in draw computes the stride phase, before
+    // the individual enemy body is rendered. Neutral gait must mean angle 0.
+    const intended=gait*(.83+(index-15)*.13);
+    assert.ok(Math.abs(angles[0]-intended)<1e-9,
+      'world '+(index+1)+' gait must start neutral with its own stride timing');
+  }
+});
+
 test('cloud-trail rigs for games 11–15 have independent silhouettes and safe stage-aware motion', () => {
   const artPath=path.join(__dirname,'../assets/animation/cloud-trail-enemy-rigs-v1.js');
   const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
