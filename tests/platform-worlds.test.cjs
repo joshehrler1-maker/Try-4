@@ -354,7 +354,7 @@ test('original crab-era enemy appearances are restored in all 25 playable games'
   assert.ok(code.includes('else if(foe.reefEnemy!==undefined) drawReefEnemy('));
   assert.ok(code.includes('else if(foe.clockEnemy!==undefined) drawClockEnemy('));
   assert.ok(code.includes('else if(index===16) drawSteamworksEnemy('));
-  const build='pawcade-side-scroll-no-badges-v2.js?v=original-creature-rigs-25-20261114';
+  const build='pawcade-side-scroll-no-badges-v2.js?v=creature-era-shapes-all25-20261114';
   assert.ok(page.includes(build) && cache.includes(build),
     'game JS and offline cache must load the same restored visuals');
 });
@@ -402,7 +402,7 @@ test('Furnace Crab is the default illustrated Foundry enemy and never reuses the
     'preserve all individually drawn stage-specific Foundry enemies');
   assert.ok(!html.includes('src="assets/animation/enemy-3d-prototype-v1.js'),
     'the rejected low-detail 3D preview must remain out of live gameplay');
-  const build='pawcade-side-scroll-no-badges-v2.js?v=original-creature-rigs-25-20261114';
+  const build='pawcade-side-scroll-no-badges-v2.js?v=creature-era-shapes-all25-20261114';
   assert.ok(html.includes(build),'restored version should load in live game source');
   assert.ok(sw.includes(build),'offline cached game version should match');
 });
@@ -435,7 +435,7 @@ test('all 25 unique enemy rigs use eased hit-recovery without changing bash coll
     assert.ok(middle>0&&middle<1);
     assert.equal(end,0);
   }
-  const build='pawcade-side-scroll-no-badges-v2.js?v=original-creature-rigs-25-20261114';
+  const build='pawcade-side-scroll-no-badges-v2.js?v=creature-era-shapes-all25-20261114';
   assert.ok(html.includes(build),'game page must load updated enemy visual state');
   assert.ok(offline.includes(build),'offline cache must load the same game script');
 });
