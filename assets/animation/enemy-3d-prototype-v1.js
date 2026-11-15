@@ -67,12 +67,18 @@ const finishParts=Object.freeze([
  // Quarry: layered stone visor and drill collars with polished eyes.
  [['box',0,1.04,.45,.39,.13,.053,'#e2d2b4'],['orb',-.23,1.17,.53,.13,.12,.065,'#fff0cb'],['orb',.24,1.17,.53,.13,.12,.065,'#fff0cb'],['orb',-.22,1.17,.6,.053,.064,.027,'#554a54'],['orb',.25,1.17,.6,.053,.064,.027,'#554a54'],['orb',-.75,-.55,.66,.12,.09,.055,'#dfc9a4'],['orb',.75,-.55,.66,.12,.09,.055,'#dfc9a4'],['box',-1.55,-.12,.27,.12,.15,.13,'main'],['box',1.55,-.12,.27,.12,.15,.13,'main']]
 ]);
-function addSurface(index,m,P,t,bob,reduced){
- const wave=reduced?0:(index===2?Math.sin(t*3)*.12:index===5?Math.sin(t*2.8)*.15:0);
- // A fixed attachment offset keeps all surface pieces attached through gait.
+function addSurface(index,m,P,t,bob,reduced,mode,step,strike){
+ // Follow each model's ACTUAL body rig in every state; no drifting eye meshes.
+ let offset=bob;
+ if(index===2) offset+=reduced?0:Math.sin(t*3)*.12;
+ if(index===4) offset+=(mode==='move'&&!reduced?Math.abs(step)*.2:0)-strike*.11;
+ if(index===5) offset=reduced?0:Math.sin(t*2.8)*.15;
+ if(index===6) offset+=mode==='move'&&!reduced?Math.abs(step)*.21:0;
+ if(index===8) offset-=strike*.16;
+ if(index===9) offset=0; // The quarry turret remains planted.
  for(const [type,x,y,z,sx,sy,sz,shade,tilt=0] of finishParts[index]){
   const color=shade==='light'?m.light:shade==='dark'?m.dark:shade==='main'?m.main:shade;
-  P(type,x,y+bob+wave,z,sx,sy,sz,color,tilt);
+  P(type,x,y+offset,z,sx,sy,sz,color,tilt);
  }
 }
 
@@ -213,7 +219,7 @@ for(let k=0;k<3;k++)P('spike',-.49+k*.45,.75+y,0,.1,.26,.11,m.dark,(k-1)*.15);
   P('spike',side*1.79,-.19,.11,.17,.32,.15,m.dark,side*.63);
  }
 }
-addSurface(index,m,P,t,bob,reduced);
+addSurface(index,m,P,t,bob,reduced,mode,step,strike);
 return {game:m.game,enemy:m.enemy,parts:out,hit,fall};
 }
 // Non-uniform ellipsoids need corrected normals or faces look artificially flat.
