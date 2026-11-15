@@ -7911,16 +7911,43 @@
         ?Math.max(-.06,Math.min(.06,verticalSpeed/6000)):0;
       const cargoLatch=index===24 && firing && !reducedMotion
         ?attackPose*.04:0;
+      // The 25 hand-authored per-world bodies already animate their own joints.
+      // Do not glue generic accessories, rings, legs or exaggerated stretch
+      // over them. That caused disconnected appendages and muddy silhouettes.
+      const originWorldRig = usesOriginRig(foe) &&
+        typeof window.pawtopiaOriginEnemyRigs?.draw === 'function';
+      const fiveWorldRig = index>=5 && index<=9 &&
+        typeof window.pawtopiaFiveEnemyRigs?.draw === 'function';
+      const cloudWorldRig = index>=10 && index<=14 &&
+        typeof window.pawtopiaCloudEnemyRigs?.draw === 'function';
+      const midWorldRig = index>=15 && index<=19 &&
+        typeof window.pawtopiaMidEnemyRigs?.draw === 'function';
+      const lateWorldRig = index>=20 && index<=24 &&
+        typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
+      const specialistArt = foe.foundryEnemy!==undefined ||
+        foe.libraryEnemy!==undefined || foe.reefEnemy!==undefined ||
+        foe.clockEnemy!==undefined || index===16;
+      const authoredEnemyArt=originWorldRig || fiveWorldRig ||
+        cloudWorldRig || midWorldRig || lateWorldRig || specialistArt;
       ctx.save();
-      // A distinct animation state for patrolling, hopping, flying and firing.
+      // Keep authored proportions stable; their local articulation drives
+      // locomotion and combat instead of the legacy global squash stack.
       ctx.translate(at.x,at.y+19);
-      if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
-      if(airborne) ctx.rotate(motion*.065);
-      else ctx.rotate(enemyLean+attackTilt+verticalLean+polarityTurn+windBank+cloudPursuit+observatoryFlip+bambooSwoop+canyonPatrol+sunflowerBank);
-      ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5-seedAscent*.5+seedDescent+stagePulse+quarryBrace-waterfallDive*.4+thunderCharge-autumnHop*.4+steamPulse+snowBrace+neonDash+marbleWeight+cargoLatch-swampBob*.4,
-        (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression+seedAscent-seedDescent+waterfallDive+lanternFloat-stagePulse-quarryBrace-thunderCharge+autumnHop-steamPulse-snowBrace+submarineFin-neonDash-marbleWeight-cargoLatch+swampBob);
-      ctx.translate(-at.x,-at.y-19-footstep);
-      if(!reducedMotion){
+      if(authoredEnemyArt){
+        const authoredLean=airborne ? Math.max(-.055,Math.min(.055,motion*.02))
+          : Math.max(-.06,Math.min(.06,enemyLean*.24+verticalLean*.2));
+        ctx.rotate(authoredLean);
+        const authoredImpact=Math.max(-.04,Math.min(.04,landingPose*.22));
+        ctx.scale(1+authoredImpact,1-authoredImpact);
+      }else{
+        if(!airborne && enemyPattern==='charge' && nearby) ctx.rotate((faceLeft?1:-1)*.075);
+        if(airborne) ctx.rotate(motion*.065);
+        else ctx.rotate(enemyLean+attackTilt+verticalLean+polarityTurn+windBank+cloudPursuit+observatoryFlip+bambooSwoop+canyonPatrol+sunflowerBank);
+        ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5-seedAscent*.5+seedDescent+stagePulse+quarryBrace-waterfallDive*.4+thunderCharge-autumnHop*.4+steamPulse+snowBrace+neonDash+marbleWeight+cargoLatch-swampBob*.4,
+          (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression+seedAscent-seedDescent+waterfallDive+lanternFloat-stagePulse-quarryBrace-thunderCharge+autumnHop-steamPulse-snowBrace+submarineFin-neonDash-marbleWeight-cargoLatch+swampBob);
+      }
+      ctx.translate(-at.x,-at.y-19-(authoredEnemyArt?0:footstep));
+      if(!reducedMotion && !authoredEnemyArt){
         const flex=airborne ? motion*.2 : footCycle*movingWeight*.22;
         const impact=Math.min(1,landingPose*12);
         const trim=settleAccessory(foe,clock,flex+attackPose*.14-recoil*.28+impact*.23,
@@ -7932,17 +7959,7 @@
       // silhouettes in the playable canvas, not the generic enemy atlas.
       // If the free optional rig module fails to load, keep the old sprite
       // and articulated limbs so gameplay never depends on this art upgrade.
-      const originWorldRig = usesOriginRig(foe) &&
-        typeof window.pawtopiaOriginEnemyRigs?.draw === 'function';
-      const fiveWorldRig = index>=5 && index<=9 &&
-        typeof window.pawtopiaFiveEnemyRigs?.draw === 'function';
-      const cloudWorldRig = index>=10 && index<=14 &&
-        typeof window.pawtopiaCloudEnemyRigs?.draw === 'function';
-      const midWorldRig = index>=15 && index<=19 &&
-        typeof window.pawtopiaMidEnemyRigs?.draw === 'function';
-      const lateWorldRig = index>=20 && index<=24 &&
-        typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
-      if(!originWorldRig && !fiveWorldRig && !cloudWorldRig && !midWorldRig && !lateWorldRig)
+      if(!authoredEnemyArt)
         drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
       const rendered3D=drawEnemy3d(at,foe,faceLeft,attackPose,recoil,movingWeight);
       if(rendered3D) {
@@ -8004,10 +8021,10 @@
       // New original silhouettes include their own mechanical, cloth,
       // mist and sound accents; avoid drawing the obsolete extra limbs
       // over them, but retain the original fallback when scripts are absent.
-      if(!rendered3D && !originWorldRig && !fiveWorldRig) drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
+      if(!rendered3D && !authoredEnemyArt) drawWorldSpecificEnemyMotion(at,foe,faceLeft,attackPose);
       // No detached armor outlines or U-shaped halo above enemies.
       // Render the enemy's own sprite and grounded motion effects only.
-      if(!rendered3D) drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
+      if(!rendered3D && !authoredEnemyArt) drawEnemySecondaryMotion(at,foe,airborne,firing,movingWeight,footCycle,faceLeft);
       // Keep the space above enemies clear: no floating rank badges,
       // insignias, arrows or attack symbols. Enemy art and motion remain.
       if(foe===bashReady){
