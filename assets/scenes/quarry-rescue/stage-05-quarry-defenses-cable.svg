@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="135" viewBox="0 0 150 135" role="img" aria-label="Armored quarry cable shield winch"><title>Armored quarry cable shield winch</title><defs><linearGradient id="front" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e9d5b7"/><stop offset=".42" stop-color="#a98c78"/><stop offset="1" stop-color="#5b5b6c"/></linearGradient><linearGradient id="edge" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#5b5b6c"/><stop offset=".5" stop-color="#a98c78"/><stop offset="1" stop-color="#e9d5b7"/></linearGradient><linearGradient id="shine" x1="0" y1="0" x2=".85" y2=".95"><stop stop-color="#ffffff"/><stop offset=".4" stop-color="#e7a968"/><stop offset="1" stop-color="#a98c78"/></linearGradient><radialGradient id="glow"><stop stop-color="#e9d5b7" stop-opacity=".68"/><stop offset=".44" stop-color="#e7a968" stop-opacity=".4"/><stop offset="1" stop-color="#a98c78" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="75" cy="129" rx="69" ry="5.5" fill="#5b5b6c" opacity=".36"/>
+
+<path d="M12 124 39 115 117 116 139 127 111 131H35Z" fill="#504c58" stroke="#e4b68a" stroke-width="2"/>
+<path d="M26 115 39 51 55 35 113 41 126 59 129 116Z" fill="url(#front)" stroke="#f2d0a8" stroke-width="3"/>
+<path d="M55 35 72 17 110 26 113 41Z" fill="url(#shine)" stroke="#fff2cd" stroke-width="2"/>
+<path d="M113 42 125 59 130 117 113 108Z" fill="#666171" stroke="#dfba91" stroke-width="2"/>
+<path d="M38 60h79M33 98h90" stroke="#e4bb90" stroke-width="5"/>
+<path d="M47 56v57M109 56v58" stroke="#7a6973" stroke-width="6"/>
+<circle cx="76" cy="79" r="24" fill="#4a4b5b" stroke="#f6d4a1" stroke-width="5"/>
+<circle cx="76" cy="79" r="13" fill="#d19b68" stroke="#ffe4b6" stroke-width="2"/>
+<path d="M76 61v36m-18-18h36" stroke="#f7d7a8" stroke-width="3"/>
+<path d="M100 70 129 53 142 56M56 67 23 48 10 51" fill="none" stroke="#d7bca1" stroke-width="5"/>
+<path d="M129 53 138 45l6 8-2 3-13-3Z" fill="#e1b58c" stroke="#f8ebd1" stroke-width="2"/>
+<path d="m31 28 14-13 14 18-16 10Z" fill="#93816f" stroke="#f2d8b2" stroke-width="2"/>
+<ellipse cx="76" cy="79" rx="49" ry="45" fill="url(#glow)" opacity=".31"/>
+</svg>

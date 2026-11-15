@@ -1,5 +1,28 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
+## Batch 19 — ten game-specific stage-4/5 illustrated depth props for games 6–10
+
+Built from the **verified source** stages (10 separate stage layouts) and per-game reference assignments: Waterfall Climb → Rayman Legends (glide), Lantern Festival → Kirby Super Star (float), Crystal Polarity → VVVVVV (gravity flip), Stage Beat → Geometry Dash (rhythm), Quarry Rescue → Bionic Commando (grapple). These are original Super Paw Heroes compositions informed by mechanics, not copies of copyrighted levels, character art or map layouts.
+
+| Game | Stage | Original placed asset | Stage-local x/y | World top-left | Bottom-center pivot | Scale | Existing collision support | Animation trigger |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Waterfall Climb | 4 Warrior Ridge | `assets/scenes/waterfall-climb/stage-04-warrior-ridge-tower.svg` | (473, 150) | (7073, 150) | (7148, 285) | 150×135 | floor, y=285 | static / camera-culled |
+| Waterfall Climb | 5 Dark Summit | `assets/scenes/waterfall-climb/stage-05-dark-summit-ice.svg` | (574, 147) | (9374, 147) | (9449, 282) | 150×135 | ice, y=282 | static / camera-culled |
+| Lantern Festival | 4 Airship Revenge | `assets/scenes/lantern-festival/stage-04-airship-revenge-turrets.svg` | (544, 148) | (7144, 148) | (7219, 283) | 150×135 | floor, y=283 | static / camera-culled |
+| Lantern Festival | 5 Starlight World | `assets/scenes/lantern-festival/stage-05-starlight-world-glide.svg` | (484, 130) | (9284, 130) | (9359, 265) | 150×135 | floor, y=265 | static / camera-culled |
+| Crystal Polarity | 4 Intermission Rails | `assets/scenes/crystal-polarity/stage-04-intermission-rails-ceiling.svg` | (759, 191) | (7359, 191) | (7434, 326) | 150×135 | floor, y=326 | static / camera-culled |
+| Crystal Polarity | 5 Tower Interior | `assets/scenes/crystal-polarity/stage-05-tower-interior-tower.svg` | (844, 191) | (9644, 191) | (9719, 326) | 150×135 | floor, y=326 | static / camera-culled |
+| Stage Beat | 4 Dry Circuit | `assets/scenes/stage-beat/stage-04-dry-circuit-spring.svg` | (425, 145) | (7025, 145) | (7090, 280) | 130×135 | spring, y=280 | static / camera-culled |
+| Stage Beat | 5 Bassline Flight | `assets/scenes/stage-beat/stage-05-bassline-flight-steps.svg` | (400, 134) | (9200, 134) | (9275, 269) | 150×135 | floor, y=269 | static / camera-culled |
+| Quarry Rescue | 4 Lift Shaft | `assets/scenes/quarry-rescue/stage-04-lift-shaft-lifts.svg` | (575, 147) | (7175, 147) | (7250, 282) | 150×135 | lift, y=282 | static / camera-culled |
+| Quarry Rescue | 5 Quarry Defenses | `assets/scenes/quarry-rescue/stage-05-quarry-defenses-cable.svg` | (389, 110) | (9189, 110) | (9264, 245) | 150×135 | floor, y=245 | static / camera-culled |
+
+Depth: existing behind-platform world illustration layer. Existing stage room IDs, geometry, hazards, enemy encounters, camera, hitboxes, input and movement timing are unchanged; these are scenic props, not new collidable platforms. Assets load only for their game, stage index and camera view; SVGs use no linked scripts/assets or GPU-heavy filters. A standalone JSON registry and source regression test record the exact placements. **Not** high-poly 3D models, animated characters, finished films or authored motion clips.
+
+QA: static validation targets art dimensions, 2200-unit stage offsets, collision support from source audit, source wiring, deferred image load, camera culling, correct per-game isolation, worker cache and game script version parity. Live GitHub Pages and Android FPS/playthrough MUST be verified separately; no claim of a finished game/film.
+
+
+
 ## Batch 18 — 10 unique stage-2/3 scenic artworks for games 16–20
 
 **Added to playable builds:** Custom layered, perspective-shaded 2.5D SVG landmarks in games 16–20 at exact stage-local placements with supporting existing world platforms. Every scene has its own visual design and file. No mechanics, hitboxes, textures or models are shared between different games by this batch. These are decorative film-look illustrations; the feature-film 3D environment and animation goal remains unfulfilled.

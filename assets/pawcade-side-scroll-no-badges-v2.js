@@ -362,6 +362,37 @@
         return {stage, image, x, y, w, h};
       })
     : [];
+  // Five counterpart-specific adventures, stages 4 and 5 (zero-index 3/4).
+  // Real 3D film environments remain outstanding; these are unique original
+  // static dimensional 2.5D scenery, exactly supported by existing platforms.
+  const middleLateStageSetpieces = [
+    [
+      ['assets/scenes/waterfall-climb/stage-04-warrior-ridge-tower.svg', 3, 473, 150, 150, 135],
+      ['assets/scenes/waterfall-climb/stage-05-dark-summit-ice.svg', 4, 574, 147, 150, 135]
+    ],
+    [
+      ['assets/scenes/lantern-festival/stage-04-airship-revenge-turrets.svg', 3, 544, 148, 150, 135],
+      ['assets/scenes/lantern-festival/stage-05-starlight-world-glide.svg', 4, 484, 130, 150, 135]
+    ],
+    [
+      ['assets/scenes/crystal-polarity/stage-04-intermission-rails-ceiling.svg', 3, 759, 191, 150, 135],
+      ['assets/scenes/crystal-polarity/stage-05-tower-interior-tower.svg', 4, 844, 191, 150, 135]
+    ],
+    [
+      ['assets/scenes/stage-beat/stage-04-dry-circuit-spring.svg', 3, 425, 145, 130, 135],
+      ['assets/scenes/stage-beat/stage-05-bassline-flight-steps.svg', 4, 400, 134, 150, 135]
+    ],
+    [
+      ['assets/scenes/quarry-rescue/stage-04-lift-shaft-lifts.svg', 3, 575, 147, 150, 135],
+      ['assets/scenes/quarry-rescue/stage-05-quarry-defenses-cable.svg', 4, 389, 110, 150, 135]
+    ]
+  ];
+  const middleLateStageArt = index >= 5 && index <= 9
+    ? middleLateStageSetpieces[index - 5].map(([url,stage,x,y,w,h]) => {
+        const image=new Image(); image.src=url;
+        return {stage,image,x,y,w,h};
+      })
+    : [];
   const earlySecondStage = index < 5 ? new Image() : null;
   if (earlySecondStage) earlySecondStage.src = earlySecondStagePaths[index];
   const secondStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
@@ -7307,6 +7338,14 @@
     }
     // Scenes never introduce hitboxes or change a counterpart's unique stage route.
     for (const slot of lateMiddleStageArt) {
+      if (sections <= slot.stage || !slot.image.naturalWidth) continue;
+      const artX = stageStarts[slot.stage] + slot.x;
+      if (artX + slot.w >= camera && artX <= camera + width) {
+        ctx.drawImage(slot.image, artX, slot.y, slot.w, slot.h);
+      }
+    }
+    // Camera-cull stage-local film-look illustration only; no collision changes.
+    for (const slot of middleLateStageArt) {
       if (sections <= slot.stage || !slot.image.naturalWidth) continue;
       const artX = stageStarts[slot.stage] + slot.x;
       if (artX + slot.w >= camera && artX <= camera + width) {
