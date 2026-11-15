@@ -323,6 +323,42 @@ test('defeated mid- and late-world enemies retain only a short visual after hitb
     'restart must reset defeated enemy visual state');
 });
 
+test('original crab-era enemy appearances are restored in all 25 playable games', () => {
+  const code=fs.readFileSync(path.join(__dirname,
+    '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const page=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const cache=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  assert.ok(code.includes('const useCrabEraArt = index>=0 && index<25;'),
+    'every game must take the archived creature-art path');
+  for(let i=0;i<25;i++){
+    assert.equal(i>=0&&i<25,true,'restore original creature design for game '+(i+1));
+  }
+  for(const moduleName of ['Origin','Five','Cloud','Mid','Late']){
+    assert.ok(code.includes('typeof window.pawtopia'+moduleName+
+      'EnemyRigs?.draw === \'function\' && !useCrabEraArt;'),
+      'new '+moduleName+' enemy rig must not replace old live creature visuals');
+  }
+  assert.ok(code.includes('(specialistArt && !useCrabEraArt)'),
+    'old specialist sprites and rendering physics must be used again');
+  assert.ok(code.includes('const rendered3D=!useCrabEraArt && drawEnemy3d('),
+    'old sprite renderer must not be overlaid with prototype WebGL enemies');
+  assert.ok(code.includes('drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose)'),
+    'restore the old creature sprite joint presentation');
+  assert.ok(code.includes('else if(!atlasSprite(enemyArt,5,cell,at.x,at.y-12,73,73,faceLeft,5))'),
+    'restore the existing, original game-by-game sprite atlas');
+  assert.ok(code.includes('else if(useCrabEraArt){'),
+    'defeat appearance should remain the same original creature');
+  assert.ok(code.includes('if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,'),
+    'the original 18 stage-specific crab-era Foundry foes must remain');
+  assert.ok(code.includes('else if(foe.libraryEnemy!==undefined) drawLibraryEnemy('));
+  assert.ok(code.includes('else if(foe.reefEnemy!==undefined) drawReefEnemy('));
+  assert.ok(code.includes('else if(foe.clockEnemy!==undefined) drawClockEnemy('));
+  assert.ok(code.includes('else if(index===16) drawSteamworksEnemy('));
+  const build='pawcade-side-scroll-no-badges-v2.js?v=restore-legacy-enemy-creatures-all25-20261114';
+  assert.ok(page.includes(build) && cache.includes(build),
+    'game JS and offline cache must load the same restored visuals');
+});
+
 test('Furnace Crab is the default illustrated Foundry enemy and never reuses the generic rig', () => {
   const runtime=fs.readFileSync(path.join(__dirname,
     '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
@@ -345,7 +381,7 @@ test('Furnace Crab is the default illustrated Foundry enemy and never reuses the
     'preserve all individually drawn stage-specific Foundry enemies');
   assert.ok(!html.includes('src="assets/animation/enemy-3d-prototype-v1.js'),
     'the rejected low-detail 3D preview must remain out of live gameplay');
-  const build='pawcade-side-scroll-no-badges-v2.js?v=crab-art-restored-20261114';
+  const build='pawcade-side-scroll-no-badges-v2.js?v=restore-legacy-enemy-creatures-all25-20261114';
   assert.ok(html.includes(build),'restored version should load in live game source');
   assert.ok(sw.includes(build),'offline cached game version should match');
 });
@@ -378,7 +414,7 @@ test('all 25 unique enemy rigs use eased hit-recovery without changing bash coll
     assert.ok(middle>0&&middle<1);
     assert.equal(end,0);
   }
-  const build='pawcade-side-scroll-no-badges-v2.js?v=enemy-hit-ease-25-20261114';
+  const build='pawcade-side-scroll-no-badges-v2.js?v=restore-legacy-enemy-creatures-all25-20261114';
   assert.ok(html.includes(build),'game page must load updated enemy visual state');
   assert.ok(offline.includes(build),'offline cache must load the same game script');
 });
