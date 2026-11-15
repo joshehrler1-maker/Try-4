@@ -359,6 +359,27 @@ test('original crab-era enemy appearances are restored in all 25 playable games'
     'game JS and offline cache must load the same restored visuals');
 });
 
+test('original creature-era limbs and accent silhouettes stay visually unchanged', () => {
+  const code=fs.readFileSync(path.join(__dirname,
+    '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  // These characteristic details were present when the crab-era designs
+  // looked right; the newer gait/halo variants changed their proportions.
+  assert.ok(code.includes('const gaitBlend=Math.min(1,Math.max(0,stride||0));'),
+    'restore original stride contact and creature leg silhouette');
+  assert.ok(code.includes('const footX=kneeX+legSwing*.45+dir*3-'),
+    'restore the original knee/foot articulation rather than longer new legs');
+  assert.ok(code.includes('const support=Math.max(0,side*gaitContact);'),
+    'restore original staggered support-foot contact');
+  assert.ok(code.includes('for(let n=0;n<3;n++){\n        const side=direction*(23+n*8);'),
+    'restore the old airborne trails, not the later exaggerated shapes');
+  assert.ok(code.includes('ctx.beginPath();ctx.ellipse(0,-26,24,6+Math.sin(phase)*2,0,0,Math.PI*2);ctx.stroke();'),
+    'restore original creature antenna/motion silhouettes');
+  assert.ok(!code.includes('const defensiveAttack=[1,7,9,14,17,22]'),
+    'new world-wide gait shape redesign is rejected');
+  assert.ok(!code.includes('const trailCount=2+index%3'),
+    'do not reintroduce the bulkier experimental flight trail design');
+});
+
 test('Furnace Crab is the default illustrated Foundry enemy and never reuses the generic rig', () => {
   const runtime=fs.readFileSync(path.join(__dirname,
     '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
