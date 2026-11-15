@@ -1,6 +1,6 @@
-/* Super Paw Heroes — original experimental 3D enemy meshes for games 1–5.
- * Real lit triangular geometry in WebGL 1; no CDN, textures or paid service.
- * Preview lab ONLY; not yet part of the 2.5D game or feature-film-quality.
+/* Super Paw Heroes — ten individually designed experimental 3D enemies.
+ * Optional low-resolution WebGL preview (OFF by default, 2D fallback intact).
+ * Original meshes; not approved feature-film rigs or finished animation.
  */
 (function(root){'use strict';
 const TAU=Math.PI*2;
@@ -42,11 +42,52 @@ const models=Object.freeze([
 {game:'Stage Beat',enemy:'Bass Bouncer',main:'#6d477f',light:'#edb2dc',dark:'#473d77'},
 {game:'Quarry Rescue',enemy:'Slate Burrower',main:'#8f8888',light:'#d5c4a1',dark:'#5c6077'}
 ]);
+
+// World-specific attached surface meshes: modeled eyes, tooling, panel ridges,
+// plates and lights. Distinct geometry per game; never detachable UI badges.
+const finishParts=Object.freeze([
+ // Foundry: furnace eyes, twin stacks, riveted clamp.
+ [['orb',-.24,1.03,.43,.13,.12,.07,'#ffe9b3'],['orb',.24,1.03,.43,.13,.12,.07,'#ffe9b3'],['orb',-.23,1.03,.51,.05,.064,.03,'#51313e'],['orb',.25,1.03,.51,.05,.064,.03,'#51313e'],['rod',-.28,1.41,-.08,.12,.3,.13,'light'],['rod',.27,1.37,-.09,.12,.25,.13,'dark'],['orb',1.22,.08,.29,.12,.1,.07,'#ffe2a3'],['orb',1.38,-.17,.28,.12,.1,.07,'#ffe2a3'],['box',0,.24,.54,.27,.12,.07,'light']],
+ // Library: embroidered spine, reading eyes, quill and page studs.
+ [['orb',-.17,1.15,.35,.12,.13,.06,'#fff4dc'],['orb',.17,1.15,.35,.12,.13,.06,'#fff4dc'],['orb',-.16,1.15,.42,.042,.072,.03,'#48516c'],['orb',.18,1.15,.42,.042,.072,.03,'#48516c'],['box',0,.16,.55,.075,.68,.07,'#85658e'],['orb',0,.64,.6,.12,.13,.07,'#ffebc0'],['spike',-.28,1.54,-.12,.12,.33,.11,'light'],['orb',-.51,-.08,.54,.08,.08,.045,'#f2dbb6'],['orb',.54,-.08,.54,.08,.08,.045,'#f2dbb6']],
+ // Reef: paired gill eyes, branching dorsal coral and vent fins.
+ [['orb',.59,.37,.38,.12,.14,.1,'#f6f7d4'],['orb',.9,.38,.33,.12,.14,.1,'#f6f7d4'],['orb',.61,.37,.48,.048,.084,.04,'#2a6681'],['orb',.92,.38,.43,.048,.084,.04,'#2a6681'],['spike',-.22,1.07,-.1,.12,.37,.12,'#f7b987'],['spike',.22,.98,-.12,.12,.33,.12,'#ffdbac'],['orb',.42,-.02,.49,.17,.075,.06,'dark'],['orb',-.4,.02,.48,.2,.08,.06,'light']],
+ // Clocktower: real dial rings, hands, and brass crown screws.
+ [['orb',0,.13,.73,.38,.38,.055,'#f7e5be'],['orb',0,.13,.79,.3,.3,.049,'#81626b'],['rod',0,.26,.85,.03,.17,.029,'#ffe7a7'],['rod',.13,.12,.85,.027,.14,.03,'#ffe7a7'],['orb',-.27,.14,.85,.05,.06,.027,'#ffeec0'],['orb',.27,.14,.85,.05,.06,.027,'#ffeec0'],['orb',-.2,1.05,.37,.1,.12,.06,'#fff5ce'],['orb',.19,1.05,.37,.1,.12,.06,'#fff5ce'],['orb',0,1.49,-.1,.17,.11,.14,'light']],
+ // Seed Garden: seed eyes, veined pod plates and living thorns.
+ [['orb',-.25,.46,.49,.115,.12,.06,'#fff0bd'],['orb',.23,.46,.49,.115,.12,.06,'#fff0bd'],['orb',-.24,.46,.56,.042,.065,.026,'#3b6451'],['orb',.24,.46,.56,.042,.065,.026,'#3b6451'],['spike',-.49,.84,-.12,.15,.36,.12,'dark'],['spike',.5,.84,-.12,.15,.36,.12,'light'],['orb',-.28,-.04,.59,.2,.115,.064,'#b9d48c'],['orb',.27,-.04,.59,.2,.115,.064,'#f0dd93'],['spike',0,1.12,-.15,.14,.32,.13,'light']],
+ // Waterfall: aerodynamic feather ribs, spray fins and two expressive eyes.
+ [['orb',.19,.33,.69,.12,.12,.058,'#f6ffff'],['orb',.43,.33,.63,.12,.12,.058,'#f6ffff'],['orb',.2,.33,.77,.048,.067,.025,'#256c95'],['orb',.44,.33,.71,.048,.067,.025,'#256c95'],['rod',-.84,.38,.36,.07,.29,.061,'dark'],['rod',.84,.38,.36,.07,.29,.061,'dark'],['orb',-.93,.38,.39,.12,.074,.045,'#d4ffff'],['orb',.95,.38,.39,.12,.074,.045,'#d4ffff'],['spike',-.64,.1,-.13,.13,.37,.12,'light']],
+ // Lanterns: silk face mask, embroidered cuffs and lantern centers.
+ [['box',0,1.36,.34,.32,.12,.05,'dark'],['orb',-.17,1.17,.38,.12,.12,.07,'#fff4d8'],['orb',.17,1.17,.38,.12,.12,.07,'#fff4d8'],['orb',-.16,1.17,.46,.047,.07,.03,'#654c88'],['orb',.18,1.17,.46,.047,.07,.03,'#654c88'],['orb',-.93,.33,.35,.16,.11,.08,'#f1ccaa'],['orb',.94,.33,.35,.16,.11,.08,'#f1ccaa'],['orb',0,1.28,.32,.1,.14,.08,'#fff1a8'],['spike',0,1.69,.05,.13,.24,.12,'light']],
+ // Polarity: asymmetric antenna, front sensor eyes and beetle plating.
+ [['rod',.26,.85,-.05,.08,.36,.08,'light'],['rod',.67,.85,-.05,.08,.36,.08,'light'],['orb',.26,1.18,-.05,.12,.12,.11,'#b4edfb'],['orb',.67,1.18,-.05,.12,.12,.11,'#a6aef5'],['orb',.4,.39,.55,.1,.12,.055,'#e6faff'],['orb',.67,.39,.55,.1,.12,.055,'#e6faff'],['orb',.42,.39,.61,.041,.07,.026,'#3b477e'],['orb',.69,.39,.61,.041,.07,.026,'#3b477e'],['box',-.25,.19,.66,.3,.1,.06,'#c1e6f3']],
+ // Beat: concentric physical drum membrane, tension pegs, crown tabs.
+ [['orb',0,.15,.84,.56,.57,.031,'#f4bfe5'],['orb',0,.15,.88,.46,.48,.024,'dark'],['orb',0,.15,.91,.34,.35,.03,'main'],['orb',0,.15,.94,.17,.2,.026,'#fce5dc'],['orb',-.53,.21,.72,.085,.11,.06,'#f6d2ac'],['orb',.53,.21,.72,.085,.11,.06,'#f6d2ac'],['box',-.39,1.0,.05,.15,.12,.16,'light'],['box',.39,1.0,.05,.15,.12,.16,'light']],
+ // Quarry: layered stone visor and drill collars with polished eyes.
+ [['box',0,1.04,.45,.39,.13,.053,'#e2d2b4'],['orb',-.23,1.17,.53,.13,.12,.065,'#fff0cb'],['orb',.24,1.17,.53,.13,.12,.065,'#fff0cb'],['orb',-.22,1.17,.6,.053,.064,.027,'#554a54'],['orb',.25,1.17,.6,.053,.064,.027,'#554a54'],['orb',-.75,-.55,.66,.12,.09,.055,'#dfc9a4'],['orb',.75,-.55,.66,.12,.09,.055,'#dfc9a4'],['box',-1.55,-.12,.27,.12,.15,.13,'main'],['box',1.55,-.12,.27,.12,.15,.13,'main']]
+]);
+function addSurface(index,m,P,t,bob,reduced,mode,step,strike){
+ // Follow each model's ACTUAL body rig in every state; no drifting eye meshes.
+ let offset=bob;
+ if(index===2) offset+=reduced?0:Math.sin(t*3)*.12;
+ if(index===4) offset+=(mode==='move'&&!reduced?Math.abs(step)*.2:0)-strike*.11;
+ if(index===5) offset=reduced?0:Math.sin(t*2.8)*.15;
+ if(index===6) offset+=mode==='move'&&!reduced?Math.abs(step)*.21:0;
+ if(index===8) offset-=strike*.16;
+ if(index===9) offset=0; // The quarry turret remains planted.
+ for(const [type,x,y,z,sx,sy,sz,shade,tilt=0] of finishParts[index]){
+  const color=shade==='light'?m.light:shade==='dark'?m.dark:shade==='main'?m.main:shade;
+  P(type,x,y+offset,z,sx,sy,sz,color,tilt);
+ }
+}
+
 function build(index,mode='idle',t=0,reduced=false){
 if(!Number.isInteger(index)||index<0||index>9)throw Error('Unknown 3D enemy');
-t=reduced?0:Math.max(0,t);const m=models[index],out=[];
+t=reduced||!Number.isFinite(t)?0:Math.max(0,t);const m=models[index],out=[];
 const moving=mode==='move'&&!reduced,attacking=mode==='attack'&&!reduced;
-const step=moving?Math.sin(t*6):0,strike=attacking?.5+.5*Math.sin(t*5):0;
+// Smooth anticipation, contact and follow-through instead of a snapped pose.
+const step=moving?Math.sin(t*6):0,strike=attacking?Math.pow(Math.sin(Math.PI*((t%1.1)/1.1)),2):0;
 const bob=moving?Math.abs(step)*.08:reduced?0:Math.sin(t*1.6)*.025;
 const hit=mode==='hit'&&!reduced?Math.max(0,1-t/.7):0;
 const fall=mode==='defeat'&&!reduced?bound(t/1.2):0;
@@ -178,10 +219,12 @@ for(let k=0;k<3;k++)P('spike',-.49+k*.45,.75+y,0,.1,.26,.11,m.dark,(k-1)*.15);
   P('spike',side*1.79,-.19,.11,.17,.32,.15,m.dark,side*.63);
  }
 }
+addSurface(index,m,P,t,bob,reduced,mode,step,strike);
 return {game:m.game,enemy:m.enemy,parts:out,hit,fall};
 }
-const VSH='attribute vec3 aPos;attribute vec3 aNormal;uniform mat4 uMvp;uniform mat4 uModel;varying vec3 vNorm;varying vec3 vWorld;void main(){vec4 p=uModel*vec4(aPos,1.0);vWorld=p.xyz;vNorm=normalize(mat3(uModel)*aNormal);gl_Position=uMvp*vec4(aPos,1.0);}';
-const FSH='precision mediump float;uniform vec3 uColor;varying vec3 vNorm;varying vec3 vWorld;void main(){vec3 n=normalize(vNorm);vec3 l=normalize(vec3(-0.43,0.8,1.1));float d=max(0.0,dot(n,l));vec3 v=normalize(vec3(0.0,1.0,8.0)-vWorld);float rim=pow(1.0-max(0.0,dot(n,v)),2.0);vec3 color=uColor*(0.36+0.64*d)+vec3(0.20)*rim*0.23;gl_FragColor=vec4(sqrt(color),1.0);}';
+// Non-uniform ellipsoids need corrected normals or faces look artificially flat.
+const VSH='attribute vec3 aPos;attribute vec3 aNormal;uniform mat4 uMvp;uniform mat4 uModel;uniform vec3 uNormalScale;varying vec3 vNorm;varying vec3 vWorld;void main(){vec4 p=uModel*vec4(aPos,1.0);vWorld=p.xyz;vNorm=normalize(mat3(uModel)*(aNormal*uNormalScale));gl_Position=uMvp*vec4(aPos,1.0);}';
+const FSH='precision mediump float;uniform vec3 uColor;varying vec3 vNorm;varying vec3 vWorld;void main(){vec3 n=normalize(vNorm);vec3 key=normalize(vec3(-0.43,0.8,1.1));vec3 fill=normalize(vec3(0.75,0.30,-0.55));float light=max(dot(n,key),0.0);float bounce=max(dot(n,fill),0.0);vec3 eye=normalize(vec3(0.0,0.75,7.0)-vWorld);float edge=pow(1.0-max(dot(n,eye),0.0),2.6);float gleam=pow(max(dot(reflect(-key,n),eye),0.0),15.0);vec3 color=uColor*(0.27+0.62*light+0.23*bounce)+vec3(0.32,0.51,0.76)*edge*0.21+vec3(1.0,0.83,0.61)*gleam*0.15;gl_FragColor=vec4(sqrt(clamp(color,0.0,1.0)),1.0);}';
 function compile(gl,type,src){const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)){const msg=gl.getShaderInfoLog(sh);throw Error('WebGL shader failed: '+msg);}return sh;}
 function init(canvas,options={}){
 const sprite=Boolean(options.sprite);
@@ -193,7 +236,7 @@ gl.attachShader(program,v);gl.attachShader(program,f);gl.linkProgram(program);
 if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
 gl.deleteShader(v);gl.deleteShader(f);gl.useProgram(program);
 const loc={p:gl.getAttribLocation(program,'aPos'),n:gl.getAttribLocation(program,'aNormal'),
-mvp:gl.getUniformLocation(program,'uMvp'),model:gl.getUniformLocation(program,'uModel'),color:gl.getUniformLocation(program,'uColor')};
+mvp:gl.getUniformLocation(program,'uMvp'),model:gl.getUniformLocation(program,'uModel'),color:gl.getUniformLocation(program,'uColor'),normalScale:gl.getUniformLocation(program,'uNormalScale')};
 const gpu={};
 for(const [key,mesh] of Object.entries(meshes)){
 const p=gl.createBuffer(),n=gl.createBuffer(),idx=gl.createBuffer();
@@ -208,6 +251,7 @@ const drawPart=(v,view)=>{
 const world=mul(pos(...v.position),mul(rz(v.tilt||0),size(...v.scale)));
 const g=gpu[v.type];
 gl.uniformMatrix4fv(loc.model,false,world);gl.uniformMatrix4fv(loc.mvp,false,mul(view,world));gl.uniform3fv(loc.color,rgb(v.color));
+gl.uniform3fv(loc.normalScale,new Float32Array(v.scale.map(x=>1/Math.max(0.0001,x*x))));
 gl.bindBuffer(gl.ARRAY_BUFFER,g.p);gl.enableVertexAttribArray(loc.p);gl.vertexAttribPointer(loc.p,3,gl.FLOAT,false,0,0);
 gl.bindBuffer(gl.ARRAY_BUFFER,g.n);gl.enableVertexAttribArray(loc.n);gl.vertexAttribPointer(loc.n,3,gl.FLOAT,false,0,0);
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,g.idx);gl.drawElements(gl.TRIANGLES,g.count,gl.UNSIGNED_SHORT,0);
