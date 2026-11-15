@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v85-enemy-recoil';
+const CACHE = 'try4-public-v86-stage45-five-games';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-companions.html","pawtopia-arcade.html","crystal-regions/blue-tech-mines.html","crystal-regions/brown-earth-quarries.html","crystal-regions/cyan-frost-caverns.html","crystal-regions/green-life-groves.html","crystal-regions/indigo-shadow-tunnels.html","crystal-regions/orange-volcanic-depths.html","crystal-regions/pink-harmony-grotto.html","crystal-regions/purple-mystic-halls.html","crystal-regions/red-flame-caves.html","crystal-regions/yellow-light-ruins.html","assets/pawtopia-scenes.css","assets/scenes/pawtopia.webp","assets/scenes/cottage.webp","assets/scenes/arcade.webp","assets/scenes/catacombs.webp","assets/scenes/red-flame-caves.webp","assets/scenes/purple-mystic-halls.webp","assets/scenes/blue-tech-mines.webp","assets/scenes/green-life-groves.webp","assets/scenes/orange-volcanic-depths.webp","assets/scenes/cyan-frost-caverns.webp","assets/scenes/indigo-shadow-tunnels.webp","assets/scenes/yellow-light-ruins.webp","assets/scenes/pink-harmony-grotto.webp","assets/scenes/brown-earth-quarries.webp","assets/whisker-luna-master.png","assets/pawtopia-atlas.css","assets/crystal-regions.css","assets/pawtopia-save.js","assets/companion-cottage.css","assets/companion-cottage.js");
 FILES.push('enemy-3d-prototype.html','assets/animation/enemy-3d-prototype-v1.js?v=3d-ten-polished-12b6180','enemy-motion-lab.html');
@@ -22,7 +22,7 @@ FILES.push(
   'assets/animation/cloud-trail-enemy-rigs-v1.js?v=material-cloud-44c92967',
   'assets/animation/five-world-enemy-rigs-v1.js?v=material-five-9cc2586d',
   'assets/animation/origin-world-enemy-rigs-v1.js?v=material-origin-017babeb',
-  'assets/pawcade-side-scroll-no-badges-v2.js?v=enemy-hit-ease-25-20261114',
+  'assets/pawcade-side-scroll-no-badges-v2.js?v=film-stage45-midgames-20261114',
   'assets/pawcade-side-scroll.css?v=landscape-controls-68386cd',
   'assets/platform-worlds.js', 'assets/game-fullscreen.css', 'assets/game-fullscreen.js',
   'assets/touch-joystick.css', 'assets/touch-joystick.js', 'assets/touch-joystick.js?v=pointer-stability-v1', 'assets/whisker-luna-master.webp',
@@ -134,6 +134,19 @@ FILES.push(
   'assets/scenes/canyon-crossing/stage-03-collapsing-hall-bridge.svg',
   'assets/scenes/submarine-dock/stage-02-perimeter-sweep-dodge.svg',
   'assets/scenes/submarine-dock/stage-03-carrier-climb-tower.svg'
+);
+// Ten original independently placed stage-4/5 film-look props (games 6–10).
+FILES.push(
+  'assets/scenes/waterfall-climb/stage-04-warrior-ridge-tower.svg',
+  'assets/scenes/waterfall-climb/stage-05-dark-summit-ice.svg',
+  'assets/scenes/lantern-festival/stage-04-airship-revenge-turrets.svg',
+  'assets/scenes/lantern-festival/stage-05-starlight-world-glide.svg',
+  'assets/scenes/crystal-polarity/stage-04-intermission-rails-ceiling.svg',
+  'assets/scenes/crystal-polarity/stage-05-tower-interior-tower.svg',
+  'assets/scenes/stage-beat/stage-04-dry-circuit-spring.svg',
+  'assets/scenes/stage-beat/stage-05-bassline-flight-steps.svg',
+  'assets/scenes/quarry-rescue/stage-04-lift-shaft-lifts.svg',
+  'assets/scenes/quarry-rescue/stage-05-quarry-defenses-cable.svg'
 );
 const gamePage = new URL('pawcade-side-scroll.html', self.registration.scope);
 const allowed = new Set(FILES.map(file => new URL(file, self.registration.scope).href));
