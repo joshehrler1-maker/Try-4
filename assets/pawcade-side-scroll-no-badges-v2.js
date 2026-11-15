@@ -8009,7 +8009,8 @@
       else if(lateWorldRig && window.pawtopiaLateEnemyRigs.draw(
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
-          recoil,landing:landingPose,clock,reduced:reducedMotion
+          recoil,landing:landingPose,clock,reduced:reducedMotion,
+          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
         })) {
         // Each late-world enemy's hinged parts now follow the game's actual
         // gait and projectile timing; physics and hitboxes remain untouched.
