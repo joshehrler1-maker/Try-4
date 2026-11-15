@@ -488,6 +488,11 @@
   ];
   const [jumpFactor,holdGravity,releaseGravity,fallGravity]=jumpProfiles[index];
   const sections = chapters.length;
+  // User-approved visual rollback: use the original Nov 14 Furnace Crab era
+  // renderer in ALL 25 playable games, while preserving each game's original
+  // specialist enemy (including Foundry crab), spawns, AI, stages and collisions.
+  // New procedural/3D rig experiments remain only in the separate preview lab.
+  const useCrabEraArt = index>=0 && index<25;
   const sectionSize = index===0 || index===16 ? 3020 : 2200;
   // Steamworks alternates compact shooting galleries with longer factory runs.
   const stageWidths=index===0 && sections===18 ? [3170,2390,3300,3110,3075,2520,3420,3160,3310,3100,3030,3500,3205,3140,2980,3310,3680,3250] : index===16 ? [3020,3270,3020,3460,3220,3020] : index===1 && sections===6 ? [2200,2278,1903,2195,3750,2191] : index===3 && sections===6 ? [2200,2249,2299,2225,2571,1879] : index===4 && sections===6 ? [2200,1450,2200,1710,1375,1050] : index===2 && sections===6 ? [2200,3300,2613,2819,2613,2819] : index===13 && sections===6 ? [2200,2200,2202,2200,1238,1928] : Array(sections).fill(sectionSize);
@@ -7748,6 +7753,23 @@
         // back into the generic base enemy that was disliked.
         if(usesFoundryCrab(foe)){
           drawFoundryEnemy({x,y},0,Boolean(foe.faceLeft),foe.offset||0);
+        }else if(useCrabEraArt){
+          // Keep the *same pre-rig creature appearance* in hit/defeat frames.
+          // No morph into the newer angular prototype when an enemy dies.
+          const left=Boolean(foe.faceLeft);
+          if(foe.foundryEnemy!==undefined)
+            drawFoundryEnemy({x,y},foe.foundryEnemy,left,foe.offset||0);
+          else if(foe.libraryEnemy!==undefined)
+            drawLibraryEnemy({x,y},foe,left,false,0);
+          else if(foe.reefEnemy!==undefined)
+            drawReefEnemy({x,y},foe,left,0);
+          else if(foe.clockEnemy!==undefined)
+            drawClockEnemy({x,y},foe,left,0);
+          else if(index===16)
+            drawSteamworksEnemy({x,y},foe,left,false);
+          else if(!atlasSprite(enemyArt,5,index,x,y-12,73,73,left,5)){
+            ctx.fillStyle='#bd664e';ctx.fillRect(x-18,y-17,36,34);
+          }
         }else{
           dyingEnemyArt.draw(ctx,index,{x,y},foe,{
             faceLeft:foe.faceLeft,reduced:true
@@ -7977,21 +7999,22 @@
       // Do not glue generic accessories, rings, legs or exaggerated stretch
       // over them. That caused disconnected appendages and muddy silhouettes.
       const originWorldRig = usesOriginRig(foe) && !usesFoundryCrab(foe) &&
-        typeof window.pawtopiaOriginEnemyRigs?.draw === 'function';
+        typeof window.pawtopiaOriginEnemyRigs?.draw === 'function' && !useCrabEraArt;
       const fiveWorldRig = index>=5 && index<=9 &&
-        typeof window.pawtopiaFiveEnemyRigs?.draw === 'function';
+        typeof window.pawtopiaFiveEnemyRigs?.draw === 'function' && !useCrabEraArt;
       const cloudWorldRig = index>=10 && index<=14 &&
-        typeof window.pawtopiaCloudEnemyRigs?.draw === 'function';
+        typeof window.pawtopiaCloudEnemyRigs?.draw === 'function' && !useCrabEraArt;
       const midWorldRig = index>=15 && index<=19 &&
-        typeof window.pawtopiaMidEnemyRigs?.draw === 'function';
+        typeof window.pawtopiaMidEnemyRigs?.draw === 'function' && !useCrabEraArt;
       const lateWorldRig = index>=20 && index<=24 &&
-        typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
+        typeof window.pawtopiaLateEnemyRigs?.draw === 'function' && !useCrabEraArt;
       const specialistArt = usesFoundryCrab(foe) ||
         foe.foundryEnemy!==undefined ||
         foe.libraryEnemy!==undefined || foe.reefEnemy!==undefined ||
         foe.clockEnemy!==undefined || index===16;
       const authoredEnemyArt=originWorldRig || fiveWorldRig ||
-        cloudWorldRig || midWorldRig || lateWorldRig || specialistArt;
+        cloudWorldRig || midWorldRig || lateWorldRig ||
+        (specialistArt && !useCrabEraArt);
       ctx.save();
       // Keep authored proportions stable; their local articulation drives
       // locomotion and combat instead of the legacy global squash stack.
@@ -8024,7 +8047,7 @@
       // and articulated limbs so gameplay never depends on this art upgrade.
       if(!authoredEnemyArt)
         drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,movingWeight,attackPose);
-      const rendered3D=drawEnemy3d(at,foe,faceLeft,attackPose,recoil,movingWeight);
+      const rendered3D=!useCrabEraArt && drawEnemy3d(at,foe,faceLeft,attackPose,recoil,movingWeight);
       if(rendered3D) {
         // Transparent 3D mesh composited at the original enemy position.
       }
