@@ -7,6 +7,40 @@
   'use strict';
   const TWO_PI = Math.PI * 2;
   const limit = value => Math.max(0, Math.min(1, Number(value) || 0));
+  // Original world-specific directional material shading, no recycled art.
+  // Large panels receive a subtle top light; eyes and tiny particles stay flat.
+  const surfacePalettes=[["#ffc6fb","#2b2854"],["#f4eeff","#3e3857"],["#d8ffb0","#243e3c"],["#fff4c0","#65414f"],["#dffbff","#293b56"]];
+  let activeSurfaceWorld=0;
+  const tint=(a,b,t)=>{
+    const c=parseInt(a.slice(1),16),d=parseInt(b.slice(1),16);
+    const channel=shift=>Math.round(((c>>shift)&255)*(1-t)+((d>>shift)&255)*t);
+    return '#'+[channel(16),channel(8),channel(0)]
+      .map(v=>v.toString(16).padStart(2,'0')).join('');
+  };
+  const sculptedFill=(ctx,color,x0,y0,x1,y1)=>{
+    if(typeof color!=='string'||!/^#[0-9a-f]{6}$/i.test(color)||
+       (x1-x0)*(y1-y0)<320)return color;
+    if(typeof ctx.createLinearGradient!=='function')return color;
+    const gradient=ctx.createLinearGradient(x0,y0,x1,y1);
+    if(!gradient||typeof gradient.addColorStop!=='function')return color;
+    const [key,shade]=surfacePalettes[activeSurfaceWorld];
+    gradient.addColorStop(0,tint(color,key,.46));
+    gradient.addColorStop(.27,tint(color,'#ffffff',.13));
+    gradient.addColorStop(.58,color);
+    gradient.addColorStop(1,tint(color,shade,.49));
+    return gradient;
+  };
+  const panelFill=(ctx,color,points)=>{
+    if(!points||points.length<3)return color;
+    let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+    for(const [x,y] of points){
+      if(x<x0)x0=x;if(x>x1)x1=x;
+      if(y<y0)y0=y;if(y>y1)y1=y;
+    }
+    return sculptedFill(ctx,color,x0,y0,x1,y1);
+  };
+  const orbFill=(ctx,color,x,y,rx,ry)=>
+    sculptedFill(ctx,color,x-rx,y-ry,x+rx,y+ry);
   const line = (ctx, points, stroke, width=2) => {
     ctx.beginPath();
     ctx.moveTo(points[0][0], points[0][1]);
@@ -20,12 +54,12 @@
     ctx.moveTo(points[0][0],points[0][1]);
     for(let j=1;j<points.length;j++) ctx.lineTo(points[j][0],points[j][1]);
     ctx.closePath();
-    ctx.fillStyle=fill;ctx.fill();
+    ctx.fillStyle=panelFill(ctx,fill,points);ctx.fill();
     if (stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke();}
   };
   const oval=(ctx,x,y,rx,ry,fill,stroke)=>{
     ctx.beginPath();ctx.ellipse(x,y,Math.max(.1,rx),Math.max(.1,ry),0,0,TWO_PI);
-    ctx.fillStyle=fill;ctx.fill();
+    ctx.fillStyle=orbFill(ctx,fill,x,y,rx,ry);ctx.fill();
     if(stroke){ctx.lineWidth=1.8;ctx.strokeStyle=stroke;ctx.stroke();}
   };
 
@@ -215,6 +249,7 @@
       ctx.translate(at.x,at.y);
       if(pose.faceLeft) ctx.scale(-1,1);
       ctx.lineJoin='round';ctx.lineCap='round';
+      activeSurfaceWorld=world-20;
       family(ctx,step,move,attack,recoil,landing,time,offset);
     } finally {
       ctx.restore();
