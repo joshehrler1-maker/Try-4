@@ -20,3 +20,9 @@
 ## Crab-era movement silhouette restoration — follow-up
 
 The original `drawEnemyArticulatedLimbs` and `drawEnemySecondaryMotion` art functions were copied from the verified historical `9768ec86ad` code and reinstalled **verbatim** in the playable source. This undoes later generic longer limbs, changed feet and bulkier flight decorations, without altering enemy AI, collision, level geometry or animation timing of the simulation. Source QA checks the original characteristic shapes. Page/worker/game versions advanced together for offline refresh. Device screenshots remain necessary for visual approval.
+
+## Full 25-game restoration pass and stage verification
+
+Use [the individually checked 25-game / 162-stage restoration checklist](ENEMY-RESTORATION-CHECKLIST-25.md) and machine-readable `assets/enemy-restoration-baseline-25.json`. The verified source now routes **all 25 games** through the exact older creature-art rendering transforms as well as the prior body/leg/articulated motion functions. All newer five-family rig assets are designated **preview-only** in `assets/enemy-art-motion-registry.json`; they must not be silently restored to the playable engine.
+
+The separate `tests/enemy-restoration-25.test.cjs` compares every stage's specific room, encounter/setpiece, hero and assigned counterpart with the real world definitions. It also guards old body proportions, original existing specialists, sprite atlas path, and the HTML/worker build version. **Source QA is complete; visual approval and actual live/Android browser gameplay QA are pending.**
