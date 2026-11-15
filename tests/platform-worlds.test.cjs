@@ -674,16 +674,24 @@ test('first-ten real WebGL mesh prototypes have unique 3D parts and safe lifecyc
   assert.equal(deletes,buffers,'WebGL buffers should be disposed on page exit');
 });
 
-test('opt-in gameplay WebGL enemies preserve the original 2D fallback', () => {
+test('experimental WebGL enemy art stays studio-only while playable enemies remain original', () => {
   const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
   const runtime=fs.readFileSync(path.join(__dirname,'../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
   const sw=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
   const js=fs.readFileSync(path.join(__dirname,'../assets/animation/enemy-3d-prototype-v1.js'),'utf8');
-  assert.ok(html.includes('id="side-3d-enemies" aria-pressed="false" hidden'));
-  assert.ok(html.indexOf('src="assets/animation/enemy-3d-prototype-v1.js') <
-    html.indexOf('src="assets/pawcade-side-scroll-no-badges-v2.js'));
+  assert.ok(!html.includes('id="side-3d-enemies"'),
+    'low-detail experimental models must not replace playable enemies');
+  assert.ok(!html.includes('src="assets/animation/enemy-3d-prototype-v1.js'),
+    'the playable page must not load low-poly WebGL prototypes');
+  assert.ok(html.includes('href="enemy-3d-prototype.html"'),
+    'experimental models remain available only in the separate preview lab');
   assert.ok(sw.includes('enemy-3d-prototype-v1.js?v=3d-ten-'));
-  assert.ok(sw.includes('pawcade-side-scroll-no-badges-v2.js?v=live-3d-10-'));
+  assert.ok(sw.includes('pawcade-side-scroll-no-badges-v2.js?v=enemy-silhouette-restore-'));
+  assert.ok(runtime.includes('const authoredEnemyArt=originWorldRig || fiveWorldRig ||'));
+  assert.ok(runtime.includes('if(!reducedMotion && !authoredEnemyArt)'));
+  assert.ok(runtime.includes('if(!rendered3D && !authoredEnemyArt) drawEnemySecondaryMotion'));
+  assert.ok(runtime.includes('ctx.translate(-at.x,-at.y-19-(authoredEnemyArt?0:footstep))'),
+    'original joint motion must not be doubled by the legacy bobbing overlay');
   assert.ok(runtime.includes('enemy3dAvailable=index>=0 && index<=9'));
   assert.ok(runtime.includes('enemy3dDraws>=2'));
   assert.ok(runtime.includes('enemy3dSlowFrames>=12'));
