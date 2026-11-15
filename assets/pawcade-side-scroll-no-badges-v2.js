@@ -7839,6 +7839,14 @@
         attackProfiles[index][0]:attackProfiles[index][1];
       foe._attackPose=(foe._attackPose||0)+(poseTarget-(foe._attackPose||0))*
         (1-Math.exp(-poseRate*blendDt));
+      // Source-of-truth is the enemy's real bash timer (0.48 s).
+      // Distinct per-game recovery curves bring eyes, limbs and body shading
+      // back to neutral gradually: no binary hit-pose pop at the end.
+      // Cosmetic only; enemy motion, attack AI, collisions and damage unchanged.
+      const hitRemaining=foe.bashed && clock<foe.bashed.until
+        ? Math.max(0,Math.min(1,(foe.bashed.until-clock)/.48)):0;
+      const hitRecovery=[0.92,1.17,0.78,1.34,0.86,1.03,1.24,0.88,1.39,1.52,1.08,1.21,0.74,1.31,0.95,1.13,1.47,0.89,1.02,0.81,1.28,1.54,0.93,0.84,1.43][index];
+      const hitPose=reducedMotion?0:Math.pow(hitRemaining,hitRecovery);
       const attackPose=reducedMotion?0:foe._attackPose;
       const squash=attackPose*.045;
       const attackStyle=[.04,.025,.07,.018,.09,.05,.065,.03,.085,.02,.075,.045,.06,.055,.035,.08,.022,.04,.095,.028,.07,.025,.065,.09,.032][index];
@@ -7969,7 +7977,7 @@
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
           recoil,landing:landingPose,clock,reduced:reducedMotion,
-          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
+          airborne,hit:hitPose
         })) {
         // Distinct first-five base enemy bodies; preserve already-authored
         // Foundry/Library/Reef/Clock specialist motions by dispatch guard.
@@ -7978,7 +7986,7 @@
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
           recoil,landing:landingPose,clock,reduced:reducedMotion,
-          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
+          airborne,hit:hitPose
         })) {
         // Five distinct environments have five separate animated bodies.
         // The shot timing, world positions and hitboxes remain authoritative.
@@ -7987,7 +7995,7 @@
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
           recoil,landing:landingPose,clock,reduced:reducedMotion,
-          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
+          airborne,hit:hitPose
         })) {
         // Five separate silhouettes. Motion follows this enemy's world
         // gait, strike, landing and attack simulation, not a looped GIF.
@@ -7996,7 +8004,7 @@
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
           recoil,landing:landingPose,clock,reduced:reducedMotion,
-          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
+          airborne,hit:hitPose
         })) {
         // Each of games 16–20 has an original silhouette with its own
         // traversal/contact articulation and visual-only impact timing.
@@ -8010,7 +8018,7 @@
         ctx,index,at,foe,{
           faceLeft,stride:movingWeight,attack:attackPose,
           recoil,landing:landingPose,clock,reduced:reducedMotion,
-          airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0
+          airborne,hit:hitPose
         })) {
         // Each late-world enemy's hinged parts now follow the game's actual
         // gait and projectile timing; physics and hitboxes remain untouched.
