@@ -239,6 +239,7 @@
     const attack=reduced?0:limit(pose.attack);
     const recoil=reduced?0:limit(pose.recoil);
     const landing=reduced?0:limit(pose.landing);
+    const hit=reduced?0:limit(pose.hit);
     const gait=reduced?0:Number(foe._gait)||0;
     const step=reduced?0:Math.sin(gait*(world===20?1.37:world===21?.83:
       world===22?1.05:world===23?1.17:.94));
@@ -249,6 +250,10 @@
       ctx.translate(at.x,at.y);
       if(pose.faceLeft) ctx.scale(-1,1);
       ctx.lineJoin='round';ctx.lineCap='round';
+      // Late-world bodies now react to confirmed hits without leaving
+      // their collision position or spawning decorative hit icons.
+      ctx.globalAlpha*=1-hit*.17;
+      ctx.translate(-hit*2,-hit*.7);
       activeSurfaceWorld=world-20;
       family(ctx,step,move,attack,recoil,landing,time,offset);
     } finally {
