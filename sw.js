@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v84-enemy-materials';
+const CACHE = 'try4-public-v85-enemy-recoil';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-companions.html","pawtopia-arcade.html","crystal-regions/blue-tech-mines.html","crystal-regions/brown-earth-quarries.html","crystal-regions/cyan-frost-caverns.html","crystal-regions/green-life-groves.html","crystal-regions/indigo-shadow-tunnels.html","crystal-regions/orange-volcanic-depths.html","crystal-regions/pink-harmony-grotto.html","crystal-regions/purple-mystic-halls.html","crystal-regions/red-flame-caves.html","crystal-regions/yellow-light-ruins.html","assets/pawtopia-scenes.css","assets/scenes/pawtopia.webp","assets/scenes/cottage.webp","assets/scenes/arcade.webp","assets/scenes/catacombs.webp","assets/scenes/red-flame-caves.webp","assets/scenes/purple-mystic-halls.webp","assets/scenes/blue-tech-mines.webp","assets/scenes/green-life-groves.webp","assets/scenes/orange-volcanic-depths.webp","assets/scenes/cyan-frost-caverns.webp","assets/scenes/indigo-shadow-tunnels.webp","assets/scenes/yellow-light-ruins.webp","assets/scenes/pink-harmony-grotto.webp","assets/scenes/brown-earth-quarries.webp","assets/whisker-luna-master.png","assets/pawtopia-atlas.css","assets/crystal-regions.css","assets/pawtopia-save.js","assets/companion-cottage.css","assets/companion-cottage.js");
 FILES.push('enemy-3d-prototype.html','assets/animation/enemy-3d-prototype-v1.js?v=3d-ten-79f7903','enemy-motion-lab.html');
@@ -17,12 +17,12 @@ FILES.push("assets/pawcade-directory.css");
 FILES.push("pawcade-side-scroll.html","assets/pawcade-side-scroll.js","assets/pawcade-side-scroll.js?v=landing-edges","assets/pawcade-side-scroll.css","assets/pawcade-side-directory.css","assets/scenes/side-scroll-worlds.webp");
 FILES.push(
   'assets/platform-worlds.js?v=harbor-finale-e803531',
-  'assets/animation/late-world-enemy-rigs-v1.js?v=material-late-c073da11',
+  'assets/animation/late-world-enemy-rigs-v1.js?v=material-late-hit-caf0ee32',
   'assets/animation/mid-world-enemy-rigs-v1.js?v=material-mid-3af5a101',
   'assets/animation/cloud-trail-enemy-rigs-v1.js?v=material-cloud-44c92967',
   'assets/animation/five-world-enemy-rigs-v1.js?v=material-five-9cc2586d',
   'assets/animation/origin-world-enemy-rigs-v1.js?v=material-origin-017babeb',
-  'assets/pawcade-side-scroll-no-badges-v2.js?v=enemy-silhouette-restore-dbbfdd6',
+  'assets/pawcade-side-scroll-no-badges-v2.js?v=enemy-art-physical-recoil-c75f2a94',
   'assets/pawcade-side-scroll.css?v=landscape-controls-68386cd',
   'assets/platform-worlds.js', 'assets/game-fullscreen.css', 'assets/game-fullscreen.js',
   'assets/touch-joystick.css', 'assets/touch-joystick.js', 'assets/touch-joystick.js?v=pointer-stability-v1', 'assets/whisker-luna-master.webp',
