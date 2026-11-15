@@ -7935,7 +7935,17 @@
       // Keep authored proportions stable; their local articulation drives
       // locomotion and combat instead of the legacy global squash stack.
       ctx.translate(at.x,at.y+19);
-      if(authoredEnemyArt){
+      if(useCrabEraArt){
+        // Exact creature-era visual weighting (commit 9768ec86ad).
+        // Don't stretch the user's approved shells/faces/claws using the
+        // newer game-wide transform formula: preserve their old silhouettes.
+        if(!airborne && enemyPattern==='charge' && nearby)
+          ctx.rotate((faceLeft?1:-1)*.075);
+        if(airborne) ctx.rotate(motion*.065);
+        else ctx.rotate(enemyLean+attackTilt+verticalLean);
+        ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5,
+          (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression);
+      }else if(authoredEnemyArt){
         const authoredLean=airborne ? Math.max(-.055,Math.min(.055,motion*.02))
           : Math.max(-.06,Math.min(.06,enemyLean*.24+verticalLean*.2));
         ctx.rotate(authoredLean);
