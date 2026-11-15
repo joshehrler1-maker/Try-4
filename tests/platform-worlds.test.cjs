@@ -620,7 +620,7 @@ test('first-ten real WebGL mesh prototypes have unique 3D parts and safe lifecyc
   assert.ok(game.includes('href="enemy-3d-prototype.html"'),
     'prototype should be discoverable from Games Room');
   for(const file of ['enemy-3d-prototype.html',
-    'assets/animation/enemy-3d-prototype-v1.js?v=3d-ten-79f7903']){
+    'assets/animation/enemy-3d-prototype-v1.js?v=3d-ten-polished-12b6180']){
     assert.ok(worker.includes(file), 'new WebGL source not precached: '+file);
   }
   const ctx={window:{devicePixelRatio:2}};
@@ -628,6 +628,20 @@ test('first-ten real WebGL mesh prototypes have unique 3D parts and safe lifecyc
   const art=ctx.window.SuperPawEnemy3D;
   assert.equal(art.models.length,10);
   assert.equal(new Set(art.models.map(m=>m.enemy)).size,10);
+  assert.ok(source.includes('uNormalScale'),'scaled enemy shapes need corrected surface normals');
+  assert.ok(source.includes('addSurface(index,m,P,t,bob,reduced,mode,step,strike)'),
+    'mesh details must track their own body's movement');
+  assert.ok(source.includes('Math.pow(Math.sin('),
+    'attacks must ease in and out rather than snap into strike poses');
+  const unique3dFinishes=new Set();
+  for(let i=0;i<10;i++){
+    const rest=art.build(i,'idle',0,false);
+    assert.ok(rest.parts.length>=15,'enemy needs detailed, connected 3D parts: '+rest.enemy);
+    unique3dFinishes.add(rest.parts.map(v=>v.type+':'+v.color).join('|'));
+    assert.equal(art.build(i,'attack',0,false).parts.length,rest.parts.length);
+  }
+  assert.equal(unique3dFinishes.size,10,'all ten 3D enemy families need distinct finishes');
+
   for(const [kind,m] of Object.entries(art.meshes)){
     assert.equal(m.p.length,m.n.length,'normals must match 3D vertices: '+kind);
     assert.equal(m.p.length%3,0);
