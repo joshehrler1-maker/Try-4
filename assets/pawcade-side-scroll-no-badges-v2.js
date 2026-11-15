@@ -1899,6 +1899,15 @@
       foe.reefEnemy===undefined &&
       foe.clockEnemy===undefined;
   }
+  // Restore the user's approved mechanical Furnace Crab to regular Foundry
+  // encounter slots. The earlier generic Cinder Tongs rig is not approved
+  // as a replacement; keep the 18 authored specialist stages unchanged.
+  // Game 1 only: never reuse this crab across the other 24 adventures.
+  function usesFoundryCrab(foe) {
+    return index===0 && foe.foundryEnemy===undefined &&
+      foe.libraryEnemy===undefined && foe.reefEnemy===undefined &&
+      foe.clockEnemy===undefined;
+  }
   function markFoeDefeated(foe) {
     if(foe.dead)return;
     const shouldAnimate=!reducedMotion && (
@@ -7735,9 +7744,15 @@
         ctx.rotate((foe.faceLeft?1:-1)*t*.26);
         ctx.scale(1-t*.23,1-t*.4);
         ctx.translate(-x,-y);
-        dyingEnemyArt.draw(ctx,index,{x,y},foe,{
-          faceLeft:foe.faceLeft,reduced:true
-        });
+        // Defeat must fade the SAME crab seen during play, not morph
+        // back into the generic base enemy that was disliked.
+        if(usesFoundryCrab(foe)){
+          drawFoundryEnemy({x,y},0,Boolean(foe.faceLeft),foe.offset||0);
+        }else{
+          dyingEnemyArt.draw(ctx,index,{x,y},foe,{
+            faceLeft:foe.faceLeft,reduced:true
+          });
+        }
         ctx.restore();
       }
     }
@@ -7961,7 +7976,7 @@
       // The 25 hand-authored per-world bodies already animate their own joints.
       // Do not glue generic accessories, rings, legs or exaggerated stretch
       // over them. That caused disconnected appendages and muddy silhouettes.
-      const originWorldRig = usesOriginRig(foe) &&
+      const originWorldRig = usesOriginRig(foe) && !usesFoundryCrab(foe) &&
         typeof window.pawtopiaOriginEnemyRigs?.draw === 'function';
       const fiveWorldRig = index>=5 && index<=9 &&
         typeof window.pawtopiaFiveEnemyRigs?.draw === 'function';
@@ -7971,7 +7986,8 @@
         typeof window.pawtopiaMidEnemyRigs?.draw === 'function';
       const lateWorldRig = index>=20 && index<=24 &&
         typeof window.pawtopiaLateEnemyRigs?.draw === 'function';
-      const specialistArt = foe.foundryEnemy!==undefined ||
+      const specialistArt = usesFoundryCrab(foe) ||
+        foe.foundryEnemy!==undefined ||
         foe.libraryEnemy!==undefined || foe.reefEnemy!==undefined ||
         foe.clockEnemy!==undefined || index===16;
       const authoredEnemyArt=originWorldRig || fiveWorldRig ||
@@ -8048,6 +8064,10 @@
         // Each of games 16–20 has an original silhouette with its own
         // traversal/contact articulation and visual-only impact timing.
       }
+      // The previously approved original crab creature also represents
+      // ordinary foundry foes. No prototype mesh, generic arm overlays or
+      // floating ornaments should obscure its eyes, beak or pincers.
+      else if(usesFoundryCrab(foe)) drawFoundryEnemy(at,0,faceLeft,foe.offset||0,attackPose,recoil,foe._gait||0,landingPose,hitPose);
       else if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,faceLeft,foe.offset,attackPose,recoil,foe._gait||0,landingPose,foe.bashed?1:0);
       else if(foe.libraryEnemy!==undefined) drawLibraryEnemy(at,foe,faceLeft,firing,attackPose);
       else if(foe.reefEnemy!==undefined) drawReefEnemy(at,foe,faceLeft,attackPose);
