@@ -323,6 +323,33 @@ test('defeated mid- and late-world enemies retain only a short visual after hitb
     'restart must reset defeated enemy visual state');
 });
 
+test('Furnace Crab is the default illustrated Foundry enemy and never reuses the generic rig', () => {
+  const runtime=fs.readFileSync(path.join(__dirname,
+    '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const sw=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  assert.ok(runtime.includes('Furnace Crab: unmistakable right-facing silhouette'),
+    'the approved original beaked crab creature must remain in the source');
+  assert.ok(runtime.includes('function usesFoundryCrab(foe)'));
+  assert.ok(runtime.includes('return index===0 && foe.foundryEnemy===undefined'),
+    'crab restoration belongs ONLY to Ember Foundry, never all 25 games');
+  assert.ok(runtime.includes('const originWorldRig = usesOriginRig(foe) && !usesFoundryCrab(foe)'),
+    'regular Foundry enemies must never be replaced by generic Cinder Tongs');
+  assert.ok(runtime.includes('const specialistArt = usesFoundryCrab(foe) ||'),
+    'the restored crab must not receive the old disconnected accessory overlays');
+  assert.ok(runtime.includes('else if(usesFoundryCrab(foe)) drawFoundryEnemy(at,0,faceLeft,'),
+    'render the original crab with its own animated eye, beak, pincers and foot');
+  assert.ok(runtime.includes('if(usesFoundryCrab(foe)){\n          drawFoundryEnemy({x,y},0,'),
+    'the defeat fade must use the same crab art, never change model on defeat');
+  assert.ok(runtime.includes('else if(foe.foundryEnemy!==undefined) drawFoundryEnemy(at,foe.foundryEnemy,'),
+    'preserve all individually drawn stage-specific Foundry enemies');
+  assert.ok(!html.includes('src="assets/animation/enemy-3d-prototype-v1.js'),
+    'the rejected low-detail 3D preview must remain out of live gameplay');
+  const build='pawcade-side-scroll-no-badges-v2.js?v=crab-art-restored-20261114';
+  assert.ok(html.includes(build),'restored version should load in live game source');
+  assert.ok(sw.includes(build),'offline cached game version should match');
+});
+
 test('all 25 unique enemy rigs use eased hit-recovery without changing bash collision', () => {
   const source=fs.readFileSync(path.join(__dirname,
     '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
