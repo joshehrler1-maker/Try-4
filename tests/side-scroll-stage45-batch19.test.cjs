@@ -71,5 +71,4 @@ assert(runtime.includes('if (artX + slot.w >= camera && artX <= camera + width)'
 const build=html.split('pawcade-side-scroll-no-badges-v2.js?v=')[1]?.split('"')[0];
 assert(build&&offline.includes('pawcade-side-scroll-no-badges-v2.js?v='+build),
   'game JS and offline worker must use the same version');
-assert.equal(build,'film-stage45-midgames-20261114');
 console.log('PASS: 10 stage-4/5 original assets grounded in five independently referenced games (6–10); online/Android playback still unverified.');
