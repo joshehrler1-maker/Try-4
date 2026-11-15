@@ -38,6 +38,7 @@ jobs:
           node tests/side-scroll-midgame-scenery.test.cjs
           node tests/side-scroll-twilight-scenery.test.cjs
           node tests/side-scroll-latemid-scenery.test.cjs
+          node tests/enemy-surface-finish.test.cjs
           node tests/heroes.test.cjs
           node --test tests/core.test.cjs tests/server.test.mjs tests/crystal-polish.test.cjs tests/platform-worlds.test.cjs
           python3 scripts/check_android.py
