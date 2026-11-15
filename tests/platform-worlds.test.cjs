@@ -328,9 +328,9 @@ test('all 25 unique enemy rigs use eased hit-recovery without changing bash coll
     '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
   const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
   const offline=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
-  const curve=source.match(/const hitRecovery=\\[([\\d.,\\s]+)\\]\\[index\\]/);
+  const curve=source.split('const hitRecovery=[')[1]?.split('][index]')[0];
   assert.ok(curve,'missing 25 individual hit-recovery curves');
-  const profiles=curve[1].split(',').map(Number);
+  const profiles=curve.split(',').map(Number);
   assert.equal(profiles.length,25,'each game needs its own recovery rate');
   assert.equal(new Set(profiles).size,25,'recovery timing must stay individualized');
   assert.ok(profiles.every(n=>n>=.7&&n<=1.6),'hit curves must stay smooth and bounded');
