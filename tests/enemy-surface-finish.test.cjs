@@ -30,7 +30,7 @@ test('all 25 independently authored enemy bodies receive bounded individual surf
           assert.ok([x0,y0,x1,y1].every(Number.isFinite));
           gradients++;
           const stops=[];
-          return {addColorStop(t,c)=>{
+          return {addColorStop:(t,c)=>{
             assert.ok(t>=0&&t<=1&&/^#[0-9a-f]{6}$/i.test(c));
             stops.push([t,c]);
             if(stops.length===4)highlighted.push(stops[0][1]+':'+stops[3][1]);
