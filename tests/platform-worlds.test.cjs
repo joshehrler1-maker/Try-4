@@ -700,7 +700,10 @@ test('experimental WebGL enemy art stays studio-only while playable enemies rema
   assert.ok(html.includes('href="enemy-3d-prototype.html"'),
     'experimental models remain available only in the separate preview lab');
   assert.ok(sw.includes('enemy-3d-prototype-v1.js?v=3d-ten-'));
-  assert.ok(sw.includes('pawcade-side-scroll-no-badges-v2.js?v=enemy-silhouette-restore-'));
+  const runtimePath='assets/pawcade-side-scroll-no-badges-v2.js?v=';
+  const liveVersion=html.split('src="'+runtimePath)[1]?.split('"')[0];
+  assert.ok(liveVersion && sw.includes("'"+runtimePath+liveVersion+"'"),
+    'game script and offline cache must use the same current version');
   assert.ok(runtime.includes('const authoredEnemyArt=originWorldRig || fiveWorldRig ||'));
   assert.ok(runtime.includes('if(!reducedMotion && !authoredEnemyArt)'));
   assert.ok(runtime.includes('if(!rendered3D && !authoredEnemyArt) drawEnemySecondaryMotion'));
