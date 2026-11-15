@@ -7,15 +7,49 @@
   'use strict';
   const TAU=Math.PI*2;
   const unit=v=>Math.max(0,Math.min(1,Number(v)||0));
+  // Original world-specific directional material shading, no recycled art.
+  // Large panels receive a subtle top light; eyes and tiny particles stay flat.
+  const surfacePalettes=[["#ffd6ae","#543446"],["#eff8ff","#3a467e"],["#aef7ff","#204c7b"],["#ffe0aa","#534b3a"],["#e4dfff","#333555"]];
+  let activeSurfaceWorld=0;
+  const tint=(a,b,t)=>{
+    const c=parseInt(a.slice(1),16),d=parseInt(b.slice(1),16);
+    const channel=shift=>Math.round(((c>>shift)&255)*(1-t)+((d>>shift)&255)*t);
+    return '#'+[channel(16),channel(8),channel(0)]
+      .map(v=>v.toString(16).padStart(2,'0')).join('');
+  };
+  const sculptedFill=(ctx,color,x0,y0,x1,y1)=>{
+    if(typeof color!=='string'||!/^#[0-9a-f]{6}$/i.test(color)||
+       (x1-x0)*(y1-y0)<320)return color;
+    if(typeof ctx.createLinearGradient!=='function')return color;
+    const gradient=ctx.createLinearGradient(x0,y0,x1,y1);
+    if(!gradient||typeof gradient.addColorStop!=='function')return color;
+    const [key,shade]=surfacePalettes[activeSurfaceWorld];
+    gradient.addColorStop(0,tint(color,key,.46));
+    gradient.addColorStop(.27,tint(color,'#ffffff',.13));
+    gradient.addColorStop(.58,color);
+    gradient.addColorStop(1,tint(color,shade,.49));
+    return gradient;
+  };
+  const panelFill=(ctx,color,points)=>{
+    if(!points||points.length<3)return color;
+    let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+    for(const [x,y] of points){
+      if(x<x0)x0=x;if(x>x1)x1=x;
+      if(y<y0)y0=y;if(y>y1)y1=y;
+    }
+    return sculptedFill(ctx,color,x0,y0,x1,y1);
+  };
+  const orbFill=(ctx,color,x,y,rx,ry)=>
+    sculptedFill(ctx,color,x-rx,y-ry,x+rx,y+ry);
   function ellipse(ctx,x,y,w,h,fill,border,width=1.6){
     ctx.beginPath();ctx.ellipse(x,y,Math.max(.1,w),Math.max(.1,h),0,0,TAU);
-    ctx.fillStyle=fill;ctx.fill();
+    ctx.fillStyle=orbFill(ctx,fill,x,y,w,h);ctx.fill();
     if(border){ctx.strokeStyle=border;ctx.lineWidth=width;ctx.stroke();}
   }
   function shape(ctx,points,fill,border,width=1.7){
     ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);
     for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);
-    ctx.closePath();ctx.fillStyle=fill;ctx.fill();
+    ctx.closePath();ctx.fillStyle=panelFill(ctx,fill,points);ctx.fill();
     if(border){ctx.strokeStyle=border;ctx.lineWidth=width;ctx.stroke();}
   }
   function line(ctx,points,color,width=2){
@@ -214,6 +248,7 @@
       const baseOpacity=Number.isFinite(ctx.globalAlpha)?ctx.globalAlpha:1;
       ctx.globalAlpha=baseOpacity*(1-m.hit*.2);
       ctx.translate(-m.hit*1.6,0);
+      activeSurfaceWorld=index-10;
       family(ctx,m);
     }finally{ctx.restore();}
     return true;
