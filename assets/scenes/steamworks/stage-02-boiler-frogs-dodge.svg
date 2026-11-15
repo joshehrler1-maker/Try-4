@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="135" viewBox="0 0 150 135" role="img" aria-label="Boiler Frogs — mechanical steam pressure pump with kinetic pistons"><defs><linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff2d4"/><stop offset=".31" stop-color="#dcb389"/><stop offset=".72" stop-color="#a07176"/><stop offset="1" stop-color="#4d4057"/></linearGradient><linearGradient id="shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5cb87"/><stop offset=".34" stop-color="#dcb389"/><stop offset="1" stop-color="#4d4057"/></linearGradient><linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".43" stop-color="#f5cb87"/><stop offset="1" stop-color="#a07176"/></linearGradient><radialGradient id="aura"><stop stop-color="#ffffff" stop-opacity=".88"/><stop offset=".38" stop-color="#f5cb87" stop-opacity=".68"/><stop offset="1" stop-color="#a07176" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="75" cy="127" rx="67" ry="7" fill="#342744" opacity=".52"/>
+<path d="m12 117 17-10h95l13 11-18 11H29Z" fill="url(#base)" stroke="#493b50" stroke-width="2"/>
+<path d="M21 108V44l15-12h18l9 76m33 0 8-76h18l12 12v64" fill="url(#base)" stroke="#78525a" stroke-width="3"/>
+<path d="M37 32V15h75v17" stroke="#ffc887" stroke-width="7" fill="none"/>
+<path d="M40 53h68v54H40Z" fill="#302d44" stroke="#d4a77b" stroke-width="3"/>
+<path d="M56 53v54m34-54v54" stroke="#e6b18a" stroke-width="5"/>
+<path d="M60 64q15-13 31 0v29q-15 13-31 0Z" fill="url(#glass)" stroke="#ffebcd" stroke-width="2"/>
+<circle cx="76" cy="80" r="15" fill="url(#shine)" stroke="#ffe0a0" stroke-width="3"/>
+<path d="M73 80h6m-3-8v16" stroke="#fffbd5" stroke-width="2.5"/>
+<path d="M39 30q-23 4-19 21m90-21q21 6 21 22" fill="none" stroke="#e5c6b1" stroke-width="5"/>
+<path d="M29 52q-12 9-5 24m99-23q13 11 3 25" stroke="#c9d0d0" stroke-width="3" fill="none"/>
+<ellipse cx="74" cy="77" rx="43" ry="44" fill="url(#aura)" opacity=".42"/>
+<path d="M41 107h69" stroke="#f9d3a2" stroke-width="3"/>
+<circle cx="18" cy="18" r="4" fill="none" stroke="#fbefe2" stroke-width="2"/><circle cx="134" cy="16" r="3" fill="#fff7db"/></svg>

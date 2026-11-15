@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="135" viewBox="0 0 150 135" role="img" aria-label="Water Vein — jade bamboo hydro-wheel with cascading water"><defs><linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1ffde"/><stop offset=".31" stop-color="#91d1ac"/><stop offset=".72" stop-color="#488f83"/><stop offset="1" stop-color="#31556e"/></linearGradient><linearGradient id="shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c8fcfa"/><stop offset=".34" stop-color="#91d1ac"/><stop offset="1" stop-color="#31556e"/></linearGradient><linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".43" stop-color="#c8fcfa"/><stop offset="1" stop-color="#488f83"/></linearGradient><radialGradient id="aura"><stop stop-color="#ffffff" stop-opacity=".88"/><stop offset=".38" stop-color="#c8fcfa" stop-opacity=".68"/><stop offset="1" stop-color="#488f83" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="75" cy="128" rx="67" ry="7" fill="#143b49" opacity=".42"/>
+<path d="m14 118 21-11h84l17 11-18 11H29Z" fill="url(#base)" stroke="#2a5c58" stroke-width="2"/>
+<path d="M26 108V37l14-18h13l5 89m42 0 6-89h15l12 18v71" fill="url(#base)" stroke="#3b6c60" stroke-width="3"/>
+<path d="M40 18v88m66-88v88M37 45h20m46 0h19M36 73h20m47 0h18" stroke="#b9f0a9" stroke-width="4"/>
+<path d="M26 38q11-20 30-15-10 18-30 15Zm84-7q17-18 29-9-7 16-29 9Z" fill="url(#shine)" stroke="#cdf7c1" stroke-width="2"/>
+<circle cx="75" cy="75" r="35" fill="url(#base)" stroke="#c3f9d6" stroke-width="3"/>
+<circle cx="75" cy="75" r="24" fill="url(#glass)" stroke="#ebfff4" stroke-width="2"/>
+<circle cx="75" cy="75" r="9" fill="#e7ffe4" stroke="#5e9f96" stroke-width="3"/>
+<path d="m75 50 5 16 17-7-11 15 17 14-23-5-6 17-6-17-20 4 15-13-11-16 18 8Z" fill="url(#shine)" opacity=".85"/>
+<path d="M34 95q17 8 24-3m34 0q13 13 28-3" fill="none" stroke="#b6fbf6" stroke-width="5"/>
+<path d="M62 25q-13-14-22-8m62-1q-19 2-17 15" fill="none" stroke="#80cda3" stroke-width="3"/>
+<ellipse cx="75" cy="74" rx="44" ry="46" fill="url(#aura)" opacity=".38"/>
+<circle cx="19" cy="23" r="3" fill="#e8fff9"/><circle cx="135" cy="15" r="4" fill="#f5ffdc"/></svg>

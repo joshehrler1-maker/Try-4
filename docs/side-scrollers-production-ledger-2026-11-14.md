@@ -1,5 +1,20 @@
 # Super Paw Heroes — 25-game art and film production ledger
 
+## Batch 18 — 10 unique stage-2/3 scenic artworks for games 16–20
+
+**Added to playable builds:** Custom layered, perspective-shaded 2.5D SVG landmarks in games 16–20 at exact stage-local placements with supporting existing world platforms. Every scene has its own visual design and file. No mechanics, hitboxes, textures or models are shared between different games by this batch. These are decorative film-look illustrations; the feature-film 3D environment and animation goal remains unfulfilled.
+
+| Game | Stage 2 art (x,y; w×h) | Stage 3 art (x,y; w×h) |
+|---|---|---|
+| Bamboo Village | Water Vein jade hydro-wheel (388,117;150×135) | Flood Escape bamboo storm dam (463,136;150×135) |
+| Steamworks | Boiler Frogs brass pressure pump (352,143;150×135) | Garden Machinery blossom drive train (380,114;135×135) |
+| Snow Village | Palace Dungeon aurora ice gate (764,111;150×135) | Cave Approach ice arch lantern (517,135;150×135) |
+| Canyon Crossing | Guard Corridor sandstone sentinel (392,120;150×135) | Collapsing Hall cracked arch keystone (503,155;150×135) |
+| Submarine Dock | Perimeter Sweep naval radar tower (510,115;150×135) | Carrier Climb armored winch capsule (563,148;150×135) |
+
+Each game loads only its own stage-2 and stage-3 art and canvas draws only if the corresponding source image has loaded and is inside the camera range. Added ten offline paths, versioned the Games Room runtime and service-worker cache, and registered the source-placement check in standard $0 GitHub Actions. CI/Pages status must be separately verified after the commit, and there is no claim of real Android gameplay/FPS testing or film-quality 3D rendering.
+
+
 ## Batch 17 — games 11–15, stages 2–3: dimensional setpieces integrated
 
 **Source changes:** Ten scene-specific SVG depth illustrations have been created and registered in the existing playable games (two per game). Designs incorporate layered surface gradients, shaded side faces and focal lighting but are *small illustrated assets*, not full cinematic 3D worlds or finished feature-film renders. Each image belongs to only one stage and game, and is shown at its stage's supported platform position without changing original collision, enemy AI, player movement, or camera control. Existing stage 1 art, 3D enemy preview toggle, touch controls, and score remain untouched.

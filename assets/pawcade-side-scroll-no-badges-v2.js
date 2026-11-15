@@ -333,6 +333,35 @@
         return {stage, image, x, y, w, h};
       })
     : [];
+  // Per-game film-look stage scenery, adventures 16-20. Draw-only original assets.
+  const lateMiddleStageSetpieces = [
+    [
+      ['assets/scenes/bamboo-village/stage-02-water-vein-bash.svg', 1, 388, 117, 150, 135],
+      ['assets/scenes/bamboo-village/stage-03-flood-escape-tower.svg', 2, 463, 136, 150, 135]
+    ],
+    [
+      ['assets/scenes/steamworks/stage-02-boiler-frogs-dodge.svg', 1, 352, 143, 150, 135],
+      ['assets/scenes/steamworks/stage-03-garden-machinery-dodge.svg', 2, 380, 114, 135, 135]
+    ],
+    [
+      ['assets/scenes/snow-village/stage-02-palace-dungeon-traps.svg', 1, 764, 111, 150, 135],
+      ['assets/scenes/snow-village/stage-03-cave-approach-bridge.svg', 2, 517, 135, 150, 135]
+    ],
+    [
+      ['assets/scenes/canyon-crossing/stage-02-guard-corridor-steps.svg', 1, 392, 120, 150, 135],
+      ['assets/scenes/canyon-crossing/stage-03-collapsing-hall-bridge.svg', 2, 503, 155, 150, 135]
+    ],
+    [
+      ['assets/scenes/submarine-dock/stage-02-perimeter-sweep-dodge.svg', 1, 510, 115, 150, 135],
+      ['assets/scenes/submarine-dock/stage-03-carrier-climb-tower.svg', 2, 563, 148, 150, 135]
+    ]
+  ];
+  const lateMiddleStageArt = index >= 15 && index <= 19
+    ? lateMiddleStageSetpieces[index - 15].map(([url, stage, x, y, w, h]) => {
+        const image = new Image(); image.src = url;
+        return {stage, image, x, y, w, h};
+      })
+    : [];
   const earlySecondStage = index < 5 ? new Image() : null;
   if (earlySecondStage) earlySecondStage.src = earlySecondStagePaths[index];
   const secondStageLandmark = index >= 20 && index <= 24 ? new Image() : null;
@@ -7270,6 +7299,14 @@
     }
     // Twilit traversal landmarks: stage-local placement with frustum culling.
     for (const slot of twilightStageArt) {
+      if (sections <= slot.stage || !slot.image.naturalWidth) continue;
+      const artX = stageStarts[slot.stage] + slot.x;
+      if (artX + slot.w >= camera && artX <= camera + width) {
+        ctx.drawImage(slot.image, artX, slot.y, slot.w, slot.h);
+      }
+    }
+    // Scenes never introduce hitboxes or change a counterpart's unique stage route.
+    for (const slot of lateMiddleStageArt) {
       if (sections <= slot.stage || !slot.image.naturalWidth) continue;
       const artX = stageStarts[slot.stage] + slot.x;
       if (artX + slot.w >= camera && artX <= camera + width) {

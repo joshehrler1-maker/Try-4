@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="135" viewBox="0 0 150 135" role="img" aria-label="Cave Approach — icy suspended arch lantern with frozen rope supports"><defs><linearGradient id="base" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff6ec"/><stop offset=".31" stop-color="#c9e6ed"/><stop offset=".72" stop-color="#8cacc6"/><stop offset="1" stop-color="#4e6d95"/></linearGradient><linearGradient id="shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e7fdff"/><stop offset=".34" stop-color="#c9e6ed"/><stop offset="1" stop-color="#4e6d95"/></linearGradient><linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".43" stop-color="#e7fdff"/><stop offset="1" stop-color="#8cacc6"/></linearGradient><radialGradient id="aura"><stop stop-color="#ffffff" stop-opacity=".88"/><stop offset=".38" stop-color="#e7fdff" stop-opacity=".68"/><stop offset="1" stop-color="#8cacc6" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="75" cy="128" rx="66" ry="7" fill="#315073" opacity=".4"/>
+<path d="m14 118 22-12h82l19 12-20 11H28Z" fill="url(#base)" stroke="#51788f" stroke-width="2"/>
+<path d="M29 112V65l12-18h15l7 65m33 0 7-65h14l12 18v47" fill="url(#base)" stroke="#66899f" stroke-width="3"/>
+<path d="M27 61 43 44l33-25 35 25 15 17-11 13-39-38-39 38Z" fill="url(#shine)" stroke="#eeffff" stroke-width="3"/>
+<path d="M43 44 57 31m34 0 21 14" stroke="#a5d8e3" stroke-width="4"/>
+<path d="M58 61 76 47l17 14v36H58Z" fill="#3d6081" stroke="#b6e4f0" stroke-width="2"/>
+<path d="M76 23v37" stroke="#c5e4e5" stroke-width="4"/>
+<path d="M62 66h28l-4 31H66Z" fill="url(#glass)" stroke="#f6ffff" stroke-width="2"/>
+<path d="M76 65q-8 12 0 21 8-9 0-21" fill="#dffffc" stroke="#fff" stroke-width="2"/>
+<ellipse cx="75" cy="82" rx="39" ry="34" fill="url(#aura)" opacity=".55"/>
+<path d="m38 101-12 7m85-7 14 7" stroke="#f9ffff" stroke-width="3"/>
+<path d="M20 91q16-8 28 0m56 0q14-8 28 0" stroke="#d4faff" stroke-width="2.5" fill="none"/>
+<circle cx="18" cy="24" r="3" fill="#efffff"/><circle cx="136" cy="20" r="4" fill="#f2ffff"/></svg>
