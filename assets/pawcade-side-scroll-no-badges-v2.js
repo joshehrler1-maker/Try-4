@@ -406,7 +406,7 @@
   const enemyArt = new Image();
   enemyArt.src = 'assets/scenes/platform-enemies.webp';
   const companionEnemyArt = new Image();
-  if(index<5) companionEnemyArt.src = 'assets/scenes/platform-enemy-companions-v1.webp';
+  if(index<15) companionEnemyArt.src = 'assets/scenes/platform-enemy-companions-v3.webp';
   const heroArt = new Image();
   heroArt.src = 'assets/scenes/platform-heroes.webp';
   const terrainArt=new Image();
@@ -1607,9 +1607,9 @@
   }
   // Use one ordinary encounter in chapter three. Specialist foes retain
   // their original slots and the rest of the roster still uses its atlas.
-  if(index<5){
+  if(index<15){
     const foe=enemies.find(enemy=>stageAt(enemy.x)===2 &&
-      usesOriginRig(enemy) && (index===1 || !enemy.turret));
+      (index>=5 || usesOriginRig(enemy)) && (index===1 || !enemy.turret));
     if(foe){
       foe.companionSprite=true;
       if(index===1) foe.turret=true;
@@ -3894,7 +3894,7 @@
   }
   function drawCompanionEnemy(foe,x,y,faceLeft) {
     return foe.companionSprite && atlasSprite(companionEnemyArt,5,index,
-      x,y-(index===2?16:14),76,76,faceLeft,1);
+      x,y-(index===2?16:14),76,76,faceLeft,3);
   }
   const sprite = (...args) => atlasSprite(sprites,4,...args);
   const terrainCells={floor:0,ice:1,belt:2,shelf:3,hazard:4,spring:5,lift:6,barrel:7,rail:8,pogo:10,drop:11,ceiling:12,current:13};
