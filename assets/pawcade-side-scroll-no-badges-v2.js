@@ -8226,9 +8226,17 @@
       ctx.fillStyle='#ffe9a9';ctx.beginPath();ctx.arc(a.x,a.y,a.radius||9,0,Math.PI*2);ctx.fill();
     }
     for(const shot of hazards) {
+      if(shot.life<=0) continue;
       if(index===16 && shot.parry){
         ctx.save();
         ctx.translate(shot.x,shot.y);
+        if(phase==='playing' && !player.on && player.techCooldown<=0 && close(player,shot,55,55)){
+          ctx.strokeStyle='#fff4fc';
+          ctx.lineWidth=2;
+          ctx.beginPath();
+          ctx.arc(0,0,15,0,Math.PI*2);
+          ctx.stroke();
+        }
         ctx.fillStyle='#ff78d3';
         ctx.strokeStyle='#592245';
         ctx.lineWidth=2;
