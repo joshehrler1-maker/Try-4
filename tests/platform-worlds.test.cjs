@@ -323,6 +323,39 @@ test('defeated mid- and late-world enemies retain only a short visual after hitb
     'restart must reset defeated enemy visual state');
 });
 
+test('all 25 unique enemy rigs use eased hit-recovery without changing bash collision', () => {
+  const source=fs.readFileSync(path.join(__dirname,
+    '../assets/pawcade-side-scroll-no-badges-v2.js'),'utf8');
+  const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
+  const offline=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  const curve=source.match(/const hitRecovery=\\[([\\d.,\\s]+)\\]\\[index\\]/);
+  assert.ok(curve,'missing 25 individual hit-recovery curves');
+  const profiles=curve[1].split(',').map(Number);
+  assert.equal(profiles.length,25,'each game needs its own recovery rate');
+  assert.equal(new Set(profiles).size,25,'recovery timing must stay individualized');
+  assert.ok(profiles.every(n=>n>=.7&&n<=1.6),'hit curves must stay smooth and bounded');
+  assert.ok(source.includes('hitRemaining=foe.bashed && clock<foe.bashed.until'));
+  assert.ok(source.includes('(foe.bashed.until-clock)/.48'),
+    'art must be tied to the already-authoritative 0.48 s bash simulation');
+  assert.ok(source.includes('const hitPose=reducedMotion?0:Math.pow(hitRemaining,hitRecovery)'),
+    'prefers-reduced-motion cannot receive kinetic recoil effects');
+  assert.equal(source.split('hit:hitPose').length-1,5,
+    'all five independently authored 5-game rig groups need eased recoil');
+  assert.ok(!source.includes('hit:foe.bashed && clock<foe.bashed.until ? 1 : 0'),
+    'binary hit pose makes enemy art pop at the recovery boundary');
+  for(const curveRate of profiles){
+    const start=Math.pow(1,curveRate);
+    const middle=Math.pow(.5,curveRate);
+    const end=Math.pow(0,curveRate);
+    assert.equal(start,1);
+    assert.ok(middle>0&&middle<1);
+    assert.equal(end,0);
+  }
+  const build='pawcade-side-scroll-no-badges-v2.js?v=enemy-hit-ease-25-20261114';
+  assert.ok(html.includes(build),'game page must load updated enemy visual state');
+  assert.ok(offline.includes(build),'offline cache must load the same game script');
+});
+
 test('five mid-world enemy rigs preserve game-specific silhouettes and safe render state', () => {
   const artFile=path.join(__dirname,'../assets/animation/mid-world-enemy-rigs-v1.js');
   const html=fs.readFileSync(path.join(__dirname,'../pawcade-side-scroll.html'),'utf8');
