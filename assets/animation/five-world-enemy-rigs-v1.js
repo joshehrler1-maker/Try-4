@@ -7,10 +7,44 @@
 (() => {
   'use strict';
   const TAU=Math.PI*2,cap=v=>Math.max(0,Math.min(1,Number(v)||0));
+  // Original world-specific directional material shading, no recycled art.
+  // Large panels receive a subtle top light; eyes and tiny particles stay flat.
+  const surfacePalettes=[["#c9fffd","#1b415d"],["#ffe2b2","#52305d"],["#a7f4ff","#303c75"],["#ffe7ee","#41284d"],["#eee9d1","#3d3b52"]];
+  let activeSurfaceWorld=0;
+  const tint=(a,b,t)=>{
+    const c=parseInt(a.slice(1),16),d=parseInt(b.slice(1),16);
+    const channel=shift=>Math.round(((c>>shift)&255)*(1-t)+((d>>shift)&255)*t);
+    return '#'+[channel(16),channel(8),channel(0)]
+      .map(v=>v.toString(16).padStart(2,'0')).join('');
+  };
+  const sculptedFill=(ctx,color,x0,y0,x1,y1)=>{
+    if(typeof color!=='string'||!/^#[0-9a-f]{6}$/i.test(color)||
+       (x1-x0)*(y1-y0)<320)return color;
+    if(typeof ctx.createLinearGradient!=='function')return color;
+    const gradient=ctx.createLinearGradient(x0,y0,x1,y1);
+    if(!gradient||typeof gradient.addColorStop!=='function')return color;
+    const [key,shade]=surfacePalettes[activeSurfaceWorld];
+    gradient.addColorStop(0,tint(color,key,.46));
+    gradient.addColorStop(.27,tint(color,'#ffffff',.13));
+    gradient.addColorStop(.58,color);
+    gradient.addColorStop(1,tint(color,shade,.49));
+    return gradient;
+  };
+  const panelFill=(ctx,color,points)=>{
+    if(!points||points.length<3)return color;
+    let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+    for(const [x,y] of points){
+      if(x<x0)x0=x;if(x>x1)x1=x;
+      if(y<y0)y0=y;if(y>y1)y1=y;
+    }
+    return sculptedFill(ctx,color,x0,y0,x1,y1);
+  };
+  const orbFill=(ctx,color,x,y,rx,ry)=>
+    sculptedFill(ctx,color,x-rx,y-ry,x+rx,y+ry);
   function shell(c,pts,fill,line='#f4e7d4',thickness=1.7){
     c.beginPath();c.moveTo(pts[0][0],pts[0][1]);
     for(let j=1;j<pts.length;j++)c.lineTo(pts[j][0],pts[j][1]);
-    c.closePath();c.fillStyle=fill;c.fill();
+    c.closePath();c.fillStyle=panelFill(c,fill,pts);c.fill();
     c.strokeStyle=line;c.lineWidth=thickness;c.stroke();
   }
   function strand(c,pts,color,width=2){
@@ -20,7 +54,7 @@
   }
   function oval(c,x,y,rx,ry,fill,line=null){
     c.beginPath();c.ellipse(x,y,Math.max(.1,rx),Math.max(.1,ry),0,0,TAU);
-    c.fillStyle=fill;c.fill();
+    c.fillStyle=orbFill(c,fill,x,y,rx,ry);c.fill();
     if(line){c.strokeStyle=line;c.lineWidth=1.7;c.stroke();}
   }
   // Waterfall Climb: MIST GLIDER. Completely airborne, a transparent
@@ -206,6 +240,7 @@
       const originalOpacity=Number.isFinite(ctx.globalAlpha)?ctx.globalAlpha:1;
       ctx.globalAlpha=originalOpacity*(1-m.hit*.2);
       ctx.translate(-m.hit*1.7,0);
+      activeSurfaceWorld=index-5;
       design(ctx,m);
     }finally{ctx.restore();}
     return true;
