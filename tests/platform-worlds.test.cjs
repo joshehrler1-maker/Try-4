@@ -620,7 +620,7 @@ test('first-ten real WebGL mesh prototypes have unique 3D parts and safe lifecyc
   assert.ok(game.includes('href="enemy-3d-prototype.html"'),
     'prototype should be discoverable from Games Room');
   for(const file of ['enemy-3d-prototype.html',
-    'assets/animation/enemy-3d-prototype-v1.js?v=3d-ten-79f7903']){
+    'assets/animation/enemy-3d-prototype-v1.js?v=3d-ten-polished-12b6180']){
     assert.ok(worker.includes(file), 'new WebGL source not precached: '+file);
   }
   const ctx={window:{devicePixelRatio:2}};
@@ -628,6 +628,22 @@ test('first-ten real WebGL mesh prototypes have unique 3D parts and safe lifecyc
   const art=ctx.window.SuperPawEnemy3D;
   assert.equal(art.models.length,10);
   assert.equal(new Set(art.models.map(m=>m.enemy)).size,10);
+  // This is a detailed EXPERIMENTAL studio preview, not released in the games.
+  assert.ok(source.includes('uNormalScale'), 'ellipsoid normals must respect nonuniform scale');
+  assert.ok(source.includes('addSurface(index,m,P,t,bob,reduced,mode,step,strike)'),
+    'eye, armor and tool details must be attached to moving bodies');
+  assert.ok(source.includes('Math.pow(Math.sin('),
+    'attack must ease from wind-up through contact and recovery');
+  const silhouettes=new Set();
+  for(let i=0;i<10;i++){
+    const sample=art.build(i,'idle',0,false);
+    assert.ok(sample.parts.length>=15,'not enough body and attached facial features: '+sample.enemy);
+    silhouettes.add(sample.parts.map(p=>p.type+':'+p.color).join('|'));
+    assert.equal(art.build(i,'attack',0,false).parts.length,sample.parts.length,
+      'wind-up must not detach modeled details');
+  }
+  assert.equal(silhouettes.size,10,'each adventure must use a distinct model finish');
+
   for(const [kind,m] of Object.entries(art.meshes)){
     assert.equal(m.p.length,m.n.length,'normals must match 3D vertices: '+kind);
     assert.equal(m.p.length%3,0);
