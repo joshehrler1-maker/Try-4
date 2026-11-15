@@ -79,5 +79,10 @@ test('game scripts, offline cache and motion quality controls use the same versi
   assert.ok(!html.includes('src="assets/animation/enemy-3d-prototype-v1.js'));
   assert.ok(core.includes('if(!rendered3D && !authoredEnemyArt) drawEnemySecondaryMotion'));
   assert.ok(core.includes('ctx.translate(-at.x,-at.y-19-(authoredEnemyArt?0:footstep))'));
-  assert.ok(core.includes('airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0'));
+  assert.ok(core.includes('const useCrabEraArt = index>=0 && index<25;'));
+  assert.ok(core.includes('if(useCrabEraArt){'));
+  assert.ok(core.includes('ctx.rotate(enemyLean+attackTilt+verticalLean);'));
+  assert.ok(core.includes('(1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression)'));
+  assert.ok(!html.includes('src="assets/animation/enemy-3d-prototype-v1.js'),
+    'unapproved low-detail WebGL designs must stay out of actual gameplay');
 });
