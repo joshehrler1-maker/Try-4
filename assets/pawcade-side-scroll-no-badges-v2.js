@@ -3303,10 +3303,12 @@
     // The Foundry enemy's face is authored on the RIGHT side of its local
     // artwork. Mirror the complete body only when walking to the left.
     if(faceLeft) ctx.scale(-1,1);
-    const phase=reducedMotion?0:clock*13+offset;
+    // Foundry-only: clamp and kiln foes animate from traveled gait, with
+    // a small independent idle pulse instead of constant mechanical jitter.
+    const phase=reducedMotion?0:(gait*1.35+clock*.9+offset);
     if(!design){
       ctx.save();
-      ctx.translate(0,Math.sin(phase)*(kind===8?3:1.8));
+      ctx.translate(0,Math.sin(phase)*(kind===8?3:1.8)*(Math.abs(gait)>.03?1:.35));
       ctx.strokeStyle=colors[1];
       ctx.lineWidth=4;
       ctx.lineJoin='round';
@@ -3474,8 +3476,11 @@
     ctx.lineCap='round';
     ctx.stroke(design.details);
     // Moonlit Library: hinged illuminated pages and a closing book strike.
-    const fold=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
-    const pageWave=reducedMotion?0:Math.sin(phase*2)*.12;
+    // Library-only: different atlas sentries fold their pages at different
+    // angles and rhythms; never apply this paper mechanic to other games.
+    const pageFoldScale=[.72,1.05,.88,1.2,.63,1.12][kind]??1;
+    const fold=reducedMotion?0:Math.max(0,Math.min(1,attackPose))*pageFoldScale;
+    const pageWave=reducedMotion?0:Math.sin(phase*(1.7+kind*.16))*(.08+kind*.012);
     for(const side of [-1,1]){
       ctx.save();ctx.translate(side*12,-9);
       ctx.rotate(side*(.3+pageWave-fold*.8));
@@ -3520,8 +3525,12 @@
     ctx.fillStyle='#fff2cf';ctx.beginPath();
     ctx.ellipse(kind===1?4:12,kind===2?0:-4,3,2.5,0,0,Math.PI*2);ctx.fill();
     // Coral Courier: flexible fin strokes and a forward water-jet attack.
+    // Reef-only: swimming fins use separate stroke frequencies and water
+    // jet reach for each aquatic enemy silhouette.
+    const finStroke=[2.1,1.4,2.8,1.9,2.5,1.65][kind]??2.4;
+    const jetReach=[.75,1.15,.9,1.35,.8,1.2][kind]??1;
     const thrust=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
-    const finBeat=reducedMotion?0:Math.sin(phase*2.4)*7;
+    const finBeat=reducedMotion?0:Math.sin(phase*finStroke)*7;
     ctx.fillStyle=['#f5b78b','#c7b5f2','#85e4e5','#f6df98','#b3e6a6','#f6acc8'][kind];
     ctx.strokeStyle='#e7ffff';ctx.lineWidth=1.3;
     for(const side of [-1,1]){
@@ -3533,7 +3542,7 @@
       ctx.save();ctx.globalAlpha=thrust*.7;ctx.strokeStyle='#bdfbff';ctx.lineWidth=2;
       for(let jet=0;jet<3;jet++){
         ctx.beginPath();ctx.moveTo(-26-jet*5,-7+jet*6);
-        ctx.quadraticCurveTo(-35-jet*6,-9+jet*6,-46-jet*7,-7+jet*6);
+        ctx.quadraticCurveTo(-35-jet*6*jetReach,-9+jet*6,-26-(20+jet*7)*jetReach,-7+jet*6);
         ctx.stroke();
       }
       ctx.restore();
@@ -3561,8 +3570,11 @@
     ctx.moveTo(-7-kind,0);ctx.lineTo(7+kind,0);
     ctx.stroke();
     // Clocktower Relay: ratcheting clock hands accelerate into a strike.
+    // Clocktower-only: different sentinels wind their ratchets at distinct
+    // angles before releasing a mechanical hand strike.
     const strike=reducedMotion?0:Math.max(0,Math.min(1,attackPose));
-    ctx.rotate(strike*(kind%2?-1:1)*.95);
+    const ratchetArc=[.72,1.04,.88,1.18,.8,1.1][kind]??.95;
+    ctx.rotate(strike*(kind%2?-1:1)*ratchetArc);
     ctx.strokeStyle='#ffce71';ctx.lineWidth=3;ctx.lineCap='round';
     ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-17-kind);ctx.stroke();
     ctx.fillStyle='#fff1bc';ctx.beginPath();ctx.arc(0,0,3.5,0,Math.PI*2);ctx.fill();
@@ -7923,7 +7935,17 @@
       // Keep authored proportions stable; their local articulation drives
       // locomotion and combat instead of the legacy global squash stack.
       ctx.translate(at.x,at.y+19);
-      if(authoredEnemyArt){
+      if(useCrabEraArt){
+        // Exact creature-era visual weighting (commit 9768ec86ad).
+        // Don't stretch the user's approved shells/faces/claws using the
+        // newer game-wide transform formula: preserve their old silhouettes.
+        if(!airborne && enemyPattern==='charge' && nearby)
+          ctx.rotate((faceLeft?1:-1)*.075);
+        if(airborne) ctx.rotate(motion*.065);
+        else ctx.rotate(enemyLean+attackTilt+verticalLean);
+        ctx.scale((1+recoil*.09+motion*.025)+bodyStretch+chargeCompression+squash+landingPose+strideCompression*.5,
+          (1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression);
+      }else if(authoredEnemyArt){
         const authoredLean=airborne ? Math.max(-.055,Math.min(.055,motion*.02))
           : Math.max(-.06,Math.min(.06,enemyLean*.24+verticalLean*.2));
         ctx.rotate(authoredLean);

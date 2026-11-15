@@ -1,0 +1,1776 @@
+{
+  "schemaVersion": 1,
+  "baselineDate": "2026-11-14",
+  "preferredVisualReferenceCommit": "9768ec86ad",
+  "status": "restored source draw path, still pending live Pages and Android visual QA",
+  "renderSource": "assets/pawcade-side-scroll-no-badges-v2.js",
+  "atlas": "assets/scenes/platform-enemies.webp",
+  "approvedMode": "useCrabEraArt index 0-24",
+  "rules": [
+    "Preserve each game's own older creatures, do not paste one crab into 25 games.",
+    "All individual stage-specialists, encounters, physics, movement and collisions remain unchanged.",
+    "Use the original creature-era shading, feet, shell/face and motion accent proportions.",
+    "Any redesigned enemy silhouette requires preview and explicit owner approval.",
+    "Verify live URL and Android landscape performance before claiming QA passed."
+  ],
+  "games": [
+    {
+      "index": 0,
+      "game": "Ember Foundry",
+      "hero": "Whisker",
+      "counterpart": "Super Mario World",
+      "movement": "stomp",
+      "encounterPattern": "patrol",
+      "sourceArt": "drawFoundryEnemy (Furnace Crab & individual specialist variants)",
+      "supersededUnapprovedRig": "Cinder Tongs",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Foundry Trail",
+          "room": "forgeTrail",
+          "gameplaySetpiece": "blocks",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Amber Switch Hall",
+          "room": "switchHall",
+          "gameplaySetpiece": "blocks",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Cinder Hills",
+          "room": "forgeHills",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Suspended Bridges",
+          "room": "forgeBridges",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Cooling Banks",
+          "room": "forgeBanks",
+          "gameplaySetpiece": "current",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Furnace Keep",
+          "room": "forgeKeep",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 7,
+          "name": "Smelter Switchbacks",
+          "room": "forgeSwitchbacks",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 8,
+          "name": "Floodgate Crossing",
+          "room": "forgeFloodplain",
+          "gameplaySetpiece": "lifts",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 9,
+          "name": "Kiln Canopy",
+          "room": "forgeKilnCanopy",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 10,
+          "name": "Slag Aqueduct",
+          "room": "forgeSlagAqueduct",
+          "gameplaySetpiece": "speed",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 11,
+          "name": "Cinder Orchard",
+          "room": "forgeExpansion0",
+          "gameplaySetpiece": "blocks",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 12,
+          "name": "Copper Viaduct",
+          "room": "forgeExpansion1",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 13,
+          "name": "Bellows Basin",
+          "room": "forgeExpansion2",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 14,
+          "name": "Ashfall Galleries",
+          "room": "forgeExpansion3",
+          "gameplaySetpiece": "lifts",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 15,
+          "name": "Clinker Cavern",
+          "room": "forgeExpansion4",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 16,
+          "name": "Rivet Rapids",
+          "room": "forgeExpansion5",
+          "gameplaySetpiece": "current",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 17,
+          "name": "Sootspire Approach",
+          "room": "forgeExpansion6",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 18,
+          "name": "Furnace Crown",
+          "room": "forgeExpansion7",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "game": "Moonlit Library",
+      "hero": "Luna",
+      "counterpart": "Mega Man X",
+      "movement": "buster",
+      "encounterPattern": "turret",
+      "sourceArt": "Moonlit Library specialists and original atlas",
+      "supersededUnapprovedRig": "Atlas Warden",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Convoy Ambush",
+          "room": "convoy",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Frozen Archive",
+          "room": "iceworks",
+          "gameplaySetpiece": "ice",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Airship Platforms",
+          "room": "airfield",
+          "gameplaySetpiece": "lifts",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Generator Blackout",
+          "room": "generator",
+          "gameplaySetpiece": "dodge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Minecart Run",
+          "room": "minecart",
+          "gameplaySetpiece": "speed",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Floodgate Vault",
+          "room": "floodgate",
+          "gameplaySetpiece": "current",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "game": "Coral Courier",
+      "hero": "Luna",
+      "counterpart": "Ecco the Dolphin",
+      "movement": "swim",
+      "encounterPattern": "school",
+      "sourceArt": "Coral Courier specialists and original atlas",
+      "supersededUnapprovedRig": "Reef Skimmer",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Home Reef",
+          "room": "coralBay",
+          "gameplaySetpiece": "reef",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Kelp Channels",
+          "room": "coralChannels",
+          "gameplaySetpiece": "current",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Undercaves",
+          "room": "coralCaves",
+          "gameplaySetpiece": "kelp",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Thermal Vents",
+          "room": "coralVents",
+          "gameplaySetpiece": "dodge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Pearl Lagoon",
+          "room": "coralLagoon",
+          "gameplaySetpiece": "reef",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Deepwater Ridge",
+          "room": "coralRidge",
+          "gameplaySetpiece": "current",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "game": "Clocktower Relay",
+      "hero": "Bolt",
+      "counterpart": "Sonic the Hedgehog 2",
+      "movement": "momentum",
+      "encounterPattern": "charge",
+      "sourceArt": "Clocktower Relay specialists and original atlas",
+      "supersededUnapprovedRig": "Pendulum Sentinel",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Coastal Run",
+          "room": "coast",
+          "gameplaySetpiece": "speed",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Chemical Works",
+          "room": "chemical",
+          "gameplaySetpiece": "speed",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Sunken Ruins",
+          "room": "ruins",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Pinball Hall",
+          "room": "pinball",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Volcanic Ridge",
+          "room": "volcano",
+          "gameplaySetpiece": "glide",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Crystal Cavern",
+          "room": "cavern",
+          "gameplaySetpiece": "traps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "game": "Seed Garden",
+      "hero": "Ivy",
+      "counterpart": "Donkey Kong Country 2",
+      "movement": "roll",
+      "encounterPattern": "hopper",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 4)",
+      "supersededUnapprovedRig": "Thorn Hopper",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Seedship Deck",
+          "room": "seedDeck",
+          "gameplaySetpiece": "barrels",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "High Rigging",
+          "room": "seedRigging",
+          "gameplaySetpiece": "vines",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Sunset Galley",
+          "room": "seedGalley",
+          "gameplaySetpiece": "barrels",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Flooded Locker",
+          "room": "seedLocker",
+          "gameplaySetpiece": "current",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Topsail Ascent",
+          "room": "seedTopsail",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Canopy Nest",
+          "room": "seedNest",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "game": "Waterfall Climb",
+      "hero": "Frost",
+      "counterpart": "Rayman Legends",
+      "movement": "glide",
+      "encounterPattern": "swoop",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 5)",
+      "supersededUnapprovedRig": "Mist Glider",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Forest Rescue",
+          "room": "course5Stage1",
+          "gameplaySetpiece": "glide",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Castle Banquet",
+          "room": "course5Stage2",
+          "gameplaySetpiece": "lifts",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Ocean Laboratory",
+          "room": "course5Stage3",
+          "gameplaySetpiece": "current",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Warrior Ridge",
+          "room": "course5Stage4",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Dark Summit",
+          "room": "course5Stage5",
+          "gameplaySetpiece": "ice",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Musical Escape",
+          "room": "course5Stage6",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "game": "Lantern Festival",
+      "hero": "Melody",
+      "counterpart": "Kirby Super Star",
+      "movement": "float",
+      "encounterPattern": "hopper",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 6)",
+      "supersededUnapprovedRig": "Lantern Juggler",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Spring Breeze",
+          "room": "course6Stage1",
+          "gameplaySetpiece": "float",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Footrace Ridge",
+          "room": "course6Stage2",
+          "gameplaySetpiece": "speed",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Cavern Treasure",
+          "room": "course6Stage3",
+          "gameplaySetpiece": "blocks",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Airship Revenge",
+          "room": "course6Stage4",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Starlight World",
+          "room": "course6Stage5",
+          "gameplaySetpiece": "glide",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Lantern Arena",
+          "room": "course6Stage6",
+          "gameplaySetpiece": "dodge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "game": "Crystal Polarity",
+      "hero": "Bolt",
+      "counterpart": "VVVVVV",
+      "movement": "flip",
+      "encounterPattern": "patrol",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 7)",
+      "supersededUnapprovedRig": "Flux Beetle",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Transporter Deck",
+          "room": "course7Stage1",
+          "gameplaySetpiece": "ceiling",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Laboratory Shaft",
+          "room": "course7Stage2",
+          "gameplaySetpiece": "ceiling",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Warp Grid",
+          "room": "course7Stage3",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Intermission Rails",
+          "room": "course7Stage4",
+          "gameplaySetpiece": "ceiling",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Tower Interior",
+          "room": "course7Stage5",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Final Flip",
+          "room": "course7Stage6",
+          "gameplaySetpiece": "ceiling",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "game": "Stage Beat",
+      "hero": "Melody",
+      "counterpart": "Geometry Dash",
+      "movement": "beat",
+      "encounterPattern": "rhythm",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 8)",
+      "supersededUnapprovedRig": "Bass Bouncer",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Stereo Steps",
+          "room": "course8Stage1",
+          "gameplaySetpiece": "spikes",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Backbeat Blocks",
+          "room": "course8Stage2",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Polarity Pulse",
+          "room": "course8Stage3",
+          "gameplaySetpiece": "spikes",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Dry Circuit",
+          "room": "course8Stage4",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Bassline Flight",
+          "room": "course8Stage5",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Final Beat",
+          "room": "course8Stage6",
+          "gameplaySetpiece": "spikes",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "game": "Quarry Rescue",
+      "hero": "Stone",
+      "counterpart": "Bionic Commando",
+      "movement": "grapple",
+      "encounterPattern": "turret",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 9)",
+      "supersededUnapprovedRig": "Slate Burrower",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Landing Gantry",
+          "room": "course9Stage1",
+          "gameplaySetpiece": "cable",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Industrial Base",
+          "room": "course9Stage2",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Canopy Wires",
+          "room": "course9Stage3",
+          "gameplaySetpiece": "cable",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Lift Shaft",
+          "room": "course9Stage4",
+          "gameplaySetpiece": "lifts",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Quarry Defenses",
+          "room": "course9Stage5",
+          "gameplaySetpiece": "cable",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Rescue Gantries",
+          "room": "course9Stage6",
+          "gameplaySetpiece": "cable",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "game": "Sunset Wind Sail",
+      "hero": "Whisker",
+      "counterpart": "Klonoa: Door to Phantomile",
+      "movement": "airlift",
+      "encounterPattern": "swoop",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 10)",
+      "supersededUnapprovedRig": "Gale Kite",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Windmill Village",
+          "room": "course10Stage1",
+          "gameplaySetpiece": "ring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Tree Village",
+          "room": "course10Stage2",
+          "gameplaySetpiece": "glide",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Sunken Palace",
+          "room": "course10Stage3",
+          "gameplaySetpiece": "ring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Wind Kingdom Ruins",
+          "room": "course10Stage4",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Dream Foundry",
+          "room": "course10Stage5",
+          "gameplaySetpiece": "ring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Moonlit Windmill",
+          "room": "course10Stage6",
+          "gameplaySetpiece": "glide",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "game": "Cloud City",
+      "hero": "Luna",
+      "counterpart": "Celeste",
+      "movement": "airdash",
+      "encounterPattern": "pursuit",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 11)",
+      "supersededUnapprovedRig": "Nimbus Guard",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Forsaken Towers",
+          "room": "cloudCity",
+          "gameplaySetpiece": "dash",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Dream Passage",
+          "room": "cloudDream",
+          "gameplaySetpiece": "dash",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Storm Lodge",
+          "room": "cloudResort",
+          "gameplaySetpiece": "traps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Golden Cloud Ridge",
+          "room": "cloudRidge",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Mirror Vault",
+          "room": "cloudMirror",
+          "gameplaySetpiece": "dash",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Reflection Ascent",
+          "room": "cloudReflection",
+          "gameplaySetpiece": "glide",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "game": "Thunder Harbor",
+      "hero": "Frost",
+      "counterpart": "Shovel Knight",
+      "movement": "pogo",
+      "encounterPattern": "charge",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 12)",
+      "supersededUnapprovedRig": "Coil Ray",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Plains Approach",
+          "room": "course12Stage1",
+          "gameplaySetpiece": "pogo",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Sunken Treasure",
+          "room": "course12Stage2",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Lava Yard",
+          "room": "course12Stage3",
+          "gameplaySetpiece": "pogo",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Clockwork Tower",
+          "room": "course12Stage4",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Airship Deck",
+          "room": "course12Stage5",
+          "gameplaySetpiece": "spikes",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Storm Relay",
+          "room": "course12Stage6",
+          "gameplaySetpiece": "pogo",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "game": "Autumn Trail",
+      "hero": "Spark",
+      "counterpart": "Yoshi’s Island",
+      "movement": "throw",
+      "encounterPattern": "hopper",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 13)",
+      "supersededUnapprovedRig": "Bramble Stalker",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Egg-Toss Meadow",
+          "room": "eggMeadow",
+          "gameplaySetpiece": "eggs",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Falling Rock Ravine",
+          "room": "eggRavine",
+          "gameplaySetpiece": "traps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Roundstone Cave",
+          "room": "eggCave",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Amber Fort",
+          "room": "eggFort",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Donut Lift Crossing",
+          "room": "eggDonuts",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Stilt Patrol",
+          "room": "eggStilts",
+          "gameplaySetpiece": "eggs",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "game": "Inverted Observatory",
+      "hero": "Shadow",
+      "counterpart": "Super Metroid",
+      "movement": "blaster",
+      "encounterPattern": "pursuit",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 14)",
+      "supersededUnapprovedRig": "Orbit Watcher",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Surface Approach",
+          "room": "observatorySurface",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Burrow Network",
+          "room": "observatoryBurrow",
+          "gameplaySetpiece": "crawl",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Thermal Galleries",
+          "room": "observatoryHeat",
+          "gameplaySetpiece": "traps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Wrecked Observatory",
+          "room": "observatoryWreck",
+          "gameplaySetpiece": "lifts",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Tidal Labyrinth",
+          "room": "observatoryTide",
+          "gameplaySetpiece": "current",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Lower Core",
+          "room": "observatoryCore",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "game": "Bamboo Village",
+      "hero": "Ivy",
+      "counterpart": "Ori and the Blind Forest",
+      "movement": "airlift",
+      "encounterPattern": "swoop",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 15)",
+      "supersededUnapprovedRig": "Cane Striker",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Spirit Glade",
+          "room": "course15Stage1",
+          "gameplaySetpiece": "vines",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Water Vein",
+          "room": "course15Stage2",
+          "gameplaySetpiece": "bash",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Flood Escape",
+          "room": "course15Stage3",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Wind Valley",
+          "room": "course15Stage4",
+          "gameplaySetpiece": "glide",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Frozen Ruins",
+          "room": "course15Stage5",
+          "gameplaySetpiece": "ice",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Firebreak Ascent",
+          "room": "course15Stage6",
+          "gameplaySetpiece": "bash",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 16,
+      "game": "Steamworks",
+      "hero": "Bolt",
+      "counterpart": "Cuphead",
+      "movement": "shooter",
+      "encounterPattern": "rhythm",
+      "sourceArt": "Steamworks specialist and original atlas",
+      "supersededUnapprovedRig": "Pressure Piston",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Root Cellar",
+          "room": "course16Stage1",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Boiler Frogs",
+          "room": "course16Stage2",
+          "gameplaySetpiece": "dodge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Garden Machinery",
+          "room": "course16Stage3",
+          "gameplaySetpiece": "dodge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Carnival Track",
+          "room": "course16Stage4",
+          "gameplaySetpiece": "speed",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Junkyard Press",
+          "room": "course16Stage5",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Boiler Breaker",
+          "room": "course16Stage6",
+          "gameplaySetpiece": "dodge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 17,
+      "game": "Snow Village",
+      "hero": "Frost",
+      "counterpart": "Disney’s Aladdin",
+      "movement": "throw",
+      "encounterPattern": "turret",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 17)",
+      "supersededUnapprovedRig": "Frost Lantern",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Market Rooftops",
+          "room": "course17Stage1",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Palace Dungeon",
+          "room": "course17Stage2",
+          "gameplaySetpiece": "traps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Cave Approach",
+          "room": "course17Stage3",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Lava Flight",
+          "room": "course17Stage4",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Lantern Interior",
+          "room": "course17Stage5",
+          "gameplaySetpiece": "lifts",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Frozen Palace",
+          "room": "course17Stage6",
+          "gameplaySetpiece": "ice",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 18,
+      "game": "Canyon Crossing",
+      "hero": "Stone",
+      "counterpart": "Prince of Persia",
+      "movement": "precision",
+      "encounterPattern": "patrol",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 18)",
+      "supersededUnapprovedRig": "Dust Runner",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Prison Steps",
+          "room": "course18Stage1",
+          "gameplaySetpiece": "traps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Guard Corridor",
+          "room": "course18Stage2",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Collapsing Hall",
+          "room": "course18Stage3",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Blade Gallery",
+          "room": "course18Stage4",
+          "gameplaySetpiece": "traps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Mirror Passage",
+          "room": "course18Stage5",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Palace Bridge",
+          "room": "course18Stage6",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 19,
+      "game": "Submarine Dock",
+      "hero": "Spark",
+      "counterpart": "Contra III: The Alien Wars",
+      "movement": "shooter",
+      "encounterPattern": "school",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 19)",
+      "supersededUnapprovedRig": "Abyss Probe",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Street Insertion",
+          "room": "course19Stage1",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Perimeter Sweep",
+          "room": "course19Stage2",
+          "gameplaySetpiece": "dodge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Carrier Climb",
+          "room": "course19Stage3",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Highway Convoy",
+          "room": "course19Stage4",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Alien Junction",
+          "room": "course19Stage5",
+          "gameplaySetpiece": "dodge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Dock Core",
+          "room": "course19Stage6",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 20,
+      "game": "Neon Circuit",
+      "hero": "Shadow",
+      "counterpart": "Pizza Tower",
+      "movement": "momentum",
+      "encounterPattern": "pursuit",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 20)",
+      "supersededUnapprovedRig": "Pixel Phantom",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Lobby Sprint",
+          "room": "course20Stage1",
+          "gameplaySetpiece": "speed",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Dungeon Heat",
+          "room": "course20Stage2",
+          "gameplaySetpiece": "blocks",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Western Run",
+          "room": "course20Stage3",
+          "gameplaySetpiece": "speed",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Haunted Circuit",
+          "room": "course20Stage4",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Factory Dash",
+          "room": "course20Stage5",
+          "gameplaySetpiece": "speed",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Tower Reset",
+          "room": "course20Stage6",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 21,
+      "game": "Marble Temple",
+      "hero": "Luna",
+      "counterpart": "Castlevania: Rondo of Blood",
+      "movement": "whip",
+      "encounterPattern": "charge",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 21)",
+      "supersededUnapprovedRig": "Mosaic Golem",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Ruined Village",
+          "room": "moonVillage",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Moon Gate",
+          "room": "moonGate",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Marble Chapel",
+          "room": "moonChapel",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Inner Halls",
+          "room": "moonHalls",
+          "gameplaySetpiece": "traps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Phantom Ship",
+          "room": "moonShip",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Silver Gallery",
+          "room": "moonGallery",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 22,
+      "game": "Swamp Ferry",
+      "hero": "Ivy",
+      "counterpart": "Disney’s DuckTales",
+      "movement": "pogo",
+      "encounterPattern": "hopper",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 22)",
+      "supersededUnapprovedRig": "Bog Lantern",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Jungle Relics",
+          "room": "ferryJungle",
+          "gameplaySetpiece": "pogo",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Haunted Manor",
+          "room": "ferryManor",
+          "gameplaySetpiece": "blocks",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Gem Mines",
+          "room": "ferryMine",
+          "gameplaySetpiece": "pogo",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Snowbound Pass",
+          "room": "ferrySnow",
+          "gameplaySetpiece": "ice",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Moon Outpost",
+          "room": "ferryMoon",
+          "gameplaySetpiece": "pogo",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Return to the Manor",
+          "room": "ferryReturn",
+          "gameplaySetpiece": "steps",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 23,
+      "game": "Sunflower Flight",
+      "hero": "Spark",
+      "counterpart": "Kirby’s Epic Yarn",
+      "movement": "glide",
+      "encounterPattern": "swoop",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 23)",
+      "supersededUnapprovedRig": "Pollen Drifter",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Grass Patch",
+          "room": "course23Stage1",
+          "gameplaySetpiece": "yarn",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Stitched Desert",
+          "room": "course23Stage2",
+          "gameplaySetpiece": "spring",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "Threaded Treats",
+          "room": "course23Stage3",
+          "gameplaySetpiece": "yarn",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "Felt Ocean",
+          "room": "course23Stage4",
+          "gameplaySetpiece": "vines",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Snowy Seams",
+          "room": "course23Stage5",
+          "gameplaySetpiece": "ice",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Patchwork Orbit",
+          "room": "course23Stage6",
+          "gameplaySetpiece": "yarn",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    },
+    {
+      "index": 24,
+      "game": "Starship Cargo",
+      "hero": "Whisker",
+      "counterpart": "Metal Slug",
+      "movement": "shooter",
+      "encounterPattern": "turret",
+      "sourceArt": "assets/scenes/platform-enemies.webp (game cell 24)",
+      "supersededUnapprovedRig": "Cargo Mimic",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "Outpost Landing",
+          "room": "course24Stage1",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 2,
+          "name": "Mountain Convoy",
+          "room": "course24Stage2",
+          "gameplaySetpiece": "lifts",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 3,
+          "name": "River Crossing",
+          "room": "course24Stage3",
+          "gameplaySetpiece": "bridge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 4,
+          "name": "City Siege",
+          "room": "course24Stage4",
+          "gameplaySetpiece": "turrets",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 5,
+          "name": "Factory Assault",
+          "room": "course24Stage5",
+          "gameplaySetpiece": "dodge",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        },
+        {
+          "stage": 6,
+          "name": "Cargo Stronghold",
+          "room": "course24Stage6",
+          "gameplaySetpiece": "tower",
+          "enemySource": "legacy species/atlas; existing stage encounters unchanged",
+          "integration": "source-gated-legacy-art",
+          "imageReview": "PENDING_ANDROID_REVIEW"
+        }
+      ]
+    }
+  ]
+}

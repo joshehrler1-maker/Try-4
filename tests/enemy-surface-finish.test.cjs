@@ -81,4 +81,8 @@ test('game scripts, offline cache and motion quality controls use the same versi
   assert.ok(core.includes('ctx.translate(-at.x,-at.y-19-(authoredEnemyArt?0:footstep))'));
   assert.ok(core.includes('const hitPose=reducedMotion?0:Math.pow(hitRemaining,hitRecovery);'));
   assert.ok(core.includes('airborne,hit:hitPose'));
+  assert.ok(core.includes('const useCrabEraArt = index>=0 && index<25;'));
+  assert.ok(core.includes('if(useCrabEraArt){'));
+  assert.ok(core.includes('ctx.rotate(enemyLean+attackTilt+verticalLean);'));
+  assert.ok(core.includes('(1-recoil*.06-motion*.025)-bodyStretch*.7-chargeCompression-squash-landingPose-strideCompression)'));
 });
