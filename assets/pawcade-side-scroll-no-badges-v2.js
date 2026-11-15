@@ -6799,40 +6799,15 @@
   // Unlike detached motion badges, paws and arms remain connected to the foe.
   function drawEnemyArticulatedLimbs(at,foe,airborne,faceLeft,stride,attackPose){
     const dir=faceLeft?-1:1;
-    // Use the existing course movement model until each game's stride
-    // timing is measured and verified against its OWN reference.
     const phase=(foe._gait||0)*(0.8+(index%5)*.11);
     // Clamp the animation speed when the simulation skips frames. This
     // protects Android browsers from a huge limb snap after tab switching.
-    // Plant the feet during a strike, then blend back into the world-specific
-    // walking cycle. Attack animation stays visual-only and preserves hitboxes.
-    // Different enemies keep different amounts of foot travel while attacking:
-    // heavy defenders plant firmly, rushers retain momentum, and swimmers
-    // remain free-moving. These are per-game pose rules, not new hitboxes.
-    const defensiveAttack=[1,7,9,14,17,22].includes(index);
-    const rushingAttack=[0,3,8,15,20].includes(index);
-    const swimmingAttack=[2,19].includes(index);
-    // Use the existing locomotion family until the corresponding game's
-    // reference attack is reviewed; never invent 25 counterpart timings.
-    const plantStrength=swimmingAttack?.12:defensiveAttack?.85:rushingAttack?.38:.6;
-    const attackPlant=Math.min(.85,Math.max(0,attackPose||0)*plantStrength);
-    const gaitBlend=Math.min(1,Math.max(0,stride||0))*(1-attackPlant);
-    // Smooth attack-driven gait suppression across consecutive rendered frames.
-    // A shot should not snap both feet to their planted poses in one frame.
-    // Long frame gaps (tab restore, checkpoint or respawn) should reset pose
-    // springs rather than retain a stale attack stance on the next frame.
-    const rawGaitDt=Math.max(0,clock-(foe._plantFrameAt??clock));
-    if(rawGaitDt>.15)foe._attackGaitBlend=gaitBlend;
-    const gaitDt=Math.min(.05,rawGaitDt);
-    foe._plantFrameAt=clock;
-    foe._attackGaitBlend=(foe._attackGaitBlend??gaitBlend)+
-      (gaitBlend-(foe._attackGaitBlend??gaitBlend))*(1-Math.exp(-13*gaitDt));
-    const smoothGaitBlend=reducedMotion?0:foe._attackGaitBlend;
+    const gaitBlend=Math.min(1,Math.max(0,stride||0));
     // Animation pose stays stable when paused or reduced motion is enabled.
     const animTime=reducedMotion?0:clock;
     // Separate stance and swing phases so planted feet do not lift together.
-    const swing=reducedMotion?0:Math.sin(phase)*smoothGaitBlend;
-    const gaitContact=reducedMotion?0:Math.cos(phase)*smoothGaitBlend;
+    const swing=reducedMotion?0:Math.sin(phase)*gaitBlend;
+    const gaitContact=reducedMotion?0:Math.cos(phase)*gaitBlend;
     const reach=reducedMotion?0:attackPose;
     // Individual game families get different windup and recoil timing.
     // Keep the pose attached to the existing foe sprite, not a floating cue.
@@ -6846,9 +6821,7 @@
     // Brief body-level recoil for confirmed bash states; no overhead markers.
     // A hit reaction must decay; a persistent bashed flag must not make
     // an enemy jitter forever. Advance only while the enemy is rendered.
-    const rawReactionDt=Math.max(0,clock-(foe._rigFrameAt??clock));
-    const reactionDt=Math.min(.05,rawReactionDt);
-    if(rawReactionDt>.15)foe._rigHitReaction=0;
+    const reactionDt=Math.min(.05,Math.max(0,clock-(foe._rigFrameAt??clock)));
     foe._rigFrameAt=clock;
     const hitEdge=Boolean(foe.bashed)&&!foe._rigWasBashed;
     foe._rigWasBashed=Boolean(foe.bashed);
@@ -6909,26 +6882,16 @@
     for(const side of [-1,1]){
       const hip=at.x+side*13,shoulder=at.x+side*20;
       const flightCycle=Math.sin(animTime*(4.2+index%5*.55)+foe.offset+side);
-      // A stance/swing gait uses the travel phase rather than a second
-      // wall-clock oscillator. This keeps the feet synchronized to the
-      // enemy's actual speed, with smooth lift and a longer planted phase.
-      const legPhase=phase+(side===1?Math.PI:0);
-      const cycle=(legPhase/(Math.PI*2)%1+1)%1;
-      const inSwing=cycle>=.60;
-      const progress=inSwing?(cycle-.60)/.40:cycle/.60;
-      const ease=progress*progress*(3-2*progress);
-      const footTravel=inSwing?(-1+2*ease):(1-2*ease);
-      // A continuous sine swing arc keeps both ends of each airborne step
-      // at ground height; per-game knee scales preserve distinct silhouettes.
-      const footLift=inSwing?Math.sin(Math.PI*progress)*5.5*poseKnee*smoothGaitBlend:0;
       const legSwing=airborne?flightCycle*(aerialWorld?7:5):
-        footTravel*9*poseStride*chapterWeight*smoothGaitBlend;
+        swing*side*9*poseStride*chapterWeight;
       const kneeX=hip+legSwing*.65;
-      const kneeY=at.y+4+(airborne?-5:footLift*.45);
-      const footX=kneeX+legSwing*.45+dir*3;
-      // One paw supports the body while the other lifts; easing removes
-      // abrupt snaps at the start and end of every step.
-      const footY=at.y+18-(airborne?7+Math.max(0,flightCycle)*3:footLift);
+      const kneeY=at.y+4+(airborne?-5:Math.abs(swing)*2*poseKnee);
+      const footX=kneeX+legSwing*.45+dir*3-
+        (!airborne && Math.max(0,-side*swing)>.25?legSwing*.2:0);
+      // Plant the support foot while the opposite paw lifts; preserve a
+      // steady contact point rather than making both feet skate together.
+      const support=Math.max(0,side*gaitContact);
+      const footY=at.y+18-(airborne?7+Math.max(0,flightCycle)*3:support*5*poseKnee);
       ctx.strokeStyle=outline;ctx.lineWidth=radius+3;
       ctx.beginPath();ctx.moveTo(hip,at.y-6);ctx.lineTo(kneeX,kneeY);ctx.lineTo(footX,footY);ctx.stroke();
       ctx.strokeStyle=armor;ctx.lineWidth=radius;
@@ -6984,52 +6947,27 @@
     ctx.fillStyle=enemyCueColors[index];
     ctx.lineWidth=1.7;
     if(airborne){
-      // World-specific flight trails: staggered wing strokes, compressed
-      // propulsion wakes and broad air currents use different silhouettes.
-      const trailCount=2+index%3;
-      const sweep=9+index%4*3;
-      for(let n=0;n<trailCount;n++){
-        const side=direction*(22+n*(7+index%3));
-        const y=-30+n*(7+index%3);
-        ctx.beginPath();ctx.moveTo(-side,y);
-        if(index%3===0){
-          ctx.quadraticCurveTo(-side-direction*sweep,y-5+Math.sin(phase+n)*4,
-            -side-direction*(sweep+7+n*2),y);
-        }else if(index%3===1){
-          ctx.lineTo(-side-direction*(sweep*.6),y-3);
-          ctx.lineTo(-side-direction*(sweep+6),y-2);
-        }else{
-          ctx.bezierCurveTo(-side-direction*5,y-9,
-            -side-direction*sweep,y+6,
-            -side-direction*(sweep+8),y-1);
-        }
-        ctx.stroke();
+      // Wingbeats, propeller trails and air displacement for aerial threats.
+      for(let n=0;n<3;n++){
+        const side=direction*(23+n*8);
+        ctx.beginPath();ctx.moveTo(-side,-28+n*9);
+        ctx.quadraticCurveTo(-side-direction*11,-33+n*9+Math.sin(phase+n)*4,
+          -side-direction*(19+n*3),-28+n*9);ctx.stroke();
       }
     }else if(firing){
-      // Recoil is anchored to the facing side; radius and arc spacing vary
-      // by world instead of applying one generic muzzle effect everywhere.
-      const recoilRadius=8+index%4*2;
-      const recoilWobble=Math.sin(phase)*.15;
-      // Mirror the actual arc as well as its origin. Previously left-facing
-      // enemies still emitted right-facing arcs despite moving the origin.
-      const recoilCenter=direction<0?Math.PI:0;
+      // Attack follow-through: bright, short-lived recoil arcs.
       for(let n=0;n<2;n++){
-        ctx.beginPath();ctx.arc(direction*(21+index%3),-13,
-          recoilRadius+n*(5+index%3),
-          recoilCenter-.9+recoilWobble,recoilCenter+.9+recoilWobble);
-        ctx.stroke();
+        ctx.beginPath();ctx.arc(direction*22,-13,11+n*7,
+          -.9+Math.sin(phase)*.15,.9+Math.sin(phase)*.15);ctx.stroke();
       }
     }else if(stride>.12){
-      // Distance-based ground contacts scale with movement and fade as the
-      // enemy slows, avoiding a permanent hovering ring beneath idle foes.
+      // Contact marks follow the actual distance-based gait.
       const offset=Math.sin(foe._gait||0)*5;
-      ctx.globalAlpha=(.25+stride*.26)*stride;
       for(let n=0;n<2;n++){
         ctx.beginPath();
-        ctx.ellipse(-direction*(9+n*(7+index%3)),16+Math.abs(offset)*.2,
-          3+stride*(3+index%3),1.2,0,0,Math.PI*2);ctx.fill();
+        ctx.ellipse(-direction*(9+n*9),16+Math.abs(offset)*.2,
+          4+stride*4,1.2,0,0,Math.PI*2);ctx.fill();
       }
-      ctx.globalAlpha=.25+stride*.26;
     }
     // Distinct secondary motion families: flicker, sweep, orbit, pulse, sparkle.
     if(index===0 && !airborne){
@@ -7077,38 +7015,16 @@
       ctx.lineTo(direction*(29+attackReach),-13);
       ctx.stroke();
     }else if(family===0){
-      // Different furnace, wind, light and hull enemies use distinct
-      // antenna lengths and rhythms rather than identical motion loops.
-      const reach=9+(index%4)*3;
-      ctx.beginPath();ctx.moveTo(-8,-38);
-      ctx.quadraticCurveTo(-reach+Math.sin(phase)*4,-46-index%3*3,-4,-52-index%4*2);
-      ctx.stroke();
+      ctx.beginPath();ctx.moveTo(-8,-38);ctx.quadraticCurveTo(-15+Math.sin(phase)*4,-48,-4,-54);ctx.stroke();
     }else if(family===1){
-      const span=14+(index%4)*3;
-      ctx.beginPath();ctx.moveTo(-span,-30);
-      ctx.quadraticCurveTo(0,-39-index%3*3+Math.sin(phase)*5,span,-30);
-      if(index%2){ctx.moveTo(-span+3,-29);ctx.lineTo(-span+7,-24);}
-      ctx.stroke();
+      ctx.beginPath();ctx.moveTo(-20,-30);ctx.quadraticCurveTo(0,-43+Math.sin(phase)*5,20,-30);ctx.stroke();
     }else if(family===2){
-      const radius=18+(index%5)*2;
-      ctx.beginPath();
-      ctx.ellipse(0,-26,radius,4+index%3+Math.sin(phase)*2,
-        (index%2?-.16:.16),0,Math.PI*2);
-      ctx.stroke();
+      ctx.beginPath();ctx.ellipse(0,-26,24,6+Math.sin(phase)*2,0,0,Math.PI*2);ctx.stroke();
     }else if(family===3){
-      const radius=15+(index%4)*3;
-      ctx.beginPath();ctx.arc(0,-26,radius+Math.sin(phase)*2,
-        Math.PI*(1.06+index%3*.04),Math.PI*(1.9-index%3*.03));
-      ctx.stroke();
+      ctx.beginPath();ctx.arc(0,-26,19+Math.sin(phase)*2,Math.PI*1.12,Math.PI*1.88);ctx.stroke();
     }else{
-      const count=2+(index%3);
-      for(let n=0;n<count;n++){
-        const angle=phase+n*Math.PI*2/count;
-        ctx.beginPath();
-        ctx.arc(Math.cos(angle)*(17+index%4*2),
-          -27+Math.sin(angle)*(10+index%3*3),1.2+index%3*.3,0,Math.PI*2);
-        ctx.fill();
-      }
+      for(let n=0;n<3;n++){const a=phase+n*2.094;ctx.beginPath();
+        ctx.arc(Math.cos(a)*22,-27+Math.sin(a)*14,1.5,0,Math.PI*2);ctx.fill();}
     }
     ctx.restore();
   }
