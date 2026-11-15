@@ -27,8 +27,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
-      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Cinder Tongs vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "grounded-clamp",
         "attackSequence": "plant rear foot, compress shoulders, close jaws, recoil",
@@ -47,7 +47,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
+      "productionSource": "original playable Furnace Crab and other Foundry specialists / assets/scenes/platform-enemies.webp",
+      "prototypeSource": "assets/animation/origin-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 1,
@@ -65,8 +68,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
-      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Atlas Warden vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "guard-sweep",
         "attackSequence": "brace spine, unfold page armor, sweep, refold",
@@ -85,7 +88,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
+      "productionSource": "Moonlit Library specialist render / assets/scenes/platform-enemies.webp",
+      "prototypeSource": "assets/animation/origin-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 2,
@@ -103,8 +109,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
-      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Reef Skimmer vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "swim-spiral",
         "attackSequence": "bank fins, coil torso, spiral, glide out",
@@ -123,7 +129,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
+      "productionSource": "Coral Courier specialist render / assets/scenes/platform-enemies.webp",
+      "prototypeSource": "assets/animation/origin-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 3,
@@ -141,8 +150,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
-      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Pendulum Sentinel vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "pendulum-arc",
         "attackSequence": "wind up against swing, release at beat, damp oscillation",
@@ -161,7 +170,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
+      "productionSource": "Clocktower Relay specialist render / assets/scenes/platform-enemies.webp",
+      "prototypeSource": "assets/animation/origin-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 4,
@@ -179,8 +191,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-2.5d-base-enemy-rig-integrated; original-specialist-enemy-art-preserved; 3D-film-art-pending",
-      "implementationStatus": "partial: original gameplay-linked animated base enemy body, attack, recoil and short defeat; special stage enemies keep existing individual motion; 3D model, full move library and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Thorn Hopper vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "spring-pounce",
         "attackSequence": "squat, load hind legs, leap, absorb landing",
@@ -199,7 +211,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/origin-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 4",
+      "prototypeSource": "assets/animation/origin-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 5,
@@ -217,8 +232,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
-      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Mist Glider vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "aerial-dive",
         "attackSequence": "rise on air current, tuck wings, dive, flare",
@@ -237,7 +252,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 5",
+      "prototypeSource": "assets/animation/five-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 6,
@@ -255,8 +273,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
-      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Lantern Juggler vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "juggle-toss",
         "attackSequence": "gather three lanterns, alternate release, catch, reset",
@@ -275,7 +293,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 6",
+      "prototypeSource": "assets/animation/five-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 7,
@@ -293,8 +314,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
-      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Flux Beetle vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "magnetic-dash",
         "attackSequence": "polarize shell, lean into pull, dash, brake",
@@ -313,7 +334,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 7",
+      "prototypeSource": "assets/animation/five-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 8,
@@ -331,8 +355,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
-      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Bass Bouncer vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "beat-stomp",
         "attackSequence": "sync crouch to beat, lift foot, stomp, settle",
@@ -351,7 +375,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 8",
+      "prototypeSource": "assets/animation/five-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 9,
@@ -369,8 +396,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; 3D film-level source meshes and motion pending",
-      "implementationStatus": "partial: unique playable 2.5D illustrated enemy body and simulation-cued gait/attack/recoil/defeat; physical Android QA and full 3D clips pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Slate Burrower vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "burrow-eruption",
         "attackSequence": "dig below ground, surface with dust, strike, descend",
@@ -389,7 +416,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/five-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 9",
+      "prototypeSource": "assets/animation/five-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 10,
@@ -407,8 +437,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
-      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Gale Kite vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "wind-dive",
         "attackSequence": "tilt sail, ride gust, dive across lane, recover",
@@ -427,7 +457,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 10",
+      "prototypeSource": "assets/animation/cloud-trail-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 11,
@@ -445,8 +478,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
-      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Nimbus Guard vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "hover-slam",
         "attackSequence": "hover charge, descend, cushion rebound, regain altitude",
@@ -465,7 +498,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 11",
+      "prototypeSource": "assets/animation/cloud-trail-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 12,
@@ -483,8 +519,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
-      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Coil Ray vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "electric-discharge",
         "attackSequence": "charge coils, orient ray, discharge, vent",
@@ -503,7 +539,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 12",
+      "prototypeSource": "assets/animation/cloud-trail-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 13,
@@ -521,8 +560,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
-      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Bramble Stalker vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "ambush-swipe",
         "attackSequence": "hide in foliage, uncoil, swipe, withdraw",
@@ -541,7 +580,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 13",
+      "prototypeSource": "assets/animation/cloud-trail-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 14,
@@ -559,8 +601,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-vector-rig-integrated; poster-matched-3D-model-pending",
-      "implementationStatus": "partial: individualized playable 2.5D enemy body/gait/attack/hit/defeat; true-3D lighting, full clip sets and Android visual QA pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Orbit Watcher vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "gravity-pulse",
         "attackSequence": "orbit center, reverse lean, pulse, stabilize",
@@ -579,7 +621,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/cloud-trail-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 14",
+      "prototypeSource": "assets/animation/cloud-trail-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 15,
@@ -597,8 +642,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
-      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Cane Striker vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "vault-strike",
         "attackSequence": "plant pole, vault, extend strike, land",
@@ -617,7 +662,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 15",
+      "prototypeSource": "assets/animation/mid-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 16,
@@ -635,8 +683,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
-      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Pressure Piston vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "piston-jab",
         "attackSequence": "pressurize chamber, extend piston, retract, vent",
@@ -655,7 +703,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
+      "productionSource": "Steamworks specialist render / assets/scenes/platform-enemies.webp",
+      "prototypeSource": "assets/animation/mid-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 17,
@@ -673,8 +724,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
-      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Frost Lantern vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "frost-cone",
         "attackSequence": "inhale cold, lean forward, exhale cone, thaw",
@@ -693,7 +744,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 17",
+      "prototypeSource": "assets/animation/mid-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 18,
@@ -711,8 +765,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
-      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Dust Runner vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "dash-feint",
         "attackSequence": "stutter-step, feint, burst, skid stop",
@@ -731,7 +785,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 18",
+      "prototypeSource": "assets/animation/mid-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 19,
@@ -749,8 +806,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; full-3D-poster-style-model-pending",
-      "implementationStatus": "partial: playable 2.5D bespoke enemy silhouette plus travel/attack/hit/defeat pose; actual gameplay QA, cinematic 3D and full clip library pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Abyss Probe vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "sonar-bolt",
         "attackSequence": "scan cone, lock target, emit bolt, cool down",
@@ -769,7 +826,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/mid-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 19",
+      "prototypeSource": "assets/animation/mid-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 20,
@@ -787,8 +847,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
-      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Pixel Phantom vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "blink-strike",
         "attackSequence": "telegraph glitch, disappear, reappear, strike, settle",
@@ -807,7 +867,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 20",
+      "prototypeSource": "assets/animation/late-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 21,
@@ -825,8 +888,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
-      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Mosaic Golem vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "rolling-crush",
         "attackSequence": "brace stone segments, curl, roll, uncoil",
@@ -845,7 +908,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 21",
+      "prototypeSource": "assets/animation/late-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 22,
@@ -863,8 +929,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
-      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Bog Lantern vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "lure-burst",
         "attackSequence": "pulse lure, attract, inflate, burst, deflate",
@@ -883,7 +949,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 22",
+      "prototypeSource": "assets/animation/late-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 23,
@@ -901,8 +970,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
-      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Pollen Drifter vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "swoop-spiral",
         "attackSequence": "flutter, spiral downward, sweep, climb",
@@ -921,7 +990,10 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 23",
+      "prototypeSource": "assets/animation/late-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     },
     {
       "gameIndex": 24,
@@ -939,8 +1011,8 @@
         "hit",
         "defeat"
       ],
-      "artStatus": "original-procedural-vector-rig-integrated; feature-film-3D-art-pending",
-      "implementationStatus": "partial: game-linked idle/travel/attack/recovery visual rig; real-device, hit and defeat motion pending",
+      "artStatus": "approved earlier crab-era creature style restored in source; new Cargo Mimic vector rig retained as preview-only, NOT active in gameplay; Android visual approval pending",
+      "implementationStatus": "partial: original historical creature art path source-selected; game-specific old atlas/stage specialist visuals, feet and motion accents restored; live verification and Android screenshot QA pending",
       "motionDesign": {
         "profile": "grapple-snap",
         "attackSequence": "unfold crate disguise, extend grapple, snap, retract",
@@ -959,7 +1031,22 @@
           "verify Android landscape frame pacing"
         ]
       },
-      "productionSource": "assets/animation/late-world-enemy-rigs-v1.js"
+      "productionSource": "assets/scenes/platform-enemies.webp / per-game cell 24",
+      "prototypeSource": "assets/animation/late-world-enemy-rigs-v1.js",
+      "prototypeBlockedFromPlayable": true,
+      "approvedAppearanceCommit": "9768ec86ad"
     }
-  ]
+  ],
+  "approvedEnemyAppearance": {
+    "approvedBaseline": "crab-era",
+    "referenceCommit": "9768ec86ad",
+    "editableSource": "assets/pawcade-side-scroll-no-badges-v2.js",
+    "activeAtlas": "assets/scenes/platform-enemies.webp",
+    "perGameChecklist": "docs/ENEMY-RESTORATION-CHECKLIST-25.md",
+    "stageRegistry": "assets/enemy-restoration-baseline-25.json",
+    "selectedForGameIndices": "0 through 24",
+    "hasRealAndroidVisualQA": false,
+    "liveDeploymentVerified": false,
+    "futureChanges": "Only timing/lighting that does not redesign silhouette; require user-approved visual comparison before switching to any prototype rig."
+  }
 }
