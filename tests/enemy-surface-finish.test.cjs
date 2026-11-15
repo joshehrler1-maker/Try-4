@@ -79,5 +79,6 @@ test('game scripts, offline cache and motion quality controls use the same versi
   assert.ok(!html.includes('src="assets/animation/enemy-3d-prototype-v1.js'));
   assert.ok(core.includes('if(!rendered3D && !authoredEnemyArt) drawEnemySecondaryMotion'));
   assert.ok(core.includes('ctx.translate(-at.x,-at.y-19-(authoredEnemyArt?0:footstep))'));
-  assert.ok(core.includes('airborne,hit:foe.bashed && clock<foe.bashed.until ? 1 : 0'));
+  assert.ok(core.includes('const hitPose=reducedMotion?0:Math.pow(hitRemaining,hitRecovery);'));
+  assert.ok(core.includes('airborne,hit:hitPose'));
 });
