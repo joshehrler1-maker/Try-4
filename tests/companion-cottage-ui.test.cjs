@@ -8,6 +8,7 @@ const vm = require('node:vm');
 const root = path.join(__dirname, '..');
 const read = filename => fs.readFileSync(path.join(root, filename), 'utf8');
 const bondScript = read('assets/pawtopia-pet-bond.js');
+const scoutScript = read('assets/pawtopia-scout.js');
 const cottageScript = read('assets/companion-cottage.js');
 
 class Element {
@@ -80,6 +81,7 @@ function createCottage(seed = initial()) {
     Object, String, Number, Math, Array, Boolean
   };
   vm.runInNewContext(bondScript, context, {filename: 'pawtopia-pet-bond.js'});
+  vm.runInNewContext(scoutScript, context, {filename: 'pawtopia-scout.js'});
   vm.runInNewContext(cottageScript, context, {filename: 'companion-cottage.js'});
   const adopt = async name => {
     element('cat-name').value = name;
@@ -168,4 +170,33 @@ test('four-cat capacity is enforced; next day refreshes free activities', async 
   const apiWindow = {};
   vm.runInNewContext(bondScript, {window:apiWindow, Date, Object, Array, Number, String, Math});
   assert.equal(apiWindow.PawtopiaPetBond.read(page.get().companion, 'Sat Nov 21 2026').available.length, 3);
+});
+
+test('unlocked Scout Trail accessory belongs to one adopted cat and displays on its portrait', async () => {
+  const seed = initial();
+  seed.companion = {
+    name: 'Mochi', breed: 'Maine Coon', fullness: 65, happiness: 65,
+    updatedAt: Date.now(), scoutStamps: ['meadow'], scoutAccessory: ''
+  };
+  seed.otherCompanions = [{
+    name: 'Snowflake', breed: 'Siamese', fullness: 65, happiness: 65,
+    updatedAt: Date.now()
+  }];
+  const page = createCottage(seed);
+  assert.equal(page.element('cottage-scout-stamps').textContent, '1 of 4 trail stamps found by this cat');
+  assert.equal(page.element('cottage-scout-accessory').children.length, 2);
+  page.element('cottage-scout-accessory').value = 'sunleaf';
+  await page.element('cottage-scout-equip').listeners.click();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(page.get().companion.scoutAccessory, 'sunleaf');
+  assert.equal(page.element('cat-portrait').attributes['data-scout-icon'], '🌻');
+  assert.match(page.element('cottage-scout-current').textContent, /Sunleaf Ribbon/);
+  assert.equal(page.get().otherCompanions[0].scoutAccessory, undefined);
+  page.element('active-cat').value = '1';
+  await page.element('active-cat').listeners.change();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(page.get().companion.name, 'Snowflake');
+  assert.equal(page.element('cat-portrait').attributes['data-scout-icon'], '');
+  assert.equal(page.element('cottage-scout-accessory').children.length, 1);
+  assert.equal(page.element('cottage-scout-accessory').value, 'none');
 });

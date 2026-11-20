@@ -9,6 +9,7 @@ on:
       - 'scripts/**'
       - 'index.html'
       - 'pawtopia-arcade.html'
+      - 'pawtopia-scout-trails.html'
       - '.github/workflows/verify.yml'
   push:
     branches: [main]
@@ -56,6 +57,7 @@ jobs:
           node --test tests/pawtopia-hub.test.cjs
           node --test tests/companion-bond.test.cjs
           node --test tests/companion-cottage-ui.test.cjs
+          node --test tests/pawtopia-scout.test.cjs
           node --test tests/guest-arcade.test.cjs
           node --test tests/guest-3d-arcade.test.cjs
           node tests/side-scroll-cinematic-stage34.test.cjs
