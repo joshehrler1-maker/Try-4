@@ -48,7 +48,7 @@ test('all 56 approved breeds map to distinct current art cells and move identiti
     assert.equal(kit.animations.length,8,kit.breed);
     assert.ok(kit.movement,kit.breed);
     assert.ok(kit.theme.color.startsWith('#'));
-    assert.ok(worker.includes(kit.sprite.src)||worker.includes('adopt-'+kit.breed.toLowerCase().replaceAll(' ','-')),kit.breed);
+    assert.ok(fs.existsSync(path.join(root,kit.sprite.src)),'Missing approved source image for '+kit.breed);
     assert.equal(data.kitFor(kit.breed).breed,kit.breed);
   }
   assert.equal(data.kits[6].sprite.src,'assets/scenes/adopt-catalog-1.webp');
