@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="assets/companion-cottage.css">
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/pawtopia-pet-bond.js"></script>
+<script defer src="assets/pawtopia-scout.js"></script>
 <script defer src="assets/companion-cottage.js"></script>
 <link rel="stylesheet" href="assets/pawtopia-scenes.css">
 <link rel="stylesheet" href="assets/pawtopia-explore.css">
@@ -19,7 +20,7 @@
   <nav aria-label="Pawtopia"><a href="pawtopia-town.html">Town Square</a><a href="index.html#crystal-regions">Crystal Regions</a><a href="pawtopia-arcade.html">Games Room</a></nav>
 </header>
 <main>
-<nav class="paw-world-nav" aria-label="Explore Pawtopia"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html" aria-current="page">Companions</a><a href="pawtopia-arcade.html">Games Room</a><a href="pawtopia-town.html">Shops</a><a href="pawtopia-town.html#dailies">Dailies</a><a href="pawtopia-town.html#card-album">Card Album</a><a href="index.html#crystal-regions">Crystal Regions</a></nav>
+<nav class="paw-world-nav" aria-label="Explore Pawtopia"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html" aria-current="page">Companions</a><a href="pawtopia-arcade.html">Games Room</a><a href="pawtopia-town.html">Shops</a><a href="pawtopia-town.html#dailies">Dailies</a><a href="pawtopia-scout-trails.html">Scout Trails</a><a href="pawtopia-town.html#card-album">Card Album</a><a href="index.html#crystal-regions">Crystal Regions</a></nav>
 
   <section class="hero" aria-labelledby="title">
     <div><p class="location">Pawtopia</p><h1 id="title">Companion Cottage</h1><p>Give a cat a home, then head to the Games Room to earn coins for food and toys.</p><a class="button" href="pawtopia-arcade.html">Play arcade games</a></div>
@@ -88,6 +89,19 @@
     <p id="pet-album-count">0 of 4 companions adopted</p>
     <div id="pet-album-cards" class="pet-album-grid"></div>
     <p class="hint">Each cat has its own personality, favorite activity, friendship memories, and training progress. Choose your active companion above.</p>
+  </section>
+  <section class="panel" id="cottage-scout-style" aria-labelledby="cottage-scout-title">
+    <h2 id="cottage-scout-title">Trail souvenirs &amp; cat accessories</h2>
+    <p>Explore Scout's Trail with your adopted cat to collect keepsake stamps and unlock free outfits. Souvenirs belong to each cat individually.</p>
+    <p id="cottage-scout-stamps">0 of 4 trail stamps found</p>
+    <p id="cottage-scout-current">Wearing: Everyday look</p>
+    <label for="cottage-scout-accessory">Choose an unlocked accessory</label>
+    <div class="controls">
+      <select id="cottage-scout-accessory"><option value="none">Everyday look</option></select>
+      <button type="button" id="cottage-scout-equip">Dress your companion</button>
+      <a class="button" href="pawtopia-scout-trails.html">Explore Scout's Trail</a>
+    </div>
+    <p class="hint">These free accessories are displayed as little keepsake badges on your cat's portrait, preserving its original artwork.</p>
   </section>
   <section class="panel" id="cottage-customization">
     <h2>Wardrobe and furnishings</h2>
