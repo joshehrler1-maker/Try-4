@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#132e53">
+<meta name="description" content="Battle with your adopted cat in Pawtopia's free animated Battle Arena. Watch your cat fight clockwork challengers, unlock four moves, level up, and earn better loot against stronger foes.">
+<link rel="canonical" href="https://joshehrler1-maker.github.io/Try-4/pawtopia-battle-arena.html">
+<meta property="og:title" content="Pawtopia Battle Arena | Super Paw Heroes">
+<meta property="og:description" content="Watch your adopted cat battle 12 original clockwork foes, unlock special moves and earn free rewards.">
+<title>Pawtopia Battle Arena | Super Paw Heroes</title>
+<link rel="stylesheet" href="assets/pawtopia-battle-arena.css">
+<script defer src="assets/pawtopia-save.js"></script>
+<script defer src="assets/pawtopia-battle-data.js"></script>
+<script defer src="assets/pawtopia-battle-engine.js"></script>
+<script defer src="assets/pawtopia-battle-arena.js"></script>
+</head>
+<body>
+<a class="skip" href="#arena-main">Skip to Battle Arena</a>
+<header class="site-top">
+<a class="logo" href="index.html#pawtopia">🐾 Super Paw Heroes</a>
+<nav aria-label="Pawtopia destinations"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html">Adopt Cats</a><a href="pawtopia-scout-trails.html">Scout Trails</a><a href="pawtopia-town.html">Town Square</a><a href="pawtopia-arcade.html">Games Room</a></nav>
+</header>
+<main id="arena-main">
+<section class="welcome">
+<div class="welcome-copy">
+<p class="eyebrow">Pawtopia · Original, free pet battles</p>
+<h1>Battle Arena</h1>
+<p>Every adopted cat can become a champion! Choose your companion, challenge a clockwork foe, and <strong>watch the fight</strong> as pets move, strike, cast their unique skills, and celebrate victories.</p>
+<p>12 increasingly difficult challengers · 56 breed-specific battle art kits · 4 moves per cat</p>
+<a class="primary" href="pawtopia-companions.html">Adopt or train a cat</a>
+</div>
+<img src="assets/scenes/town-arena.webp" width="500" height="500" loading="lazy" alt="Original Pawtopia arena environment art">
+</section>
+<section class="select-panel" aria-label="Choose your fighter and challenge">
+<div class="arena-setup">
+<div>
+<h2>Choose your adopted cat</h2>
+<label for="battle-pet-select">Your fighter</label>
+<select id="battle-pet-select"></select>
+<p id="battle-pet-detail">Adopt a cat first to enter the Battle Arena.</p>
+<div class="xp-track"><label for="battle-xp">Battle experience</label><progress id="battle-xp" max="18" value="0"></progress><span id="battle-xp-text">0 / 18 XP</span></div>
+<p class="mini" id="battle-record">0 wins · 0 losses</p>
+</div>
+<div>
+<h2>Next challenge</h2>
+<div id="next-challenge" class="next-challenge">Training arena</div>
+<p class="mini">Defeat the highest unlocked challenger to unlock the next. Previously unlocked opponents can be replayed for training.</p>
+</div>
+</div>
+<h2 id="foe-list-title">The 12-step challenger ladder</h2>
+<div id="battle-foe-list" class="foe-list" role="group" aria-labelledby="foe-list-title"></div>
+<div class="setup-actions"><button id="battle-start" type="button" class="primary">Enter Arena</button><button id="battle-forfeit" type="button" class="secondary">Forfeit current battle</button><button id="battle-sound" type="button" class="secondary" aria-pressed="false">Sound: Off</button></div>
+</section>
+<section class="fight-section" aria-labelledby="fight-title">
+<h2 id="fight-title">Watch the Battle</h2>
+<p class="arena-status" id="battle-status" role="status" aria-live="polite">Choose your adopted cat and a challenger to start the fight.</p>
+<div class="battle-stage" id="battle-stage" aria-label="Animated turn-based battle field">
+<div class="battle-backdrop" aria-hidden="true"></div>
+<div class="battler battler-pet" id="battle-pet-fighter">
+<div class="battler-ui"><span id="stage-pet-name">Your Cat</span><strong id="stage-pet-level">Lv 1</strong></div>
+<div class="hp-row"><progress id="stage-pet-hp" max="20" value="20"></progress><span id="stage-pet-hp-text">20/20 HP</span></div>
+<div class="fighter-sprite" id="battle-pet-sprite">
+  <span class="fighter-shadow" aria-hidden="true"></span>
+  <div class="cat-avatar" id="battle-cat-art" role="img" aria-label="Your adopted cat's original breed artwork"></div>
+  <span class="motion-paw" aria-hidden="true">🐾</span>
+  <span class="fighter-tag" id="battle-cat-tag">CAT</span>
+</div>
+</div>
+<div class="battle-center" aria-hidden="true"><span>VS</span></div>
+<div class="battler battler-foe" id="battle-foe-fighter">
+<div class="battler-ui"><span id="stage-foe-name">Clockwork Challenger</span><strong id="stage-foe-level">Lv 1</strong></div>
+<div class="hp-row"><progress id="stage-foe-hp" max="20" value="20"></progress><span id="stage-foe-hp-text">20/20 HP</span></div>
+<div class="fighter-sprite" id="battle-foe-sprite">
+  <span class="fighter-shadow" aria-hidden="true"></span>
+  <svg class="foe-illustration" viewBox="0 0 190 190" role="img" aria-label="Original mechanical hound challenger art">
+    <circle class="gear-halo" cx="95" cy="100" r="74" fill="none" stroke-width="8" stroke-dasharray="12 9"/>
+    <path class="foe-ear" d="M40 75 L29 18 L75 52 L113 52 L156 18 L150 80" stroke-width="7" stroke-linejoin="round"/>
+    <path class="foe-head" d="M39 75 Q33 47 93 48 Q158 43 155 80 L159 128 Q154 162 95 168 Q33 162 31 126 Z" stroke-width="8"/>
+    <path class="foe-eye" d="M54 91 L79 92 L77 106 L54 107 Z M111 92 L135 90 L134 107 L112 106 Z"/>
+    <path class="foe-muzzle" d="M66 125 Q97 111 126 125 L122 146 L96 156 L70 146 Z" stroke-width="4"/>
+    <path class="foe-nose" d="M86 131 L108 131 L98 144 Z"/>
+    <path class="foe-plate" d="M51 72 L72 65 M118 65 L139 72 M47 126 L56 139 M144 126 L136 139" stroke-width="5"/>
+  </svg>
+  <span class="foe-emblem" id="battle-foe-emblem">⚙</span>
+</div>
+</div>
+<div id="battle-vfx" class="battle-vfx" aria-hidden="true"></div>
+</div>
+<div class="battle-actions">
+<h3>Four unlockable moves</h3>
+<p class="mini">Level 1: Paw Swipe · Level 3: Guard Curl · Level 6: your pet's unique skill · Level 10: unique ultimate attack</p>
+<div id="battle-moves" class="move-grid" role="group" aria-label="Your cat's battle moves"></div>
+</div>
+<div class="battle-outcome" id="battle-outcome" role="status" aria-live="polite"></div>
+</section>
+<section class="extra">
+<div class="panel"><h2>Battle story</h2><ol id="battle-log" class="battle-log"><li>Adopt a cat and choose a challenger to begin.</li></ol></div>
+<div class="panel"><h2>Rewards &amp; training</h2><p><strong>Stronger foes give better XP, coins and loot.</strong> Higher ranks can award crystal shards, an arena toy and collectible medals. Every reward is fictional in-game currency or an item.</p><p>Train your cat's Strength, Defence, Movement, Endurance and Intelligence at Companion Cottage. Arena XP also levels your cat and unlocks moves.</p><p id="battle-trophies" class="mini">No trophies yet</p><a class="secondary-link" href="pawtopia-companions.html#companion-care">Visit Companion Training School</a></div>
+</section>
+<p class="disclosure">Free solo battles against computer-controlled clockwork opponents. No real-money betting, purchases, chat, account signup or player-versus-player features. Progress is saved only in this browser. Artwork uses the existing approved 56-breed cat portraits; motion is rendered from lightweight sprite rigs and effects rather than hand-drawn animation frames.</p>
+</main>
+<footer><a href="index.html#pawtopia">Return to Pawtopia</a> · <a href="pawtopia-companions.html">Your Cats</a></footer>
+<noscript>Enable JavaScript to play animated Battle Arena.</noscript>
+</body>
+</html>
