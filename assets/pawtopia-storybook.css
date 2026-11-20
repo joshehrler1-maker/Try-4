@@ -196,3 +196,51 @@
  #pawtopia .paw-hub-intro img{transform:none}
  #pawtopia .paw-hub-cta,#pawtopia .paw-hub-place img{transition:none}
 }
+
+/* Bright storybook site shell: use original Pawtopia imagery and familiar pet-world navigation. */
+body.pawtopia-scene.pawtopia-art{
+ background:#8bcde0;
+ background-image:linear-gradient(180deg,#a4e7ef77,#b2e1d080 32%,#f6dbbb5e 68%,#12304dbd 100%),var(--pawtopia-scene);
+ background-position:center top,center top;background-size:auto,cover;background-repeat:no-repeat;
+}
+.home-header{
+ border-bottom:4px solid #b17b50;
+ background:linear-gradient(180deg,#fff1c6,#f7cb79);
+ box-shadow:0 5px 0 #e9aa66,0 10px 20px #1f4f6c66;
+}
+.home-header .logo,.home-header .logo b{color:#465568;text-shadow:0 2px 0 #fff9e8}
+.home-header .logo b{color:#b55d67}
+.home-header nav a,.home-more summary{
+ color:#4e5462;background:#fff5deab;border:1px solid #e3bb8e;border-radius:.6rem;
+ box-shadow:0 2px 0 #d7a96d;padding-inline:.65rem;margin:0 .05rem
+}
+.home-header nav a:hover,.home-more summary:hover{
+ color:#fff;background:#508f98
+}
+.home-more>div{
+ background:#fff7e6;border:3px solid #e2af85;
+ box-shadow:0 7px 0 #bf956a,0 14px 22px #182e444c
+}
+.home-more>div a{color:#4b596b;background:#fff6e8}
+.home-welcome{
+ border:5px solid #fff9dc;border-radius:2rem;
+ background:linear-gradient(100deg,#84cadddc,#9cdebd8c 50%,#ffedbd66),url("scenes/pawtopia.webp") center/cover no-repeat;
+ box-shadow:0 9px 0 #72aa9a,0 20px 40px #173955a6
+}
+.home-welcome h1{color:#fff8dc;text-shadow:3px 4px 0 #3c6b77,0 7px 15px #1f4e5c99}
+.home-welcome p{color:#fffdf0;text-shadow:1px 2px 4px #295a67,0 0 12px #28616e}
+.home-welcome .btn{box-shadow:0 5px 0 #997259}
+.home-welcome .btn.alt{background:#4398a6;color:#fff;border-color:#c5fbf8}
+.home-welcome img{border:4px solid #fff9e1;background:#eee0db45;box-shadow:0 7px 0 #d7d2b7;transform:rotate(1deg);object-fit:contain}
+.home-directory h2{color:#fff8df;text-shadow:2px 3px 0 #477885}
+.home-destinations a{border:4px solid #fff8e4;border-radius:1.25rem;background:#fff4d8;box-shadow:0 6px 0 #8dbfb0,0 12px 20px #213f5570}
+.home-destinations span{background:#fff5e0;color:#405668;font-weight:850}
+.home-destinations a:hover{border-color:#ffe4a3;box-shadow:0 6px 0 #c89d6d,0 12px 20px #213f5570}
+@media(max-width:660px){
+ .home-header{position:relative}
+ .home-header nav a,.home-more summary{font-size:.78rem;padding-inline:.45rem}
+ .home-welcome{border-radius:1.1rem;border-width:3px}
+ .home-welcome img{border-width:2px;transform:none}
+ .home-destinations a{border-width:3px}
+}
+@media(prefers-reduced-motion:reduce){.home-welcome img{transform:none}}
