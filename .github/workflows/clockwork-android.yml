@@ -1,0 +1,40 @@
+name: Clockwork Android verification
+on:
+  push:
+    branches: [clockwork-android-verification]
+permissions:
+  contents: read
+jobs:
+  android:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify recovered source
+        working-directory: clockwork-adventure
+        run: npm run check && node --check dist/software-renderer.js && npm test
+      - name: Prepare Android tools and site origins
+        run: |
+          sudo chmod a+rw /dev/kvm
+          curl --retry 2 -fsSL https://archive.mozilla.org/pub/fenix/releases/144.0/android/fenix-144.0-android-x86_64/fenix-144.0.multi.android-x86_64.apk -o "$RUNNER_TEMP/firefox.apk"
+          curl --retry 2 -fsSL https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz | tar -xz -C "$RUNNER_TEMP"
+          mkdir -p "$RUNNER_TEMP/www/Try-4"
+          ln -s "$GITHUB_WORKSPACE/clockwork-adventure" "$RUNNER_TEMP/www/Try-4/clockwork-adventure"
+          python3 -m http.server 8072 --bind 127.0.0.1 --directory "$RUNNER_TEMP/www" >"$RUNNER_TEMP/stage.log" 2>&1 &
+          python3 -m http.server 8073 --bind 127.0.0.1 --directory clockwork-adventure/dist >"$RUNNER_TEMP/original.log" 2>&1 &
+          "$RUNNER_TEMP/geckodriver" >"$RUNNER_TEMP/driver.log" 2>&1 &
+      - name: Run on Android 11
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          profile: pixel_2
+          disable-animations: true
+          script: bash clockwork-adventure/tests/run-android.sh
+      - name: Report diagnostics
+        if: failure()
+        run: tail -60 "$RUNNER_TEMP"/*.log || true
