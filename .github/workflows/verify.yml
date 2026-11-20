@@ -12,6 +12,7 @@ on:
       - 'index.html'
       - 'coloring-book.html'
       - 'guest-arcade.html'
+      - 'guest-3d-arcade.html'
       - 'surreal-worlds-coloring-book.html'
       - 'sitemap.xml'
       - 'crystal-professional.*'
@@ -43,6 +44,7 @@ jobs:
           node tests/sales-page-integrity.test.cjs
           node --test tests/pawtopia-hub.test.cjs
           node --test tests/guest-arcade.test.cjs
+          node --test tests/guest-3d-arcade.test.cjs
           node tests/side-scroll-cinematic-stage34.test.cjs
           node tests/side-scroll-midgame-scenery.test.cjs
           node tests/side-scroll-twilight-scenery.test.cjs
