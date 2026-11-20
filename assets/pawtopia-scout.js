@@ -67,8 +67,8 @@
     };
   }
   function solve(progress, areaId, answer, day) {
+    if (!Object.hasOwn(byId, areaId) || typeof day !== 'string' || !day) return { ok: false, message: 'That trail is unavailable.' };
     const area = byId[areaId];
-    if (!area || typeof day !== 'string' || !day) return { ok: false, message: 'That trail is unavailable.' };
     const pet = progress?.companion;
     if (!pet || typeof pet !== 'object') return { ok: false, message: 'Adopt a cat in Companion Cottage before setting off.' };
     const current = read(progress, day);
