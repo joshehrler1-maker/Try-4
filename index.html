@@ -34,6 +34,7 @@
 <link rel="stylesheet" href="assets/pawtopia-explore.css">
 <link rel="stylesheet" href="assets/pawtopia-home.css">
 <link rel="stylesheet" href="assets/pawtopia-hub.css">
+<link rel="stylesheet" href="assets/pawtopia-storybook.css">
 <script defer src="assets/pawtopia-hub.js"></script>
 </head>
 <body class="pawtopia-scene pawtopia-art">
@@ -47,7 +48,7 @@
 <a href="pawtopia-town.html">Town Square</a>
 <details class="home-more"><summary>More</summary><div>
 <a href="#crystal-regions">Crystal Regions</a><a href="#games">Adventures</a>
-<a href="#coloring-book">Bookshop</a><a href="#hero-headquarters">Hero Profile</a>
+<a href="#coloring-book">Bookshop</a><a href="#paw-hub">Hero Profile</a>
 <a href="#challenge">Hero Challenge</a><a href="#explore">Explore the Universe</a>
 <a href="#families">For Families</a><a href="studio.html">Creator Studio</a>
 <a href="readiness.html">Setup &amp; Status</a>
@@ -101,6 +102,46 @@
     <div class="paw-hub-stat"><span class="symbol" aria-hidden="true">🐈</span><span><small>Your cats</small><strong id="paw-hub-cat-count">0</strong></span></div>
     <div class="paw-hub-stat"><span class="symbol" aria-hidden="true">⭐</span><span><small>Your adventure</small><strong id="paw-hub-hero-name">Choose a hero</strong></span></div>
   </div>
+  <section class="paw-hub-world" aria-labelledby="paw-hub-world-heading">
+    <h4 id="paw-hub-world-heading">🗺️ Where will you go today?</h4>
+    <p>Follow illustrated paths, shop for your companion, collect treasures, and discover unique games around Pawtopia.</p>
+    <div class="paw-hub-map-layout">
+      <div class="paw-hub-map-main">
+        <div class="paw-hub-map-caption"><span>✦ THE WORLD OF PAWTOPIA ✦</span><small>Choose a sign to visit a destination</small></div>
+        <div class="pawtopia-atlas" aria-label="Illustrated map of Pawtopia">
+<a class="atlas-sign" style="--x:17%;--y:45%" href="pawtopia-town.html" aria-label="Town Square. Visit the shops, bank, and daily activities">Town Square</a>
+<a class="atlas-sign" style="--x:50%;--y:45%" href="pawtopia-arcade.html" aria-label="Festival Arcade. Play six arcade games">Festival Arcade</a>
+<a class="atlas-sign" style="--x:83%;--y:45%" href="pawgrove.html" aria-label="Pawgrove. Investigate the Lantern Curse">Pawgrove</a>
+<a class="atlas-sign" style="--x:17%;--y:88%" href="super-paw-3d.html" aria-label="Crystal Catacombs. Explore the 3D adventure">Crystal Catacombs</a>
+<a class="atlas-sign" style="--x:50%;--y:88%" href="#coloring-book" aria-label="Coloring Book Shop. Browse books and try free pages">Coloring Book Shop</a>
+<a class="atlas-sign" style="--x:83%;--y:88%" href="#challenge" aria-label="Hero Training. Take the Hero Choice Challenge">Hero Training</a>
+<a class="atlas-sign" style="--x:22%;--y:16%" href="pawtopia-companions.html">Companion Cottage</a>
+<a class="atlas-sign" style="--x:78%;--y:16%" href="#crystal-regions">Crystal Regions</a>
+</div>
+        <p class="paw-hub-map-hint">Explore all eight destinations with a tap. Every location links to a real place on this site.</p>
+      </div>
+      <aside class="paw-hub-map-side" aria-label="Featured adventure">
+        <span class="paw-hub-badge">🐾 ADVENTURE GUIDE</span>
+        <img src="assets/scenes/cottage.webp" width="836" height="470" loading="lazy" alt="Illustrated Pawtopia companion cottage">
+        <h5>Your adventure starts here</h5>
+        <p>Make friends with a cat, discover daily surprises, and explore every corner of Pawtopia!</p>
+        <ol class="paw-hub-first-steps">
+          <li><a href="pawtopia-companions.html">Adopt a feline friend</a></li>
+          <li><a href="pawtopia-arcade.html">Play a game for Paw Coins</a></li>
+          <li><a href="pawtopia-town.html#shops">Visit the colorful town shops</a></li>
+        </ol>
+        <a class="paw-hub-cta" href="pawtopia-companions.html">Begin Your Adventure 🐾</a>
+      </aside>
+    </div>
+    <div class="paw-hub-destinations">
+      <a class="paw-hub-place" href="pawtopia-companions.html"><img src="assets/scenes/cottage.webp" width="836" height="470" alt="Cozy cat cottage" loading="lazy"><span class="paw-hub-tag">Adopt &amp; care</span><span class="paw-hub-place-text"><strong>🐾 Companion Cottage</strong><small>Meet cats, feed your friend, dress up, and decorate</small></span></a>
+      <a class="paw-hub-place" href="pawtopia-arcade.html"><img src="assets/scenes/arcade.webp" width="836" height="470" alt="Colorful Pawtopia game room" loading="lazy"><span class="paw-hub-tag">Earn coins</span><span class="paw-hub-place-text"><strong>🎮 Festival Arcade</strong><small>Play mini-games and improve your personal best</small></span></a>
+      <a class="paw-hub-place" href="pawtopia-town.html#shops"><img src="assets/scenes/town-market.webp" width="500" height="500" alt="Pawtopia market shops" loading="lazy"><span class="paw-hub-tag">Shops &amp; style</span><span class="paw-hub-place-text"><strong>🛍️ Town Marketplace</strong><small>Spend free Paw Coins on gifts, treats, and items</small></span></a>
+      <a class="paw-hub-place" href="pawtopia-town.html#quests"><img src="assets/scenes/town-gazette.webp" width="500" height="500" alt="Town gathering place" loading="lazy"><span class="paw-hub-tag">Daily quests</span><span class="paw-hub-place-text"><strong>📜 Hero Quest Board</strong><small>Help Pawtopia friends and earn quest rewards</small></span></a>
+      <a class="paw-hub-place" href="pawtopia-town.html#card-album"><img src="assets/scenes/town-trading.webp" width="500" height="500" alt="Pawtopia trading marketplace" loading="lazy"><span class="paw-hub-tag">Collections</span><span class="paw-hub-place-text"><strong>🌟 Collectors' Corner</strong><small>Find hero cards, expand your collection, and trade</small></span></a>
+      <a class="paw-hub-place" href="pawgrove.html"><img src="assets/scenes/pawtopia.webp" width="836" height="470" alt="Illustrated colorful world of Pawtopia" loading="lazy"><span class="paw-hub-tag">Explore</span><span class="paw-hub-place-text"><strong>🌳 Adventure Trails</strong><small>Visit new places and uncover the Lantern Curse</small></span></a>
+    </div>
+  </section>
   <div class="paw-hub-grid">
     <section class="paw-hub-panel" aria-labelledby="paw-hub-pet-heading">
       <h4 id="paw-hub-pet-heading">🐱 Your Cat Companion</h4>
@@ -141,34 +182,13 @@
       <p class="paw-hub-note">Paw Coins are free fictional game rewards, not real money. No purchases, accounts, or advertising required.</p>
     </section>
   </div>
-  <section class="paw-hub-world" aria-labelledby="paw-hub-world-heading">
-    <h4 id="paw-hub-world-heading">🗺️ Where will you go today?</h4>
-    <p>Follow illustrated paths, shop for your companion, collect treasures, and discover unique games around Pawtopia.</p>
-    <div class="paw-hub-destinations">
-      <a class="paw-hub-place" href="pawtopia-companions.html"><img src="assets/scenes/cottage.webp" width="836" height="470" alt="Cozy cat cottage" loading="lazy"><span class="paw-hub-tag">Adopt &amp; care</span><span class="paw-hub-place-text"><strong>🐾 Companion Cottage</strong><small>Meet cats, feed your friend, dress up, and decorate</small></span></a>
-      <a class="paw-hub-place" href="pawtopia-arcade.html"><img src="assets/scenes/arcade.webp" width="836" height="470" alt="Colorful Pawtopia game room" loading="lazy"><span class="paw-hub-tag">Earn coins</span><span class="paw-hub-place-text"><strong>🎮 Festival Arcade</strong><small>Play mini-games and improve your personal best</small></span></a>
-      <a class="paw-hub-place" href="pawtopia-town.html#shops"><img src="assets/scenes/town-market.webp" width="500" height="500" alt="Pawtopia market shops" loading="lazy"><span class="paw-hub-tag">Shops &amp; style</span><span class="paw-hub-place-text"><strong>🛍️ Town Marketplace</strong><small>Spend free Paw Coins on gifts, treats, and items</small></span></a>
-      <a class="paw-hub-place" href="pawtopia-town.html#quests"><img src="assets/scenes/town-gazette.webp" width="500" height="500" alt="Town gathering place" loading="lazy"><span class="paw-hub-tag">Daily quests</span><span class="paw-hub-place-text"><strong>📜 Hero Quest Board</strong><small>Help Pawtopia friends and earn quest rewards</small></span></a>
-      <a class="paw-hub-place" href="pawtopia-town.html#card-album"><img src="assets/scenes/town-trading.webp" width="500" height="500" alt="Pawtopia trading marketplace" loading="lazy"><span class="paw-hub-tag">Collections</span><span class="paw-hub-place-text"><strong>🌟 Collectors' Corner</strong><small>Find hero cards, expand your collection, and trade</small></span></a>
-      <a class="paw-hub-place" href="pawgrove.html"><img src="assets/scenes/pawtopia.webp" width="836" height="470" alt="Illustrated colorful world of Pawtopia" loading="lazy"><span class="paw-hub-tag">Explore</span><span class="paw-hub-place-text"><strong>🌳 Adventure Trails</strong><small>Visit new places and uncover the Lantern Curse</small></span></a>
-    </div>
-  </section>
+
   <p class="paw-hub-note">Your progress is saved on this device and browser, not synced across accounts. Cat care never falls below 25%; your friends stay safe.</p>
 </div>
 
 
-<div class="world-profile" id="hero-headquarters" style="scroll-margin-top:110px"><div><strong>Hero headquarters</strong><p id="world-save" role="status">Choose your hero.</p></div><div><button type="button" data-world-hero="Whisker">Whisker</button> <button type="button" data-world-hero="Luna">Luna</button> <button type="button" id="world-daily">Claim daily coins</button></div></div>
-<p class="atlas-note">Tap a sign to visit a place in Pawtopia.</p>
-<div class="pawtopia-atlas" aria-label="Illustrated map of Pawtopia">
-<a class="atlas-sign" style="--x:17%;--y:45%" href="pawtopia-town.html" aria-label="Town Square. Visit the shops, bank, and daily activities">Town Square</a>
-<a class="atlas-sign" style="--x:50%;--y:45%" href="pawtopia-arcade.html" aria-label="Festival Arcade. Play six arcade games">Festival Arcade</a>
-<a class="atlas-sign" style="--x:83%;--y:45%" href="pawgrove.html" aria-label="Pawgrove. Investigate the Lantern Curse">Pawgrove</a>
-<a class="atlas-sign" style="--x:17%;--y:88%" href="super-paw-3d.html" aria-label="Crystal Catacombs. Explore the 3D adventure">Crystal Catacombs</a>
-<a class="atlas-sign" style="--x:50%;--y:88%" href="#coloring-book" aria-label="Coloring Book Shop. Browse books and try free pages">Coloring Book Shop</a>
-<a class="atlas-sign" style="--x:83%;--y:88%" href="#challenge" aria-label="Hero Training. Take the Hero Choice Challenge">Hero Training</a>
-<a class="atlas-sign" style="--x:22%;--y:16%" href="pawtopia-companions.html">Companion Cottage</a>
-<a class="atlas-sign" style="--x:78%;--y:16%" href="#crystal-regions">Crystal Regions</a>
-</div>
+<details class="paw-hub-classic"><summary>✨ More Pawtopia activities — classic games &amp; Crystal Badge</summary><div class="paw-hub-classic-content"><div class="world-profile" id="hero-headquarters" style="scroll-margin-top:110px"><div><strong>Hero headquarters</strong><p id="world-save" role="status">Choose your hero.</p></div><div><button type="button" data-world-hero="Whisker">Whisker</button> <button type="button" data-world-hero="Luna">Luna</button> <button type="button" id="world-daily">Claim daily coins</button></div></div>
+
 <h3>Games by location</h3>
 <div class="world-map" aria-label="Games by location">
 <div><strong>Town Square</strong><p><a href="pawtopia-arcade.html?game=courier">Town Square Courier</a></p></div>
@@ -177,7 +197,7 @@
 <div><strong>Crystal Catacombs</strong><p><a href="pawtopia-arcade.html?game=crystal">Crystal Echo</a></p><p><a href="pawtopia-arcade.html?game=beacons">Catacombs Beacons</a></p><p><a href="super-paw-3d.html">Crystal Catacombs 3D RPG</a></p></div>
 </div>
 <div class="world-profile"><div><strong>Companion Cottage</strong><p>Adopt a cat, earn Paw Coins in the arcade, and bring home a treat.</p></div><a class="btn" href="pawtopia-companions.html">Visit Companion Cottage</a></div>
-<div class="world-profile" id="pawtopia-shop"><div><strong>Town Shop</strong><p id="world-inventory">Collection: empty</p></div><button type="button" id="world-buy">Collect a Crystal Badge · 10 coins</button></div>
+<div class="world-profile" id="pawtopia-shop"><div><strong>Town Shop</strong><p id="world-inventory">Collection: empty</p></div><button type="button" id="world-buy">Collect a Crystal Badge · 10 coins</button></div></div></details>
 </section>
 <script>
 (() => {
