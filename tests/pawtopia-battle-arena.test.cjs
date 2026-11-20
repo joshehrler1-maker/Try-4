@@ -97,7 +97,7 @@ test('real match plays through multiple turns and pays one verified fictional re
   assert.ok(p.battleMatch.history.includes('Victory! '+last.rewards.join(' · ')));
   const after=clone(p);
   assert.equal(engine.takeTurn(p,'swipe',guaranteed).ok,false,'Finished fight cannot pay again');
-  assert.deepEqual(p,after,'Repeated win never adds more coins');
+  assert.equal(JSON.stringify(p),JSON.stringify(after),'Repeated win never adds more coins');
   assert.equal(before.bankCoins,p.bankCoins,'Never touches owner bank or external payouts');
   assert.equal(before.hero,p.hero,'Preserve user hero and adoption state');
 });
@@ -130,7 +130,7 @@ test('signature cooldown and once-per-battle ultimate are enforced',()=>{
   assert.equal(engine.moveList(p.companion,p.battleMatch)[2].ready,false);
   const snapshot=clone(p);
   assert.equal(engine.takeTurn(p,'signature',guaranteed).ok,false);
-  assert.deepEqual(p,snapshot);
+  assert.equal(JSON.stringify(p),JSON.stringify(snapshot));
   if(!p.battleMatch.finished)engine.takeTurn(p,'swipe',guaranteed);
   assert.equal(engine.moveList(p.companion,p.battleMatch)[2].ready,true);
   const another=fresh();another.companion.stats.level=10;another.companion.stats.endurance=20;
