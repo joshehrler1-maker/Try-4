@@ -126,3 +126,25 @@ test('storybook Explore provides one original illustrated interactive map and mo
   assert.ok(serviceWorker.includes('assets/pawtopia-storybook.css'));
   assert.ok(serviceWorker.includes('assets/pawtopia-adventure-map.svg'));
 });
+
+
+test('storybook theme is consistent across linked pet-world destinations', () => {
+  const shell = fs.readFileSync(path.join(root, 'assets/pawtopia-world-shell.css'), 'utf8');
+  assert.ok(shell.includes('body.cottage-art'));
+  assert.ok(shell.includes('body.arcade-art'));
+  assert.ok(shell.includes('body.pawtopia-town-world'));
+  for (const page of ['pawtopia-companions.html', 'pawtopia-town.html', 'pawtopia-arcade.html']) {
+    const html = fs.readFileSync(path.join(root, page), 'utf8');
+    assert.ok(html.includes('href="assets/pawtopia-world-shell.css"'), page + ' missing shared style');
+    assert.ok(html.includes('href="index.html#pawtopia"'), page + ' needs Explore navigation');
+  }
+  const town = fs.readFileSync(path.join(root, 'pawtopia-town.html'), 'utf8');
+  assert.ok(town.includes('<body class="pawtopia-town-world">'));
+  assert.ok(town.includes('id="shops"') && town.includes('id="quests"'));
+  const cottage = fs.readFileSync(path.join(root, 'pawtopia-companions.html'), 'utf8');
+  assert.ok(cottage.includes('id="adopt"') && cottage.includes('id="feed"'));
+  const arcade = fs.readFileSync(path.join(root, 'pawtopia-arcade.html'), 'utf8');
+  assert.ok(arcade.includes('id="game-search"') && arcade.includes('id="game-panel"'));
+  const worker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  assert.ok(worker.includes('assets/pawtopia-world-shell.css'));
+});
