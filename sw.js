@@ -23,6 +23,7 @@ FILES.push(
   'assets/animation/five-world-enemy-rigs-v1.js?v=material-five-9cc2586d',
   'assets/animation/origin-world-enemy-rigs-v1.js?v=material-origin-017babeb',
   'assets/pawcade-side-scroll-no-badges-v2.js?v=approved-opening-art-batch1',
+  'assets/pawcade-side-scroll-no-badges-v2.js?v=steamworks-parry-range',
   'assets/pawcade-side-scroll.css?v=landscape-controls-68386cd',
   'assets/platform-worlds.js', 'assets/game-fullscreen.css', 'assets/game-fullscreen.js',
   'assets/touch-joystick.css', 'assets/touch-joystick.js', 'assets/touch-joystick.js?v=pointer-stability-v1', 'assets/whisker-luna-master.webp',
