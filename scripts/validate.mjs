@@ -38,6 +38,19 @@ for (const file of fs.readdirSync(root).filter(f => /\.(html|js|json|webmanifest
   if (target) ok(known(target), `${file}: missing local link ${target}`);
  }
 }
+// Public discovery: ensure the sitemap stays accurate without exposing owner-only tools.
+const siteBase = 'https://joshehrler1-maker.github.io/Try-4/';
+const sitemapUrls = [...read('sitemap.xml').matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+ok(sitemapUrls.length >= 10, 'Sitemap must cover the main public destinations');
+ok(new Set(sitemapUrls).size === sitemapUrls.length, 'Sitemap URLs must be unique');
+for (const url of sitemapUrls) {
+ ok(url.startsWith(siteBase), 'Sitemap URL must use the published GitHub Pages origin and path');
+ const page = url.slice(siteBase.length);
+ ok(page === '' || known(page), 'Sitemap references a missing public page: ' + page);
+ ok(!/^(?:operations-center|readiness|studio)\.html$/.test(page), 'Do not promote owner-oriented tools in the public sitemap');
+}
+ok(read('robots.txt').includes('Sitemap: ' + siteBase + 'sitemap.xml'), 'robots.txt must advertise the current sitemap');
+
 const manifest = JSON.parse(read('manifest.webmanifest'));
 ok(manifest.scope === './' && manifest.start_url === './index.html', 'Manifest must stay within repository subpath');
 for (const icon of manifest.icons) ok(known(icon.src), 'Missing icon');
