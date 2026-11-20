@@ -25,6 +25,8 @@
   let visible = 24;
   let active = null;
   let dynamicProviders = new Set();
+  let snapshotLoaded = false;
+  let snapshotDate = '';
   const expectedHosts = {GameZipper:'gamezipper.com',PlayKovo:'playkovo.com'};
   function safeLink(provider, value) {
     try {
@@ -62,7 +64,7 @@
       description:String(row.shortDescription || row.description || '').slice(0,140)
     };
   }
-  function mergeResults(provider, rows) {
+  function mergeResults(provider, rows, isLive = true) {
     if (!Array.isArray(rows)) return;
     const normalized = rows.slice(0,1600).map(row=>normalize(provider,row)).filter(Boolean);
     if (!normalized.length) return;
@@ -74,7 +76,7 @@
       } else map.set(row.id,row);
     }
     games = [...map.values()];
-    dynamicProviders.add(provider);
+    if (isLive) dynamicProviders.add(provider);
     update();
   }
   const fmtProvider = p => p === 'GameZipper' ? 'GameZipper' : 'PlayKovo';
@@ -123,7 +125,7 @@
     const show=filtered.slice(0,visible);
     byId('cards').replaceChildren(...show.map(createCard));
     byId('more').hidden=filtered.length<=visible;
-    const source=dynamicProviders.size?'Live publisher feeds loaded: '+[...dynamicProviders].join(' and ')+'.':'Showing built-in starter games; publisher feeds may add more.';
+    const source=(snapshotLoaded ? 'Catalog snapshot checked '+snapshotDate+'. ' : 'Built-in starter games available. ') + (dynamicProviders.size ? 'Live feed updates: '+[...dynamicProviders].join(' and ')+'.' : 'Live feed updates not confirmed on this browser.');
     byId('count').textContent=filtered.length+' matching games · '+games.length+' currently available. '+source;
     if(!show.length)byId('cards').append(make('p','empty','No games match. Try another search or category.'));
   }
@@ -149,8 +151,7 @@
     frame.replaceChildren(iframe);
     byId('player-title').textContent=game.name;
     byId('game-publisher').textContent='Hosted by '+game.publisher+'. This game is not created by Super Paw Heroes.';
-    byId('open-provider').href=game.publisher==='PlayKovo'
-      ? 'https://playkovo.com/games/'+game.slug : link;
+    byId('open-provider').href=link;
     page.hidden=false;
     page.scrollIntoView({behavior:'smooth',block:'start'});
   }
@@ -191,8 +192,20 @@
       /* CORS, offline, feed unavailable: retain valid starter catalog and never invent game counts. */
     }finally{clearTimeout(stop);}
   }
-  Promise.allSettled([
-    loadProvider('GameZipper','https://gamezipper.com/api/games.json'),
-    loadProvider('PlayKovo','https://playkovo.com/api/embed-games?format=json')
-  ]);
+  async function loadLocalCatalog() {
+    try{
+      const response=await fetch('assets/guest-arcade-catalog.json',{credentials:'same-origin',cache:'default'});
+      if(!response.ok)return;
+      const data=await response.json();
+      if(!Array.isArray(data.games)||data.games.length<100)return;
+      snapshotLoaded=true;
+      snapshotDate=String(data.generatedAt||'').slice(0,10);
+      mergeResults('GameZipper',data.games.filter(row=>row.publisher==='GameZipper'),false);
+      mergeResults('PlayKovo',data.games.filter(row=>row.publisher==='PlayKovo'),false);
+    }catch{ /* Offline or snapshot unavailable: keep the 100 original verified entries. */ }
+  }
+  loadLocalCatalog();
+  /* GameZipper allows browser catalog requests (CORS: *). PlayKovo does not.
+     PlayKovo's approved feed metadata is kept in the static, dated snapshot above. */
+  loadProvider('GameZipper','https://gamezipper.com/api/games.json');
 })();
