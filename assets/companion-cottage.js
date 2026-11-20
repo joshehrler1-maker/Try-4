@@ -13,6 +13,9 @@
   const stats = save.battleStats();
   const trainingPrice = 5;
   const maxCats = 4;
+  const petBond = window.PawtopiaPetBond;
+  const bondPanel = byId('pet-bond-panel');
+  const bondButtons = [...document.querySelectorAll('[data-pet-bond]')];
   const active = byId('active-cat');
   const training = byId('training-stat');
   const train = byId('train-cat');
@@ -112,6 +115,7 @@
       return option;
     }));
     byId('care').hidden = !companion;
+    bondPanel.hidden = !companion;
     controls.food.disabled = !companion || coins < snackPrice;
     controls.toy.disabled = !companion || toy || coins < toyPrice;
     if (companion) {
@@ -132,6 +136,29 @@
       byId('happiness-label').textContent = happiness + '%';
       controls.feed.disabled = !food || fullness === 100;
       controls.play.disabled = happiness === 100;
+      const bonding = petBond.read(companion, save.today());
+      byId('pet-personality').textContent = bonding.temperament.name + ' personality · ' + bonding.temperament.description + ' Favorite: ' + petBond.activities[bonding.temperament.favorite].label.toLowerCase() + '.';
+      byId('pet-bond-title').textContent = bonding.title;
+      byId('pet-bond-progress').value = bonding.points;
+      byId('pet-bond-value').textContent = bonding.points + '/100 friendship';
+      byId('pet-bond-badges').textContent = bonding.badges.join(' · ');
+      bondButtons.forEach(button => {
+        const complete = bonding.done.includes(button.dataset.petBond);
+        button.disabled = complete;
+        button.setAttribute('aria-label', button.textContent.trim() + (complete ? ' — completed today' : ' — available today'));
+        button.setAttribute('aria-pressed', String(complete));
+      });
+      const memories = bonding.memories.map(entry => {
+        const li = document.createElement('li');
+        li.textContent = petBond.activities[entry.activity].label + ' · ' + entry.day;
+        return li;
+      });
+      if (!memories.length) {
+        const li = document.createElement('li');
+        li.textContent = 'Your first friendship memory is waiting.';
+        memories.push(li);
+      }
+      byId('pet-bond-memories').replaceChildren(...memories);
     }
     if (typeof message === 'string') byId('feedback').textContent = message;
   }
@@ -211,6 +238,10 @@
     Object.assign(cat, levels, { happiness: Math.min(100, levels.happiness + (progress.toy ? 25 : 10)), updatedAt: Date.now() });
     return 'You played with ' + cat.name + '.';
   }));
+  bondButtons.forEach(button => button.addEventListener('click', () => act(progress => {
+    const result = petBond.perform(progress.companion, button.dataset.petBond, save.today());
+    return result.message;
+  })));
   cape.addEventListener('click', () => act(progress => {
     if (!progress.companion || !progress.townCollection['Festival Cape']) return 'Adopt a companion and buy a Festival Cape first.';
     progress.capeEquipped = !progress.capeEquipped;
