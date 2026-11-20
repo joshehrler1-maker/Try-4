@@ -19,6 +19,8 @@ test('Guest Arcade uses original hero art, publisher credit, no paywall, and ded
   assert.ok(home.includes('href="guest-arcade.html"'));
   assert.ok(arcade.includes('href="guest-arcade.html"'));
   assert.ok(get('sw.js').includes('guest-arcade.html') && get('sw.js').includes('assets/guest-arcade.js'));
+  assert.ok(get('sw.js').includes('assets/guest-arcade-catalog.json'));
+
 });
 test('100 actual starter entries are unique publisher-listed embed slugs',()=>{
   const block=script.match(/const sourceGroups = \{([\s\S]*?)\n  \};/);
@@ -38,7 +40,17 @@ test('100 actual starter entries are unique publisher-listed embed slugs',()=>{
 });
 test('Remote catalogs are allowlisted and click-to-play, not copied into the site',()=>{
   assert.ok(script.includes('https://gamezipper.com/api/games.json'));
-  assert.ok(script.includes('https://playkovo.com/api/embed-games?format=json'));
+  assert.ok(script.includes('assets/guest-arcade-catalog.json'), 'The verified local catalog must load first');
+  const snapshot = JSON.parse(get('assets/guest-arcade-catalog.json'));
+  assert.ok(snapshot.games.length >= 600, 'Hundreds of verified publisher listings must be present');
+  assert.equal(snapshot.count,snapshot.games.length);
+  assert.equal(new Set(snapshot.games.map(game=>game.publisher+':'+game.slug)).size,snapshot.games.length);
+  for(const game of snapshot.games){
+    assert.ok(['GameZipper','PlayKovo'].includes(game.publisher));
+    assert.ok(/^[a-z0-9-]{2,100}$/.test(game.slug));
+    const prefix=game.publisher==='GameZipper' ? 'https://gamezipper.com/' : 'https://playkovo.com/embed/';
+    assert.ok(game.url.startsWith(prefix), 'Only approved publisher hosts may be embedded');
+  }
   assert.ok(script.includes("GameZipper:'gamezipper.com',PlayKovo:'playkovo.com'"));
   assert.ok(script.includes('function safeLink('));
   assert.ok(script.includes('iframe.src=url.toString()'));
