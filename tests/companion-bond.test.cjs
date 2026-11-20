@@ -84,6 +84,10 @@ test('Companion Cottage integrates the journal with existing local save and acce
     assert.ok(html.includes('id="'+id+'"'),id);
   }
   assert.ok(html.includes('src="assets/pawtopia-pet-bond.js"'));
+  assert.ok(html.includes('id="pet-album"'));
+  assert.ok(html.includes('id="pet-album-cards"'));
+  assert.ok(cottage.includes("byId('pet-album-cards').replaceChildren"));
+  assert.ok(cottage.includes('allCats.map((cat, index) =>'));
   assert.ok(html.indexOf('assets/pawtopia-pet-bond.js') < html.indexOf('assets/companion-cottage.js'));
   for(const action of ['brush','story','explore']) assert.ok(html.includes('data-pet-bond="'+action+'"'));
   assert.ok(cottage.includes('petBond.perform(progress.companion'));
