@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://joshehrler1-maker.github.io/Try-4/sitemap.xml
