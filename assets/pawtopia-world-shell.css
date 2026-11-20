@@ -1,0 +1,125 @@
+/* Original storybook shell for Pawtopia's pet, arcade and town pages.
+   Decorative CSS only. Existing games, controls and saved progress remain unchanged. */
+body.cottage-art,body.arcade-art,body.pawtopia-town-world{
+ --storybook-ink:#365466;--storybook-paper:#fffaf0;--storybook-yellow:#ffdf9a;
+ color:var(--storybook-ink);
+ background-color:#d2eee6;
+ background-image:linear-gradient(180deg,#c9f3f5a1,#f3ebdcd9 68%,#b9e5d9);
+ background-attachment:fixed;
+}
+body.cottage-art a,body.arcade-art a,body.pawtopia-town-world a{color:#326c86}
+body.cottage-art a:focus-visible,body.arcade-art a:focus-visible,body.pawtopia-town-world a:focus-visible,
+body.cottage-art button:focus-visible,body.arcade-art button:focus-visible,body.pawtopia-town-world button:focus-visible{outline:3px solid #de8556;outline-offset:3px}
+body.cottage-art .paw-world-nav,body.arcade-art .paw-world-nav,body.pawtopia-town-world .paw-world-nav{
+ display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;max-width:none;width:100%;
+ background:linear-gradient(#fff0b9,#f6d088);border:3px solid #c08e5e;border-radius:1.1rem;
+ padding:.5rem;box-shadow:0 5px 0 #cb9a6b,0 10px 18px #357b8a50
+}
+body.cottage-art .paw-world-nav a,body.arcade-art .paw-world-nav a,body.pawtopia-town-world .paw-world-nav a{
+ min-height:43px;padding:.48rem .75rem;background:#fff8e8;border:1px solid #e1bd91;
+ border-radius:.7rem;color:#4a5b68;text-decoration:none;font-size:.85rem;font-weight:800
+}
+body.cottage-art .paw-world-nav a[aria-current],body.arcade-art .paw-world-nav a[aria-current],body.pawtopia-town-world .paw-world-nav a[aria-current],
+body.cottage-art .paw-world-nav a:hover,body.arcade-art .paw-world-nav a:hover,body.pawtopia-town-world .paw-world-nav a:hover{
+ color:#fff;background:#4d9098;text-decoration:none
+}
+body.cottage-art header.top,body.arcade-art header.arcade-header,body.pawtopia-town-world>header{
+ border:3px solid #fff8e2;border-radius:1rem;background:linear-gradient(#fff7d9,#f9d996);
+ box-shadow:0 6px 0 #d3a675;min-height:70px;margin-top:1rem;padding:1rem; color:#38576d
+}
+body.cottage-art header.top a,body.arcade-art header.arcade-header a,body.pawtopia-town-world>header a{color:#436476;font-weight:900}
+body.cottage-art header.top nav a,body.arcade-art header.arcade-header nav a{padding:.5rem .7rem;background:#fff9e9;border-radius:.7rem;border:1px solid #e8caa0}
+body.cottage-art .hero,body.arcade-art .hero{
+ border:4px solid #fffaf0;border-radius:1.65rem;
+ box-shadow:0 7px 0 #9ccab8,0 15px 26px #2f6f7a66;
+ overflow:hidden
+}
+body.cottage-art .hero{
+ background:linear-gradient(120deg,#fff3db,#d5ecdf);
+ color:#35586a
+}
+body.cottage-art .hero .location{color:#8c6272}
+body.cottage-art .hero h1{font-family:Georgia,serif;color:#4e6474}
+body.cottage-art .hero img{border-left:4px solid #fff5df}
+body.cottage-art .wallet{color:#4b6a79;font-weight:850}
+body.cottage-art .panel{
+ color:#3e5969;border:3px solid #fff9e7;border-radius:1.35rem;
+ background:linear-gradient(145deg,#fff8eb,#f5f9e6);
+ box-shadow:0 7px 0 #abcbb9,0 12px 18px #527e7554
+}
+body.cottage-art .panel h2,body.cottage-art .panel h3,body.cottage-art .panel h4{font-family:Georgia,serif;color:#4b6675}
+body.cottage-art .panel button,body.cottage-art .button{
+ border:2px solid #b8895e;border-radius:.8rem;background:linear-gradient(#ffefba,#ffce78);
+ color:#584456;font-weight:850;box-shadow:0 3px 0 #b78c65;cursor:pointer
+}
+body.cottage-art .panel button:disabled{opacity:.58;cursor:not-allowed}
+body.cottage-art input,body.cottage-art select{
+ color:#354b5c;background:#fffefa;border:2px solid #a7b8a8;border-radius:.7rem;padding:.48rem
+}
+body.cottage-art #breed-options label{
+ padding:.4rem .2rem;background:#fffaf0;border:2px solid #d8d8c1;border-radius:.8rem
+}
+body.cottage-art #breed-options label:has(input:checked){background:#d9f6e7;border-color:#84c5b2}
+body.cottage-art #cat-portrait,body.cottage-art .breed-portrait{border:2px solid #fff9df;box-shadow:0 4px 10px #4e6d6e5b}
+body.cottage-art .hint,body.cottage-art #feedback{color:#547580}
+body.cottage-art .paw-map{border:4px solid #fff9e5;border-radius:1.3rem;box-shadow:0 8px 0 #a8bfb1,0 12px 18px #4c737860}
+body.pawtopia-town-world>header{margin:1rem auto;width:min(100% - 2rem,74rem)}
+body.pawtopia-town-world .layout{max-width:76rem}
+body.pawtopia-town-world .layout>nav{
+ background:#fff4d2;border:3px solid #dbb787;border-radius:1.1rem;
+ box-shadow:0 6px 0 #c7a275;overflow:hidden
+}
+body.pawtopia-town-world .layout>nav a{border-bottom:1px solid #ead2a5;color:#4a596c}
+body.pawtopia-town-world .layout>nav a:hover{background:#e6f7e6}
+body.pawtopia-town-world .banner{
+ min-height:13rem;border:4px solid #fff7e7;border-radius:1.4rem;
+ background:linear-gradient(0deg,#2e627dcc,#2f6d9d2b),url("scenes/pawtopia.webp") center/cover no-repeat;
+ box-shadow:0 7px 0 #8ac1b2,0 12px 19px #4d807659
+}
+body.pawtopia-town-world .banner h1{font-family:Georgia,serif;color:#fff6d7;text-shadow:2px 3px 0 #2e6170}
+body.pawtopia-town-world section{
+ border:3px solid #fff9e8;border-radius:1.15rem;background:#fff9ec;
+ box-shadow:0 5px 0 #bbd7c7
+}
+body.pawtopia-town-world section h2{font:800 1.5rem Georgia,serif;color:#476376}
+body.pawtopia-town-world .town-map{border:4px solid #fff8e3;border-radius:1.2rem;box-shadow:0 5px 0 #a7c3af}
+body.pawtopia-town-world button{
+ border:2px solid #af855a;background:linear-gradient(#ffeab1,#f7cb83);
+ color:#584451;border-radius:.7rem;font-weight:850
+}
+body.pawtopia-town-world #feedback{background:#f7eedd;color:#48666b;border-radius:.6rem}
+body.arcade-art header.arcade-header{width:min(100% - 2rem,64rem)}
+body.arcade-art .hero{
+ color:#fffef1;
+ background:linear-gradient(0deg,#274b67ed,#317e997c 65%,#9bd3f566),url("whisker-luna-master.png") center 22%/cover no-repeat
+}
+body.arcade-art .hero h1{font-family:Georgia,serif;color:#fff8d2;text-shadow:2px 3px 0 #315c7c}
+body.arcade-art .game-directory{
+ border:3px solid #fff9eb;border-radius:1.3rem;
+ color:#435c70;background:linear-gradient(120deg,#fff9ed,#e9f8ea);
+ box-shadow:0 6px 0 #add5c3
+}
+body.arcade-art .game-directory h2{color:#435e73;font-family:Georgia,serif}
+body.arcade-art .game-directory input,body.arcade-art .game-directory select{
+ background:#fff;color:#39536b;border:2px solid #a5c4b6
+}
+body.arcade-art .game-directory a{color:#386d81}
+body.arcade-art .game-directory button{color:#fff;background:#57729d}
+body.arcade-art .play{color:#fff;border:3px solid #b9bedf;box-shadow:0 7px 0 #759aa6}
+body.arcade-art .games button{border:2px solid #b6a5d5;box-shadow:0 3px 0 #655a8e}
+body.arcade-art .sponsor{color:#4f6573;background:#fff5e9;border-color:#fff}
+body.arcade-art footer{color:#4e6573}
+@media(max-width:750px){
+ body.cottage-art .paw-world-nav,body.arcade-art .paw-world-nav,body.pawtopia-town-world .paw-world-nav{
+  overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start
+ }
+ body.cottage-art .paw-world-nav a,body.arcade-art .paw-world-nav a,body.pawtopia-town-world .paw-world-nav a{white-space:nowrap;flex:0 0 auto}
+ body.pawtopia-town-world .layout>nav{display:flex;flex-wrap:wrap}
+ body.pawtopia-town-world .layout>nav a{padding:.35rem .55rem;font-size:.85rem}
+}
+@media(max-width:560px){
+ body.cottage-art .panels{grid-template-columns:1fr}
+ body.cottage-art header.top,body.arcade-art header.arcade-header{flex-wrap:wrap}
+ body.pawtopia-town-world .layout{padding:.65rem}
+}
+@media(prefers-reduced-motion:reduce){body.cottage-art *,body.arcade-art *,body.pawtopia-town-world *{scroll-behavior:auto}}
