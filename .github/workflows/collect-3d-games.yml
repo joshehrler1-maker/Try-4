@@ -1,0 +1,20 @@
+name: Verify 3D guest game listings
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/collect-3d-games.yml'
+permissions:
+  contents: read
+jobs:
+  gather:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Read safe 3D publisher metadata (no games downloaded)
+        run: node scripts/collect-3d-catalog.mjs
