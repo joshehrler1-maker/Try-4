@@ -1,0 +1,64 @@
+/* Pawtopia Explore - original art, no paid dependencies */
+#pawtopia .paw-hub{margin:1rem auto 1.5rem;max-width:76rem;color:#fff5eb}
+#pawtopia .paw-hub *{box-sizing:border-box}
+#pawtopia .paw-hub h3,#pawtopia .paw-hub h4{font-family:Georgia,serif;line-height:1.15}
+#pawtopia .paw-hub h3{font-size:clamp(2rem,5vw,4rem);margin:.55rem 0;color:#fff4d0;text-shadow:0 3px 10px #0b1339aa}
+#pawtopia .paw-hub h4{font-size:clamp(1.3rem,2.6vw,1.85rem);margin:0 0 .65rem;color:#fff0d0}
+#pawtopia .paw-hub a,#pawtopia .paw-hub button{transition:transform .2s,filter .2s}
+#pawtopia .paw-hub a:hover,#pawtopia .paw-hub button:not(:disabled):hover{transform:translateY(-3px);filter:brightness(1.08)}
+#pawtopia .paw-hub a:focus-visible,#pawtopia .paw-hub button:focus-visible{outline:3px solid #fff4a4;outline-offset:3px}
+#pawtopia .paw-hub-intro{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(130px,.7fr);gap:1rem;align-items:center;min-height:270px;padding:clamp(1.2rem,4vw,2.5rem);border:2px solid #f0d48f;border-radius:1.65rem;overflow:hidden;background:radial-gradient(ellipse at 80% 24%,#9669cbb0,transparent 49%),linear-gradient(125deg,#39265c,#254c7a 58%,#1c7271);box-shadow:0 13px 35px #050c2c91}
+#pawtopia .paw-hub-intro p{font-size:clamp(.98rem,1.9vw,1.11rem);line-height:1.5;color:#f2eaff;max-width:38rem;margin:.65rem 0 1.1rem}
+#pawtopia .paw-hub-intro img{display:block;justify-self:center;width:min(100%,310px);max-height:305px;height:auto;object-fit:contain;filter:drop-shadow(0 12px 20px #0b1533a0)}
+#pawtopia .paw-hub-eyebrow{display:inline-block;padding:.36rem .78rem;margin:0!important;border-radius:99px;background:#ffe6ad;color:#312246!important;font-weight:900;font-size:.74rem!important;letter-spacing:.08em;text-transform:uppercase}
+#pawtopia .paw-hub-actions,#pawtopia .paw-hub-controls{display:flex;flex-wrap:wrap;gap:.6rem}
+#pawtopia .paw-hub-cta{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:.72rem 1.1rem;border:2px solid #f9cd83;border-radius:.85rem;background:#ffe5ab;color:#302040;text-decoration:none;font-weight:850;box-shadow:0 4px 0 #674976}
+#pawtopia .paw-hub-cta.alt{background:#235674;color:#fff;border-color:#a2ecfa}
+#pawtopia .paw-hub-progress{margin-top:1.1rem;max-width:350px}
+#pawtopia .paw-hub-progress label{display:block;margin-bottom:.35rem;font-size:.88rem;font-weight:750}
+#pawtopia .paw-hub-progress progress{display:block;width:100%;height:.85rem;accent-color:#ffe18c}
+#pawtopia .paw-hub-progress small{display:block;margin-top:.3rem;color:#e6dfff}
+#pawtopia .paw-hub-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin:1rem 0}
+#pawtopia .paw-hub-stat{display:flex;align-items:center;gap:.75rem;min-width:0;padding:.85rem 1rem;border:1px solid #b2a0db;border-radius:1rem;background:linear-gradient(125deg,#33295f,#174066)}
+#pawtopia .paw-hub-stat .symbol{font-size:1.85rem}
+#pawtopia .paw-hub-stat strong{display:block;font-size:clamp(.95rem,2vw,1.15rem);overflow-wrap:anywhere}
+#pawtopia .paw-hub-stat small{display:block;color:#deddf7;font-size:.75rem}
+#pawtopia .paw-hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:1rem 0}
+#pawtopia .paw-hub-panel{padding:clamp(1rem,3vw,1.5rem);border:2px solid #ab92d5;border-radius:1.4rem;background:linear-gradient(135deg,#2b2558,#14345b);box-shadow:0 8px 19px #070d296c}
+#pawtopia .paw-hub-panel p{line-height:1.48;color:#edeaff;margin:.55rem 0}
+#pawtopia .paw-hub-pet-layout{display:grid;grid-template-columns:minmax(100px,37%) 1fr;gap:1rem;align-items:center}
+#pawtopia .paw-hub-portrait{width:100%;aspect-ratio:1;object-fit:cover;border:3px solid #ffdfad;border-radius:1.1rem;background:#977aa9;box-shadow:0 7px 16px #040a2d80}
+#pawtopia .paw-hub-portrait[hidden]{display:none}
+#pawtopia .paw-hub-pet-name{display:block;color:#ffe5a8;font-size:1.13rem;font-weight:850}
+#pawtopia .paw-hub-meter{display:grid;grid-template-columns:1fr auto;gap:.15rem .4rem;margin:.5rem 0}
+#pawtopia .paw-hub-meter label,#pawtopia .paw-hub-meter output{font-size:.83rem;color:#f1ebff}
+#pawtopia .paw-hub-meter output{font-weight:850;color:#ffe6a4}
+#pawtopia .paw-hub-meter meter{grid-column:1/-1;width:100%;height:1.05rem}
+#pawtopia .paw-hub-controls{margin:.85rem 0}
+#pawtopia .paw-hub-controls button,#pawtopia .paw-hub-chests button,#pawtopia .paw-hub-picker button{min-height:46px;border:2px solid #ebc886;border-radius:.8rem;padding:.7rem .85rem;background:#ffe5af;color:#352244;font:inherit;font-weight:850;cursor:pointer}
+#pawtopia .paw-hub-controls button:disabled,#pawtopia .paw-hub-chests button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+#pawtopia .paw-hub-feedback{min-height:1.5rem;color:#ffe6a4!important;font-size:.9rem}
+#pawtopia .paw-hub-picker{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:.8rem 0}
+#pawtopia .paw-hub-picker button[aria-pressed=true]{background:#b5ebd0;border-color:#e2ffdc}
+#pawtopia .paw-hub-chests{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin:1rem 0}
+#pawtopia .paw-hub-chests button{display:grid;justify-items:center;gap:.15rem;background:#705292;color:#fff3e6;border-color:#bb9edb;box-shadow:0 4px 0 #352454}
+#pawtopia .paw-hub-chests button span{font-size:2rem}
+#pawtopia .paw-hub-chests button[aria-pressed=true]{background:#a1efd6;color:#174743;border-color:#dbffee}
+#pawtopia .paw-hub-note{font-size:.83rem;color:#dcdaf2!important}
+#pawtopia .paw-hub-world{margin:1.4rem auto .4rem}
+#pawtopia .paw-hub-world>p{color:#e1e7fb}
+#pawtopia .paw-hub-destinations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem;margin-top:1rem}
+#pawtopia .paw-hub-place{position:relative;display:block;overflow:hidden;border:2px solid #a2bbdf;border-radius:1.15rem;background:#223356;color:#fff9e9;text-decoration:none;box-shadow:0 7px 16px #060f2c79}
+#pawtopia .paw-hub-place img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;transition:transform .23s}
+#pawtopia .paw-hub-place:hover img{transform:scale(1.04)}
+#pawtopia .paw-hub-place-text{display:block;padding:.8rem 1rem 1.05rem;background:linear-gradient(120deg,#292c5d,#332954)}
+#pawtopia .paw-hub-place-text strong{display:block;color:#ffe5ac;font-size:1.07rem}
+#pawtopia .paw-hub-place-text small{display:block;margin-top:.22rem;color:#e5e9ff;line-height:1.42}
+#pawtopia .paw-hub-tag{position:absolute;top:.65rem;left:.65rem;padding:.28rem .6rem;border-radius:99px;background:#ffedb2;color:#352040;font-size:.74rem;font-weight:900;box-shadow:0 2px 5px #08122595}
+#pawtopia .paw-hub-trail{margin:1rem 0;border:1px solid #a995c9;border-radius:1rem;background:#241d48;padding:1rem 1.2rem}
+#pawtopia .paw-hub-trail>summary{min-height:44px;align-content:center;color:#ffe8b6;font-weight:850;font-size:1.08rem;cursor:pointer}
+#pawtopia .paw-hub-trail>div{margin-top:1rem}
+@media(max-width:760px){#pawtopia .paw-hub-destinations{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:660px){#pawtopia .paw-hub-intro{grid-template-columns:minmax(0,1fr) 120px;min-height:220px;padding:1rem}#pawtopia .paw-hub-intro img{max-height:175px}#pawtopia .paw-hub h3{font-size:2.1rem}#pawtopia .paw-hub-grid{grid-template-columns:1fr}#pawtopia .paw-hub-stats{gap:.4rem}}
+@media(max-width:430px){#pawtopia .paw-hub-intro{grid-template-columns:1fr}#pawtopia .paw-hub-intro img{display:none}#pawtopia .paw-hub-destinations{grid-template-columns:1fr}#pawtopia .paw-hub-stat{padding:.65rem .4rem;gap:.3rem;flex-direction:column;text-align:center}#pawtopia .paw-hub-stat .symbol{font-size:1.45rem}}
+@media(prefers-reduced-motion:reduce){#pawtopia .paw-hub a,#pawtopia .paw-hub button,#pawtopia .paw-hub-place img{transition:none}}
