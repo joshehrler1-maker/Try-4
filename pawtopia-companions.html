@@ -7,6 +7,7 @@
 <title>Companion Cottage | Super Paw Heroes</title>
 <link rel="stylesheet" href="assets/companion-cottage.css">
 <script defer src="assets/pawtopia-save.js"></script>
+<script defer src="assets/pawtopia-pet-bond.js"></script>
 <script defer src="assets/companion-cottage.js"></script>
 <link rel="stylesheet" href="assets/pawtopia-scenes.css">
 <link rel="stylesheet" href="assets/pawtopia-explore.css">
@@ -57,6 +58,22 @@
         <p><label for="fullness">Fullness</label> <output id="fullness-label"></output><meter id="fullness" min="0" max="100"></meter></p>
         <p><label for="happiness">Happiness</label> <output id="happiness-label"></output><meter id="happiness" min="0" max="100"></meter></p>
         <div class="controls"><button id="feed" type="button">Feed a snack</button><button id="play" type="button">Play with your cat</button></div>
+        <section class="pet-bond" id="pet-bond-panel" aria-labelledby="pet-bond-heading" hidden>
+          <h4 id="pet-bond-heading">Friendship &amp; Memory Journal</h4>
+          <p id="pet-personality"></p>
+          <p><strong id="pet-bond-title">New Friend</strong> · <output id="pet-bond-value">0/100 friendship</output></p>
+          <meter id="pet-bond-progress" min="0" max="100" value="0" aria-label="Companion friendship"></meter>
+          <p class="hint">Enjoy free activities with your cat. Each can be done once a day; skipping a day never costs you progress.</p>
+          <div class="controls pet-bond-actions">
+            <button type="button" data-pet-bond="brush">🪮 Brush fur</button>
+            <button type="button" data-pet-bond="story">📖 Read a story</button>
+            <button type="button" data-pet-bond="explore">🐾 Explore together</button>
+          </div>
+          <p><strong>Friendship memories:</strong> <span id="pet-bond-badges"></span></p>
+          <h5>Recent moments together</h5>
+          <ol id="pet-bond-memories"></ol>
+          <p class="hint">Memories are saved privately in this browser with your other Pawtopia progress.</p>
+        </section>
       </div>
     </section>
     <section class="panel" aria-labelledby="shop-title">
