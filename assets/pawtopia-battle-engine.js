@@ -68,7 +68,7 @@
     progress.battleMatch={
       petId:cat.battleId,foeId:foe.id,hp:maxHp(cat),foeHp:foe.hp,
       round:1,guard:0,dodge:0,foeSlow:0,ultimateUsed:false,
-      signatureReadyAt:0,finished:false,result:'',lastMove:''
+      signatureReadyAt:0,finished:false,result:'',lastMove:'',history:['A new battle begins!']
     };
     return {ok:true,message:cat.name+' challenges '+foe.name+'! Choose a move and watch the fight.'};
   }
@@ -108,6 +108,7 @@
     if (!view || view.match.finished)return {ok:false,message:'There is no active match to forfeit.'};
     ensure(view.cat).battle.losses++;
     view.match.finished=true;view.match.result='forfeit';
+    view.match.history=[...(Array.isArray(view.match.history)?view.match.history:[]),'Match forfeited without a penalty.'].slice(-24);
     return {ok:true,message:'Match ended. No coins or XP were lost.'};
   }
   function takeTurn(progress,moveId,random=Math.random) {
@@ -131,7 +132,8 @@
       let damage=moveId==='swipe'?3+s.strength+Math.floor(level(cat)/3):
         moveId==='signature'?5+s.strength+s.intelligence+Math.floor(level(cat)/2):
         10+s.strength*2+s.intelligence+level(cat);
-      damage=clamp(damage-Math.floor(foe.defence/2),1,450);
+      damage=clamp(damage-Math.floor(foe.defence/2)-(safe(match.foeGuard)||0),1,450);
+      match.foeGuard=0;
       let detail='';
       if(moveId==='signature'||moveId==='ultimate'){
         const bonus=kit.theme.bonus;
@@ -172,16 +174,19 @@
     const petFirst=moveId==='guard'||s.movement+level(cat)/4+rand()*3 >= foe.speed+foe.level/4+rand()*3;
     if(petFirst){petAttack();enemyAttack();}else{enemyAttack();if(match.hp>0)petAttack();}
     match.lastMove=moveId;
+    match.history=[...(Array.isArray(match.history)?match.history:[]),...events.map(e=>e.name+(e.damage?' dealt '+e.damage+' damage':'')+(e.detail?' · '+e.detail:''))].slice(-24);
     match.round++;
     let rewards=[];
     if(match.foeHp<=0){
       match.finished=true;match.result='win';
       rewards=grantVictory(progress,cat,foe);
       events.push({who:'system',name:'Victory!',target:'none',damage:0,remaining:0,fx:'victory',detail:rewards.join(' · ')});
+      match.history.push('Victory! '+rewards.join(' · '));match.history=match.history.slice(-24);
     } else if(match.hp<=0){
       match.finished=true;match.result='loss';
       ensure(cat).battle.losses++;
       events.push({who:'system',name:'Practice Complete',target:'none',damage:0,remaining:0,fx:'defeat',detail:'Try training or challenging a weaker foe. No coins lost.'});
+      match.history.push('Defeat. Try training or a weaker foe; no coins lost.');match.history=match.history.slice(-24);
     }
     return {ok:true,message:match.finished
       ?(match.result==='win'?'Victory! '+rewards.join(' · '):'The challenger won. Your cat is safe and can try again.')
