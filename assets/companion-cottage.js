@@ -14,6 +14,9 @@
   const trainingPrice = 5;
   const maxCats = 4;
   const petBond = window.PawtopiaPetBond;
+  const scout = window.PawtopiaScout;
+  const scoutChoice = byId('cottage-scout-accessory');
+  const scoutEquip = byId('cottage-scout-equip');
   const bondPanel = byId('pet-bond-panel');
   const bondButtons = [...document.querySelectorAll('[data-pet-bond]')];
   const active = byId('active-cat');
@@ -106,6 +109,8 @@
       portrait.className = 'pet-album-portrait';
       portrait.setAttribute('role', 'img');
       paintPortrait(portrait, cat.breed || 'Maine Coon');
+      const keepsake = scout.accessoryFor(cat);
+      portrait.setAttribute('data-scout-icon', keepsake ? keepsake.icon : '');
       portrait.setAttribute('aria-label', (cat.breed || 'Cat') + ' portrait');
       const details = document.createElement('div');
       const heading = document.createElement('h3');
@@ -119,7 +124,10 @@
       memory.textContent = bonding.memories[0]
         ? 'Last memory: ' + petBond.activities[bonding.memories[0].activity].label
         : 'First memory waiting';
-      details.append(heading, breed, friendship, memory);
+      const scoutInfo = document.createElement('p');
+      const stampCount = scout.read({ companion: cat }, save.today()).stamps.length;
+      scoutInfo.textContent = stampCount + ' of 4 trail stamps · ' + (keepsake ? keepsake.name : 'Everyday look');
+      details.append(heading, breed, friendship, memory, scoutInfo);
       card.append(portrait, details);
       return card;
     });
@@ -129,6 +137,21 @@
       albumCards.push(empty);
     }
     byId('pet-album-cards').replaceChildren(...albumCards);
+    const stamps = scout.read({ companion }, save.today()).stamps;
+    byId('cottage-scout-stamps').textContent = stamps.length + ' of 4 trail stamps found by this cat';
+    const selectedStyle = scout.accessoryFor(companion);
+    byId('cottage-scout-current').textContent = 'Wearing: ' + (selectedStyle ? selectedStyle.icon + ' ' + selectedStyle.name : 'Everyday look');
+    scoutEquip.disabled = !companion;
+    const styles = [{ id: 'none', name: 'Everyday look' }, ...scout.areas
+      .filter(area => stamps.includes(area.id)).map(area => area.accessory)];
+    scoutChoice.replaceChildren(...styles.map(style => {
+      const option = document.createElement('option');
+      option.value = style.id;
+      option.textContent = (style.icon ? style.icon + ' ' : '') + style.name;
+      return option;
+    }));
+    scoutChoice.disabled = !companion;
+    scoutChoice.value = selectedStyle ? selectedStyle.id : 'none';
     cape.disabled = !companion || !townCollection['Festival Cape'];
     cape.textContent = capeEquipped ? 'Remove Festival Cape' : 'Equip Festival Cape';
     bed.disabled = !townCollection['Velvet Cat Bed'];
@@ -158,6 +181,8 @@
       if (companion.breed) {
         paintPortrait(image, companion.breed);
         image.setAttribute('aria-label', companion.breed + ' companion portrait');
+        const accessory = scout.accessoryFor(companion);
+        image.setAttribute('data-scout-icon', accessory ? accessory.icon : '');
       }
       const values = save.battleStats(companion);
       showStats(byId('companion-stats'), values);
@@ -274,6 +299,10 @@
     const result = petBond.perform(progress.companion, button.dataset.petBond, save.today());
     return result.message;
   })));
+  scoutEquip.addEventListener('click', () => {
+    const chosen = scoutChoice.value;
+    act(progress => scout.equip(progress, chosen).message);
+  });
   cape.addEventListener('click', () => act(progress => {
     if (!progress.companion || !progress.townCollection['Festival Cape']) return 'Adopt a companion and buy a Festival Cape first.';
     progress.capeEquipped = !progress.capeEquipped;
