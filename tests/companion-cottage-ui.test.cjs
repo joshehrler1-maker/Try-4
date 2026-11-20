@@ -87,6 +87,9 @@ function createCottage(seed = initial()) {
       preventDefault() {},
       currentTarget: {}
     });
+    // The DOM submit listener starts an async save without returning its promise.
+    // Wait through its microtask-render turn before asserting visual state.
+    await new Promise(resolve => setImmediate(resolve));
   };
   return { element, buttons, adopt, get: () => clone(progress), setDay: value => { day = value; } };
 }
