@@ -137,6 +137,8 @@ test('switching cats keeps their personality, friendship and journal independent
   assert.equal(page.get().otherCompanions.length, 1);
   page.element('active-cat').value = '1';
   await page.element('active-cat').listeners.change();
+  // The change handler also starts an async save without returning the promise.
+  await new Promise(resolve => setImmediate(resolve));
   assert.equal(page.get().companion.name, 'Snowflake');
   assert.equal(page.get().companion.bondPoints || 0, 0);
   assert.equal(page.get().otherCompanions[0].bondPoints, originalPoints);
