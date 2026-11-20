@@ -1,0 +1,198 @@
+/* Original Pawtopia storybook theme inspired by classic browser pet-world layout patterns.
+   All images belong to Try-4; no Neopets/MaraPets/trademarked art is used. */
+#pawtopia.content{
+ --paw-ink:#294453;--paw-pink:#f8a7a4;--paw-gold:#f4c66c;--paw-mint:#bde9b8;
+ width:calc(100% - clamp(1rem,3vw,2.5rem));max-width:1260px;margin:clamp(1rem,3vw,2rem) auto 2rem;
+ padding:clamp(1rem,3vw,2.25rem);isolation:isolate;
+ border:5px solid #fff4db;border-radius:2rem;
+ background:
+ radial-gradient(circle at 4% 11%,#fff6d4 0 7%,transparent 7.2%),
+ radial-gradient(circle at 93% 18%,#f9dbd280 0 6%,transparent 6.2%),
+ radial-gradient(circle at 17% 83%,#c2eada88 0 5%,transparent 5.2%),
+ repeating-linear-gradient(100deg,#fff9e9 0 28px,#fff5dd 29px 30px);
+ box-shadow:0 14px 0 #a98063,0 25px 48px #09162b9c;color:var(--paw-ink)
+}
+#pawtopia #pawtopia-heading{margin:0 0 .65rem;color:#344f56;font-family:Georgia,serif;font-size:clamp(2.2rem,6vw,4rem);text-shadow:2px 3px 0 #fff9df}
+#pawtopia .paw-world-nav{
+ position:sticky;top:72px;z-index:11;display:flex;justify-content:center;flex-wrap:wrap;gap:.4rem;
+ width:100%;max-width:none;padding:.5rem .65rem;margin:.55rem auto 1rem;
+ background:linear-gradient(180deg,#ffedab,#f4cb77);border:3px solid #b88754;border-radius:1.05rem;
+ box-shadow:0 5px 0 #cc955f,0 9px 19px #8c6d6057
+}
+#pawtopia .paw-world-nav a{
+ min-height:42px;padding:.5rem .8rem;border-radius:.7rem;background:#fff9eacc;
+ border:1px solid #d9b98c;color:#445367;box-shadow:0 2px 0 #c9a471;font-size:.87rem
+}
+#pawtopia .paw-world-nav a[aria-current],
+#pawtopia .paw-world-nav a:focus-visible,#pawtopia .paw-world-nav a:hover{
+ color:#fff;background:#4c8e9a;text-decoration:none;border-color:#2b6e79
+}
+#pawtopia .paw-hub{color:var(--paw-ink)}
+#pawtopia .paw-hub-intro{
+ position:relative;isolation:isolate;overflow:hidden;min-height:270px;
+ border:4px solid #fffdf0;border-radius:1.9rem;padding:clamp(1.25rem,4vw,2.6rem);
+ background:linear-gradient(95deg,#c3eff9ec 4%,#f8f3d8c7 66%,#fff1c16c),
+ url("scenes/pawtopia.webp") center 40%/cover no-repeat;
+ box-shadow:inset 0 0 0 3px #82d1c5,0 8px 0 #6aa79c,0 16px 30px #375e6480
+}
+#pawtopia .paw-hub-intro:before{
+ content:"";position:absolute;bottom:-80px;left:-10%;right:-8%;height:145px;pointer-events:none;z-index:-1;
+ background:radial-gradient(ellipse at 20% 20%,#b4e69a 0 43%,transparent 44%),
+ radial-gradient(ellipse at 76% 15%,#8ecf87 0 52%,transparent 53%);
+ opacity:.8
+}
+#pawtopia .paw-hub-intro h3{color:#30595b;text-shadow:2px 3px 0 #fffae7;font-size:clamp(2.45rem,5.7vw,4.8rem);max-width:14ch;letter-spacing:-.025em;line-height:1.05}
+#pawtopia .paw-hub-intro p{color:#244e55;font-size:clamp(1rem,2vw,1.22rem);font-weight:650;max-width:35rem;text-shadow:0 1px 1px #fff7db}
+#pawtopia .paw-hub-intro .paw-hub-eyebrow{
+ color:#563f5b!important;background:#fff9e9;border:2px solid #e8ac79;
+ box-shadow:0 4px 0 #d7aa79
+}
+#pawtopia .paw-hub-intro img{
+ width:min(100%,325px);max-height:325px;align-self:end;
+ filter:drop-shadow(0 13px 14px #266a7c88);
+ border-radius:1.15rem;
+ transform:rotate(2deg);border:3px solid #fff6df;background:#f3ddc995
+}
+#pawtopia .paw-hub-cta,#pawtopia .paw-hub-controls button,#pawtopia .paw-hub-picker button{
+ background:linear-gradient(#ffedba,#ffc76c);border:2px solid #b78350;
+ color:#4e354a;box-shadow:0 4px 0 #af8158;font-weight:900
+}
+#pawtopia .paw-hub-cta.alt{background:linear-gradient(#a8ebe2,#73bdc3);color:#234e56;border-color:#408e98;box-shadow:0 4px 0 #458a93}
+#pawtopia .paw-hub-cta:active,#pawtopia .paw-hub-controls button:not(:disabled):active{transform:translateY(2px);box-shadow:0 2px 0 #af8158}
+#pawtopia .paw-hub-progress label,#pawtopia .paw-hub-progress small{color:#325560}
+#pawtopia .paw-hub-progress progress{height:1rem;border:1px solid #aa9965;border-radius:30px;overflow:hidden;background:#fff8e5;accent-color:#6ab68a}
+#pawtopia .paw-hub-progress progress::-webkit-progress-bar{background:#fff8e5}
+#pawtopia .paw-hub-progress progress::-webkit-progress-value{background:#5dbca0;border-radius:30px}
+#pawtopia .paw-hub-stats{gap:.85rem;margin:1.45rem 0 1.15rem}
+#pawtopia .paw-hub-stat{
+ gap:.9rem;padding:.85rem 1.1rem;border:3px solid #fff9e6;border-radius:1.25rem;
+ background:linear-gradient(155deg,#ffebbb,#fff7db);color:#3b4c58;
+ box-shadow:0 5px 0 #e4b681,0 8px 16px #8a6c6c40
+}
+#pawtopia .paw-hub-stat:nth-child(2){background:linear-gradient(155deg,#e5fae2,#fff8e4);box-shadow:0 5px 0 #a0d3a9,0 8px 16px #6c9a8040}
+#pawtopia .paw-hub-stat:nth-child(3){background:linear-gradient(155deg,#e5e3ff,#fff8e4);box-shadow:0 5px 0 #b3a2df,0 8px 16px #8a6c9940}
+#pawtopia .paw-hub-stat small{color:#5f6472;font-weight:750}
+#pawtopia .paw-hub-stat strong{color:#365063;font-size:1.25rem}
+#pawtopia .paw-hub-world{margin:1.8rem auto 2rem}
+#pawtopia .paw-hub-world>h4{font-family:Georgia,serif;color:#4c5d65;text-align:center;font-size:clamp(1.6rem,4vw,2.45rem)}
+#pawtopia .paw-hub-world>p{text-align:center;color:#516171;font-size:1.04rem}
+#pawtopia .paw-hub-map-layout{
+ display:grid;grid-template-columns:minmax(0,1.85fr) minmax(220px,.76fr);
+ gap:1rem;align-items:stretch;margin:1.2rem 0 2rem
+}
+#pawtopia .paw-hub-map-main{
+ min-width:0;overflow:hidden;padding:clamp(.65rem,1.4vw,1rem);
+ border:4px solid #eac18e;border-radius:1.55rem;
+ background:#fff5d9;box-shadow:0 7px 0 #b78c65,0 11px 22px #765c5255
+}
+#pawtopia .paw-hub-map-caption{display:flex;justify-content:space-between;gap:.4rem;align-items:center;flex-wrap:wrap;padding:.3rem .4rem .8rem}
+#pawtopia .paw-hub-map-caption span{font-size:clamp(.84rem,1.5vw,1rem);color:#794d46;font-weight:950;letter-spacing:.085em}
+#pawtopia .paw-hub-map-caption small{color:#58707c;font-size:.78rem}
+#pawtopia .pawtopia-atlas{
+ position:relative;width:100%;max-width:none;aspect-ratio:3/2;
+ margin:0;border:4px solid #fdf0c4;border-radius:1.15rem;
+ background:#70c1d7 url("pawtopia-adventure-map.svg") center/100% 100% no-repeat;
+ box-shadow:inset 0 0 0 2px #4a9c9f,0 6px 15px #4d859180;overflow:hidden
+}
+#pawtopia .pawtopia-atlas .atlas-sign{
+ max-width:29%;min-height:39px;padding:.29rem .42rem;
+ border:2px solid #96633f;border-radius:.65rem;
+ background:linear-gradient(#fff6d4,#f6ce8b);color:#593f47;
+ font-size:clamp(.57rem,1.2vw,.87rem);line-height:1.14;font-weight:900;
+ box-shadow:0 3px 0 #a46a49,0 5px 10px #3c5d6f80;text-shadow:0 1px 0 #fff9e4;
+ transform:translate(-50%,-50%);text-decoration:none
+}
+#pawtopia .pawtopia-atlas .atlas-sign:hover,#pawtopia .pawtopia-atlas .atlas-sign:focus-visible{
+ color:#fff;background:#517a99;border-color:#fff5d7;z-index:3
+}
+#pawtopia .paw-hub-map-hint{text-align:center;font-size:.83rem;color:#54737c;margin:.8rem 0 .2rem}
+#pawtopia .paw-hub-map-side{
+ display:flex;flex-direction:column;align-items:flex-start;min-width:0;
+ border:4px solid #fff8e7;border-radius:1.55rem;padding:1.15rem;
+ background:linear-gradient(170deg,#fff2d6,#e6f7dc 58%,#bde7da);
+ box-shadow:0 7px 0 #a3c3ae,0 11px 22px #547e7b4a
+}
+#pawtopia .paw-hub-map-side img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:.8rem;border:3px solid #fff;box-shadow:0 4px 12px #8ca99a80;margin:.5rem 0}
+#pawtopia .paw-hub-map-side h5{font:850 clamp(1.3rem,2.5vw,1.8rem)/1.15 Georgia,serif;color:#43656d;margin:.55rem 0}
+#pawtopia .paw-hub-map-side p{color:#4a6569;font-size:.92rem;line-height:1.5}
+#pawtopia .paw-hub-badge{font-size:.72rem;letter-spacing:.09em;font-weight:900;color:#804b45;background:#ffe4b5;border:2px solid #e3ac81;border-radius:100px;padding:.35rem .65rem}
+#pawtopia .paw-hub-first-steps{margin:.3rem 0 1rem;padding-left:1.3rem;font-size:.88rem;line-height:1.55;color:#446a63}
+#pawtopia .paw-hub-first-steps li{margin:.3rem 0;padding:0}
+#pawtopia .paw-hub-first-steps a{color:#396e81;font-weight:800;text-decoration:underline;text-underline-offset:2px}
+#pawtopia .paw-hub-map-side .paw-hub-cta{width:100%;text-align:center;margin-top:auto;font-size:.86rem}
+#pawtopia .paw-hub-destinations{grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+#pawtopia .paw-hub-place{
+ border:4px solid #fff9e7;border-radius:1.3rem;background:#fff8ed;
+ box-shadow:0 7px 0 #b8c9bd,0 13px 18px #5879875c;overflow:hidden;color:#445465
+}
+#pawtopia .paw-hub-place:nth-child(2n){box-shadow:0 7px 0 #b3b3d4,0 13px 18px #5879875c}
+#pawtopia .paw-hub-place img{aspect-ratio:16/8.5;object-fit:cover}
+#pawtopia .paw-hub-place-text{padding:.85rem 1.05rem 1.1rem;background:linear-gradient(#fff9e8,#ffefdb)}
+#pawtopia .paw-hub-place-text strong{color:#415d65}
+#pawtopia .paw-hub-place-text small{color:#637079}
+#pawtopia .paw-hub-tag{color:#643c48;background:#ffe29c;border:2px solid #fff7eb;box-shadow:0 3px 7px #53314b65}
+#pawtopia .paw-hub-grid{gap:1.2rem;margin:1.4rem 0}
+#pawtopia .paw-hub-panel{
+ border:4px solid #fff9e9;border-radius:1.4rem;
+ background:linear-gradient(145deg,#fff5dd 0%,#f9f6e8 80%);
+ color:#3e5764;box-shadow:0 7px 0 #b5d5cd,0 12px 18px #688d8560
+}
+#pawtopia .paw-hub-panel:nth-child(2){background:linear-gradient(145deg,#f8edff 0%,#fff8e7 80%);box-shadow:0 7px 0 #cbb2da,0 12px 18px #88729e60}
+#pawtopia .paw-hub-panel h4{color:#52617a;border-bottom:2px dashed #d3bb9c;padding-bottom:.75rem}
+#pawtopia .paw-hub-panel p{color:#596371}
+#pawtopia .paw-hub-portrait{border:4px solid white;box-shadow:0 4px 0 #bb9d8d}
+#pawtopia .paw-hub-pet-name{color:#4b6284}
+#pawtopia .paw-hub-meter label,#pawtopia .paw-hub-meter output{color:#5d6371}
+#pawtopia .paw-hub-controls button:disabled,#pawtopia .paw-hub-chests button:disabled{color:#7e7989}
+#pawtopia .paw-hub-chests button{border:3px solid #fff2de;background:linear-gradient(#be9bdf,#8b7ab8);box-shadow:0 4px 0 #765f99;color:#fffdf0}
+#pawtopia .paw-hub-chests button[aria-pressed=true]{background:#8cd7be;color:#23574e}
+#pawtopia .paw-hub-feedback,#pawtopia .paw-hub-note{color:#526e73!important}
+#pawtopia .paw-hub-note{text-align:center;font-size:.82rem}
+#pawtopia .paw-hub-classic{
+ margin:1rem 0;border:2px dashed #bc9782;border-radius:1.15rem;padding:.7rem 1rem;
+ background:#fff8e8;color:#465b65
+}
+#pawtopia .paw-hub-classic>summary{min-height:44px;cursor:pointer;font-weight:850;color:#75545f;font-size:1rem;display:list-item;align-content:center}
+#pawtopia .paw-hub-classic-content{padding:.6rem .2rem}
+#pawtopia .paw-hub-classic .world-profile{color:#fff}
+#pawtopia .paw-hub-classic .world-map{grid-template-columns:repeat(2,minmax(0,1fr));background:#e1f1e7;color:#364d60;border-color:#bcb7a8}
+#pawtopia .paw-hub-classic .world-map>div{background:#fff8e8}
+#pawtopia .paw-hub-classic .world-map a{color:#fff}
+#pawtopia .paw-hub-classic .world-map>div a{color:#354e65;background:#ffefd7}
+#pawtopia .paw-hub-classic h3{color:#455968;margin:1rem 0}
+@media(max-width:970px){
+ #pawtopia .paw-hub-map-layout{grid-template-columns:1fr}
+ #pawtopia .paw-hub-map-side{display:grid;grid-template-columns:145px 1fr;gap:.5rem 1rem;align-items:center}
+ #pawtopia .paw-hub-map-side .paw-hub-badge{grid-column:1/-1;width:max-content}
+ #pawtopia .paw-hub-map-side img{grid-row:2/5}
+ #pawtopia .paw-hub-map-side .paw-hub-cta{grid-column:1/-1}
+ #pawtopia .paw-hub-first-steps{grid-column:2}
+}
+@media(max-width:750px){
+ #pawtopia .paw-hub-destinations{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #pawtopia .paw-world-nav{position:sticky;top:0;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
+ #pawtopia .paw-world-nav a{flex:0 0 auto;white-space:nowrap}
+ #pawtopia .paw-hub-intro img{max-height:230px}
+}
+@media(max-width:510px){
+ #pawtopia.content{width:calc(100% - 12px);padding:.75rem;border-width:3px;border-radius:1.1rem}
+ #pawtopia .paw-hub-intro{grid-template-columns:1fr;gap:.3rem}
+ #pawtopia .paw-hub-intro img{display:block!important;max-height:180px;width:auto;max-width:67%;justify-self:center;border-radius:.9rem;transform:rotate(1deg)}
+ #pawtopia .paw-hub-intro h3{font-size:clamp(2.1rem,10vw,3rem)}
+ #pawtopia .paw-hub-stats{gap:.35rem}
+ #pawtopia .paw-hub-stat{padding:.55rem .35rem;gap:.25rem}
+ #pawtopia .paw-hub-stat strong{font-size:.9rem}
+ #pawtopia .paw-hub-stat small{font-size:.66rem}
+ #pawtopia .paw-hub-map-main{padding:.4rem}
+ #pawtopia .paw-hub-map-caption small{font-size:.7rem}
+ #pawtopia .pawtopia-atlas{aspect-ratio:3/2;border-width:2px}
+ #pawtopia .pawtopia-atlas .atlas-sign{font-size:clamp(.51rem,2.15vw,.67rem);max-width:31%;min-height:36px;padding:.12rem .24rem;border-radius:.44rem}
+ #pawtopia .paw-hub-map-side{display:block}
+ #pawtopia .paw-hub-map-side img{max-height:170px}
+ #pawtopia .paw-hub-destinations{grid-template-columns:1fr}
+ #pawtopia .paw-hub-classic .world-map{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+ #pawtopia .paw-hub-intro img{transform:none}
+ #pawtopia .paw-hub-cta,#pawtopia .paw-hub-place img{transition:none}
+}
