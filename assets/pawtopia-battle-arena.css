@@ -1,0 +1,137 @@
+:root{color-scheme:dark;--ink:#f6efff;--muted:#c8d5ee;--gold:#f8dc9d;--teal:#80e9df;--line:#7b789e;font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);background:radial-gradient(ellipse at 15% 0,#35477a,#171b42 48%,#11152b 96%);overflow-x:hidden}
+a{color:var(--gold)}
+button,input,select{font:inherit}
+button,a,select{touch-action:manipulation}
+button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #b5faff;outline-offset:3px}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.55}
+.skip{position:absolute;z-index:50;left:12px;top:-100px;padding:10px;background:white;color:#1a2445}
+.skip:focus{top:12px}
+.site-top,main,footer{width:min(100% - 28px,1160px);margin:auto}
+.site-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:16px 0}
+.logo{font-weight:900;font-size:1.1rem}
+.site-top nav{display:flex;flex-wrap:wrap;gap:7px}
+.site-top nav a{border-radius:12px;text-decoration:none;background:#2e3865;padding:11px 12px;min-height:44px;font-size:.9rem;font-weight:750}
+.site-top nav a:hover,.secondary-link:hover{background:#404b85}
+h1,h2,h3{font-family:Georgia,serif;line-height:1.15}
+h1{font-size:clamp(2.45rem,6vw,4.5rem);margin:.15em 0}
+h2{font-size:clamp(1.45rem,3vw,2rem);margin:.3em 0 .75em}
+h3{font-size:1.25rem}
+.welcome{display:grid;grid-template-columns:1.3fr 0.7fr;gap:18px;padding:24px;border:2px solid #b5b0da;border-radius:28px;background:linear-gradient(125deg,#232a5f,#3b3266);overflow:hidden;box-shadow:0 12px 40px #07091790}
+.welcome img{width:100%;height:100%;max-height:300px;object-fit:cover;border:3px solid #b7c6f4;border-radius:22px}
+.eyebrow{text-transform:uppercase;letter-spacing:.1em;font-size:.8rem;font-weight:900;color:var(--teal)}
+.primary,.secondary,.secondary-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;min-height:46px;border-radius:13px;padding:10px 16px;font-weight:800}
+.primary{background:linear-gradient(#ffebbb,#eeba68);border:2px solid #f9dfa5;color:#2a2450}
+.secondary,.secondary-link{background:#2d3d66;border:2px solid #8297bd;color:#fcf0d9}
+.select-panel,.fight-section,.panel{padding:20px;margin-top:22px;border:2px solid #797da5;border-radius:22px;background:linear-gradient(160deg,#232e56,#252644);box-shadow:0 8px 24px #0003}
+.arena-setup{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+label{display:block;margin:9px 0 5px;font-weight:800}
+select{padding:11px;border-radius:12px;border:2px solid #a4b6d5;background:#141c3b;color:#fff;min-height:48px;max-width:100%;width:100%}
+.mini{color:var(--muted);font-size:.91rem}
+.xp-track progress{display:block;height:16px;width:min(100%,300px);accent-color:#81d7c6}
+.xp-track span{font-size:.86rem;color:var(--teal)}
+.next-challenge{background:#1b2342;border:2px dashed #6c95a3;padding:14px;border-radius:14px;min-height:52px;font-weight:850}
+.foe-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.foe-choice{padding:12px 10px;border:2px solid #7688af;border-radius:13px;min-height:112px;text-align:left;background:#273760;color:#fff;display:grid;gap:3px}
+.foe-choice[aria-pressed="true"]{border-color:#ffe29b;background:#465180;box-shadow:0 0 0 2px #ffe29b66}
+.foe-choice strong{font-size:.94rem}
+.foe-choice small{font-size:.76rem;color:#cddcef}
+.foe-choice.locked{filter:grayscale(.65)}
+.setup-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.setup-actions button{min-width:145px}
+.arena-status{min-height:2.9em;margin:0 0 12px;padding:10px 14px;border:1px solid #7eacc0;border-radius:11px;background:#152848;color:#c2f5e9}
+.battle-stage{--foe-color:#d8ae7b;position:relative;isolation:isolate;display:grid;grid-template-columns:1fr 82px 1fr;align-items:end;gap:6px;min-height:390px;padding:26px 15px 19px;border:3px solid #a3c5df;border-radius:22px;overflow:hidden;background:radial-gradient(ellipse at center 14%,#9e9dd9 1%,#3b4a79 43%,#1f3556 100%)}
+.battle-backdrop{position:absolute;inset:0;z-index:-1;opacity:.62;background:linear-gradient(#1d315e77,#14283faa),url("scenes/town-arena.webp") center 40% / cover no-repeat;filter:saturate(.8)}
+.battle-stage:after{content:"";position:absolute;left:-5%;right:-5%;height:23%;bottom:-13%;z-index:-1;transform:perspective(90px) rotateX(16deg);border:8px solid #8daec0;background:radial-gradient(ellipse,#8bb7aa,#385b72);border-radius:50%}
+.battler{position:relative;display:flex;align-items:center;flex-direction:column;min-width:0;z-index:1}
+.battler-ui{width:100%;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:6px 9px;border:2px solid #aecddc;border-radius:11px;background:#0f1f39db;font-weight:750;font-size:.87rem}
+.hp-row{display:flex;width:100%;align-items:center;gap:7px;margin-top:5px;font-size:.76rem;text-shadow:0 1px 2px black}
+.hp-row progress{flex:1;min-width:0;height:17px;accent-color:#70dca8}
+.fighter-sprite{position:relative;display:flex;align-items:center;justify-content:center;width:min(100%,225px);aspect-ratio:1;margin-top:17px;transform-origin:50% 90%;will-change:transform}
+.cat-avatar{position:relative;width:82%;aspect-ratio:1;border-radius:28%;border:6px solid #f6e6b6;box-shadow:0 14px 24px #0007,inset 0 0 20px #fff8cc33;background-color:#9bafbf;background-repeat:no-repeat;background-size:cover;filter:drop-shadow(0 2px 10px #9dd1ef4f);animation:pet-breathe 2.1s ease-in-out infinite}
+.fighter-tag{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);max-width:100%;padding:5px 9px;background:#1b2e58e9;border:1px solid #dce9ef;border-radius:20px;font-size:.72rem;font-weight:900;white-space:nowrap}
+.fighter-shadow{position:absolute;bottom:0;width:72%;height:16%;border-radius:50%;background:#0b15288a;filter:blur(8px)}
+.motion-paw{position:absolute;left:66%;top:46%;font-size:clamp(1.8rem,5vw,3.2rem);opacity:0;z-index:2;transform-origin:0% 100%;text-shadow:0 3px 10px #181829}
+.battle-center{align-self:center;z-index:0;text-align:center;color:#f9e5a6;font-family:Georgia,serif;font-weight:900;font-size:clamp(1.5rem,4vw,2.8rem);text-shadow:0 3px #22234c,0 0 15px #fee7ba66}
+.foe-illustration{width:82%;height:82%;filter:drop-shadow(0 12px 9px #0d152abf);animation:pet-breathe 2.2s ease-in-out infinite}
+.foe-illustration .gear-halo{stroke:var(--foe-color);opacity:.8;transform-origin:50% 53%;animation:foe-gear 14s linear infinite}
+.foe-ear,.foe-head{fill:#3d4a62;stroke:var(--foe-color)}
+.foe-eye{fill:#f7d9a0;stroke:var(--foe-color);stroke-width:2}
+.foe-muzzle{fill:#9c9db8;stroke:#273554}
+.foe-nose{fill:#2b3347}
+.foe-plate{stroke:var(--foe-color)}
+.foe-emblem{position:absolute;top:3px;right:8px;display:grid;place-items:center;font-size:1.6rem;filter:drop-shadow(0 1px 4px #000)}
+.battle-vfx{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5}
+.battle-vfx .burst-particle{position:absolute;left:var(--hit-x,50%);top:var(--hit-y,65%);color:var(--effect-color,#ffde85);font-size:clamp(1.25rem,3vw,2rem);text-shadow:0 0 14px currentColor;animation:particle-flight .75s ease-out both;transform:translate(-50%,-50%)}
+.battle-vfx .damage-popup{position:absolute;left:var(--hit-x,50%);top:calc(var(--hit-y,65%) - 10%);color:#fff7ce;text-shadow:0 3px 3px #17203c,0 0 10px #111;font-size:clamp(1.2rem,3vw,2.15rem);font-weight:900;animation:damage-float .85s ease-out forwards}
+.fighter-sprite.state-approach{animation:pet-lunge .53s ease-in-out both}
+.battler-foe .fighter-sprite.state-approach{animation:foe-lunge .53s ease-in-out both}
+.fighter-sprite.state-swipe{animation:pet-swipe .6s ease-in-out both}
+.battler-foe .fighter-sprite.state-swipe{animation:foe-swipe .6s ease-in-out both}
+.fighter-sprite.state-cast{animation:pet-cast .77s ease-in-out both}
+.fighter-sprite.state-guard{animation:guard-up .7s ease both;filter:drop-shadow(0 0 24px #8bf8d9)}
+.fighter-sprite.state-impact{animation:pet-impact .5s ease-out both}
+.battler-foe .fighter-sprite.state-impact{animation:foe-impact .5s ease-out both}
+.fighter-sprite.state-victory{animation:victory-bounce 1s ease infinite}
+.fighter-sprite.state-defeat{animation:defeat-fall .75s ease forwards}
+.state-swipe .motion-paw,.state-approach .motion-paw{opacity:1;animation:paw-arc .55s ease forwards}
+.state-cast .motion-paw{opacity:1;animation:skill-orbit .75s ease forwards}
+.battle-actions{margin-top:18px}
+.move-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.move-grid button{position:relative;min-height:100px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:12px;border:2px solid #7caac1;border-radius:15px;background:linear-gradient(165deg,#354d79,#213052);color:#fff;font-weight:800;text-align:left}
+.move-grid button strong{font-size:1rem}
+.move-grid button small{font-weight:500;color:#c9e8ed;font-size:.78rem}
+.move-grid button:not(:disabled):hover{border-color:#fde0a0;transform:translateY(-1px)}
+.move-grid button.locked{background:#25283f}
+.battle-outcome{min-height:1.3em;margin:12px 0 0;font-weight:800;color:#fce1a0}
+.extra{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+.panel{margin-top:0}
+.battle-log{max-height:280px;overflow:auto;line-height:1.5;padding-left:22px}
+.battle-log li{padding:5px 0;border-bottom:1px solid #7a8cab44}
+.disclosure{max-width:85ch;color:#b9c9e4;font-size:.83rem;margin:24px 0}
+footer{padding:16px 0 28px;text-align:center}
+@keyframes pet-breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.015)}}
+@keyframes foe-gear{to{transform:rotate(360deg)}}
+@keyframes pet-lunge{0%,100%{transform:translateX(0) translateY(0)}40%{transform:translateX(44%) translateY(-17%) scale(1.16)}65%{transform:translateX(57%) translateY(-2%) scale(1.1)}}
+@keyframes foe-lunge{0%,100%{transform:translateX(0) translateY(0)}40%{transform:translateX(-44%) translateY(-16%) scale(1.16)}65%{transform:translateX(-57%) translateY(-2%) scale(1.1)}}
+@keyframes pet-swipe{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg) translateY(-12px)}55%{transform:rotate(14deg) translateX(28%) scale(1.12)}}
+@keyframes foe-swipe{0%,100%{transform:rotate(0)}25%{transform:rotate(10deg) translateY(-12px)}55%{transform:rotate(-14deg) translateX(-28%) scale(1.12)}}
+@keyframes pet-cast{0%,100%{transform:scale(1) rotate(0)}25%{transform:scale(1.12) translateY(-25px) rotate(-6deg);filter:drop-shadow(0 0 22px #f3d6ff)}55%{transform:scale(1.2) rotate(8deg);filter:drop-shadow(0 0 32px #ffeeaf)}}
+@keyframes guard-up{30%,70%{transform:translateY(-8px) scale(.91)}}
+@keyframes pet-impact{25%{transform:translateX(-14%) rotate(-11deg)}52%{transform:translateX(-2%) rotate(7deg)}}
+@keyframes foe-impact{25%{transform:translateX(14%) rotate(11deg)}52%{transform:translateX(2%) rotate(-7deg)}}
+@keyframes victory-bounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-29px) rotate(5deg) scale(1.04)}}
+@keyframes defeat-fall{to{transform:rotate(15deg) translateY(32px) scale(.82);opacity:.5}}
+@keyframes paw-arc{0%{opacity:0;transform:translate(-25px,18px) rotate(-60deg)}45%{opacity:1;transform:translate(12px,-10px) rotate(20deg) scale(1.3)}100%{opacity:0;transform:translate(55px,20px) rotate(85deg)}}
+@keyframes skill-orbit{0%{opacity:0;transform:rotate(-30deg) translate(-28px,18px)}50%{opacity:1;transform:rotate(30deg) translate(0,-48px) scale(1.8)}100%{opacity:0;transform:rotate(180deg) translate(40px,15px)}}
+@keyframes particle-flight{0%{opacity:1;transform:translate(-50%,-50%) scale(.25)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--spin)) scale(1.4)}}
+@keyframes damage-float{0%{opacity:1;transform:translate(-50%,0) scale(.5)}35%{transform:translate(-50%,-20px) scale(1.2)}100%{opacity:0;transform:translate(-50%,-80px) scale(1)}}
+@media(max-width:880px){.foe-list{grid-template-columns:repeat(3,minmax(0,1fr))}.move-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.site-top{gap:5px}.site-top nav a{font-size:.78rem;padding:8px}.welcome,.arena-setup,.extra{grid-template-columns:1fr}.welcome img{max-height:210px}.foe-list{grid-template-columns:repeat(2,minmax(0,1fr))}.battle-stage{grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr);gap:2px;padding:18px 5px 12px;min-height:280px}.fighter-sprite{margin-top:12px}.fighter-tag{font-size:.64rem}.battler-ui{font-size:.72rem}.hp-row{font-size:.7rem;flex-wrap:wrap}.select-panel,.fight-section{padding:12px}.battle-center{font-size:1.5rem}}
+@media(max-width:400px){.foe-list{grid-template-columns:1fr 1fr}.foe-choice{min-height:105px}.move-grid button{min-height:110px;padding:8px}.battle-stage{min-height:240px}.cat-avatar{border-width:3px}.fighter-tag{bottom:-3px;font-size:.55rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Eight reusable animated skeletal motion styles layered over each of the 56
+   approved, independently mapped portrait assets. No new copied illustrations. */
+.fighter-sprite[data-motion="bounce"].state-approach .cat-avatar{animation:kit-bounce .54s ease}
+.fighter-sprite[data-motion="dash"].state-approach .cat-avatar{animation:kit-dash .54s ease}
+.fighter-sprite[data-motion="sway"].state-approach .cat-avatar{animation:kit-sway .54s ease}
+.fighter-sprite[data-motion="spring"].state-approach .cat-avatar{animation:kit-spring .54s ease}
+.fighter-sprite[data-motion="glide"].state-approach .cat-avatar{animation:kit-glide .54s ease}
+.fighter-sprite[data-motion="spin"].state-approach .cat-avatar{animation:kit-spin .54s ease}
+.fighter-sprite[data-motion="float"].state-approach .cat-avatar{animation:kit-float .54s ease}
+.fighter-sprite[data-motion="sprint"].state-approach .cat-avatar{animation:kit-sprint .54s ease}
+.state-cast .cat-avatar{animation:kit-powercast .76s ease;box-shadow:0 0 34px var(--cat-skill-color,#fbdf9e)}
+.state-guard .cat-avatar{box-shadow:0 0 35px #a7e9ff,inset 0 0 22px #b5d2e7}
+@keyframes kit-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+@keyframes kit-dash{0%,100%{transform:translateX(0)}40%{transform:translateX(26px) skewX(-9deg)}}
+@keyframes kit-sway{0%,100%{transform:rotate(0)}50%{transform:rotate(17deg)}}
+@keyframes kit-spring{0%,100%{transform:scale(1)}40%{transform:scale(.84,1.2)}70%{transform:scale(1.16,.9)}}
+@keyframes kit-glide{0%,100%{transform:translate(0,0)}55%{transform:translate(20px,-21px) rotate(5deg)}}
+@keyframes kit-spin{0%,100%{transform:rotate(0)}55%{transform:rotate(315deg)}}
+@keyframes kit-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px) rotate(-7deg)}}
+@keyframes kit-sprint{0%,100%{transform:translateX(0)}25%{transform:translateX(16px)}50%{transform:translateX(34px)}}
+@keyframes kit-powercast{0%,100%{transform:scale(1) rotate(0)}45%{transform:scale(1.13) rotate(-8deg);filter:drop-shadow(0 0 20px var(--cat-skill-color,#f4d4ff))}}
