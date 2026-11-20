@@ -115,6 +115,7 @@
     Object.assign(p.companion, levels, { happiness: Math.min(100, levels.happiness + (p.toy ? 25 : 10)), updatedAt: Date.now() });
     return 'You played with ' + p.companion.name + '! 🐾';
   }));
+  window.addEventListener('pawtopia:changed', () => render());
   window.addEventListener('pageshow', () => render());
   window.addEventListener('storage', () => render());
   render();
