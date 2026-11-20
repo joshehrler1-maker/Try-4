@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Original illustrated Pawtopia island world with cottages, a town, arcade, forest, caves, bookshop and training hall">
+<defs>
+ <linearGradient id="sea" x1="0" y1="0" x2=".25" y2="1"><stop stop-color="#b6ebee"/><stop offset=".55" stop-color="#7fd2db"/><stop offset="1" stop-color="#61b8d2"/></linearGradient>
+ <linearGradient id="earth" x1="0" y1="0" x2=".4" y2="1"><stop stop-color="#a4dc87"/><stop offset=".62" stop-color="#69bf79"/><stop offset="1" stop-color="#3c987b"/></linearGradient>
+ <linearGradient id="shore" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f9e7b0"/><stop offset="1" stop-color="#f4bc85"/></linearGradient>
+ <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff9670"/><stop offset="1" stop-color="#be6275"/></linearGradient>
+ <linearGradient id="moon" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#bb9af4"/><stop offset="1" stop-color="#7165b5"/></linearGradient>
+ <pattern id="waves" width="90" height="54" patternUnits="userSpaceOnUse"><path d="M3 28q11-10 24 0m25 17q13-9 29 0" fill="none" stroke="#e8fffc" stroke-width="3" opacity=".35" stroke-linecap="round"/></pattern>
+ <g id="pine"><path d="M0 38V-15" stroke="#83624b" stroke-width="10" stroke-linecap="round"/><path d="M0-43l-37 53h16L-43 29H43L21 10h16Z" fill="#368e72" stroke="#1c6d62" stroke-width="5" stroke-linejoin="round"/><path d="M0-38L-23-1M0-38L23-1" stroke="#9eddb1" stroke-width="5" stroke-linecap="round"/></g>
+ <g id="flower"><path d="M0 0v14" stroke="#408962" stroke-width="3"/><circle cx="0" cy="0" r="4" fill="#f8c15f"/><circle cx="-8" cy="-3" r="5" fill="#fff8eb"/><circle cx="7" cy="-5" r="5" fill="#fff8eb"/><circle cx="0" cy="-10" r="5" fill="#fff8eb"/></g>
+ <g id="cloud"><path d="M-45 15q-17-23 10-30 8-27 34-14 21-25 39 0 30-1 30 24 20 23-9 29H-36q-28 0-9-9Z" fill="#fffdf6" stroke="#c0e5ec" stroke-width="4"/></g>
+ <g id="paw"><circle cx="-18" cy="-14" r="6"/><circle cx="-5" cy="-23" r="6"/><circle cx="9" cy="-23" r="6"/><circle cx="22" cy="-14" r="6"/><path d="M-15 8q4-18 15-16Q8-12 16 8q3 18-16 14Q-19 26-15 8Z"/></g>
+ </defs>
+ <rect width="1200" height="800" rx="33" fill="url(#sea)"/>
+ <rect width="1200" height="800" rx="33" fill="url(#waves)"/>
+ <g opacity=".52" fill="#fffdf4"><circle cx="95" cy="220" r="4"/><circle cx="690" cy="135" r="5"/><circle cx="430" cy="518" r="5"/><circle cx="1130" cy="569" r="4"/><circle cx="720" cy="625" r="3"/><circle cx="95" cy="595" r="3"/><circle cx="520" cy="745" r="5"/></g>
+ <g stroke="#e7fff1" stroke-width="8" fill="none" stroke-linecap="round" opacity=".8"><path d="M42 100q40-25 80 0m545-29q35-18 73 2m319 168q38-20 86 3M42 492q42-18 83 3M1030 717q42-18 77 0"/></g>
+ <g fill="none" stroke="#f9db8c" stroke-width="18" stroke-linecap="round" stroke-dasharray="1 25" opacity=".75"><path d="M240 150C100 225 150 300 207 380S330 495 240 664"/><path d="M270 405Q580 475 600 385T930 380"/><path d="M660 180Q570 265 605 384T605 671"/><path d="M960 180Q1045 267 979 385T965 666"/></g>
+ <g fill="#387d78" opacity=".33"><ellipse cx="241" cy="174" rx="134" ry="63"/><ellipse cx="958" cy="174" rx="150" ry="70"/><ellipse cx="200" cy="415" rx="155" ry="78"/><ellipse cx="602" cy="427" rx="155" ry="78"/><ellipse cx="995" cy="424" rx="155" ry="79"/><ellipse cx="211" cy="724" rx="149" ry="76"/><ellipse cx="597" cy="726" rx="145" ry="75"/><ellipse cx="982" cy="732" rx="150" ry="68"/></g>
+ <g stroke="#4d9985" stroke-width="6">
+  <path d="M102 143Q130 83 230 79q116-15 143 65Q350 205 244 213 128 213 102 143Z" fill="url(#earth)"/>
+  <path d="M808 142q19-75 145-79 125-14 171 79-39 84-157 88-109 6-159-88Z" fill="url(#earth)"/>
+  <path d="M26 383q42-98 166-100 128-4 173 100-28 91-162 104Q58 481 26 383Z" fill="url(#earth)"/>
+  <path d="M444 382q28-110 158-106 126-6 156 108-28 100-152 106Q477 487 444 382Z" fill="url(#earth)"/>
+  <path d="M839 389q33-112 157-104 135-7 174 103-31 101-173 108-128-5-158-107Z" fill="url(#earth)"/>
+  <path d="M56 683q37-83 152-86 117-7 172 85-31 91-175 99Q80 772 56 683Z" fill="url(#earth)"/>
+  <path d="M440 690q30-87 155-91 128-8 170 87-36 90-170 96-126-6-155-92Z" fill="url(#earth)"/>
+  <path d="M815 691q30-90 158-95 130-4 185 91-30 89-174 99-138-5-169-95Z" fill="url(#earth)"/>
+ </g>
+ <g stroke="#f4e6b6" stroke-width="10" fill="none" stroke-linecap="round" opacity=".9"><path d="M142 163q96 60 183-4M865 157q80 57 185 0M90 411q111 54 225-4M508 415q96 48 193-4M899 413q94 52 203 3M119 708q107 54 213-7M502 719q100 50 198-10M876 721q105 43 207-11"/></g>
+ <!-- Companion cottage -->
+ <g transform="translate(235 137)"><ellipse cy="55" rx="82" ry="13" fill="#28745a" opacity=".4"/><path d="M-58 52V-13L0-52 60-13V52Z" fill="#fff3ce" stroke="#89645a" stroke-width="7"/><path d="M-74-8L0-69 75-8 61 1 0-42-60 3Z" fill="url(#roof)" stroke="#9a5460" stroke-width="6"/><path d="M-20 52V6h37v46" fill="#6a80ae" stroke="#5e6a89" stroke-width="6"/><rect x="27" y="2" width="25" height="26" rx="5" fill="#a5d5e6" stroke="#8c7385" stroke-width="5"/><path d="M33-39v-30h17v45" fill="#d9af95" stroke="#956e71" stroke-width="5"/><circle cx="6" cy="29" r="4" fill="#ffe8a9"/></g>
+ <g transform="translate(140 153) scale(.8)"><use href="#pine"/></g><g transform="translate(320 153) scale(.8)"><use href="#pine"/></g>
+ <!-- Crystal peaks -->
+ <g transform="translate(949 145)" stroke="#6768a2" stroke-width="7" stroke-linejoin="round"><path d="M-109 67l49-122 34 57 50-95 66 160Z" fill="url(#moon)"/><path d="M-82-1l22-54 17 28-26 22m65-30l28-58 28 41-34 6" fill="#f6f1ff"/><path d="M-15 70L9 24 40 70Z" fill="#a6e4ef"/></g>
+ <g transform="translate(1060 163) scale(.8)"><use href="#pine"/></g>
+ <!-- Town square -->
+ <g transform="translate(198 372)" stroke="#98645c" stroke-width="6" stroke-linejoin="round"><path d="M-102 56V-10h56v66Zm75 0V-37h58v93Zm74 0V-11h54v67Z" fill="#ffe2ad"/><path d="M-115-10l42-44 39 44Zm67-27 49-45 49 45Zm82 26 40-42 40 42Z" fill="url(#roof)"/><path d="M-85 56V22h19v34M-9 56V10h21v46m57 0V24h19v32" fill="#6083a2"/><path d="M-92 5h17m48-25h16m69 25h18" stroke="#fff9ec" stroke-width="9"/></g>
+ <!-- Festival arcade -->
+ <g transform="translate(606 369)" stroke-linejoin="round"><ellipse cy="69" rx="102" ry="15" fill="#43745b" opacity=".4"/><path d="M-96 46V-11L-62-64 0-35 59-64 96-11V46Z" fill="#f9dfb1" stroke="#9b7b6e" stroke-width="7"/><path d="M-96-11L-62-64-32-11 0-35 32-11 59-64 96-11Z" fill="#fc746d" stroke="#a65070" stroke-width="7"/><path d="M-40 46V2h80v44" fill="#6158a0" stroke="#695d91" stroke-width="7"/><circle cy="22" r="14" fill="#ffe6a6"/><path d="M-82 45h164" stroke="#fff1c2" stroke-width="10"/><path d="M0-42v-36" stroke="#9a6c83" stroke-width="6"/><path d="M0-78l35 14-35 14Z" fill="#ffd86b" stroke="#aa657c" stroke-width="5"/></g>
+ <!-- Pawgrove -->
+ <g transform="translate(993 379)"><path d="M-6 62V-65" stroke="#815f4d" stroke-width="25" stroke-linecap="round"/><path d="M-35-47L-77-76m71 13 47-47" stroke="#815f4d" stroke-width="14" stroke-linecap="round"/><g fill="#5fbb82" stroke="#2e9074" stroke-width="6"><circle cx="-62" cy="-88" r="43"/><circle cx="-19" cy="-117" r="47"/><circle cx="44" cy="-93" r="47"/><circle cx="-13" cy="-73" r="57"/></g><g fill="#9fe2a4"><circle cx="-67" cy="-101" r="12"/><circle cx="37" cy="-109" r="13"/><circle cx="-25" cy="-143" r="11"/></g></g>
+ <!-- Crystal catacombs cave -->
+ <g transform="translate(209 693)" stroke-linejoin="round"><path d="M-93 57l15-86 47-48 47 9 40 35 33 90Z" fill="#ae97cf" stroke="#655c9d" stroke-width="8"/><path d="M-46 58V14q6-57 46-57t46 57v44Z" fill="#3d3c73" stroke="#5d5b91" stroke-width="7"/><path d="M-79-15l20-39 18 38m83-18 13-22 23 45" fill="#eee8ff" stroke="#8175ae" stroke-width="5"/><path d="M-27 47L-5 8 18 47Z" fill="#adf0f6" stroke="#74bed8" stroke-width="6"/></g>
+ <!-- Bookshop -->
+ <g transform="translate(601 684)" stroke-linejoin="round"><path d="M-97 54V-15L0-60 99-15v69Z" fill="#fce5b0" stroke="#a87975" stroke-width="7"/><path d="M-109-16L0-84 110-16l-13 13-97-56-97 56Z" fill="#8b78c3" stroke="#645aa0" stroke-width="7"/><path d="M-48 54V-1h96v55" fill="#f5e9ff" stroke="#997ab1" stroke-width="6"/><path d="M-39 15q19-9 39 6 18-15 39-6v29q-22-8-39 5-18-13-39-5Z" fill="#fff0bd" stroke="#ae8d92" stroke-width="5"/><path d="M0 21v28" stroke="#ae8d92" stroke-width="4"/></g>
+ <!-- Training courtyard -->
+ <g transform="translate(984 688)" stroke-linejoin="round"><ellipse cy="57" rx="113" ry="20" fill="#5a8c81" opacity=".4"/><path d="M-78 49V-13h156v62Z" fill="#ffecd0" stroke="#7f679b" stroke-width="8"/><path d="M-96-12L-36-55h75l57 43-30 17H-66Z" fill="#a187cf" stroke="#6c5a9e" stroke-width="7"/><rect x="-30" y="0" width="60" height="49" rx="4" fill="#6a7ca9"/><path d="M0 0v49" stroke="#e6d1c9" stroke-width="5"/><path d="M-99-57l16-21 16 21 16-21 16 21" fill="none" stroke="#ffe1a1" stroke-width="5"/></g>
+ <g opacity=".9"><use href="#flower" transform="translate(110 177)"/><use href="#flower" transform="translate(301 186)"/><use href="#flower" transform="translate(87 456)"/><use href="#flower" transform="translate(330 413)"/><use href="#flower" transform="translate(527 466)"/><use href="#flower" transform="translate(683 457)"/><use href="#flower" transform="translate(895 461)"/><use href="#flower" transform="translate(1114 407)"/><use href="#flower" transform="translate(109 745)"/><use href="#flower" transform="translate(701 741)"/><use href="#flower" transform="translate(1108 739)"/></g>
+ <g transform="translate(590 121) scale(1.1)" fill="#fdf2c3" opacity=".62"><use href="#paw"/></g>
+ <g transform="translate(378 565) scale(.72)" fill="#fdf2c3" opacity=".58"><use href="#paw"/></g>
+ <g transform="translate(790 559) scale(.68)" fill="#fdf2c3" opacity=".64"><use href="#paw"/></g>
+ <g transform="translate(440 125) scale(.8)" opacity=".6"><use href="#cloud"/></g>
+ <g transform="translate(1140 70) scale(.65)" opacity=".6"><use href="#cloud"/></g>
+ <g transform="translate(90 35) scale(.7)" opacity=".7"><use href="#cloud"/></g>
+ <rect x="9" y="9" width="1182" height="782" rx="27" fill="none" stroke="#fff8d2" stroke-width="13" opacity=".8"/>
+</svg>
