@@ -97,6 +97,38 @@
     const { companion, coins, food, toy, townCollection, capeEquipped, bedPlaced, lastBedRest, otherCompanions } = save.read();
     byId('coins').textContent = coins;
     byId('inventory').textContent = 'Inventory · ' + food + (food === 1 ? ' snack' : ' snacks') + (toy ? ' · Crystal toy' : '');
+    const allCats = [companion, ...otherCompanions].filter(Boolean).slice(0, maxCats);
+    byId('pet-album-count').textContent = allCats.length + ' of ' + maxCats + ' companions adopted';
+    const albumCards = allCats.map((cat, index) => {
+      const card = document.createElement('article');
+      card.className = 'pet-album-card';
+      const portrait = document.createElement('div');
+      portrait.className = 'pet-album-portrait';
+      portrait.setAttribute('role', 'img');
+      paintPortrait(portrait, cat.breed || 'Maine Coon');
+      portrait.setAttribute('aria-label', (cat.breed || 'Cat') + ' portrait');
+      const details = document.createElement('div');
+      const heading = document.createElement('h3');
+      heading.textContent = (cat.name || 'Your cat').slice(0, 24) + (index === 0 ? ' · Active' : '');
+      const breed = document.createElement('p');
+      breed.textContent = String(cat.breed || 'Cat');
+      const bonding = petBond.read(cat, save.today());
+      const friendship = document.createElement('p');
+      friendship.textContent = bonding.temperament.name + ' · ' + bonding.title + ' (' + bonding.points + '/100)';
+      const memory = document.createElement('p');
+      memory.textContent = bonding.memories[0]
+        ? 'Last memory: ' + petBond.activities[bonding.memories[0].activity].label
+        : 'First memory waiting';
+      details.append(heading, breed, friendship, memory);
+      card.append(portrait, details);
+      return card;
+    });
+    if (!albumCards.length) {
+      const empty = document.createElement('p');
+      empty.textContent = 'Your collection begins when you adopt your first cat above.';
+      albumCards.push(empty);
+    }
+    byId('pet-album-cards').replaceChildren(...albumCards);
     cape.disabled = !companion || !townCollection['Festival Cape'];
     cape.textContent = capeEquipped ? 'Remove Festival Cape' : 'Equip Festival Cape';
     bed.disabled = !townCollection['Velvet Cat Bed'];
