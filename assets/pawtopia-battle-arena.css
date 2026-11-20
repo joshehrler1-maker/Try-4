@@ -113,3 +113,25 @@ footer{padding:16px 0 28px;text-align:center}
 @media(max-width:650px){.site-top{gap:5px}.site-top nav a{font-size:.78rem;padding:8px}.welcome,.arena-setup,.extra{grid-template-columns:1fr}.welcome img{max-height:210px}.foe-list{grid-template-columns:repeat(2,minmax(0,1fr))}.battle-stage{grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr);gap:2px;padding:18px 5px 12px;min-height:280px}.fighter-sprite{margin-top:12px}.fighter-tag{font-size:.64rem}.battler-ui{font-size:.72rem}.hp-row{font-size:.7rem;flex-wrap:wrap}.select-panel,.fight-section{padding:12px}.battle-center{font-size:1.5rem}}
 @media(max-width:400px){.foe-list{grid-template-columns:1fr 1fr}.foe-choice{min-height:105px}.move-grid button{min-height:110px;padding:8px}.battle-stage{min-height:240px}.cat-avatar{border-width:3px}.fighter-tag{bottom:-3px;font-size:.55rem}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Eight reusable animated skeletal motion styles layered over each of the 56
+   approved, independently mapped portrait assets. No new copied illustrations. */
+.fighter-sprite[data-motion="bounce"].state-approach .cat-avatar{animation:kit-bounce .54s ease}
+.fighter-sprite[data-motion="dash"].state-approach .cat-avatar{animation:kit-dash .54s ease}
+.fighter-sprite[data-motion="sway"].state-approach .cat-avatar{animation:kit-sway .54s ease}
+.fighter-sprite[data-motion="spring"].state-approach .cat-avatar{animation:kit-spring .54s ease}
+.fighter-sprite[data-motion="glide"].state-approach .cat-avatar{animation:kit-glide .54s ease}
+.fighter-sprite[data-motion="spin"].state-approach .cat-avatar{animation:kit-spin .54s ease}
+.fighter-sprite[data-motion="float"].state-approach .cat-avatar{animation:kit-float .54s ease}
+.fighter-sprite[data-motion="sprint"].state-approach .cat-avatar{animation:kit-sprint .54s ease}
+.state-cast .cat-avatar{animation:kit-powercast .76s ease;box-shadow:0 0 34px var(--cat-skill-color,#fbdf9e)}
+.state-guard .cat-avatar{box-shadow:0 0 35px #a7e9ff,inset 0 0 22px #b5d2e7}
+@keyframes kit-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+@keyframes kit-dash{0%,100%{transform:translateX(0)}40%{transform:translateX(26px) skewX(-9deg)}}
+@keyframes kit-sway{0%,100%{transform:rotate(0)}50%{transform:rotate(17deg)}}
+@keyframes kit-spring{0%,100%{transform:scale(1)}40%{transform:scale(.84,1.2)}70%{transform:scale(1.16,.9)}}
+@keyframes kit-glide{0%,100%{transform:translate(0,0)}55%{transform:translate(20px,-21px) rotate(5deg)}}
+@keyframes kit-spin{0%,100%{transform:rotate(0)}55%{transform:rotate(315deg)}}
+@keyframes kit-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px) rotate(-7deg)}}
+@keyframes kit-sprint{0%,100%{transform:translateX(0)}25%{transform:translateX(16px)}50%{transform:translateX(34px)}}
+@keyframes kit-powercast{0%,100%{transform:scale(1) rotate(0)}45%{transform:scale(1.13) rotate(-8deg);filter:drop-shadow(0 0 20px var(--cat-skill-color,#f4d4ff))}}
