@@ -193,6 +193,7 @@
     buy.disabled = !progress.hero || progress.badge || progress.coins < 10;
     document.getElementById('world-save').textContent = (progress.hero || 'Choose your hero') + ' · ' + progress.coins + ' Paw Coins' + (message ? ' · ' + message : '');
     document.getElementById('world-inventory').textContent = 'Collection: ' + (progress.badge ? 'Crystal Badge' : 'empty');
+    window.dispatchEvent(new Event('pawtopia:changed'));
   }
   heroes.forEach(button => button.addEventListener('click', async () => {
     render(await save.update(progress => {
