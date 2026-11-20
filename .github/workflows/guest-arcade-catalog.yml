@@ -1,0 +1,20 @@
+name: Verify free guest arcade publisher catalogs
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/guest-arcade-catalog.yml'
+permissions:
+  contents: read
+jobs:
+  catalog:
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Read publisher catalog counts and browser CORS permissions
+        run: node scripts/guest_arcade_feed_probe.mjs
