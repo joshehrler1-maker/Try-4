@@ -101,3 +101,28 @@ test('pet care uses existing snacks and save state, not parallel currency', asyn
   assert.equal(w.node('paw-hub-pet-name').textContent, 'Mittens');
   assert.equal(w.node('paw-hub-cat-count').textContent, '1');
 });
+
+
+test('storybook Explore provides one original illustrated interactive map and mobile design', () => {
+  const start = html.indexOf('<section class="content" id="pawtopia"');
+  const end = html.indexOf('<section class="content" id="crystal-regions"', start);
+  assert.ok(start >= 0 && end > start, 'Explore section must exist');
+  const explore = html.slice(start, end);
+  const stylesheet = fs.readFileSync(path.join(root,'assets/pawtopia-storybook.css'),'utf8');
+  const art = fs.readFileSync(path.join(root,'assets/pawtopia-adventure-map.svg'),'utf8');
+  assert.ok(explore.includes('class="paw-hub-map-layout"'));
+  assert.equal((explore.match(/class="pawtopia-atlas"/g) || []).length, 1, 'Only one world atlas');
+  assert.equal((explore.match(/class="atlas-sign"/g) || []).length, 8, 'Eight real destinations');
+  assert.ok(explore.indexOf('class="paw-hub-map-layout"') < explore.indexOf('id="paw-hub-pet-heading"'), 'World first');
+  assert.ok(explore.includes('class="paw-hub-classic"'), 'Classic controls still available');
+  assert.ok(explore.includes('id="world-save"') && explore.includes('id="world-buy"'));
+  assert.ok(html.includes('href="assets/pawtopia-storybook.css"'));
+  assert.ok(stylesheet.includes('url("pawtopia-adventure-map.svg")'));
+  assert.ok(stylesheet.includes('@media(max-width:510px)'), 'Small-phone layout is defined');
+  assert.ok(art.startsWith('<svg') && art.trimEnd().endsWith('</svg>'));
+  assert.ok(!/<script\b/i.test(art), 'No embedded scripts in art');
+  assert.ok(!/(?:href|src)\s*=\s*["']https?:/i.test(art), 'No third-party images');
+  const serviceWorker = fs.readFileSync(path.join(root,'sw.js'),'utf8');
+  assert.ok(serviceWorker.includes('assets/pawtopia-storybook.css'));
+  assert.ok(serviceWorker.includes('assets/pawtopia-adventure-map.svg'));
+});
