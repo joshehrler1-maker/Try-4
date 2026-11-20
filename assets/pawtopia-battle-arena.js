@@ -37,6 +37,7 @@
     art.style.backgroundPosition=kit.sprite.backgroundPosition;
     art.setAttribute('aria-label',(cat?.name||'Your cat')+' · '+kit.breed+' original adoption portrait');
     petSprite.dataset.motion=kit.movement;
+    petSprite.style.setProperty('--cat-skill-color',kit.theme.color);
     el('battle-cat-tag').textContent=kit.breed;
     return kit;
   }
