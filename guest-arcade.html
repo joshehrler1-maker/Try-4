@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#20566c">
+<meta name="description" content="Play free guest HTML5 browser games at Super Paw Heroes. Browse puzzles, arcade classics, relaxing games and brain teasers.">
+<link rel="canonical" href="https://joshehrler1-maker.github.io/Try-4/guest-arcade.html">
+<title>Guest Arcade | Free Browser Games | Super Paw Heroes</title>
+<style>
+:root{font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:#38566c;background:#a5dde1}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(circle at 90% 0,#fff2c5aa,transparent 38%),linear-gradient(155deg,#9bdbdb,#e5f4db 55%,#e7d9f5)}
+a{color:#247088}button,input,select{font:inherit}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #a05486;outline-offset:3px}
+header,main,footer{width:min(100% - 20px,1200px);margin:auto}
+header{display:flex;align-items:center;gap:.7rem;justify-content:space-between;flex-wrap:wrap;margin-top:1rem;padding:.75rem 1rem;background:#fff5d8;border:3px solid #fffaf0;border-radius:1.2rem;box-shadow:0 5px 0 #c79f74}
+header>a{font-weight:950;color:#426279;font-size:1.2rem;text-decoration:none}header nav{display:flex;flex-wrap:wrap;gap:.5rem}header nav a{display:inline-flex;align-items:center;min-height:42px;padding:.4rem .65rem;border:1px solid #e3c79e;border-radius:.7rem;background:#fffdfa;text-decoration:none;font-weight:780}
+header nav a:hover{background:#bfece5}
+.hero{display:grid;grid-template-columns:1.25fr minmax(135px,.75fr);gap:1rem;align-items:center;padding:clamp(1rem,4vw,2.4rem);margin:1.3rem 0;border:4px solid #fff8dd;border-radius:1.55rem;box-shadow:0 7px 0 #81b6a2,0 15px 25px #4a777b71;background:linear-gradient(100deg,#315b83ef,#377992ae),url('assets/scenes/arcade.webp') center/cover;color:#fff}
+.hero h1{margin:.35rem 0;font:900 clamp(2.2rem,6vw,4.4rem)/1.02 Georgia,serif;color:#fff6d8;text-shadow:2px 3px 0 #29485d}
+.hero p{margin:.7rem 0;max-width:36rem}.hero img{width:100%;max-height:240px;object-fit:contain;border:3px solid #fff4da;border-radius:1rem;background:#f4ebd26b}
+.eyebrow{display:inline-block;background:#ffecb0;color:#4d526d;border:2px solid #fff9d0;border-radius:99px;padding:.28rem .65rem;font-size:.76rem;font-weight:900}
+.tiny{font-size:.84rem;color:#677786;line-height:1.4}.hero .tiny{color:#e9f6ff}
+.panel{border:4px solid #fff9e9;background:#fff8ea;border-radius:1.4rem;box-shadow:0 7px 0 #b4d1b6,0 14px 25px #3d697e66;padding:clamp(.9rem,2.5vw,1.5rem);margin:1.4rem 0}
+h2{font:900 clamp(1.6rem,4vw,2.3rem)/1.12 Georgia,serif;margin:.1rem 0 .75rem;color:#456879}
+.filters{display:flex;flex-wrap:wrap;gap:.65rem;align-items:end;margin:.9rem 0}
+.filters label{display:grid;gap:.2rem;flex:1 1 170px;font-weight:750;font-size:.84rem}
+.filters input,.filters select{min-height:45px;padding:.55rem;background:#fff;border:2px solid #a6c2bf;border-radius:.7rem;color:#3c556b;max-width:100%}
+#count{font-weight:850;color:#536877}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin-top:1rem}
+.game-card{min-width:0;display:flex;flex-direction:column;gap:.36rem;background:#fffdf7;border:2px solid #f3ddad;border-radius:1.05rem;padding:.65rem;box-shadow:0 4px 0 #c3bda9}
+.game-card .art{display:grid;place-items:center;aspect-ratio:16/9;min-height:75px;border-radius:.75rem;background:linear-gradient(130deg,var(--start,#bce9e1),var(--end,#d3c9ed));font-size:clamp(2.2rem,5vw,3rem);overflow:hidden}
+.game-card .art img{width:100%;height:100%;object-fit:cover}
+.game-card h3{color:#50657a;font:850 1.05rem/1.18 Georgia,serif;margin:.3rem 0 .1rem}
+.game-card p{margin:0;color:#65727c;font-size:.81rem;line-height:1.4;flex:1}
+.game-card small{color:#82777a;font-size:.7rem}
+.game-card button,.action{min-height:44px;padding:.62rem .8rem;background:linear-gradient(#ffe7af,#fbd18e);color:#584360;border:2px solid #b68d61;border-radius:.68rem;font-weight:900;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.game-card button:hover,.action:hover{background:#fff1ce}
+.actions{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0}
+#more{width:min(100%,330px);margin:1rem auto;display:block}
+.player{border:4px solid #fff8e6;border-radius:1.3rem;background:#e6f6eb;box-shadow:0 7px 0 #9ec2ba;padding:clamp(.7rem,2vw,1.2rem);margin:1rem 0 1.8rem}
+.player[hidden]{display:none}
+.player-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.7rem}
+.player-bar h2{font-size:1.5rem;margin:.1rem 0}.player-buttons{display:flex;gap:.5rem;flex-wrap:wrap}
+.player-buttons button,.player-buttons a{font:750 .85rem system-ui;min-height:44px;border:1px solid #abc4bc;border-radius:.7rem;background:#fff9df;padding:.6rem .8rem;color:#4e6370;text-decoration:none;cursor:pointer}
+.frame-wrap{position:relative;width:100%;aspect-ratio:16/10;min-height:420px;margin:.75rem 0;background:#1a2643;border:3px solid #688995;border-radius:.85rem;overflow:hidden}
+.frame-wrap.portrait{max-width:450px;margin-inline:auto;aspect-ratio:9/16}
+.frame-wrap iframe{width:100%;height:100%;position:absolute;inset:0;border:0;background:#fff}
+.credit{font-size:.84rem;color:#596b77}
+.credit a{font-weight:750}.notice{line-height:1.5;color:#667585;font-size:.87rem}
+.empty{padding:1rem;border:2px dashed #9fc3bc;border-radius:1rem}
+footer{padding:1.5rem 0 2rem;color:#426575}
+@media(max-width:870px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1fr 130px}.hero img{max-height:170px}.frame-wrap{min-height:400px}}
+@media(max-width:390px){.cards{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero img{max-height:160px;justify-self:center;max-width:65%}.player-buttons{width:100%}.frame-wrap{min-height:340px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+<script defer src="assets/guest-arcade.js"></script>
+</head>
+<body>
+<header><a href="index.html">🐾 Super Paw Heroes</a><nav aria-label="Pawtopia"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-arcade.html">Original Games Room</a><a href="pawtopia-companions.html">Adopt a Cat</a></nav></header>
+<main>
+<section class="hero" aria-labelledby="title"><div><span class="eyebrow">Free guest games · No download needed</span><h1 id="title">Pawtopia Guest Arcade</h1><p>More games, more fun! Explore arcade classics, puzzlers, cozy games, and quick challenges from independent game publishers.</p><p class="tiny">Our original Super Paw Heroes games remain in the Games Room. Guest titles are owned and hosted by their respective publishers.</p><div class="actions"><a class="action" href="pawtopia-arcade.html">🎮 Play Original Games</a><a class="action" href="#game-browser">✨ Browse Guest Games</a></div></div><img src="assets/whisker-luna-master.png" width="1229" height="1536" alt="Whisker and Luna, original Super Paw Heroes artwork" loading="lazy"></section>
+<section class="panel" id="game-browser" aria-labelledby="browse-heading">
+<h2 id="browse-heading">Find your next favorite</h2>
+<p class="notice">A hand-checked starter list is included, and the catalog can expand through publishers' public feeds when they're available. Only the games actually loaded are counted below.</p>
+<div class="filters">
+<label for="search">Search games<input type="search" id="search" placeholder="Try Snake, Sudoku, coloring..." autocomplete="off"></label>
+<label for="category">Category<select id="category"><option value="">All categories</option></select></label>
+<label for="publisher">Publisher<select id="publisher"><option value="">All publishers</option><option value="GameZipper">GameZipper</option><option value="PlayKovo">PlayKovo</option></select></label>
+<label for="sort">Sort by<select id="sort"><option value="featured">Featured first</option><option value="az">A to Z</option><option value="za">Z to A</option></select></label>
+</div>
+<p id="count" role="status">Loading available games…</p>
+<div id="cards" class="cards"></div>
+<button type="button" id="more" class="action" hidden>Show more games</button>
+<noscript><p>JavaScript is required to browse the guest catalog. The <a href="https://gamezipper.com/embed-games.html">GameZipper game list</a> is also available directly.</p></noscript>
+</section>
+<section class="player" id="player" hidden aria-labelledby="player-title">
+<div class="player-bar"><div><span class="eyebrow">Guest game · Third-party content</span><h2 id="player-title">Choose a game</h2></div><div class="player-buttons"><button type="button" id="fullscreen">⛶ Full screen</button><button type="button" id="close">✕ Close game</button><a id="open-provider" href="https://gamezipper.com/" target="_blank" rel="noopener noreferrer">Open at publisher</a></div></div>
+<p id="game-publisher" class="credit"></p>
+<div class="frame-wrap" id="frame-wrap"></div>
+<p class="notice">The game loads from the publisher only after you choose Play. Third-party games need an internet connection, may have their own policies, and may sometimes be unavailable. Paw Coins are not awarded for guest games.</p>
+</section>
+<section class="panel" aria-labelledby="about-heading"><h2 id="about-heading">About these games</h2><p>These guest games are made and maintained by other creators. <a href="https://gamezipper.com/publisher-partner.html" target="_blank" rel="noopener noreferrer">GameZipper's publisher program</a> and <a href="https://playkovo.com/partners/terms" target="_blank" rel="noopener noreferrer">PlayKovo's partner terms</a> describe their permission to embed games. We do not copy game files, change their credits, or claim that they belong to Super Paw Heroes.</p><p class="notice">This site does not charge you to play guest games. Publishers may display their own advertising or use cookies when you open a game; check their individual policies. If a game does not load, use the publisher link.</p></section>
+</main>
+<footer><p>🐾 <a href="index.html">Super Paw Heroes</a> · Original Whisker and Luna artwork · Guest games supplied by their respective publishers.</p></footer>
+</body></html>
