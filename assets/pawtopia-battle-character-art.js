@@ -382,6 +382,25 @@
     const amount=phase-start;
     return values[start]+(values[end]-values[start])*amount;
   }
+  function personalMotion(art,pose,frame=3){
+    const style=art.fightingStyle||identityFor(art.breed);
+    const route=techniqueRoutes[style.technique]||techniqueRoutes.maul;
+    const power=pose==='ultimate'?1.25:pose==='signature'?1:
+      pose==='swipe'?.65:pose==='guard'?.36:pose==='approach'?.22:0;
+    const scaleX=(style.reach/32)*power;
+    const scaleY=(style.arc/29)*power;
+    function delta(points) {
+      return [
+        Math.round(keyframeValue(points.map(point=>point[0]),frame)*scaleX),
+        Math.round(keyframeValue(points.map(point=>point[1]),frame)*scaleY)
+      ];
+    }
+    const lead=delta(route.lead);
+    const offhand=delta(route.off);
+    const torso=delta(route.body);
+    const leadIndex=style.lead==='left'?0:1;
+    return Object.freeze({leadIndex,lead,offhand,torso,label:style.label,technique:style.technique});
+  }
   // A small grounded weight shift makes the back/torso react to paw force.
   // Feet remain independent of the torso so they do not float with the strike.
   function torsoWeight(art,pose,frame=3) {
@@ -391,7 +410,14 @@
     const shift=Math.round((attack?art.choreography.reach/6:guard?-3:hit?-4:0)*weight);
     const lift=Math.round((pose==='ultimate'?-7:pose==='signature'?-5:attack?-2:hit?3:0)*Math.max(0,weight));
     const tilt=Math.round((attack?Math.min(6,art.choreography.arc/5):guard?-3:hit?-5:0)*weight);
-    return Object.freeze({shift,lift,tilt});
+    const personal=personalMotion(art,pose,frame);
+    // Do not translate the feet with this body movement. The rear paws stay
+    // planted even when the cat performs a forceful heavy or acrobatic move.
+    return Object.freeze({
+      shift:shift+Math.round(personal.torso[0]*.65),
+      lift:lift+Math.round(personal.torso[1]*.5),
+      tilt:tilt+Math.round(personal.torso[0]*.16)
+    });
   }
   function choreograph(art,pose,frame=3) {
     const phase=Number.isFinite(frame)?Math.max(0,Math.min(5,frame)):3;
@@ -424,9 +450,41 @@
         drawn.push([x,y,goal[2]||0]);
       }
     }
-    const headAngle=Math.round(target[4]*weight+(pose==='impact'?-counter*.2:0));
+    const individual=personalMotion(art,pose,frame);
+    for(let i=0;i<2;i++){
+      const delta=i===individual.leadIndex?individual.lead:individual.offhand;
+      drawn[i][2]=Math.min(219,Math.max(4,drawn[i][2]+delta[0]));
+      drawn[i][3]=Math.min(220,Math.max(12,drawn[i][3]+delta[1]));
+    }
+    const headAngle=Math.round(target[4]*weight+
+      (pose==='impact'?-counter*.2:0)+individual.torso[0]*.14);
     drawn.push(headAngle);
     return drawn;
+  }
+  function fightingStyleTrail(art,pose,frame=3){
+    if(!['swipe','signature','ultimate'].includes(pose))return '';
+    const style=art.fightingStyle;
+    const lead=style.lead==='left'?0:1;
+    const start=choreograph(art,pose,1.5)[lead];
+    const apex=choreograph(art,pose,3)[lead];
+    const finish=choreograph(art,pose,4.5)[lead];
+    const opacity=Math.max(.12,Math.min(.9,keyframeValue([.12,.25,.58,.9,.68,.2],frame)));
+    const thick=pose==='ultimate'?7:pose==='signature'?5:3;
+    // This path traces the fighter's OWN animated claw trajectory, not a
+    // generic star/swish duplicated across all 56 cats.
+    const d='M'+start[2]+' '+start[3]+' Q'+
+      Math.round((start[2]+apex[2])/2+style.arc*.15)+' '+
+      Math.round((start[3]+apex[3])/2-style.arc*.4)+' '+
+      apex[2]+' '+apex[3]+' Q'+
+      Math.round((apex[2]+finish[2])/2+style.reach*.1)+' '+
+      Math.round((apex[3]+finish[3])/2-style.arc*.28)+' '+
+      finish[2]+' '+finish[3];
+    return '<g class="art-fighting-style-trail" data-style="'+style.serial+
+      '" data-technique="'+style.technique+'" opacity="'+opacity+'">'+
+      '<path d="'+d+'" fill="none" stroke="'+art.color+'" stroke-width="'+
+      thick+'" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<circle cx="'+apex[2]+'" cy="'+apex[3]+'" r="'+
+      (pose==='ultimate'?7:4)+'" fill="'+art.eyes+'" opacity=".8"/></g>';
   }
   function svgForBreed(breed,pose='idle',frame=3){
     const art=getArt(breed);
@@ -468,7 +526,7 @@
       paw(art,...p[0],false,key)+paw(art,...p[1],true,key)+
       '<g class="art-head-weight" transform="translate('+Math.round(balance.shift*.45)+' '+balance.lift+')">'+head+'</g>'+
       smallClaws+defeat+
-      abilityArt(art,key,frame)+signatureSeal(art,key,frame)+individualAttackTrail(art,key,frame)+
+      abilityArt(art,key,frame)+signatureSeal(art,key,frame)+individualAttackTrail(art,key,frame)+fightingStyleTrail(art,key,frame)+
       (key==='impact'?'<path d="M158 40 l7 -12 l5 12 l13 4 l-13 5 l-5 12 l-6 -13 l-13 -4 Z" fill="#ffe17c"/>':'')+
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
       '</svg>';
@@ -488,9 +546,9 @@
     const art=getArt(breed);
     const base=pose==='ultimate'?780:pose==='signature'?650:
       pose==='guard'?430:pose==='impact'?310:pose==='swipe'?480:550;
-    return base+art.choreography.tempo;
+    return base+art.choreography.tempo+(art.fightingStyle?.tempo||0);
   }
   window.PawtopiaBattleCharacterArt=Object.freeze({
-    collection,getArt,poseKeys,animationFrames,smoothFrames,keyframeValue,torsoWeight,choreograph,timingFor,svgForBreed,paint
+    collection,getArt,poseKeys,animationFrames,smoothFrames,keyframeValue,torsoWeight,personalMotion,choreograph,timingFor,svgForBreed,paint,fightingStyles,identityFor
   });
 })();
