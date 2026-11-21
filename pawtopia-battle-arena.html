@@ -10,13 +10,14 @@
 <meta property="og:description" content="Watch your adopted cat battle 12 original clockwork foes, unlock special moves and earn free rewards.">
 <title>Pawtopia Battle Arena | Super Paw Heroes</title>
 <link rel="stylesheet" href="assets/pawtopia-battle-arena.css">
+<link rel="stylesheet" href="assets/pawtopia-item-art.css?v=1">
 <link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
 <script defer src="assets/pawtopia-save.js?v=catalog-2569"></script>
 <script defer src="assets/pawtopia-upgrade-points.js"></script>
 <script defer src="assets/pawtopia-battle-data.js?v=dogs-all"></script>
 <script defer src="assets/pawtopia-item-tiers.js?v=shop-prices-3"></script>
 <script defer src="assets/pawtopia-items.js?v=catalog-2569"></script>
-<script defer src="assets/pawtopia-battle-engine.js?v=dogs-all"></script>
+<script defer src="assets/pawtopia-battle-engine.js?v=item-art-1"></script>
 <script defer src="assets/pawtopia-battle-puppet.js?v=dogs-painted"></script>
 <script defer src="assets/pawtopia-battle-character-art.js?v=motion-1"></script>
 <script defer src="assets/pawtopia-battle-foe-art.js?v=dogs-painted"></script>
@@ -24,7 +25,8 @@
 <script defer src="assets/pawtopia-battle-cinematics.js?v=dogs-all"></script>
 <script defer src="assets/pawtopia-battle-3d.js?v=painted-1"></script>
 <script defer src="assets/pawtopia-battle-sound.js?v=1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=sfx-1"></script>
+<script defer src="assets/pawtopia-item-art.js?v=1"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=item-art-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 </head>
 <body>
@@ -36,6 +38,7 @@
 <main id="arena-main">
 <p class="arena-market-link"><a href="pawtopia-items.html">Item Market &amp; Gear</a></p>
 <p id="arena-loadout"></p>
+<ul id="battle-gear-items" aria-label="Illustrated battle gear"></ul>
 <section class="welcome">
 <div class="welcome-copy">
 <p class="eyebrow">Pawtopia · Original, free pet battles</p>
@@ -93,6 +96,7 @@
 <div class="battler-ui"><span id="stage-pet-name">Your Cat</span><strong id="stage-pet-level">Lv 1</strong></div>
 <div class="hp-row"><progress id="stage-pet-hp" max="20" value="20"></progress><span id="stage-pet-hp-text">20/20 HP</span></div>
 <div class="fighter-sprite" id="battle-pet-sprite">
+  <span class="pet-gear-aura" id="battle-gear-aura" aria-hidden="true" hidden></span>
   <span class="fighter-shadow" aria-hidden="true"></span>
   <div class="cat-avatar" id="battle-cat-art" role="img" aria-label="Your adopted cat's battle illustration"></div>
   <span class="motion-paw" aria-hidden="true">🐾</span>

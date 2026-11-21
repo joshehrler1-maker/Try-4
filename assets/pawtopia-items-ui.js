@@ -7,10 +7,7 @@
   const tier = $('market-tier'), source = $('market-source');
   const previous = $('market-prev'), next = $('market-next');
   const pageSize = 24;
-  const itemMotifs = {
-    Food:'🍲',Toy:'🧸',Remedy:'🌿',Weapon:'⚔️',Armor:'🛡️',Relic:'🔮',
-    Book:'📚',Material:'🧵',Wearable:'🎀',Furnishing:'🪑',Collectible:'🖼️','Battle Gear':'⚙️'
-  };
+  const art=window.PawtopiaItemArt;
   let page = 0;
   const stock = window.PawtopiaShopStock;
   const storefront = document.body.dataset.storefront;
@@ -28,6 +25,18 @@
     parent.append(node);
     return node;
   };
+  function picture(parent,item,className='item-illustration') {
+    if(!art||!item)return;
+    art.mount(add(parent,'span','',className),item);
+  }
+  function showUsed(item,message) {
+    const feedback=$('market-used-item');
+    if(!feedback)return;
+    feedback.replaceChildren();
+    if(!/^(Used|Read|Equipped|Displayed)\b/.test(message))return;
+    picture(feedback,item,'item-use-portrait');
+    add(feedback,'strong',item.name);
+  }
   function control(parent, label, action, item, disabled=false) {
     const button = add(parent,'button',label);
     button.type = 'button';
@@ -36,6 +45,7 @@
       button.disabled=true;
       status.textContent=await save.update(p => market[action](p,item.id));
       render(item.id);
+      showUsed(item,status.textContent);
     });
   }
   function renderStaples(progress) {
@@ -44,7 +54,9 @@
     const offers = stock.shops.filter(offer => offer.store===document.body.dataset.localStock);
     for (const [index,offer] of offers.entries()) {
       const name = offer.label || stock.labels[offer.item];
-      const row = add(staples,'li',name+' ');
+      const row = add(staples,'li','');
+      picture(row,art?.staple(name,offer.item),'item-staple-portrait');
+      add(row,'span',name);
       const button = add(row,'button','Buy · '+offer.price+' coins');
       button.type='button';
       button.disabled=progress.coins<offer.price;
@@ -69,9 +81,15 @@
     const loadout = $('market-loadout');
     loadout.replaceChildren();
     for (const [slot,name] of Object.entries({weapon:'Weapon',armor:'Armor',relic:'Relic',wearable:'Wearable'})){
-      add(loadout,'li',name + ': ' + (market.worn(p,cat,slot)?.name || 'Empty'));
+      const item=market.worn(p,cat,slot);
+      const row=add(loadout,'li','');
+      picture(row,item,'item-mini-portrait');
+      add(row,'span',name+': '+(item?.name||'Empty'));
     }
-    add(loadout,'li','Cottage display: '+(market.exhibition(p)?.name || 'Empty'));
+    const displayed=market.exhibition(p);
+    const display=add(loadout,'li','');
+    picture(display,displayed,'item-mini-portrait');
+    add(display,'span','Cottage display: '+(displayed?.name||'Empty'));
     const term=search.value.toLowerCase().trim();
     const visible=shopItems.filter(item => {
       if (category.value && item.category!==category.value) return false;
@@ -94,15 +112,13 @@
     for (const item of visible.slice(page*pageSize,(page+1)*pageSize)){
       const units=market.stock(p,item.id), card=add(list,'article','');
       card.id='item-'+item.id;
-      if (storefront) {
-        const art = add(card,'div',item.badge || itemMotifs[item.category] || '🐾','shop-card-art');
-        art.setAttribute('aria-hidden','true');
-      }
-      add(card,'h3',item.badge ? item.badge+' '+item.name : item.name);
+      picture(card,item);
+      add(card,'h3',item.name);
       const classification=item.tier?' · '+item.tier+' tier · Power '+item.rating:'';
       const acquisition=item.achievement?' · Achievement reward':item.price?' · Shop':'';
       add(card,'p',item.category+classification+acquisition+' · '+units+' owned','meta');
       add(card,'p',item.description);
+      if(art?.design(item).aura)add(card,'p','Arena aura · Shown when equipped','item-aura-label');
       if (item.recipe){
         const parts=Object.entries(item.recipe).map(([id,amount]) => market.byId.get(id).name+
           ' '+Math.min(market.stock(p,id),amount)+'/'+amount);

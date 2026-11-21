@@ -9,6 +9,7 @@
   const cinematics=window.PawtopiaBattleCinematics;
   const watcher=window.PawtopiaBattleWatch;
   const sound=window.PawtopiaBattleSound;
+  const itemArt=window.PawtopiaItemArt;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
   let challengerTier=0;
@@ -59,6 +60,51 @@
     el('battle-cat-tag').textContent=kit.breed;
     return kit;
   }
+  const gearFor=(progress,cat,match)=>itemArt?.equipped(window.PawtopiaItems,progress,cat,match)||[];
+  function gearAura(items){
+    const holder=el('battle-gear-aura');
+    if(!holder||!itemArt)return;
+    const weapon=items.find(item=>itemArt.design(item).aura);
+    if(holder.dataset.itemArt===(weapon?.id||''))return;
+    holder.dataset.itemArt=weapon?.id||'';
+    holder.innerHTML=weapon?itemArt.aura(weapon):'';
+    holder.hidden=!weapon;
+  }
+  function renderGear(progress,cat,match){
+    const list=el('battle-gear-items');
+    if(!list||!itemArt)return;
+    const items=gearFor(progress,cat,match);
+    list.replaceChildren();
+    for(const item of items){
+      const chip=addText(list,'li','','battle-gear-chip');
+      itemArt.mount(addText(chip,'span','','item-mini-portrait'),item);
+      addText(chip,'span',item.name);
+    }
+    gearAura(items);
+  }
+  function showGearEffects(evt,items){
+    if(!itemArt||evt.who==='system')return;
+    const attacking=evt.who==='pet'&&evt.target==='foe'&&evt.damage>0;
+    const defending=evt.who==='foe'&&evt.target==='pet'||evt.who==='pet'&&evt.fx==='guard';
+    const spell=attacking&&!['swipe','impact','guard'].includes(evt.fx);
+    let order=0;
+    for(const item of items){
+      const style=itemArt.design(item);
+      if(!style.tier)continue;
+      if(item.slot==='weapon'&&!attacking)continue;
+      if((item.slot==='armor'||item.slot==='wearable')&&!defending)continue;
+      if(item.slot==='relic'&&!spell&&!defending&&evt.name!=='Relic Counter')continue;
+      const effect=addText(el('battle-vfx'),'span','','battle-item-effect');
+      effect.dataset.finish=String(style.finish);
+      effect.dataset.side=attacking?'foe':'pet';
+      effect.dataset.travel=String(style.n%3);
+      effect.style.setProperty('--gear-offset',((order++-1)*2.2)+'rem');
+      effect.innerHTML=itemArt.effect(item);
+      const image=addText(effect,'span','','battle-item-sigil');
+      itemArt.mount(image,item);
+      setTimeout(()=>effect.remove(),reduced()?500:720/playbackSpeed);
+    }
+  }
   function render() {
     const progress=save.read(),cats=engine.fighters(progress),view=engine.matchInfo(progress);
     const fighting=view&&!view.match.finished;
@@ -90,6 +136,7 @@
       const gear=['weapon','armor','relic'].map(slot=>window.PawtopiaItems?.worn(progress,pet,slot)?.name).filter(Boolean);
       gearSummary.textContent=gear.length?'Gear for next match: '+gear.join(' · '):'Equip gear at the market before your next match.';
     }
+    renderGear(progress,pet,currentView?.match.finished?null:currentView?.match);
     el('battle-pet-detail').textContent=pet
       ?pet.breed+' · Fighting style: '+(characterArt?.identityFor(pet.breed)?.label||'Balanced Claw')+
         ' · Strength '+engine.training(pet).strength+' · Defence '+engine.training(pet).defence+
@@ -343,9 +390,12 @@
       await wait(reduced()?25:Math.max(18,Math.floor(duration/frames.length)));
     }
   }
-  async function showEvents(events,cat){
+  async function showEvents(events,cat,preview=false){
     const kit=data.kitFor(cat?.breed);
-    const currentFoe=engine.matchInfo(save.read())?.foe || data.foes[selectedFoe];
+    const progress=save.read(), current=preview?null:engine.matchInfo(progress);
+    const currentFoe=current?.foe || data.foes[selectedFoe];
+    const equipped=gearFor(progress,cat,current?.match);
+    gearAura(equipped);
     const pose=state=>{if(characterArt&&cat)paintCat(el('battle-cat-art'),cat.breed,state);};
     const foePose=state=>{if(foeArt&&currentFoe)foeArt.paint(el('battle-foe-art'),currentFoe,state);};
     for(const evt of events){
@@ -417,6 +467,7 @@
           cueSound('block',{side:evt.target});
         }
       }else{burst(evt,'#84e4d8',visual);}
+      showGearEffects(evt,equipped);
       barAfter(evt);
       await wait(cast?440:350);
       await Promise.all([motion,foeMotion,hitMotion]);
@@ -638,7 +689,7 @@
           {who:'pet',target:'pet',name:'Guard Curl',damage:0,fx:'guard',remaining:20},
           {who:'pet',target:'foe',name:data.kitFor(cat.breed).ultimate,damage:20,fx:data.kitFor(cat.breed).theme.type,remaining:0},
           {who:'system',target:'none',name:'Victory!',damage:0,fx:'victory',remaining:0}
-        ],cat);
+        ],cat,true);
         status('Preview duel complete.');
       }finally{
         busy=false;

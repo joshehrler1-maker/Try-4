@@ -66,10 +66,12 @@
     if (matchInfo(progress) && !progress.battleMatch.finished)
       return {ok:false,message:'Finish or forfeit your current match before starting another.'};
     ensure(cat);
-    const gear=window.PawtopiaItems?.arena(progress,cat) || {};
+    const market=window.PawtopiaItems;
+    const gear=market?.arena(progress,cat) || {};
+    const gearArt=['weapon','armor','relic','wearable'].map(slot=>market?.worn?.(progress,cat,slot)?.id).filter(Boolean);
     const gearMaxHp=maxHp(cat)+safe(gear.health)+safe(gear.marketHealth)+safe(gear.styleHealth);
     progress.battleMatch={
-      petId:cat.battleId,foeId:foe.id,hp:gearMaxHp,foeHp:foe.hp,gear,gearMaxHp,
+      petId:cat.battleId,foeId:foe.id,hp:gearMaxHp,foeHp:foe.hp,gear,gearMaxHp,gearArt,
       round:1,guard:0,dodge:0,foeSlow:0,ultimateUsed:false,
       signatureReadyAt:0,finished:false,result:'',lastMove:'',history:['A new battle begins!']
     };
