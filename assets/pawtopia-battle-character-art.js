@@ -70,6 +70,87 @@
   const uniqueMoves = window.PawtopiaBattleData?.kits || [];
   // Each definition is individual and has a distinct face image, coat pattern,
   // head/body shape, tail, ears, color palette and 9 fully articulated drawings.
+  // Authored individually for each approved breed and named battle skill.
+  // Each fighter has a distinct fighting identity, dominant paw, reach, arc,
+  // windup rhythm and balance. Styles are data, not reused silhouette motion.
+  const fightingStyles = Object.freeze([
+    ['Maine Coon','Timber Claw','Heavy Overhand','maul','right',33,17,7],
+    ['Siamese','Moonlight Prism','Twin Moon Cross','prism','left',21,29,3],
+    ['Bengal','Sunstripe Rush','Sunstripe Dash','rush','right',39,11,9],
+    ['British Shorthair','Royal Shield','Royal Counter','shield','left',18,8,2],
+    ['Ragdoll','Velvet Comet','Floating Comet','comet','right',31,25,8],
+    ['Sphynx','Phantom Glimmer','Phantom Feint','feint','left',27,36,1],
+    ['Abyssinian','Desert Mirage','Sand Mirage Feint','feint','right',30,21,5],
+    ['American Bobtail','Bobtail Blitz','Bobtail Whirl','whirl','left',28,31,7],
+    ['American Curl','Crescent Ear','Crescent Sweep','wave','right',24,35,6],
+    ['American Shorthair','City Pounce','Rooftop Pounce','pounce','left',32,16,8],
+    ['American Wirehair','Copper Tangle','Copper Snare','shield','right',25,26,4],
+    ['Balinese','Bali Breeze','Breeze Glide','wave','left',29,34,5],
+    ['Birman','Sacred Step','Sacred Lance','lance','right',30,14,5],
+    ['Bombay','Midnight Flicker','Midnight Feint','feint','left',35,23,8],
+    ['Burmese','Amber Flash','Amber Rush','rush','right',31,22,7],
+    ['Burmilla','Silver Ripple','Silver Wave','wave','left',20,38,4],
+    ['Chartreux','Blue Ember','Ember Strike','thunder','right',25,32,6],
+    ['Cornish Rex','Spiral Sprint','Spiral Whirl','whirl','left',36,28,10],
+    ['Devon Rex','Pixie Pulse','Pixie Prism','prism','right',24,27,3],
+    ['Egyptian Mau','Nile Star','Nile Comet','comet','left',30,39,8],
+    ['European Shorthair','Trail Streak','Trail Dash','rush','right',34,17,6],
+    ['Exotic Shorthair','Cloudbreaker','Cloud Smash','maul','left',28,35,4],
+    ['Havana Brown','Cocoa Whirl','Cocoa Corkscrew','whirl','right',24,42,5],
+    ['Japanese Bobtail','Lucky Lantern','Lantern Spiral','prism','left',22,33,4],
+    ['Khao Manee','Diamond Wink','Diamond Precision','lance','right',27,19,3],
+    ['Korat','Storm Whisper','Storm Lance','lance','left',34,26,7],
+    ['LaPerm','Curling Gust','Curling Wave','wave','right',23,37,5],
+    ['Lykoi','Moon Shadow','Moon Shadow Feint','feint','left',32,29,8],
+    ['Manx','Hilltop Hop','Hilltop Pounce','pounce','right',27,40,9],
+    ['Nebelung','Mistfall','Mist Glide','comet','left',26,35,7],
+    ['Norwegian Forest Cat','Northern Roar','Northern Maul','maul','right',39,24,11],
+    ['Ocicat','Ocelot Dash','Ocelot Rush','rush','left',38,19,10],
+    ['Oriental Shorthair','Silk Lance','Silk Spear','lance','right',40,13,6],
+    ['Persian','Silken Storm','Silken Spiral','whirl','left',25,41,4],
+    ['Peterbald','Quickstep Echo','Echo Feint','feint','right',37,18,10],
+    ['Pixiebob','Pinecone Pounce','Pinecone Leap','pounce','left',33,22,6],
+    ['Ragamuffin','Dream Fluff','Dream Comet','comet','right',28,32,5],
+    ['Russian Blue','Azure Arc','Azure Sweep','wave','left',32,27,6],
+    ['Savannah','Savanna Flash','Savanna Lunge','rush','right',41,17,11],
+    ['Scottish Fold','Folded Comet','Folded Guard','shield','left',25,25,4],
+    ['Selkirk Rex','Rex Rumble','Rumble Smash','maul','right',37,30,9],
+    ['Siberian','Snowbloom','Snowflake Prism','prism','left',29,37,8],
+    ['Singapura','Tiny Thunder','Thunder Jab','thunder','right',22,21,11],
+    ['Snowshoe','Froststep','Frost Glide','wave','left',31,36,8],
+    ['Somali','Sunburst Tail','Sunburst Tailspin','whirl','right',34,40,10],
+    ['Tonkinese','Twilight Tango','Twilight Dance','prism','left',30,24,9],
+    ['Toyger','Tiger Trail','Tiger Overhand','maul','right',40,27,12],
+    ['Turkish Angora','Pearl Sweep','Pearl Crescent','wave','left',35,34,9],
+    ['Turkish Van','Lake Skimmer','Lake Pounce','pounce','right',31,29,8],
+    ['York Chocolate','Cocoa Cloud','Cocoa Shield','shield','left',27,28,4],
+    ['Australian Mist','Outback Haze','Outback Mirage','feint','right',33,31,7],
+    ['Cymric','Celtic Bounce','Celtic Pounce','pounce','left',29,34,7],
+    ['Donskoy','Radiant Heat','Radiant Thunder','thunder','right',36,16,10],
+    ['German Rex','Clockhand Spin','Clockhand Whirl','whirl','left',37,20,9],
+    ['Kurilian Bobtail','Island Current','Island Flow','wave','right',32,33,7],
+    ['Sokoke','Canopy Zigzag','Canopy Rush','rush','left',42,23,12]
+  ].map(([breed,signature,label,technique,lead,reach,arc,tempo],index)=>Object.freeze({
+    breed,signature,label,technique,lead,reach,arc,tempo,serial:index+1
+  })));
+  // Geometry is authored per technique, then personalized by all 56 individual
+  // profiles. Six key-positions cover recoil, anticipation, contact and recovery.
+  const techniqueRoutes=Object.freeze({
+    maul:Object.freeze({lead:[[0,0],[-15,-26],[-9,-43],[28,-15],[23,13],[0,0]],off:[[0,0],[7,-8],[-5,-12],[2,5],[-4,6],[0,0]],body:[[0,0],[-6,-4],[-8,-12],[16,8],[7,4],[0,0]]}),
+    prism:Object.freeze({lead:[[0,0],[-9,-8],[-22,-30],[24,-25],[17,9],[0,0]],off:[[0,0],[14,-5],[23,-28],[-19,-27],[-9,7],[0,0]],body:[[0,0],[2,-4],[-7,-9],[7,-5],[3,2],[0,0]]}),
+    rush:Object.freeze({lead:[[0,0],[-10,-6],[8,-8],[35,-3],[29,4],[0,0]],off:[[0,0],[-11,6],[-8,0],[12,7],[6,2],[0,0]],body:[[0,0],[-7,3],[-12,0],[24,0],[14,4],[0,0]]}),
+    shield:Object.freeze({lead:[[0,0],[-11,-4],[-27,-15],[-6,-31],[22,-11],[0,0]],off:[[0,0],[8,-12],[27,-18],[20,-24],[-3,-3],[0,0]],body:[[0,0],[-4,2],[-8,6],[-3,-9],[5,-3],[0,0]]}),
+    comet:Object.freeze({lead:[[0,0],[4,-12],[-10,-33],[10,-45],[28,-14],[0,0]],off:[[0,0],[-13,-5],[-17,-20],[15,-21],[3,8],[0,0]],body:[[0,0],[1,-7],[-2,-18],[14,-22],[10,-5],[0,0]]}),
+    feint:Object.freeze({lead:[[0,0],[-18,9],[-29,18],[27,-22],[15,4],[0,0]],off:[[0,0],[8,-7],[25,-13],[-9,-30],[-4,4],[0,0]],body:[[0,0],[-8,5],[-18,11],[17,-10],[4,-3],[0,0]]}),
+    whirl:Object.freeze({lead:[[0,0],[-20,-3],[-14,-36],[21,-32],[25,9],[0,0]],off:[[0,0],[12,-7],[26,-25],[-19,-19],[-7,12],[0,0]],body:[[0,0],[-5,-3],[-12,-8],[11,-5],[6,2],[0,0]]}),
+    lance:Object.freeze({lead:[[0,0],[-23,-5],[-29,-6],[40,-14],[28,-5],[0,0]],off:[[0,0],[-8,-3],[-14,-12],[5,7],[6,4],[0,0]],body:[[0,0],[-7,2],[-12,-3],[21,-5],[9,0],[0,0]]}),
+    pounce:Object.freeze({lead:[[0,0],[-12,-8],[-16,-21],[33,-31],[22,4],[0,0]],off:[[0,0],[-7,-13],[-10,-25],[26,-20],[13,7],[0,0]],body:[[0,0],[-8,3],[-17,-17],[22,-24],[10,-5],[0,0]]}),
+    wave:Object.freeze({lead:[[0,0],[-7,2],[-24,-17],[18,-39],[32,-9],[0,0]],off:[[0,0],[6,-3],[18,-14],[17,-36],[-10,-14],[0,0]],body:[[0,0],[-5,3],[-9,-5],[8,-11],[11,0],[0,0]]}),
+    thunder:Object.freeze({lead:[[0,0],[-19,-29],[-16,-46],[20,12],[16,17],[0,0]],off:[[0,0],[-8,-8],[7,-15],[18,6],[-4,5],[0,0]],body:[[0,0],[-7,-4],[-13,-15],[14,14],[5,7],[0,0]]})
+  });
+  function identityFor(breed){
+    return fightingStyles.find(style=>style.breed===breed)||fightingStyles[0];
+  }
   const collection = Object.freeze(faces.map((a,index) => Object.freeze({
     breed:a[0], fur:a[1], shade:a[2], marks:a[3], eyes:a[4],
     pattern:a[5], ears:a[6], tail:a[7],
@@ -77,6 +158,7 @@
     motion:index%8, color:specialColors[index%8], style:types[index%8],
     uniq:index, kit:uniqueMoves[index]?.id || 'cat-kit-'+String(index+1).padStart(2,'0'),
     skill:uniqueMoves[index]?.signature || 'Hero Spark',
+    fightingStyle:fightingStyles[index],
     choreography:Object.freeze({
       reach:8+((index*13+5)%33),
       arc:11+((index*17+9)%31),
@@ -300,6 +382,25 @@
     const amount=phase-start;
     return values[start]+(values[end]-values[start])*amount;
   }
+  function personalMotion(art,pose,frame=3){
+    const style=art.fightingStyle||identityFor(art.breed);
+    const route=techniqueRoutes[style.technique]||techniqueRoutes.maul;
+    const power=pose==='ultimate'?1.25:pose==='signature'?1:
+      pose==='swipe'?.65:pose==='guard'?.36:pose==='approach'?.22:0;
+    const scaleX=(style.reach/32)*power;
+    const scaleY=(style.arc/29)*power;
+    function delta(points) {
+      return [
+        Math.round(keyframeValue(points.map(point=>point[0]),frame)*scaleX),
+        Math.round(keyframeValue(points.map(point=>point[1]),frame)*scaleY)
+      ];
+    }
+    const lead=delta(route.lead);
+    const offhand=delta(route.off);
+    const torso=delta(route.body);
+    const leadIndex=style.lead==='left'?0:1;
+    return Object.freeze({leadIndex,lead,offhand,torso,label:style.label,technique:style.technique});
+  }
   // A small grounded weight shift makes the back/torso react to paw force.
   // Feet remain independent of the torso so they do not float with the strike.
   function torsoWeight(art,pose,frame=3) {
@@ -309,7 +410,14 @@
     const shift=Math.round((attack?art.choreography.reach/6:guard?-3:hit?-4:0)*weight);
     const lift=Math.round((pose==='ultimate'?-7:pose==='signature'?-5:attack?-2:hit?3:0)*Math.max(0,weight));
     const tilt=Math.round((attack?Math.min(6,art.choreography.arc/5):guard?-3:hit?-5:0)*weight);
-    return Object.freeze({shift,lift,tilt});
+    const personal=personalMotion(art,pose,frame);
+    // Do not translate the feet with this body movement. The rear paws stay
+    // planted even when the cat performs a forceful heavy or acrobatic move.
+    return Object.freeze({
+      shift:shift+Math.round(personal.torso[0]*.65),
+      lift:lift+Math.round(personal.torso[1]*.5),
+      tilt:tilt+Math.round(personal.torso[0]*.16)
+    });
   }
   function choreograph(art,pose,frame=3) {
     const phase=Number.isFinite(frame)?Math.max(0,Math.min(5,frame)):3;
@@ -342,9 +450,41 @@
         drawn.push([x,y,goal[2]||0]);
       }
     }
-    const headAngle=Math.round(target[4]*weight+(pose==='impact'?-counter*.2:0));
+    const individual=personalMotion(art,pose,frame);
+    for(let i=0;i<2;i++){
+      const delta=i===individual.leadIndex?individual.lead:individual.offhand;
+      drawn[i][2]=Math.min(219,Math.max(4,drawn[i][2]+delta[0]));
+      drawn[i][3]=Math.min(220,Math.max(12,drawn[i][3]+delta[1]));
+    }
+    const headAngle=Math.round(target[4]*weight+
+      (pose==='impact'?-counter*.2:0)+individual.torso[0]*.14);
     drawn.push(headAngle);
     return drawn;
+  }
+  function fightingStyleTrail(art,pose,frame=3){
+    if(!['swipe','signature','ultimate'].includes(pose))return '';
+    const style=art.fightingStyle;
+    const lead=style.lead==='left'?0:1;
+    const start=choreograph(art,pose,1.5)[lead];
+    const apex=choreograph(art,pose,3)[lead];
+    const finish=choreograph(art,pose,4.5)[lead];
+    const opacity=Math.max(.12,Math.min(.9,keyframeValue([.12,.25,.58,.9,.68,.2],frame)));
+    const thick=pose==='ultimate'?7:pose==='signature'?5:3;
+    // This path traces the fighter's OWN animated claw trajectory, not a
+    // generic star/swish duplicated across all 56 cats.
+    const d='M'+start[2]+' '+start[3]+' Q'+
+      Math.round((start[2]+apex[2])/2+style.arc*.15)+' '+
+      Math.round((start[3]+apex[3])/2-style.arc*.4)+' '+
+      apex[2]+' '+apex[3]+' Q'+
+      Math.round((apex[2]+finish[2])/2+style.reach*.1)+' '+
+      Math.round((apex[3]+finish[3])/2-style.arc*.28)+' '+
+      finish[2]+' '+finish[3];
+    return '<g class="art-fighting-style-trail" data-style="'+style.serial+
+      '" data-technique="'+style.technique+'" opacity="'+opacity+'">'+
+      '<path d="'+d+'" fill="none" stroke="'+art.color+'" stroke-width="'+
+      thick+'" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<circle cx="'+apex[2]+'" cy="'+apex[3]+'" r="'+
+      (pose==='ultimate'?7:4)+'" fill="'+art.eyes+'" opacity=".8"/></g>';
   }
   function svgForBreed(breed,pose='idle',frame=3){
     const art=getArt(breed);
@@ -386,7 +526,7 @@
       paw(art,...p[0],false,key)+paw(art,...p[1],true,key)+
       '<g class="art-head-weight" transform="translate('+Math.round(balance.shift*.45)+' '+balance.lift+')">'+head+'</g>'+
       smallClaws+defeat+
-      abilityArt(art,key,frame)+signatureSeal(art,key,frame)+individualAttackTrail(art,key,frame)+
+      abilityArt(art,key,frame)+signatureSeal(art,key,frame)+individualAttackTrail(art,key,frame)+fightingStyleTrail(art,key,frame)+
       (key==='impact'?'<path d="M158 40 l7 -12 l5 12 l13 4 l-13 5 l-5 12 l-6 -13 l-13 -4 Z" fill="#ffe17c"/>':'')+
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
       '</svg>';
@@ -406,9 +546,9 @@
     const art=getArt(breed);
     const base=pose==='ultimate'?780:pose==='signature'?650:
       pose==='guard'?430:pose==='impact'?310:pose==='swipe'?480:550;
-    return base+art.choreography.tempo;
+    return base+art.choreography.tempo+(art.fightingStyle?.tempo||0);
   }
   window.PawtopiaBattleCharacterArt=Object.freeze({
-    collection,getArt,poseKeys,animationFrames,smoothFrames,keyframeValue,torsoWeight,choreograph,timingFor,svgForBreed,paint
+    collection,getArt,poseKeys,animationFrames,smoothFrames,keyframeValue,torsoWeight,personalMotion,choreograph,timingFor,svgForBreed,paint,fightingStyles,identityFor
   });
 })();

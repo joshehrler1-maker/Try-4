@@ -46,7 +46,8 @@
       art.style.backgroundSize=kit.sprite.backgroundSize;
       art.style.backgroundPosition=kit.sprite.backgroundPosition;
     }
-    art.setAttribute('aria-label',(cat?.name||'Your cat')+' · '+kit.breed+' original adoption portrait');
+    art.setAttribute('aria-label',(cat?.name||'Your cat')+' · '+kit.breed+
+      ' original adoption portrait · '+(characterArt?.identityFor(kit.breed)?.label||'Battle fighter'));
     petSprite.dataset.motion=kit.movement;
     petSprite.style.setProperty('--cat-skill-color',kit.theme.color);
     el('battle-cat-tag').textContent=kit.breed;
@@ -79,7 +80,8 @@
     select.disabled=busy||Boolean(fighting)||!cats.length;
     const stats=pet?engine.profile(pet):null;
     el('battle-pet-detail').textContent=pet
-      ?pet.breed+' · Strength '+engine.training(pet).strength+' · Defence '+engine.training(pet).defence+
+      ?pet.breed+' · Fighting style: '+(characterArt?.identityFor(pet.breed)?.label||'Balanced Claw')+
+        ' · Strength '+engine.training(pet).strength+' · Defence '+engine.training(pet).defence+
         ' · Movement '+engine.training(pet).movement+' · Endurance '+engine.training(pet).endurance+
         ' · Intelligence '+engine.training(pet).intelligence
       :'Visit Companion Cottage to adopt one of 56 cats.';

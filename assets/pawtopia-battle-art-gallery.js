@@ -23,12 +23,14 @@
     el('gallery-name').textContent=chosen;
     el('gallery-skill').textContent='Signature: '+kit.signature;
     el('gallery-ultimate').textContent='Ultimate: '+kit.ultimate;
-    el('gallery-markings').textContent='Fur: '+profile.pattern+' · '+profile.tail+' tail · '+profile.ears+' ears';
+    el('gallery-markings').textContent='Style: '+profile.fightingStyle.label+
+      ' · '+profile.fightingStyle.technique+' technique · '+profile.fightingStyle.lead+'-paw lead'+
+      ' · '+profile.pattern+' coat';
     for(const button of roster.querySelectorAll('button[data-breed]'))
       button.setAttribute('aria-pressed',String(button.dataset.breed===chosen));
     for(const button of moves.querySelectorAll('button[data-pose]'))
       button.setAttribute('aria-pressed',String(button.dataset.pose==='idle'));
-    status(chosen+' is ready. Choose a move to watch its art animation.');
+    status(chosen+' uses '+profile.fightingStyle.label+'. Choose a move to watch its own fighting style.');
   }
   async function play(pose) {
     if(!art.poseKeys.includes(pose))return;
