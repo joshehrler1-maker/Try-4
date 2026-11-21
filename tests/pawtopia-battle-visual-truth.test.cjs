@@ -42,7 +42,7 @@ test('defensive moves and zero-damage blows never trigger damaging impact or cam
  assert.equal(hit.cameraShake,true);
  assert.equal(hit.label,'');
 });
-test('all 12 rank-specific enemies have distinct charge frames, not regular swipes',()=>{
+test('all arena challengers have distinct charge frames, not regular swipes',()=>{
  const w=loadPure(),art=w.PawtopiaBattleFoeArt;
  assert.equal(art.models.length,208);
  assert.ok(art.states.includes('charge'));
@@ -61,8 +61,8 @@ test('all 12 rank-specific enemies have distinct charge frames, not regular swip
    assert.notEqual(art.drawing(foe,'swipe',3),frames[3]);
    chargeShapes.add(frames[3]);
  }
- assert.equal(chargeShapes.size,12);
- assert.equal(total,72);
+ assert.equal(chargeShapes.size,art.models.length);
+ assert.equal(total,art.models.length*6);
 });
 class MockElement{
  constructor(tag='div'){
@@ -100,8 +100,13 @@ function arena(cat,foeIndex=0){
    return result;
   }}};
  const setTimeout=fn=>{Promise.resolve().then(fn);return 1;};
- for(const asset of assets)vm.runInNewContext(asset,{window,document,setTimeout});
- const choose=el('battle-foe-list').children[foeIndex];
+ const deterministicMath=Object.create(Math);
+ deterministicMath.random=()=>.5;
+ for(const asset of assets)vm.runInNewContext(asset,{window,document,setTimeout,Math:deterministicMath});
+ const foes=window.PawtopiaBattleData.foes;
+ const index=foes.findIndex(foe=>foe.id==='foe-'+(foeIndex+1));
+ if(foeIndex)el('battle-foe-tier').listeners.change({target:{value:String(foes[index].rank)}});
+ const choose=el('battle-foe-list').children.find(button=>Number(button.dataset.foe)===index);
  return {window,el,choose,getSave:()=>clone(progress)};
 }
 test('zero-damage defense animations show guard and a label without a fake hit',async()=>{
