@@ -188,3 +188,10 @@ footer{padding:16px 0 28px;text-align:center}
 @media(max-width:450px){
 .cat-avatar.has-body-art svg.paw-battle-full-body{max-width:138px;max-height:165px}
 }
+
+.battle-art-gallery{margin:1rem 0;padding:1rem;border:1px solid #7798c6;border-radius:14px;background:#141f3b}
+.battle-art-gallery summary{font-weight:850;font-size:1rem;color:#ffdf9e;cursor:pointer;padding:.3rem}
+.battle-art-preview-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem}
+.battle-art-preview-actions button{min-height:44px;border:1px solid #98b4d2;border-radius:.65rem;padding:.45rem;background:#344b75;color:#f6f0ff;font-weight:750}
+.battle-art-preview-actions button:not(:disabled):hover{border-color:#ffdd86;background:#526994}
+@media(max-width:500px){.battle-art-gallery{padding:.7rem}.battle-art-preview-actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
