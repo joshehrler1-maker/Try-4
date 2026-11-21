@@ -208,3 +208,17 @@ footer{padding:16px 0 28px;text-align:center}
 .foe-avatar[data-pose="defeat"] svg{filter:grayscale(.48) saturate(.6)}
 .foe-avatar[data-pose="victory"] svg{filter:drop-shadow(0 0 17px var(--foe-color))}
 @media(max-width:500px){.foe-avatar{max-width:155px;max-height:170px}.foe-avatar svg.foe-body-illustration{max-height:170px}}
+
+/* Hands-free one-match watch mode, Android-friendly buttons and battery-aware pace. */
+.watch-speed{display:grid;align-items:center;gap:3px;min-width:160px}
+.watch-speed label{margin:0;font-size:.8rem;color:#d3e6f5}
+.watch-speed select{min-height:46px;min-width:150px;padding:6px 10px;background:#132346;color:#fff5d8;border:2px solid #98b3d7;border-radius:11px}
+.watch-note{max-width:85ch;margin:9px 2px 0;font-size:.84rem;color:#d2dbed}
+#battle-watch{background:linear-gradient(#c8f2e5,#70d4c2);border-color:#8fe6d9;color:#102a47}
+#battle-watch:not(:disabled):hover{filter:brightness(1.08)}
+#battle-pause[aria-pressed="true"]{background:#645475;border-color:#f5d18a}
+@media(max-width:430px){
+  .setup-actions>button{flex:1 1 145px}
+  .watch-speed{width:100%}
+  .watch-speed select{width:100%}
+}
