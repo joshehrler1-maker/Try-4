@@ -287,8 +287,9 @@
   }
   async function playArtFrames(cat,state,duration,fromPose='swipe'){
     if(!characterArt||!cat)return;
-    const lightweight=frameQuality==='efficient'||window.navigator?.connection?.saveData||duration<370;
-    const smooth=(!lightweight&&characterArt.flowFrames)||null;
+    const lightweight=frameQuality==='efficient'||window.navigator?.connection?.saveData;
+    const quick=['approach','walk','run','guard','impact','recover'].includes(state);
+    const smooth=(!lightweight&&(quick?characterArt.smoothFrames:characterArt.flowFrames))||null;
     const frames=smooth||(!lightweight&&characterArt.smoothFrames)||characterArt.animationFrames||[3];
     if(reduced()){
       characterArt.paint(el('battle-cat-art'),cat.breed,state==='recover'?'idle':state,3);
@@ -537,7 +538,7 @@
     frameQuality=next==='efficient'?'efficient':'smooth';
     render();
     status(frameQuality==='efficient'?'Battery saver uses six illustrated poses per action.':
-      'Smooth mode uses eleven illustrated poses per attack.');
+      'Smooth mode uses up to 21 drawings per attack and 11 for quick transitions.');
   });
   document.addEventListener?.('visibilitychange',()=>{
     if(document.hidden&&watchMode) {
