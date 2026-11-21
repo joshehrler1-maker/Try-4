@@ -394,7 +394,7 @@
   }
   function recoveryPose(art,fromPose,frame) {
     const source=['swipe','signature','ultimate','guard','impact','approach','walk','run'].includes(fromPose)?fromPose:'swipe';
-    const start=choreograph(art,source,4.25),finish=choreograph(art,'idle',3);
+    const start=choreograph(art,source,5),finish=choreograph(art,'idle',3);
     const t=Math.max(0,Math.min(1,Number.isFinite(frame)?frame/5:1));
     const eased=t*t*(3-2*t);
     return start.map((item,i)=>Array.isArray(item)?
@@ -542,7 +542,7 @@
     const glow=pose==='ultimate'?'#ffdaa6':art.color;
     const overlay=furMarkings(art,pose);
     const recoveryProgress=Math.max(0,Math.min(1,(Number.isFinite(frame)?frame:5)/5));
-    const fromWeight=key==='recover'?torsoWeight(art,fromPose,4.25):null;
+    const fromWeight=key==='recover'?torsoWeight(art,fromPose,5):null;
     const neutral=torsoWeight(art,'idle',3);
     const settle=1-recoveryProgress*recoveryProgress*(3-2*recoveryProgress);
     const balance=key==='recover'?{
@@ -560,7 +560,8 @@
       '<path d="M76 142 Q110 155 142 141 L140 171 Q105 174 78 167 Z" fill="'+art.cape+'" stroke="#d8b16c" stroke-width="3.5" opacity=".96"/>'+
       '<path d="M105 151 L116 151 L125 159 L115 171 L105 171 L96 159 Z" fill="#f2bd69" stroke="#fce0a8" stroke-width="2"/>'+
       '<path d="M106 161 Q112 152 117 161 Q112 169 106 161" fill="#6b4587"/></g>';
-    const cape='<path d="M75 124 Q'+(34+art.uniq%11+Math.round((frame-3)*art.choreography.arc/8))+' 145 37 '+(203-(art.uniq%9))+' Q80 '+(206+(art.uniq%7))+' 102 185 L98 122 Z" fill="'+art.cape+'" stroke="#dfb975" stroke-width="4" opacity=".88"/>';
+    const capeFrame=key==='recover'?5-2*(1-settle):frame;
+    const cape='<path d="M75 124 Q'+(34+art.uniq%11+Math.round((capeFrame-3)*art.choreography.arc/8))+' 145 37 '+(203-(art.uniq%9))+' Q80 '+(206+(art.uniq%7))+' 102 185 L98 122 Z" fill="'+art.cape+'" stroke="#dfb975" stroke-width="4" opacity=".88"/>';
     const head='<g class="art-head-inner" transform="rotate('+p[4]+' 109 80)">'+earsArt+
       '<ellipse cx="110" cy="83" rx="'+(r+25)+'" ry="'+(r+26)+'" fill="'+art.shade+'" opacity=".9"/>'+
       '<ellipse cx="110" cy="78" rx="63" ry="64" fill="'+art.fur+'" stroke="'+art.shade+'" stroke-width="5"/>'+
