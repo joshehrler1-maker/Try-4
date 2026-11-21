@@ -534,9 +534,19 @@
       '<circle cx="'+apex[2]+'" cy="'+apex[3]+'" r="'+
       (pose==='ultimate'?7:4)+'" fill="'+art.eyes+'" opacity=".8"/></g>';
   }
+  // Small bounded markup cache avoids rebuilding elaborate art geometry for
+  // repeated previews. Never caches user saves or persistent data.
+  const svgCache=new Map(),svgCacheLimit=96;
   function svgForBreed(breed,pose='idle',frame=3,fromPose='swipe'){
     const art=getArt(breed);
     const key=poseKeys.includes(pose)?pose:'idle';
+    const cacheKey=art.uniq+'|'+key+'|'+String(frame)+'|'+fromPose;
+    if(svgCache.has(cacheKey)){
+      const hit=svgCache.get(cacheKey);
+      svgCache.delete(cacheKey);
+      svgCache.set(cacheKey,hit);
+      return hit;
+    }
     const p=key==='recover'?recoveryPose(art,fromPose,frame):choreograph(art,key,frame);
     const type=art.pattern;
     const mane=art.tail==='plume'||art.ears==='tuft';
@@ -577,7 +587,7 @@
     const flow=flowSignature(art);
     const flowVars='--breath-period:'+flow.breathDuration+';--tail-period:'+flow.tailDuration+
       ';--ear-period:'+flow.earDuration;
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" data-source-pose="'+
+    const markup='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" data-source-pose="'+
       (key==='recover'?fromPose:'idle')+'" style="'+flowVars+'" aria-hidden="true">'+
       safety+'<defs><clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+
       '<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>'+
@@ -592,13 +602,22 @@
       (key==='impact'?'<path d="M158 40 l7 -12 l5 12 l13 4 l-13 5 l-5 12 l-6 -13 l-13 -4 Z" fill="#ffe17c"/>':'')+
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
       '</svg>';
+    svgCache.set(cacheKey,markup);
+    if(svgCache.size>svgCacheLimit)svgCache.delete(svgCache.keys().next().value);
+    return markup;
   }
   function paint(container,breed,pose='idle',frame=3,fromPose='swipe'){
     if(!container)return false;
     const art=getArt(breed);
+    // Avoid destroying and recreating the face texture for an unchanged
+    // pose. Preserves the mounted idle CSS animations and saves mobile work.
+    if(container.dataset.breed===art.breed&&container.dataset.pose===pose&&
+       container.dataset.frame===String(frame)&&container.dataset.fromPose===fromPose&&
+       container.firstElementChild?.classList?.contains('paw-battle-full-body'))return true;
     // Markup contains ONLY our own trusted, fixed 56-breed design data.
     container.innerHTML=svgForBreed(art.breed,pose,frame,fromPose);
     container.classList.add('has-body-art');
+    container.dataset.breed=art.breed;
     container.dataset.pose=pose;
     container.dataset.frame=String(frame);
     container.dataset.fromPose=fromPose;
