@@ -12,7 +12,7 @@ function load(){
   vm.runInNewContext(read('assets/pawtopia-battle-character-art.js'),{window});
   return {data:window.PawtopiaBattleData,artist:window.PawtopiaBattleCharacterArt};
 }
-const trace=frames=>JSON.stringify(frames.map(a=>a.map(item=>Array.isArray(item)?item.slice(0,2):item)));
+const trace=frames=>JSON.stringify(frames); // Include paw tips, not only shoulder positions
 
 test('all 56 adopted breeds have six progressive body drawings for all four unlockable moves',()=>{
   const {data,artist}=load(),steps=Array.from(artist.animationFrames);
