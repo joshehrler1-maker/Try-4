@@ -4,6 +4,7 @@
   'use strict';
   const save=window.PawtopiaSave,data=window.PawtopiaBattleData,engine=window.PawtopiaBattleEngine;
   const characterArt=window.PawtopiaBattleCharacterArt;
+  const foeArt=window.PawtopiaBattleFoeArt;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
   let selectedPet=0,selectedFoe=0,busy=false,soundOn=false,audio=null;
@@ -103,6 +104,11 @@
     const kit=spriteArt(activeCat);
     stage.style.setProperty('--foe-color',activeFoe.color);
     el('battle-foe-emblem').textContent=activeFoe.glyph;
+    if(foeArt&&el('battle-foe-art')){
+      foeArt.paint(el('battle-foe-art'),activeFoe,currentView?.match.finished?
+        (currentView.match.result==='win'?'defeat':currentView.match.result==='loss'?'victory':'idle'):'idle');
+      foeSprite.classList.add('has-foe-art');
+    }
     el('stage-pet-name').textContent=activeCat?.name||'Your Cat';
     el('stage-pet-level').textContent='Lv '+(activeCat?engine.level(activeCat):1);
     el('stage-foe-name').textContent=activeFoe.name;
@@ -139,6 +145,7 @@
         result==='loss'?'💫 Defeat. Train and try again; no coins lost.':'Match forfeited without a penalty.';
       petSprite.classList.toggle('state-victory',result==='win');
       foeSprite.classList.toggle('state-defeat',result==='win');
+      foeSprite.classList.toggle('state-victory',result==='loss');
     }else{
       petSprite.classList.remove('state-victory','state-defeat');
       foeSprite.classList.remove('state-victory','state-defeat');
@@ -203,13 +210,23 @@
       await wait(interval);
     }
   }
+  async function playFoeFrames(foe,state,duration=440){
+    if(!foeArt||!foe||!el('battle-foe-art'))return;
+    const frames=reduced()?[3]:foeArt.frameIds;
+    for(const frame of frames){
+      foeArt.paint(el('battle-foe-art'),foe,state,frame);
+      await wait(reduced()?25:Math.max(35,Math.floor(duration/frames.length)));
+    }
+  }
   async function showEvents(events,cat){
     const kit=data.kitFor(cat?.breed);
+    const currentFoe=engine.matchInfo(save.read())?.foe || data.foes[selectedFoe];
     const pose=state=>{if(characterArt&&cat)characterArt.paint(el('battle-cat-art'),cat.breed,state);};
+    const foePose=state=>{if(foeArt&&currentFoe)foeArt.paint(el('battle-foe-art'),currentFoe,state);};
     for(const evt of events){
       if(evt.who==='system'){
-        if(evt.fx==='victory'){petSprite.classList.add('state-victory');await playArtFrames(cat,'victory',360);pose('victory');}
-        if(evt.fx==='defeat'){petSprite.classList.add('state-defeat');await playArtFrames(cat,'defeat',360);pose('defeat');}
+        if(evt.fx==='victory'){petSprite.classList.add('state-victory');await Promise.all([playArtFrames(cat,'victory',360),playFoeFrames(currentFoe,'defeat',360)]);pose('victory');foePose('defeat');}
+        if(evt.fx==='defeat'){petSprite.classList.add('state-defeat');await Promise.all([playArtFrames(cat,'defeat',360),playFoeFrames(currentFoe,'victory',360)]);pose('defeat');foePose('victory');}
         noise(evt.fx==='victory'?620:180,.22);
         await wait(450);continue;
       }
@@ -220,32 +237,38 @@
       const effect=guard?'state-guard':cast?'state-cast':'state-approach';
       let motion=Promise.resolve();
       let hitMotion=Promise.resolve();
+      let foeMotion=Promise.resolve();
       if(evt.who==='pet'){
         const action=guard?'guard':cast?(evt.name.includes('Finale')?'ultimate':'signature'):'approach';
         motion=playArtFrames(cat,action,guard?490:cast?characterArt?.timingFor(cat.breed,action):240);
+      }else{
+        foeMotion=playFoeFrames(currentFoe,guard?'guard':'approach',guard?380:240);
       }
       actor.classList.remove('state-approach','state-swipe','state-cast','state-guard');
       void actor.offsetWidth;actor.classList.add(effect);
       if(!guard&&!cast){
         await wait(245);
-        await motion;
+        await Promise.all([motion,foeMotion]);
         actor.classList.remove(effect);
         actor.classList.add('state-swipe');
         if(evt.who==='pet')motion=playArtFrames(cat,'swipe',characterArt?.timingFor(cat.breed,'swipe'));
+        else foeMotion=playFoeFrames(currentFoe,'swipe',470);
       }
       await wait(cast?340:guard?230:190);
       if(!guard){
         defender.classList.add('state-impact');
         if(evt.who==='foe')hitMotion=playArtFrames(cat,'impact',310);
+        else hitMotion=playFoeFrames(currentFoe,'impact',320);
         burst(evt,evt.who==='pet'?kit.theme.color:stage.style.getPropertyValue('--foe-color'));
         noise(evt.who==='pet'?520:210,.10);
       }else{burst(evt,'#84e4d8');noise(380,.08);}
       barAfter(evt);
       await wait(cast?440:350);
-      await Promise.all([motion,hitMotion]);
+      await Promise.all([motion,foeMotion,hitMotion]);
       actor.classList.remove(effect,'state-swipe');
       defender.classList.remove('state-impact');
       pose('idle');
+      foePose('idle');
     }
   }
   async function saveAction(callback) {
