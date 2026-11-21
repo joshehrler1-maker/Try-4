@@ -4,6 +4,7 @@
   'use strict';
   const save=window.PawtopiaSave,data=window.PawtopiaBattleData,engine=window.PawtopiaBattleEngine;
   const characterArt=window.PawtopiaBattleCharacterArt;
+  const paintCat=(...args)=>characterArt?.paintFighter?characterArt.paintFighter(...args):characterArt?.paint(...args);
   const foeArt=window.PawtopiaBattleFoeArt;
   const cinematics=window.PawtopiaBattleCinematics;
   const watcher=window.PawtopiaBattleWatch;
@@ -52,7 +53,7 @@
     }
     petSprite.classList.remove('needs-adoption');
     if (characterArt && art.dataset.breed !== kit.breed) {
-      characterArt.paint(art,kit.breed,'idle');
+      paintCat(art,kit.breed,'idle');
       art.dataset.breed=kit.breed;
     } else if (!characterArt) {
       art.style.backgroundImage='url("'+kit.sprite.src+'")';
@@ -60,7 +61,7 @@
       art.style.backgroundPosition=kit.sprite.backgroundPosition;
     }
     art.setAttribute('aria-label',(cat?.name||'Your cat')+' · '+kit.breed+
-      ' original adoption portrait · '+(characterArt?.identityFor(kit.breed)?.label||'Battle fighter'));
+      ' illustrated breed model · '+(characterArt?.identityFor(kit.breed)?.label||'Battle fighter'));
     petSprite.dataset.motion=kit.movement;
     petSprite.style.setProperty('--cat-skill-color',kit.theme.color);
     el('battle-cat-tag').textContent=kit.breed;
@@ -179,7 +180,7 @@
     if(finished){
       const result=currentView.match.result;
       if(characterArt&&activeCat){
-        characterArt.paint(el('battle-cat-art'),activeCat.breed,result==='win'?'victory':result==='loss'?'defeat':'idle');
+        paintCat(el('battle-cat-art'),activeCat.breed,result==='win'?'victory':result==='loss'?'defeat':'idle');
       }
       el('battle-outcome').textContent=result==='win'?'🏆 Victory! Rewards added to this cat and Pawtopia inventory.':
         result==='loss'?'💫 Defeat. Train and try again; no coins lost.':'Match forfeited without a penalty.';
@@ -190,7 +191,7 @@
       petSprite.classList.remove('state-victory','state-defeat');
       foeSprite.classList.remove('state-victory','state-defeat');
       if(characterArt&&activeCat&&!busy){
-        characterArt.paint(el('battle-cat-art'),activeCat.breed,'idle');
+        paintCat(el('battle-cat-art'),activeCat.breed,'idle');
       }
       el('battle-outcome').textContent='';
     }
@@ -306,12 +307,12 @@
     const smooth=(!lightweight&&(quick?characterArt.smoothFrames:characterArt.flowFrames))||null;
     const frames=smooth||(!lightweight&&characterArt.smoothFrames)||characterArt.animationFrames||[3];
     if(reduced()){
-      characterArt.paint(el('battle-cat-art'),cat.breed,state==='recover'?'idle':state,3);
+      paintCat(el('battle-cat-art'),cat.breed,state==='recover'?'idle':state,3);
       await wait(25);
       return;
     }
     if(state==='idle'){
-      characterArt.paint(el('battle-cat-art'),cat.breed,'idle',3);
+      paintCat(el('battle-cat-art'),cat.breed,'idle',3);
       await wait(duration||characterArt.timingFor(cat.breed,state));
       return;
     }
@@ -328,8 +329,8 @@
         Math.floor(elapsed/budget*(frames.length-1)));
       index=Math.max(index,due);
       const frame=frames[index];
-      if(state==='recover')characterArt.paint(el('battle-cat-art'),cat.breed,state,frame,fromPose);
-      else characterArt.paint(el('battle-cat-art'),cat.breed,state,frame);
+      if(state==='recover')paintCat(el('battle-cat-art'),cat.breed,state,frame,fromPose);
+      else paintCat(el('battle-cat-art'),cat.breed,state,frame);
       await wait(interval);
     }
   }
@@ -344,7 +345,7 @@
   async function showEvents(events,cat){
     const kit=data.kitFor(cat?.breed);
     const currentFoe=engine.matchInfo(save.read())?.foe || data.foes[selectedFoe];
-    const pose=state=>{if(characterArt&&cat)characterArt.paint(el('battle-cat-art'),cat.breed,state);};
+    const pose=state=>{if(characterArt&&cat)paintCat(el('battle-cat-art'),cat.breed,state);};
     const foePose=state=>{if(foeArt&&currentFoe)foeArt.paint(el('battle-foe-art'),currentFoe,state);};
     for(const evt of events){
       const visual=cueFor(evt,kit,currentFoe);
@@ -597,7 +598,7 @@
         el('stage-pet-name').textContent=cat.name;
         el('stage-foe-name').textContent=enemy.name;
         if(!ownedCat)el('battle-cat-tag').textContent='DEMO';
-        characterArt.paint(el('battle-cat-art'),cat.breed);
+        paintCat(el('battle-cat-art'),cat.breed);
         foeArt.paint(el('battle-foe-art'),enemy);
         status('Preview duel. Your saved battle is untouched.');
         stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
@@ -614,7 +615,7 @@
         render();
         if(!ownedCat&&!engine.fighters(save.read()).length){
           spriteArt(cat);
-          characterArt.paint(el('battle-cat-art'),cat.breed);
+          paintCat(el('battle-cat-art'),cat.breed);
           el('stage-pet-name').textContent=cat.name;
           el('battle-cat-tag').textContent='DEMO';
         }

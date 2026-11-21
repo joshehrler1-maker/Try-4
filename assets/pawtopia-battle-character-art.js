@@ -562,10 +562,121 @@
     return {defs,shade(markup){return markup.replace(/fill="(#[0-9a-f]{6})"/gi,
       (match,color)=>colors.has(color)?'fill="url(#'+colors.get(color).id+')"':match);}};
   }
-  function svgForBreed(breed,pose='idle',frame=3,fromPose='swipe'){
+
+  // Width of crown, width at cheeks, muzzle width, chin depth, torso width,
+  // shoulder height, reach and ear size, in artwork units. Ordered by breed.
+  const anatomyProfiles=[
+    [55,60,28,24,51,116,22,37], [43,36,19,28,35,111,29,43], [49,49,24,24,44,117,26,27],
+    [56,56,22,18,52,121,18,19], [55,58,24,24,50,114,23,30], [45,44,19,25,41,111,26,44],
+    [46,43,20,26,40,113,27,36], [52,57,25,23,49,120,21,29], [49,49,21,23,43,117,22,33],
+    [52,53,25,21,47,118,23,25], [51,54,24,22,48,119,22,27], [43,37,18,29,35,109,29,45],
+    [52,55,24,22,50,117,23,29], [51,52,21,20,47,118,23,26], [50,51,22,23,46,119,24,24],
+    [50,51,22,22,47,117,22,29], [54,57,22,19,52,122,20,21], [41,38,17,29,34,107,30,42],
+    [47,42,18,24,38,112,27,45], [48,46,22,25,42,112,28,33], [51,52,24,23,47,116,24,26],
+    [57,59,18,14,52,123,16,18], [47,43,21,26,42,114,26,33], [48,45,20,29,42,115,25,31],
+    [46,44,19,24,41,115,26,34], [54,51,21,21,46,119,23,31], [51,55,23,22,46,116,23,33],
+    [46,45,24,25,40,116,26,30], [55,57,23,22,52,119,19,22], [47,43,18,27,41,114,26,32],
+    [49,52,21,30,50,113,26,36], [48,48,25,26,46,112,28,34], [41,34,17,32,34,105,31,47],
+    [58,61,17,13,53,123,16,19], [44,37,18,31,34,106,31,45], [54,59,27,26,53,113,24,33],
+    [55,56,25,24,51,119,22,27], [49,44,20,24,41,114,25,31], [43,40,20,31,39,106,31,46],
+    [55,58,23,19,50,121,18,17], [55,58,24,22,51,120,20,24], [54,59,25,23,53,116,23,32],
+    [46,43,18,19,37,121,18,37], [48,46,21,26,45,116,24,30], [47,50,21,27,44,113,27,37],
+    [49,46,22,24,42,115,25,32], [52,55,25,26,50,112,26,27], [46,42,19,27,39,111,26,36],
+    [52,56,24,26,49,115,24,32], [53,55,23,24,49,120,21,24], [49,49,23,24,46,116,24,31],
+    [55,59,23,21,52,120,19,23], [45,42,20,27,42,113,26,38], [50,52,21,22,46,120,21,27],
+    [51,53,23,27,48,117,23,30], [45,43,22,27,41,111,29,32]
+  ];
+  const path=(d,fill,extra='')=>'<path d="'+d+'" fill="'+fill+'" '+extra+'/>';
+  function fullHead(art,key,frame){
+    const [width,cheek,muzzle,chin,,,,earSize]=anatomyProfiles[art.uniq];
+    const n=art.uniq,cx=110;
+    const furry=art.tail==='plume'||art.pattern==='shag'||art.pattern==='curly';
+    const point=art.pattern==='point',skin=art.pattern==='skin';
+    const earColor=point?art.shade:art.fur;
+    const left=cx-width*.74,right=cx+width*.74;
+    const folded=art.ears==='fold',rounded=art.ears==='round',curled=art.ears==='curl';
+    const earTop=folded?38:Math.max(4,48-earSize),eyeY=76+(chin-22)*.21;
+    const cheekY=95+(chin-22)*.26,noseY=91+(chin-22)*.52,chinY=101+chin;
+    const earsMarkup=[left,right].map((x,i)=>{
+      const side=i?1:-1,tip=x+side*(folded?20:rounded?11:earSize*.43);
+      const d=folded?
+        'M'+(x-side*14)+' 55 Q'+tip+' 26 '+(tip-side*5)+' 45 Q'+x+' 58 '+(x+side*4)+' 62 Z':
+        rounded?
+        'M'+(x-side*15)+' 55 Q'+(tip-side*12)+' '+(earTop-5)+' '+tip+' '+(earTop+6)+' Q'+(tip+side*11)+' 38 '+(x+side*10)+' 56 Z':
+        'M'+(x-side*15)+' 54 Q'+(x-side*9)+' '+(earTop+14)+' '+tip+' '+earTop+
+          (curled?' Q'+(tip+side*12)+' '+(earTop+1)+' '+(tip+side*4)+' '+(earTop+13):'')+
+          ' Q'+(tip+side*4)+' 29 '+(x+side*12)+' 55 Z';
+      const inner=path('M'+(x-side*4)+' 48 Q'+tip+' '+(earTop+8)+' '+(tip+side*2)+' '+(earTop+12)+
+        ' Q'+x+' 40 '+(x+side*5)+' 51 Z',skin?art.marks:'#d39893','opacity=".60"');
+      const tuft=art.ears==='tuft'?path('M'+(tip-side*2)+' '+(earTop+3)+' l'+(side*4)+' -8 l'+(side*1)+' 10 Z',art.shade):'';
+      return path(d,earColor,'stroke="'+art.shade+'" stroke-width="2.3" stroke-linejoin="round"')+inner+tuft;
+    }).join('');
+    const outline='M'+(cx-width)+' 70 C'+(cx-width)+' 38 '+(cx-28-(earSize%5))+' 31 110 32 C'+(138+(muzzle%5))+' 31 '+(cx+width)+' 38 '+(cx+width)+' 70 '+
+      'Q'+(cx+cheek+5)+' '+(cheekY-8)+' '+(cx+cheek-2)+' '+cheekY+
+      (furry?' l-9 9 l3 6 l-13 -1':'')+
+      ' Q'+(cx+cheek-13)+' '+(chinY-3)+' 110 '+chinY+
+      ' Q'+(cx-cheek+13)+' '+(chinY-3)+' '+(cx-cheek+2)+' '+cheekY+
+      (furry?' l-8 -1 l3 -8 l-4 -5':'')+' Q'+(cx-width-2)+' 83 '+(cx-width)+' 70 Z';
+    const clipId='cat-face-contour-'+art.uniq;
+    const lightId='cat-face-light-'+art.uniq;
+    const faceFill='<defs><clipPath id="'+clipId+'">'+path(outline,'white')+'</clipPath>'+
+      '<radialGradient id="'+lightId+'" cx="36%" cy="23%" r="76%"><stop stop-color="#ffe7cb" stop-opacity=".39"/>'+
+      '<stop offset=".55" stop-color="#ffdaaa" stop-opacity=".05"/><stop offset="1" stop-color="#212b55" stop-opacity=".43"/></radialGradient></defs>';
+    let marking='';
+    if(point){
+      marking=path('M67 80 Q86 51 110 57 Q138 54 151 78 L153 100 Q138 123 110 124 Q82 118 67 101 Z',art.shade,'opacity=".71"');
+      if(['Birman','Snowshoe'].includes(art.breed))marking+=path('M109 58 Q101 78 102 92 Q110 97 116 92 L111 61 Z',art.fur);
+    }else if(art.pattern==='tabby'||art.pattern==='ticked'||art.pattern==='wave'){
+      marking=[0,1,2].map(j=>path('M'+(cx-width+3)+' '+(59+j*13)+' q18 -5 '+(30+j*2)+' 8 q-19 -4 -33 4 Z',art.shade,'opacity=".55"')+
+        path('M'+(cx+width-3)+' '+(59+j*13)+' q-18 -6 -35 9 q22 -6 36 2 Z',art.shade,'opacity=".51"')).join('')+
+        path('M92 45 Q105 54 110 62 Q116 50 129 44 Q117 51 110 70 Q104 56 92 45 Z',art.shade,'opacity=".6"');
+    }else if(['patch','calico'].includes(art.pattern)){
+      const flip=n%2?'translate(220 0) scale(-1 1)':'';
+      marking=path('M55 42 Q102 23 115 48 Q97 53 95 78 Q80 95 52 80 Z',art.shade,'opacity=".8" transform="'+flip+'"')+
+        path('M166 70 Q140 73 143 92 Q160 108 178 97 Z',art.marks,'opacity=".72" transform="'+flip+'"');
+    }else if(art.pattern==='spots'){
+      marking=Array.from({length:12},(_,i)=>'<ellipse cx="'+(72+(i*31+n*7)%80)+'" cy="'+(48+(i*13)%49)+
+        '" rx="'+(2+i%3)+'" ry="'+(2+i%2)+'" fill="'+art.shade+'" opacity=".65"/>').join('');
+    }
+    if(skin)marking+=path('M88 51 Q96 45 105 52 M110 48 Q124 42 136 52 M87 58 Q98 54 108 57','none',
+      'stroke="'+art.shade+'" stroke-width="1.5" stroke-linecap="round" opacity=".48"');
+    const eyes=[-1,1].map((side,i)=>{
+      const x=cx+side*(width*.43), y=eyeY+(i?1:-1);
+      const blink=key==='defeat'||key==='impact'&&frame===3;
+      const ew=11+(n%4),eh=blink?2.5:7.5+(chin%4)*.65;
+      const shape='M'+(x-ew)+' '+y+' Q'+x+' '+(y-eh*1.46)+' '+(x+ew)+' '+(y-1)+
+        ' Q'+x+' '+(y+eh*1.25)+' '+(x-ew)+' '+y+' Z';
+      const eid='cat-eye-'+n+'-'+i;
+      const iris=blink?'':'<ellipse cx="'+(x+side*1.35)+'" cy="'+y+'" rx="'+(ew*.60)+'" ry="'+(eh+1)+'" fill="'+art.eyes+'"/>'+
+        '<ellipse cx="'+(x+side*1.7)+'" cy="'+y+'" rx="'+(key==='victory'?3.7:2.8)+'" ry="'+(eh+.7)+'" fill="#231c2e"/>'+
+        '<circle cx="'+(x-2)+'" cy="'+(y-2.8)+'" r="1.9" fill="#fff3df"/><circle cx="'+(x+5)+'" cy="'+(y+2)+'" r=".85" fill="#daefff"/>';
+      return '<defs><clipPath id="'+eid+'">'+path(shape,'white')+'</clipPath></defs>'+
+        path(shape,blink?art.shade:'#ead9c7','stroke="#3b2b39" stroke-width="2.2"')+
+        '<g clip-path="url(#'+eid+')">'+iris+'</g>'+
+        path('M'+(x-ew)+' '+(y-2)+' Q'+x+' '+(y-eh*1.51)+' '+(x+ew)+' '+(y-2),'none',
+          'stroke="'+art.shade+'" stroke-width="1.5" stroke-linecap="round"');
+    }).join('');
+    const muzzlePaint=skin?art.marks:point?art.marks:art.fur;
+    const muzzleArt=[-1,1].map(side=>{
+      const x=cx+side*muzzle*.39,tip=cx+side*(muzzle+20);
+      const cap='<ellipse cx="'+x+'" cy="'+(noseY+7)+'" rx="'+muzzle*.65+'" ry="'+(9+chin*.11)+
+        '" fill="'+muzzlePaint+'" stroke="'+art.shade+'" stroke-opacity=".26"/>';
+      const whiskers=[-1,0,1].map(j=>path('M'+(x+side*4)+' '+(noseY+9+j*3)+' Q'+
+        (cx+side*(muzzle+3))+' '+(noseY+5+j*5)+' '+tip+' '+(noseY+4+j*8),'none',
+        'stroke="#e6d9c3" stroke-width="1.05" stroke-linecap="round" opacity=".8"')).join('');
+      return cap+whiskers;
+    }).join('');
+    const nose=path('M102 '+noseY+' Q110 '+(noseY-4)+' 118 '+noseY+' Q116 '+(noseY+5)+' 110 '+(noseY+7)+
+      ' Q104 '+(noseY+5)+' 102 '+noseY+' Z',point||art.breed==='Bombay'?'#593f49':'#a9626c')+
+      path('M110 '+(noseY+6)+' v7 q-4 3 -9 0 M110 '+(noseY+13)+' q5 3 10 -1','none',
+        'stroke="#684153" stroke-width="1.2" stroke-linecap="round"');
+    return faceFill+'<g class="art-ear-flex">'+earsMarkup+'</g>'+path(outline,art.fur,'stroke="'+art.shade+'" stroke-width="2.6"')+
+      '<g clip-path="url(#'+clipId+')">'+marking+path(outline,'url(#'+lightId+')')+'</g>'+eyes+muzzleArt+nose;
+  }
+  function svgForBreed(breed,pose='idle',frame=3,fromPose='swipe',full=false){
     const art=getArt(breed);
     const key=poseKeys.includes(pose)?pose:'idle';
-    const cacheKey=art.uniq+'|'+key+'|'+String(frame)+'|'+fromPose;
+    const cacheKey=art.uniq+'|'+key+'|'+String(frame)+'|'+fromPose+'|'+full;
     if(svgCache.has(cacheKey)){
       const hit=svgCache.get(cacheKey);
       svgCache.delete(cacheKey);
@@ -593,19 +704,23 @@
       '<ellipse cx="'+p[3][0]+'" cy="'+p[3][1]+'" rx="23" ry="11" fill="'+art.shade+'" opacity=".95"/>'+
       '<ellipse cx="'+p[2][0]+'" cy="'+p[2][1]+'" rx="20" ry="9" fill="'+art.fur+'"/>'+
       '<ellipse cx="'+p[3][0]+'" cy="'+p[3][1]+'" rx="20" ry="9" fill="'+art.fur+'"/>';
-    const body='<g class="art-body"><path d="M80 116 Q'+(67+(art.uniq%9))+' 122 '+(66+(art.uniq%4))+' 180 Q68 219 108 222 Q151 220 '+(155-art.uniq%5)+' 178 Q151 120 136 115 Z" fill="'+art.fur+'" stroke="'+art.shade+'" stroke-width="5"/>'+
+    const [, , , , torso, shoulder, reach] = anatomyProfiles[art.uniq];
+    const bodyShape=full?'M'+(110-torso*.56)+' '+shoulder+' Q'+(110-torso)+' 151 '+(110-torso*.89)+' 180 Q'+
+      (110-torso*.75)+' '+(210+reach*.12)+' '+(107+art.uniq*.058)+' 221 Q'+(110+torso*.72)+' 215 '+(110+torso*.88)+' 181 Q'+
+      (110+torso)+' 142 '+(110+torso*.54)+' '+shoulder+' Z':null;
+    const body='<g class="art-body"><path d="'+(bodyShape||'M80 116 Q'+(67+(art.uniq%9))+' 122 '+(66+(art.uniq%4))+' 180 Q68 219 108 222 Q151 220 '+(155-art.uniq%5)+' 178 Q151 120 136 115 Z')+'" fill="'+art.fur+'" stroke="'+art.shade+'" stroke-width="5"/>'+
       '<path d="M86 133 Q108 147 132 133 Q140 154 144 183 L122 211 L88 209 L72 184 Z" fill="'+art.fur+'" opacity=".9"/>'+overlay+
       '<path d="M76 142 Q110 155 142 141 L140 171 Q105 174 78 167 Z" fill="'+art.cape+'" stroke="#d8b16c" stroke-width="3.5" opacity=".96"/>'+
       '<path d="M105 151 L116 151 L125 159 L115 171 L105 171 L96 159 Z" fill="#f2bd69" stroke="#fce0a8" stroke-width="2"/>'+
       '<path d="M106 161 Q112 152 117 161 Q112 169 106 161" fill="#6b4587"/></g>';
     const capeFrame=key==='recover'?5-2*(1-settle):frame;
     const cape='<path d="M75 124 Q'+(34+art.uniq%11+Math.round((capeFrame-3)*art.choreography.arc/8))+' 145 37 '+(203-(art.uniq%9))+' Q80 '+(206+(art.uniq%7))+' 102 185 L98 122 Z" fill="'+art.cape+'" stroke="#dfb975" stroke-width="4" opacity=".88"/>';
-    const head='<g class="art-head-inner" transform="rotate('+p[4]+' 109 80)">'+earsArt+
+    const head='<g class="art-head-inner" transform="rotate('+p[4]+' 109 80)">'+(full?fullHead(art,key,frame):earsArt+
       '<ellipse cx="110" cy="83" rx="'+(r+25)+'" ry="'+(r+26)+'" fill="'+art.shade+'" opacity=".9"/>'+
       '<ellipse cx="110" cy="78" rx="63" ry="64" fill="'+art.fur+'" stroke="'+art.shade+'" stroke-width="5"/>'+
       portrait(art)+
       (mane?'<path d="M60 105 l-14 25 l19 -8 l-10 28 l25 -12 M156 104 l15 27 l-17 -8 l9 22 l-28 -12" stroke="'+art.fur+'" stroke-width="8" fill="none" stroke-linejoin="round" opacity=".85"/>':'')+
-      '<path d="M75 133 Q110 145 144 132" fill="none" stroke="#d5ad6b" stroke-width="4"/></g>';
+      '<path d="M75 133 Q110 145 144 132" fill="none" stroke="#d5ad6b" stroke-width="4"/>')+'</g>';
     const safety='<desc>Original battle body design for '+art.breed+', retaining its existing adoption portrait. '+key+' attack pose.</desc>';
     const smallClaws=key==='swipe'?'<path d="M195 76 l22 -9 M196 85 l21 -2 M198 94 l19 7" stroke="#fff3d2" stroke-width="3" fill="none" stroke-linecap="round"/>':'';
     const defeat=key==='defeat'?'<path d="M82 183 Q107 202 129 178" fill="none" stroke="'+art.shade+'" stroke-width="5" opacity=".6"/>':'';
@@ -624,7 +739,8 @@
       '<g class="art-cape-weight" transform="'+bodyTransform+'">'+cape+'</g>'+
       backFeet+
       '<g class="art-torso-weight" transform="'+bodyTransform+'">'+body+'</g>'+
-      paw(art,...p[0],false,key)+paw(art,...p[1],true,key)+
+      paw(art,...p[0].map((v,i)=>full&&i===2?v-(reach-23)*.51:v),false,key)+
+      paw(art,...p[1].map((v,i)=>full&&i===2?v+(reach-23)*.51:v),true,key)+
       '<g class="art-head-weight" transform="translate('+Math.round(balance.shift*.45)+' '+balance.lift+')">'+head+'</g>'+
       smallClaws+defeat+
       abilityArt(art,key,frame)+signatureSeal(art,key,frame)+individualAttackTrail(art,key,frame)+fightingStyleTrail(art,key,frame)+
@@ -635,16 +751,17 @@
     if(svgCache.size>svgCacheLimit)svgCache.delete(svgCache.keys().next().value);
     return markup;
   }
-  function paint(container,breed,pose='idle',frame=3,fromPose='swipe'){
+  function paint(container,breed,pose='idle',frame=3,fromPose='swipe',full=false){
     if(!container)return false;
     const art=getArt(breed);
     // Avoid destroying and recreating the face texture for an unchanged
     // pose. Preserves the mounted idle CSS animations and saves mobile work.
     if(container.dataset.breed===art.breed&&container.dataset.pose===pose&&
-       container.dataset.frame===String(frame)&&container.dataset.fromPose===fromPose&&
+       container.dataset.frame===String(frame)&&container.dataset.fromPose===fromPose&&container.dataset.fullArt===String(full)&&
        container.firstElementChild?.classList?.contains('paw-battle-full-body'))return true;
     // Markup contains ONLY our own trusted, fixed 56-breed design data.
-    container.innerHTML=svgForBreed(art.breed,pose,frame,fromPose);
+    container.innerHTML=svgForBreed(art.breed,pose,frame,fromPose,full);
+    container.dataset.fullArt=String(full);
     container.classList.add('has-body-art');
     container.dataset.breed=art.breed;
     container.dataset.pose=pose;
@@ -662,6 +779,7 @@
   window.PawtopiaBattleCharacterArt=Object.freeze({
     collection,getArt,poseKeys,animationFrames,smoothFrames,flowFrames,keyframeValue,
     torsoWeight,personalMotion,choreograph,recoveryPose,flowSignature,timingFor,svgForBreed,paint,
+    paintFighter:(target,breed,pose,frame,fromPose)=>paint(target,breed,pose,frame,fromPose,true),
     cacheSize:()=>svgCache.size,fightingStyles,identityFor
   });
 })();
