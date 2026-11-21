@@ -6,7 +6,7 @@
   const save=window.PawtopiaSave;
   if(!save)return;
   const kinds=Object.freeze({
-    'stage':1,'clear':3,'mini':1,'3d-win':3,
+    'stage':1,'clear':3,'mini':1,'3d-win':3,'scout':1,
     'battle-win':2,'guest-launch':1,'guest3d-launch':1
   });
   const maxDaily=30,guestDaily=4,maxBalance=9999;
@@ -44,6 +44,8 @@
       return {granted:0,balance:state().balance,message:'Unknown 3D game.'};
     if(kind==='mini'&&(!/^[a-z-]{3,32}$/.test(game)||!/^score-(1|3|6)$/.test(milestone)))
       return {granted:0,balance:state().balance,message:'Invalid arcade milestone.'};
+    if(kind==='scout'&&(!['meadow','grotto','garden','frost'].includes(game)||milestone!=='solved'))
+      return {granted:0,balance:state().balance,message:'Unknown scout trail.'};
     if(kind==='battle-win'&&!/^foe-(?:[1-9]|1[0-2])$/.test(game))
       return {granted:0,balance:state().balance,message:'Invalid battle rank.'};
     const k=today()+'|'+kind+'|'+game+'|'+milestone;
