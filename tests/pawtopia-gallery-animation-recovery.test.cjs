@@ -37,7 +37,8 @@ test('all 56 idle rigs carry Android-compatible independent head and stance peri
     const markup=art.svgForBreed(cat.breed,'idle',3);
     assert.ok(markup.includes('--head-period:'+flow.headDuration));
     assert.ok(markup.includes('--stance-period:'+flow.stanceDuration));
-    assert.ok(markup.includes('art-tail-flex'));
+    if(cat.tail==='none')assert.ok(!markup.includes('art-tail-flex'),cat.breed+' is naturally tailless');
+    else assert.ok(markup.includes('art-tail-flex'),cat.breed+' should have a moving tail');
     assert.ok(markup.includes('art-ear-flex'));
   }
 });
