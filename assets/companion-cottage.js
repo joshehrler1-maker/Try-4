@@ -104,6 +104,7 @@
     const pointState=upgrades?.state();
     byId('pet-upgrade-balance').textContent=String(pointState?.balance||0);
     byId('pet-upgrade-earned-today').textContent=String(pointState?.daily||0)+' of '+(upgrades?.maxDaily||30);
+    trainPoints.disabled = !upgrades?.canSpend(progress,training.value);
     byId('coins').textContent = coins;
     byId('inventory').textContent = 'Inventory · ' + food + (food === 1 ? ' snack' : ' snacks') + (toy ? ' · Crystal toy' : '');
     const allCats = [companion, ...otherCompanions].filter(Boolean).slice(0, maxCats);
