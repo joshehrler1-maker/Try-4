@@ -14,6 +14,9 @@
   function applyBreed(breed) {
     if(!data.breeds.includes(breed))return;
     active++;
+    // Cancels any previous preview before changing the portrait, ensuring
+    // it cannot keep the gallery stuck in a permanently 'busy' state.
+    busy=false;
     chosen=breed;
     currentPose='idle';
     const profile=art.getArt(chosen),kit=data.kitFor(chosen);
@@ -39,27 +42,48 @@
     for(const button of moves.querySelectorAll('button[data-pose]'))
       button.setAttribute('aria-pressed',String(button.dataset.pose===pose));
     status(breed+' · '+(pose==='signature'?data.kitFor(breed).signature:pose==='ultimate'?data.kitFor(breed).ultimate:pose)+' animation');
-    const frames=reduced()?[3]:Array.from(art.flowFrames||art.smoothFrames||art.animationFrames);
+    const reduce=reduced();
+    const frames=reduce?[3]:Array.from(art.flowFrames||art.smoothFrames||art.animationFrames);
+    const recoveryFrames=reduce?[]:Array.from(art.smoothFrames||art.animationFrames);
     const multiplier=speedSelect.value==='1.7'?1.7:1;
     const duration=art.timingFor(breed,pose)*multiplier;
     try{
       if(pose==='idle'){
-        // CSS breathing/ear/tail loops stay mounted rather than restarting
-        // with every frame, so an idle cat visibly settles and stays alive.
+        // CSS breathing, ears and tail remain mounted rather than resetting
+        // every frame, so the idle cat stays visibly alive.
         art.paint(fighter,breed,'idle',3);
-        await snooze(reduced()?25:Math.max(1350,duration));
-      }else for(const frame of frames) {
-        if(token!==active)return;
-        if(pose==='recover')art.paint(fighter,breed,pose,frame,'signature');
-        else art.paint(fighter,breed,pose,frame);
-        await snooze(reduced()?25:Math.max(18,Math.round(duration/frames.length)));
+        await snooze(reduce?25:Math.max(1350,duration));
+      }else{
+        if(pose==='recover'){
+          // A recovery preview must begin at the last signature pose, not
+          // magically teleport there from a resting stance.
+          art.paint(fighter,breed,'signature',5);
+          await snooze(reduce?25:100);
+        }
+        for(const frame of frames){
+          if(token!==active)return;
+          if(pose==='recover')art.paint(fighter,breed,'recover',frame,'signature');
+          else art.paint(fighter,breed,pose,frame);
+          await snooze(reduce?25:Math.max(18,Math.round(duration/frames.length)));
+        }
+        // All actions settle through their own personalized articulated
+        // recovery instead of cutting directly from the contact pose to idle.
+        if(token===active&&pose!=='recover'&&!reduce){
+          const interval=Math.max(18,Math.round(240*multiplier/recoveryFrames.length));
+          for(const frame of recoveryFrames){
+            if(token!==active)return;
+            art.paint(fighter,breed,'recover',frame,pose);
+            await snooze(interval);
+          }
+        }
       }
-      if(token===active) {
-        await snooze(reduced()?25:260);
+      if(token===active){
+        await snooze(reduce?25:120);
         if(token===active){
           art.paint(fighter,breed,'idle',3);
           for(const button of moves.querySelectorAll('button[data-pose]'))
             button.setAttribute('aria-pressed',String(button.dataset.pose==='idle'));
+          status(breed+' preview complete. Choose another move or cat.');
         }
       }
     }finally{if(token===active)busy=false;}
