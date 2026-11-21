@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v113-cinematic-skill-vfx';
+const CACHE = 'try4-public-v114-smooth-56-cat-motion';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-battle-art-gallery.html","assets/pawtopia-battle-art-gallery.css","assets/pawtopia-battle-art-gallery.js");
 FILES.push("pawtopia-battle-arena.html","assets/pawtopia-battle-arena.css","assets/pawtopia-battle-data.js","assets/pawtopia-battle-engine.js","assets/pawtopia-battle-character-art.js","assets/pawtopia-battle-foe-art.js","assets/pawtopia-battle-watch.js","assets/pawtopia-battle-cinematics.js","assets/pawtopia-battle-arena.js");
