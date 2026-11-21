@@ -115,7 +115,7 @@ test('arena uses posed characters during live attacks, and provides 9 free previ
     assert.ok(html.includes('data-battle-pose="'+pose+'"'),pose);
     assert.ok(css.includes('data-pose="'+pose+'"')||pose==='idle'||pose==='approach'||pose==='swipe'||pose==='victory'||pose==='defeat',pose);
   }
-  for(const action of ["playArtFrames(cat,'swipe'","playArtFrames(cat,'impact'","playArtFrames(cat,'victory'","playArtFrames(cat,'defeat'","guard?'guard'"]) {
+  for(const action of ["playArtFrames(cat,'swipe'","hitMotion=playArtFrames(cat,reaction,310)","playArtFrames(cat,'victory'","playArtFrames(cat,'defeat'","guard?'guard'"]) {
     assert.ok(uiScript.includes(action),'Missing live action sequence '+action);
   }
   assert.ok(uiScript.includes("characterArt.paint(el('battle-cat-art'),cat.breed,state,frame)"));
