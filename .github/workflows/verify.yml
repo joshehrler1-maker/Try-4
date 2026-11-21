@@ -57,6 +57,7 @@ jobs:
           node scripts/validate.mjs
           node tests/sales-page-integrity.test.cjs
           node --test tests/pawtopia-hub.test.cjs
+          node --test tests/pawtopia-progress-center.test.cjs
           node --test tests/companion-bond.test.cjs
           node --test tests/companion-cottage-ui.test.cjs
           node --test tests/pawtopia-scout.test.cjs
