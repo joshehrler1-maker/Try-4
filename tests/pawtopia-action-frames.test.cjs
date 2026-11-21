@@ -85,7 +85,7 @@ test('source routes six-frame drawings through both combat events and the no-cos
   const art=read('assets/pawtopia-battle-character-art.js');
   const page=read('pawtopia-battle-arena.html');
   assert.ok(script.includes('async function playArtFrames(cat,state,duration)'));
-  assert.ok(script.includes('const frames=characterArt.animationFrames||[3]'));
+  assert.ok(script.includes('characterArt.smoothFrames)||characterArt.animationFrames||[3]'));
   assert.ok(script.includes("characterArt.paint(el('battle-cat-art'),cat.breed,state,frame)"));
   assert.ok(script.includes("motion=playArtFrames(cat,'swipe'"));
   assert.ok(script.includes("hitMotion=playArtFrames(cat,'impact'"));

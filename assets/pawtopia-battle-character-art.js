@@ -186,7 +186,7 @@
   function abilityArt(art,pose,frame=3){
     if(pose!=='signature'&&pose!=='ultimate')return '';
     const ultimate=pose==='ultimate',cnt=ultimate?9:5;
-    const pulse=[.28,.5,.8,1,1.14,.86][Math.max(0,Math.min(5,frame))];
+    const pulse=keyframeValue([.28,.5,.8,1,1.14,.86],frame);
     const r=Math.round((ultimate?73:48)*pulse),cx=ultimate?109:167,cy=ultimate?105:73;
     const glyph=art.style==='frost'?'❄':art.style==='leaf'?'❧':art.style==='star'?'✦':
       art.style==='water'?'◇':art.style==='wind'?'➳':art.style==='gear'?'⚙':
@@ -211,7 +211,7 @@
     const final=pose==='ultimate';
     const seed=art.uniq+1;
     const cycle=Math.max(0,Math.min(5,frame));
-    const growth=[.25,.46,.74,1,1.12,.79][cycle];
+    const growth=keyframeValue([.25,.46,.74,1,1.12,.79],cycle);
     const x=final?113:166,y=final?105:75;
     const radius=Math.round((final?61:35)*growth);
     const corners=5+seed%6;
@@ -249,7 +249,7 @@
     if(!['swipe','guard','approach','impact'].includes(pose))return '';
     const phase=Math.max(0,Math.min(5,frame));
     const seed=art.uniq+1;
-    const brightness=[.2,.38,.65,1,.7,.23][phase];
+    const brightness=keyframeValue([.2,.38,.65,1,.7,.23],phase);
     if(pose==='guard'){
       const span=33+seed%17,y=149;
       return '<g class="art-personal-guard" data-guard-id="'+seed+'" opacity="'+brightness+'">'+
@@ -290,10 +290,30 @@
     defeat:[[66,158,54,209],[151,157,165,213],[91,223,10],[144,222,14],17]
   };
   const animationFrames=Object.freeze([0,1,2,3,4,5]);
+  // Half-step in-betweens improve the motion without a new paid sprite pipeline.
+  // Six original poses are preserved for older previews and regression tests.
+  const smoothFrames=Object.freeze([0,.5,1,1.5,2,2.5,3,3.5,4,4.5,5]);
   const motionWeight=Object.freeze([0,-.18,.25,1,.73,.13]);
+  function keyframeValue(values,frame=3) {
+    const phase=Number.isFinite(frame)?Math.max(0,Math.min(5,frame)):3;
+    const start=Math.floor(phase),end=Math.min(start+1,5);
+    const amount=phase-start;
+    return values[start]+(values[end]-values[start])*amount;
+  }
+  // A small grounded weight shift makes the back/torso react to paw force.
+  // Feet remain independent of the torso so they do not float with the strike.
+  function torsoWeight(art,pose,frame=3) {
+    const weight=keyframeValue(motionWeight,frame);
+    const attack=['swipe','signature','ultimate'].includes(pose);
+    const guard=pose==='guard',hit=pose==='impact';
+    const shift=Math.round((attack?art.choreography.reach/6:guard?-3:hit?-4:0)*weight);
+    const lift=Math.round((pose==='ultimate'?-7:pose==='signature'?-5:attack?-2:hit?3:0)*Math.max(0,weight));
+    const tilt=Math.round((attack?Math.min(6,art.choreography.arc/5):guard?-3:hit?-5:0)*weight);
+    return Object.freeze({shift,lift,tilt});
+  }
   function choreograph(art,pose,frame=3) {
-    const phase=Number.isInteger(frame)?Math.max(0,Math.min(5,frame)):3;
-    const base=poseDef.idle,target=poseDef[pose]||base,weight=motionWeight[phase];
+    const phase=Number.isFinite(frame)?Math.max(0,Math.min(5,frame)):3;
+    const base=poseDef.idle,target=poseDef[pose]||base,weight=keyframeValue(motionWeight,phase);
     const {reach,arc,castLift,counter}=art.choreography;
     const active=pose!=='idle'&&pose!=='victory'&&pose!=='defeat';
     const extra=pose==='swipe'?reach:pose==='signature'?Math.round(reach*.85):
@@ -335,6 +355,8 @@
     const earsArt=ears(art);
     const glow=pose==='ultimate'?'#ffdaa6':art.color;
     const overlay=furMarkings(art,pose);
+    const balance=torsoWeight(art,key,frame);
+    const bodyTransform='translate('+balance.shift+' '+balance.lift+') rotate('+balance.tilt+' 109 171)';
     const backFeet='<ellipse cx="'+p[2][0]+'" cy="'+p[2][1]+'" rx="24" ry="11" fill="'+art.shade+'" opacity=".95"/>'+
       '<ellipse cx="'+p[3][0]+'" cy="'+p[3][1]+'" rx="23" ry="11" fill="'+art.shade+'" opacity=".95"/>'+
       '<ellipse cx="'+p[2][0]+'" cy="'+p[2][1]+'" rx="20" ry="9" fill="'+art.fur+'"/>'+
@@ -357,8 +379,13 @@
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" aria-hidden="true">'+
       safety+'<defs><clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+
       '<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>'+
-      tail(art,key,frame)+cape+backFeet+body+
-      paw(art,...p[0],false,key)+paw(art,...p[1],true,key)+head+smallClaws+defeat+
+      tail(art,key,frame)+
+      '<g class="art-cape-weight" transform="'+bodyTransform+'">'+cape+'</g>'+
+      backFeet+
+      '<g class="art-torso-weight" transform="'+bodyTransform+'">'+body+'</g>'+
+      paw(art,...p[0],false,key)+paw(art,...p[1],true,key)+
+      '<g class="art-head-weight" transform="translate('+Math.round(balance.shift*.45)+' '+balance.lift+')">'+head+'</g>'+
+      smallClaws+defeat+
       abilityArt(art,key,frame)+signatureSeal(art,key,frame)+individualAttackTrail(art,key,frame)+
       (key==='impact'?'<path d="M158 40 l7 -12 l5 12 l13 4 l-13 5 l-5 12 l-6 -13 l-13 -4 Z" fill="#ffe17c"/>':'')+
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
@@ -382,6 +409,6 @@
     return base+art.choreography.tempo;
   }
   window.PawtopiaBattleCharacterArt=Object.freeze({
-    collection,getArt,poseKeys,animationFrames,choreograph,timingFor,svgForBreed,paint
+    collection,getArt,poseKeys,animationFrames,smoothFrames,keyframeValue,torsoWeight,choreograph,timingFor,svgForBreed,paint
   });
 })();
