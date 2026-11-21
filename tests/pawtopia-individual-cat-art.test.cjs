@@ -115,11 +115,11 @@ test('arena uses posed characters during live attacks, and provides 9 free previ
     assert.ok(html.includes('data-battle-pose="'+pose+'"'),pose);
     assert.ok(css.includes('data-pose="'+pose+'"')||pose==='idle'||pose==='approach'||pose==='swipe'||pose==='victory'||pose==='defeat',pose);
   }
-  for(const target of ["pose('swipe')","pose('impact')","pose('guard')","pose('victory')","pose('defeat')"]) {
-    if(target==="pose('guard')")assert.ok(uiScript.includes("guard?'guard'"));
-    else assert.ok(uiScript.includes(target),'Missing live animation '+target);
+  for(const action of ["playArtFrames(cat,'swipe'","playArtFrames(cat,'impact'","playArtFrames(cat,'victory'","playArtFrames(cat,'defeat'","guard?'guard'"]) {
+    assert.ok(uiScript.includes(action),'Missing live action sequence '+action);
   }
-  assert.ok(uiScript.includes("characterArt.paint(el('battle-cat-art'),cat.breed,pose)"));
+  assert.ok(uiScript.includes("characterArt.paint(el('battle-cat-art'),cat.breed,state,frame)"));
+  assert.ok(uiScript.includes("await playArtFrames(cat,pose,characterArt.timingFor(cat.breed,pose))"));
   assert.match(read('sw.js'),/assets\/pawtopia-battle-character-art\.js/);
   assert.match(read('.github/workflows/verify.yml'),/tests\/pawtopia-individual-cat-art\.test\.cjs/);
   assert.doesNotMatch(artScript,/\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon/);
