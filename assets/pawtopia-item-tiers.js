@@ -157,9 +157,9 @@
   };
   const categories = Object.keys(forms);
   const bands = [
-    {tier:'Low', count:120, quests:20, min:4, max:9, price:4},
-    {tier:'Mid', count:50, quests:15, min:10, max:13, price:22},
-    {tier:'High', count:20, quests:0, min:14, max:16, price:50},
+    {tier:'Low', count:120, quests:20, min:4, max:9, price:4, priceEvery:9, priceStep:1},
+    {tier:'Mid', count:50, quests:15, min:10, max:13, price:45, priceEvery:1, priceStep:1},
+    {tier:'High', count:20, quests:0, min:14, max:16, price:120, priceEvery:1, priceStep:5},
     {tier:'High', count:20, quests:20, min:17, max:20, price:0}
   ];
   const oldFoodStats = ['18,4,0','34,0,0','24,0,2','8,14,0','12,0,5','45,18,0'];
@@ -303,7 +303,6 @@
   for (const [categoryIndex, category] of categories.entries()) {
     let index = 0;
     for (const [bandIndex, band] of bands.entries()) {
-      const low = bandIndex===0, mid = bandIndex===1;
       const pools = statPools[bandIndex];
       for (let within=0; within<band.count; within++,index++) {
         const form = index%15, district = districts[Math.floor(index/15)];
@@ -312,7 +311,7 @@
           id:'trail-supply-'+categoryIds[category]+'-'+String(index+1).padStart(3,'0'),
           name:district+' '+forms[category][form], category,
           tier:band.tier, rating:index+1,
-          price:earned ? 0 : band.price+Math.floor(within/(low?9:mid?4:2)),
+          price:earned ? 0 : band.price+Math.floor(within/band.priceEvery)*band.priceStep,
           achievement:earned ? challenge(categoryIndex,bandIndex,within-(band.count-band.quests)) : null
         };
         if (category==='Battle Gear') {
