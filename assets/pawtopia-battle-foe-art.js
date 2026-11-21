@@ -3,7 +3,7 @@
 (() => {
   'use strict';
   const foes=window.PawtopiaBattleData?.foes || [];
-  const states=Object.freeze(['idle','approach','swipe','guard','impact','victory','defeat']);
+  const states=Object.freeze(['idle','approach','swipe','charge','guard','impact','victory','defeat']);
   const frameIds=Object.freeze([0,1,2,3,4,5]);
   const models=Object.freeze(foes.map((foe,index)=>{
     const tiers=['trainer','scout','terrrier','garden','frost','bolt','recruit','striker','cryo','brass','commander','avatar'];
@@ -32,11 +32,11 @@
     const f=clampFrame(frame),phase=[0,-.15,.35,1,.66,.1][f];
     const n=model.rank,col=model.color;
     const forward=pose==='approach'?16+Math.floor(n/2):
-      pose==='swipe'?23+Math.floor(n/2):pose==='guard'?-6:0;
-    const slump=pose==='defeat'?19:pose==='impact'?7:pose==='victory'?-12:0;
+      pose==='swipe'?23+Math.floor(n/2):pose==='charge'?34+n:pose==='guard'?-6:0;
+    const slump=pose==='defeat'?19:pose==='impact'?7:pose==='victory'?-12:pose==='charge'?-8:0;
     const x=Math.round(forward*phase),y=Math.round(slump*phase);
-    const armExtension=pose==='swipe'?Math.round((18+n)*phase):0;
-    const earTilt=pose==='impact'?Math.round(11*phase):0;
+    const armExtension=pose==='swipe'?Math.round((18+n)*phase):pose==='charge'?Math.round((26+n)*phase):0;
+    const earTilt=pose==='impact'?Math.round(11*phase):pose==='charge'?Math.round(-18*phase):0;
     const eyeGlare=n>=9?'#f9b768':model.eye;
     const neckY=72+Math.round(y*.45);
     const tailTip=pose==='victory'?20:pose==='defeat'?-16:Math.round(Math.sin((f+n)*1.1)*12);
@@ -67,7 +67,7 @@
       '<ellipse cx="'+(x1+offset)+'" cy="211" rx="23" ry="11" fill="'+model.metal+'" stroke="'+model.body+'" stroke-width="4"/>';
     const limb=(left)=>{
       const sx=left?76:134,dx=left?-7:armExtension;
-      const ex=Math.round((left?64:144)+dx),ey=Math.round((left?192:189)-(pose==='guard'?19*phase:pose==='swipe'&& !left?49*phase:0));
+      const ex=Math.round((left?64:144)+dx),ey=Math.round((left?192:189)-(pose==='guard'?19*phase:(pose==='swipe'||pose==='charge')&&!left?(pose==='charge'?65:49)*phase:0));
       const joints='M'+sx+' 133 Q'+(sx+(left?-16:19))+' 158 '+ex+' '+ey;
       return '<g class="foe-arm '+(left?'foe-left-arm':'foe-right-arm')+'"><path d="'+joints+
         '" stroke="'+model.body+'" stroke-width="24" stroke-linecap="round" fill="none"/>'+
@@ -102,6 +102,15 @@
     const attack=pose==='swipe'?'<g class="foe-slash" opacity="'+(.2+Math.max(0,phase)*.75)+'">'+
       Array.from({length:3},(_,i)=>'<path d="M'+(147+i*12)+' '+(76+i*6)+' Q'+(170+i*11)+' '+(69+i*6)+
         ' '+(195+i*9)+' '+(97+i*9)+'" fill="none" stroke="'+col+'" stroke-width="4" stroke-linecap="round"/>').join('')+'</g>':'';
+    const charge=pose==='charge'?
+      '<g class="foe-charge-streak" data-foe-charge="'+n+'" opacity="'+(.2+Math.max(0,phase)*.78)+'">'+
+      '<path d="M14 122 L'+(60+Math.round(10*phase))+' '+(116-Math.round(20*phase))+
+      ' M24 157 L'+(71+Math.round(12*phase))+' '+(139-Math.round(17*phase))+
+      ' M42 183 L'+(84+Math.round(8*phase))+' '+(158-Math.round(12*phase))+
+      '" stroke="'+model.eye+'" stroke-width="'+(3+Math.floor(n/4))+
+      '" stroke-linecap="round" fill="none"/>'+
+      '<path d="M'+(155+Math.round(20*phase))+' 66 L'+(165+Math.round(27*phase))+
+      ' 45 L'+(169+Math.round(31*phase))+' 65 Z" fill="'+col+'"/></g>':'';
     const impact=pose==='impact'?'<path class="foe-impact-mark" d="M58 51 L50 29 L67 37 L78 20 L75 48 L92 57 L70 60 L65 78 Z" fill="#ffe0aa"/>':'';
     const circle='<circle cx="107" cy="114" r="'+gearR+'" stroke="'+col+'" fill="none" opacity=".3" stroke-width="3"/>';
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" class="foe-body-illustration"'+
@@ -129,7 +138,7 @@
       '<path d="M91 126 L119 126 L107 140 Z" fill="#2c374a" stroke="'+col+'" stroke-width="2"/>'+
       '<path d="M93 145 Q106 '+(155+n%5)+' 123 145" fill="none" stroke="'+model.eye+'" stroke-width="3"/>'+
       '</g>'+frost+sparks+boss+'</g>'+
-      shield+attack+impact+
+      shield+attack+charge+impact+
       (pose==='victory'?'<path d="M62 22 L72 3 L81 22 L104 27 L80 33 L73 55 L63 34 L44 28 Z" fill="'+model.eye+'" opacity=".85"/>':'')+
       '</svg>';
   }

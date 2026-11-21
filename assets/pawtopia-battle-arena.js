@@ -38,6 +38,18 @@
   function spriteArt(cat) {
     const kit=data.kitFor(cat?.breed);
     const art=el('battle-cat-art');
+    if(!cat){
+      // Do not display Maine Coon's portrait as a pretend adopted cat.
+      art.innerHTML='';
+      art.dataset.breed='';
+      art.classList.remove('has-body-art');
+      art.style.backgroundImage='none';
+      art.setAttribute('aria-label','Adopt a cat to show your fighter here');
+      petSprite.classList.add('needs-adoption');
+      el('battle-cat-tag').textContent='ADOPT A CAT';
+      return kit;
+    }
+    petSprite.classList.remove('needs-adoption');
     if (characterArt && art.dataset.breed !== kit.breed) {
       characterArt.paint(art,kit.breed,'idle');
       art.dataset.breed=kit.breed;
@@ -227,6 +239,7 @@
     },500);
   }
   function burst(evt,color,visual) {
+    const combat=cinematics?.combatVisual(evt);
     const box=el('battle-vfx');
     const target=evt.target==='pet'?'30%':'70%';
     const glyph=evt.fx==='frost'?'❄':evt.fx==='leaf'?'❧':
@@ -243,7 +256,16 @@
       particle.style.setProperty('--spin',(n%2?80:-80)+'deg');
       box.append(particle);setTimeout(()=>particle.remove(),900);
     }
-    cameraContact(evt,visual,color);
+    if(combat?.cameraShake)cameraContact(evt,visual,color);
+    if(combat?.defense){
+      const label=document.createElement('span');
+      label.className='defense-popup';
+      label.textContent=combat.label;
+      label.style.setProperty('--hit-x',target);
+      label.style.setProperty('--hit-y','57%');
+      box.append(label);
+      setTimeout(()=>label.remove(),900);
+    }
     if(evt.damage>0) {
       const label=document.createElement('span');label.className='damage-popup';
       label.textContent='−'+evt.damage;
@@ -304,6 +326,7 @@
       }
       const actor=evt.who==='pet'?petSprite:foeSprite;
       const defender=evt.who==='pet'?foeSprite:petSprite;
+      const combat=cinematics?.combatVisual(evt);
       const guard=evt.fx==='guard';
       const cast=!guard&&!['swipe','impact'].includes(evt.fx);
       const effect=guard?'state-guard':cast?'state-cast':'state-approach';
@@ -315,7 +338,7 @@
         const action=guard?'guard':cast?(evt.name.includes('Finale')?'ultimate':'signature'):'approach';
         motion=playArtFrames(cat,action,guard?490:cast?characterArt?.timingFor(cat.breed,action):240);
       }else{
-        foeMotion=playFoeFrames(currentFoe,guard?'guard':'approach',guard?380:240);
+        foeMotion=playFoeFrames(currentFoe,guard?'guard':combat?.charge?'charge':'approach',guard?380:combat?.charge?420:240);
       }
       actor.classList.remove('state-approach','state-swipe','state-cast','state-guard');
       void actor.offsetWidth;actor.classList.add(effect);
@@ -325,22 +348,23 @@
         actor.classList.remove(effect);
         actor.classList.add('state-swipe');
         if(evt.who==='pet')motion=playArtFrames(cat,'swipe',characterArt?.timingFor(cat.breed,'swipe'));
-        else foeMotion=playFoeFrames(currentFoe,'swipe',470);
+        else foeMotion=playFoeFrames(currentFoe,combat?.foeMove||'swipe',combat?.charge?590:470);
       }
       await wait(cast?340:guard?230:190);
       await projectile;
       if(!guard){
-        defender.classList.add('state-impact');
-        if(evt.who==='foe')hitMotion=playArtFrames(cat,'impact',310);
-        else hitMotion=playFoeFrames(currentFoe,'impact',320);
+        const reaction=combat?.defenderPose||'impact';
+        defender.classList.add(combat?.contact?'state-impact':'state-guard');
+        if(evt.who==='foe')hitMotion=playArtFrames(cat,reaction,310);
+        else hitMotion=playFoeFrames(currentFoe,reaction,320);
         burst(evt,evt.who==='pet'?kit.theme.color:stage.style.getPropertyValue('--foe-color'),visual);
-        noise(evt.who==='pet'?520:210,.10);
+        noise(combat?.contact?(evt.who==='pet'?520:210):385,.08);
       }else{burst(evt,'#84e4d8',visual);noise(380,.08);}
       barAfter(evt);
       await wait(cast?440:350);
       await Promise.all([motion,foeMotion,hitMotion]);
       actor.classList.remove(effect,'state-swipe');
-      defender.classList.remove('state-impact');
+      defender.classList.remove('state-impact','state-guard');
       pose('idle');
       foePose('idle');
       hideCue();

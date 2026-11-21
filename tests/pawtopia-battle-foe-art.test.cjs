@@ -47,9 +47,9 @@ test('all 12 ladder enemies map to twelve distinct and correctly named original 
   assert.ok(!art.drawing(art.profile('foe-1'),'idle').includes('class="foe-boss"'),'Starter enemy must look simple');
 });
 
-test('all seven motion states contain six actual animated drawings per opponent', () => {
+test('all eight motion states contain six actual animated drawings per opponent', () => {
   const {art} = setup();
-  assert.deepEqual(Array.from(art.states),['idle','approach','swipe','guard','impact','victory','defeat']);
+  assert.deepEqual(Array.from(art.states),['idle','approach','swipe','charge','guard','impact','victory','defeat']);
   assert.deepEqual(Array.from(art.frameIds),[0,1,2,3,4,5]);
   let states = 0, renderCount = 0;
   for(const foe of art.models) {
@@ -69,10 +69,10 @@ test('all seven motion states contain six actual animated drawings per opponent'
       stateDrawings.add(art.drawing(foe,pose,3));
       states++;
     }
-    assert.equal(stateDrawings.size,7,foe.name+' requires all seven different action states');
+    assert.equal(stateDrawings.size,8,foe.name+' requires all eight different action states');
   }
-  assert.equal(states,12*7);
-  assert.equal(renderCount,12*7*6);
+  assert.equal(states,12*8);
+  assert.equal(renderCount,12*8*6);
 });
 
 test('foe attack, guarding, boss and victory shapes are meaningful, not only label changes', () => {
@@ -80,6 +80,9 @@ test('foe attack, guarding, boss and victory shapes are meaningful, not only lab
   for(const foe of art.models) {
     const swipe = art.drawing(foe,'swipe',3);
     const guard = art.drawing(foe,'guard',3);
+    const charge = art.drawing(foe,'charge',3);
+    assert.ok(charge.includes('class="foe-charge-streak"'),foe.name+' heavy-charge streak');
+    assert.notEqual(charge,swipe,'Heavy charge must not repeat the simple swipe');
     const hit = art.drawing(foe,'impact',3);
     assert.ok(swipe.includes('class="foe-slash"'),foe.name+' attack arc');
     assert.ok(guard.includes('class="foe-guard"'),foe.name+' shield pose');
@@ -102,7 +105,7 @@ test('displaying different opponents never writes to the player save', () => {
     setAttribute(k,v){this.attributes[k]=v;}
   };
   for(const foe of data.foes){
-    for(const pose of ['idle','approach','swipe','guard','impact','victory','defeat']){
+    for(const pose of ['idle','approach','swipe','charge','guard','impact','victory','defeat']){
       assert.equal(art.paint(container,foe,pose,3),true);
       assert.equal(container.dataset.foe,foe.id);
       assert.equal(container.dataset.pose,pose);
@@ -119,8 +122,8 @@ test('arena loads and animates the actual selected rank, while keeping fallback 
   assert.ok(arenaHtml.includes('class="foe-illustration"'));
   assert.ok(arenaSource.includes("foeArt.paint(el('battle-foe-art'),activeFoe"));
   assert.match(arenaSource,/async function playFoeFrames\(foe,state,duration=440\)/);
-  assert.ok(arenaSource.includes("foeMotion=playFoeFrames(currentFoe,'swipe',470)"));
-  assert.ok(arenaSource.includes("hitMotion=playFoeFrames(currentFoe,'impact',320)"));
+  assert.ok(arenaSource.includes("foeMotion=playFoeFrames(currentFoe,combat?.foeMove||'swipe',combat?.charge?590:470)"));
+  assert.ok(arenaSource.includes("hitMotion=playFoeFrames(currentFoe,reaction,320)"));
   assert.ok(arenaSource.includes("playFoeFrames(currentFoe,'defeat',360)"));
   assert.ok(arenaSource.includes("playFoeFrames(currentFoe,'victory',360)"));
   assert.ok(css.includes('.has-foe-art .foe-avatar'));

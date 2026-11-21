@@ -88,7 +88,7 @@ test('source routes six-frame drawings through both combat events and the no-cos
   assert.ok(script.includes('characterArt.smoothFrames)||characterArt.animationFrames||[3]'));
   assert.ok(script.includes("characterArt.paint(el('battle-cat-art'),cat.breed,state,frame)"));
   assert.ok(script.includes("motion=playArtFrames(cat,'swipe'"));
-  assert.ok(script.includes("hitMotion=playArtFrames(cat,'impact'"));
+  assert.ok(script.includes("hitMotion=playArtFrames(cat,reaction,310)"));
   assert.ok(script.includes('await Promise.all([motion,foeMotion,hitMotion])'));
   assert.ok(script.includes('await playArtFrames(cat,pose,characterArt.timingFor(cat.breed,pose))'));
   assert.ok(script.includes('if(reduced())'));
