@@ -159,7 +159,7 @@
   const bands = [
     {tier:'Low', count:120, quests:20, min:4, max:9, price:4, priceEvery:9, priceStep:1},
     {tier:'Mid', count:50, quests:15, min:10, max:13, price:45, priceEvery:1, priceStep:1},
-    {tier:'High', count:20, quests:0, min:14, max:16, price:120, priceEvery:1, priceStep:5},
+    {tier:'High', count:20, quests:0, min:14, max:16, price:135, priceEvery:1, priceStep:5},
     {tier:'High', count:20, quests:20, min:17, max:20, price:0}
   ];
   const oldFoodStats = ['18,4,0','34,0,0','24,0,2','8,14,0','12,0,5','45,18,0'];
