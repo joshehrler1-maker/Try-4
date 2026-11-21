@@ -31,12 +31,15 @@
     const f=1/Math.tan(.36),near=.1,far=44;
     return [f/aspect,0,0,0, 0,f,0,0, 0,0,(far+near)/(near-far),-1, 0,0,2*far*near/(near-far),0];
   }
-  function sphere(rows,cols) {
+  function sphere(rows,cols,almond=false) {
     const points=[];
     const vertex=(row,col)=>{
       const a=PI*row/rows,b=TAU*col/cols;
       const p=[Math.sin(a)*Math.cos(b),Math.cos(a),Math.sin(a)*Math.sin(b)];
-      points.push(...p,...p);
+      if(almond){
+        const taper=1-.58*Math.abs(p[0]);
+        points.push(p[0],p[1]*taper,p[2],p[0],p[1]/taper,p[2]);
+      }else points.push(...p,...p);
     };
     for(let y=0;y<rows;y++) for(let x=0;x<cols;x++){
       vertex(y,x);vertex(y+1,x);vertex(y+1,x+1);
@@ -167,7 +170,8 @@
       }`;
     const fragment=`
       precision mediump float;
-      uniform vec3 base;
+      uniform vec3 base,coatShade;
+      uniform vec4 coat;
       uniform float roughness,alpha,glow,stone;
       varying vec3 n,w,p;
       void main(){
@@ -180,9 +184,37 @@
         float highlight=pow(max(0.0,dot(v,normalize(sun+eye))),mix(20.0,75.0,roughness));
         float fiber=sin(p.y*97.0+sin(p.x*63.0)*2.7)*sin(p.z*81.0);
         vec3 light=vec3(.50,.53,.66)+diffuse*vec3(.69,.57,.41);
-        vec3 lit=base*light + vec3(.54,.71,1.0)*max(0.0,dot(v,rim))*edge*.36;
-        lit+=vec3(1.0,.85,.66)*highlight*mix(.11,.53,roughness);
-        lit+=base*fiber*.025*(1.0-roughness);
+        vec3 tint=base;
+        float bristle=0.0;
+        if(coat.x>.5){
+          float mark=0.0;
+          float twist=sin(p.x*3.0+coat.z)*.6;
+          if(coat.y<1.5){
+            float wave=sin(p.y*17.0+p.z*3.4+twist+coat.z*.56);
+            mark=smoothstep(.38,.90,wave)*(.45+.55*abs(p.x));
+          }else if(coat.y<2.5){
+            vec2 d=fract(vec2(atan(p.z,p.x)*2.7,p.y*4.1)+vec2(coat.z,.34))-0.5;
+            mark=(1.0-smoothstep(.09,.27,length(d*vec2(1.0,1.38))))*.91;
+          }else if(coat.y<3.5){
+            mark=smoothstep(.45,.86,sin(p.x*3.1+p.y*2.7+coat.z)*cos(p.z*4.0-p.y*1.8));
+          }else if(coat.y<4.5){
+            mark=smoothstep(.26,.83,p.z*.76-p.y*.40)*.82;
+          }else if(coat.y<5.5){
+            mark=smoothstep(.19,.88,-p.y*.72+p.x*.12)*.58;
+          }else {
+            mark=.15+.10*sin(p.y*6.2+p.x*3.2);
+          }
+          if(coat.w>.5) mark*=.85;
+          float grain=sin(p.x*151.0+p.z*103.0+sin(p.y*17.0)*4.0)
+            *sin(p.x*137.0+p.z*93.0+p.y*23.0);
+          bristle=grain*coat.x;
+          tint=mix(base,coatShade,mark);
+          tint*=.97+bristle*.065;
+        }
+        vec3 lit=tint*light + vec3(.54,.71,1.0)*max(0.0,dot(v,rim))*edge*.36;
+        lit+=vec3(1.0,.85,.66)*highlight*mix(.085,.53,roughness)*(coat.x>.5?.44:1.0);
+        lit+=tint*fiber*.020*(1.0-roughness);
+        lit+=tint*edge*max(0.0,bristle)*.12;
         if(stone>.5){
           vec2 bricks=w.xz*vec2(1.23,1.42);
           bricks.x+=.5*mod(floor(bricks.y),2.0);
@@ -208,10 +240,10 @@
       if(!gl.getProgramParameter(program,gl.LINK_STATUS))return null;
     }catch{return null;}
     gl.useProgram(program);
-    const uniforms=Object.fromEntries(['model','view','orientation','base','roughness','alpha','glow','stone'].map(key=>[key,gl.getUniformLocation(program,key)]));
+    const uniforms=Object.fromEntries(['model','view','orientation','base','roughness','alpha','glow','stone','coat','coatShade'].map(key=>[key,gl.getUniformLocation(program,key)]));
     const locPoint=gl.getAttribLocation(program,'point'),locNormal=gl.getAttribLocation(program,'normal');
     const meshes={};
-    for(const [name,values] of Object.entries({round:sphere(12,19),detail:sphere(8,12),cone:cone(),plane:plane()})){
+    for(const [name,values] of Object.entries({round:sphere(12,19),detail:sphere(8,12),almond:sphere(9,16,true),cone:cone(),plane:plane()})){
       const buffer=gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
       gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(values),gl.STATIC_DRAW);
@@ -224,7 +256,7 @@
     let impact=null;
 
     function draw(parent,at,scale,tint,options={}) {
-      const {shape='round',rotate=identity(),metal=.12,opacity=1,emit=0,stone=0}=options;
+      const {shape='round',rotate=identity(),metal=.12,opacity=1,emit=0,stone=0,coat=null}=options;
       const transform=multiply(multiply(parent,position(...at)),rotate);
       const model=multiply(transform,size(...scale));
       const mesh=meshes[shape==='round'&&efficient?'detail':shape];
@@ -247,25 +279,27 @@
       gl.uniform1f(uniforms.alpha,opacity);
       gl.uniform1f(uniforms.glow,emit);
       gl.uniform1f(uniforms.stone,stone);
+      gl.uniform4fv(uniforms.coat,coat?.params || [0,0,0,0]);
+      if(coat)gl.uniform3fv(uniforms.coatShade,rgb(coat.shade));
       gl.drawArrays(gl.TRIANGLES,0,mesh.length);
     }
-    function limb(parent,a,b,width,tint,metal=.1) {
+    function limb(parent,a,b,width,tint,metal=.1,coat=null) {
       const d=b.map((x,i)=>x-a[i]),length=Math.hypot(...d);
       if(length<.001)return;
       const yaw=Math.atan2(d[0],d[2]);
       const pitch=Math.acos(clamp(d[1]/length,-1,1));
       const rotate=multiply(turnY(yaw),turnX(pitch));
-      draw(parent,a.map((x,i)=>(x+b[i])*.5),[width,length*.63,width*.92],tint,{rotate,metal,shape:'detail'});
+      draw(parent,a.map((x,i)=>(x+b[i])*.5),[width,length*.63,width*.92],tint,{rotate,metal,coat,shape:'detail'});
     }
 
     function world(m,v){
       return [0,1,2].map(i=>m[i]*v[0]+m[i+4]*v[1]+m[i+8]*v[2]+m[i+12]);
     }
-    function leg(body,feet,hip,toe,width,color,metal=0){
+    function leg(body,feet,hip,toe,width,color,metal=0,coat=null){
       const a=world(body,hip),b=world(feet,toe);
       const knee=a.map((v,i)=>mix(v,b[i],.54)+(i===2?.10:0));
-      limb(identity(),a,knee,width,color,metal);
-      limb(identity(),knee,b,width*.82,color,metal);
+      limb(identity(),a,knee,width,color,metal,coat);
+      limb(identity(),knee,b,width*.82,color,metal,coat);
     }
     function shadow(x,z,lift) {
       const floor=position(x,0,z);
@@ -281,75 +315,108 @@
       const feet=multiply(multiply(position(x,p.lift>.04?p.lift:0,p.z),yaw),dimensions);
       return {root,feet};
     }
+
+    const patternTypes={tabby:1,ticked:1,wave:1,spots:2,calico:3,patch:3,point:4,solid:5,smoke:5,curly:6,shag:6};
+    function catPaw(root,center,color,coat,fore=false){
+      const [x,y,z]=center;
+      draw(root,center,fore?[.122,.098,.137]:[.134,.100,.192],color,{coat});
+      if(efficient)return;
+      for(let i=-1;i<=1;i++){
+        draw(root,[x+i*.063,y-(fore?.019:.023),z+(fore?.085:.140)-Math.abs(i)*.014],
+          [.039,fore?.052:.051,.062],color,{shape:'detail',coat});
+      }
+    }
     function catModel(root,feet,a,p,t) {
       const long=a.tail==='plume'||a.ears==='tuft';
       const slim=['large','curl'].includes(a.ears)&&a.tail!=='plume';
-      const shape=.94+(a.uniq%8)*.018, fur=a.fur, trim=a.shade, marks=a.marks, jewel=a.color;
-      draw(root,[0,.99,0],[.44*shape,.59,.32],fur);
-      draw(root,[0,.90,.23],[.34,.40,.13],a.pattern==='point'?fur:marks);
-      if(long)draw(root,[0,1.31,.08],[.54,.28,.37],fur);
-      draw(root,[0,1.39,.10],[.43,.090,.36],a.cape,{metal:.36});
-      draw(root,[0,1.33,.44],[.094,.115,.043],jewel,{metal:.72});
-      draw(root,[0,1.93,.10],[.55*shape,slim?.48:.455,.435],fur);
-      draw(root,[0,1.74,.31],[.44,.247,.296],a.pattern==='point'?trim:fur);
+      const flatFace=['Persian','Exotic Shorthair','British Shorthair'].includes(a.breed);
+      const shape=.93+(a.uniq%8)*.018, fur=a.fur, trim=a.shade, marks=a.marks, jewel=a.color;
+      const coat=a.pattern==='skin'?null:{params:[long?1.0:.76,patternTypes[a.pattern]||5,(a.uniq%17)*.43,0],shade:trim};
+      const faceCoat=coat?{params:[...coat.params.slice(0,3),1],shade:trim}:null;
+      const neutralCoat=coat?{params:[coat.params[0],5,coat.params[2],0],shade:trim}:null;
+      const pawColor=a.pattern==='point'&&!['Birman','Snowshoe'].includes(a.breed)?trim:fur;
+      const cheekColor=a.pattern==='point'?trim:a.pattern==='skin'?marks:
+        ['solid','smoke','shag'].includes(a.pattern)?fur:marks;
+
+      draw(root,[0,1.02,0],[.413*shape,.56,.305],fur,{coat});
+      draw(root,[0,.825,.13],[.29,.29,.21],fur,{coat});
+      draw(root,[0,1.12,.192],[.31,.40,.148],a.pattern==='point'?fur:marks,{coat:neutralCoat});
+      draw(root,[0,1.39,.065],[long?.373:.296,.237,.272],fur,{coat});
+      if(long)draw(root,[0,1.30,.11],[.44,.266,.31],fur,{coat});
+      draw(root,[0,1.40,.11],[.356,.066,.299],a.cape,{metal:.28});
+      draw(root,[0,1.343,.405],[.063,.074,.035],jewel,{metal:.65});
+
+      draw(root,[0,1.934,.116],[.505*shape,slim?.437:.417,.388],fur,{coat:faceCoat});
+      draw(root,[0,1.72,.307],[flatFace?.387:.332,.225,.218],a.pattern==='point'?trim:fur,{coat:faceCoat});
+      draw(root,[0,1.685,.442],[.189,.096,.103],cheekColor,{coat:neutralCoat});
+      const muzzleZ=flatFace?.493:.535;
+      const noseColor=a.pattern==='point'||a.fur==='#30313c'?'#4f3a46':'#8e5660';
+      draw(root,[0,1.792,muzzleZ+.096],[.058,.044,.033],noseColor,{shape:'cone',rotate:tilt(PI),metal:.43});
+      draw(root,[0,1.742,muzzleZ+.081],[.011,.035,.009],'#674550',{shape:'detail'});
       for(const side of [-1,1]){
-        const earX=side*(slim?.445:.411),fold=a.ears==='fold',round=a.ears==='round'||fold;
-        const earY=round?2.29:2.43+(a.ears==='large'?.08:0);
-        const earHeight=round?.17:a.ears==='large'?.32:.28;
-        const rotation=tilt(side*(a.ears==='curl'?-.46:-.23));
-        draw(root,[earX,earY,.05],[.16,earHeight,.11],fur,{shape:round?'round':'cone',rotate:rotation});
-        draw(root,[earX,earY-.015,.145],[.094,earHeight*.64,.039],
-          a.pattern==='point'?trim:'#ce8d8e',{shape:round?'round':'cone',rotate:rotation});
-        if(a.ears==='tuft')draw(root,[earX+side*.025,earY+.23,.024],[.042,.108,.029],trim,{shape:'cone',rotate:rotation});
-        const eyeY=1.96+p.step*.15,eyeX=side*.222, blink=p.eyes;
-        draw(root,[eyeX,eyeY,.445],[.153,.160*blink,.085],'#241d30');
-        draw(root,[eyeX,eyeY+.01,.505],[.133,.134*blink,.054],'#fff1dd');
-        draw(root,[eyeX+.028,eyeY+.006,.544],[.092,.119*blink,.027],a.eyes,{metal:.47});
-        draw(root,[eyeX+.035,eyeY+.005,.565],[.045,.084*blink,.015],'#191626',{metal:.7});
-        if(blink>.35)draw(root,[eyeX+.008,eyeY+.067,.58],[.026,.026,.012],'#fffaf6',{shape:'detail',emit:.68});
-        draw(root,[side*.132,1.744,.537],[.13,.102,.078],a.pattern==='point'?a.shade:'#f2d1b8');
-        const lead=side===p.stance.lead;
-        const hip=[side*.235,.69,.04],step=p.step*side;
-        const toe=[side*p.stance.spread,.105+Math.max(0,step)*.31,
-          .20+(lead?1:-1)*p.stance.depth+step*.42];
-        leg(root,feet,hip,toe,slim?.108:.132,a.pattern==='point'?trim:fur);
-        draw(feet,toe,[.151,.105,.224],a.pattern==='point'?trim:fur);
-        const reach=lead?p.paw:p.offhand;
-        const stanceGuard=p.stance.depth*(lead?1:.46);
-        if(!efficient)for(let whisker=0;whisker<3;whisker++){
-          limb(root,[side*.19,1.73+whisker*.025,.57],
-            [side*(.43+whisker*.031),1.72+whisker*.047,.565],.007,
-            a.pattern==='point'?'#c3a7a1':'#f4dfcc');
+        const earX=side*(slim?.397:.366),fold=a.ears==='fold',round=a.ears==='round'||fold;
+        const earY=round?2.263:2.365+(a.ears==='large'?.076:0);
+        const earHeight=round?.156:a.ears==='large'?.303:.252;
+        const earTurn=side*(a.ears==='curl'?-.39:-.225);
+        const rotation=tilt(earTurn);
+        draw(root,[earX,earY,.043],[round?.144:.144,earHeight,.099],fur,
+          {shape:round?'round':'cone',rotate:rotation,coat:neutralCoat});
+        draw(root,[earX,earY-.026,.125],[.088,earHeight*.59,.030],
+          a.pattern==='point'?trim:'#ad777c',{shape:round?'round':'cone',rotate:rotation});
+        if(a.ears==='tuft')draw(root,[earX+side*.025,earY+.21,.021],[.031,.093,.026],trim,
+          {shape:'cone',rotate:tilt(earTurn-side*.08),coat:neutralCoat});
+
+        const blink=Math.max(.1,p.eyes),eyeY=1.956+p.step*.07,eyeX=side*.204;
+        const eyeAngle=tilt(side*.18),eyeZ=.440;
+        draw(root,[eyeX,eyeY,eyeZ],[.134,.082*blink,.068],'#342b35',{shape:'almond',rotate:eyeAngle});
+        if(blink>.23){
+          draw(root,[eyeX+side*.011,eyeY,eyeZ+.044],[.108,.059*blink,.042],a.eyes,
+            {shape:'almond',rotate:eyeAngle,metal:.38});
+          draw(root,[eyeX+side*.014,eyeY-.004,eyeZ+.077],[.019,.055*blink,.018],'#171925',
+            {shape:'detail',rotate:tilt(side*.07),metal:.42});
+          draw(root,[eyeX-side*.009,eyeY+.030,eyeZ+.084],[.013,.014,.008],'#eaf5ff',{shape:'detail',emit:.68});
         }
-        const shoulder=[side*.365,1.2,.02];
-        const lift=p.overhead*(lead?1:.36);
-        const elbow=[side*(.45+reach*.17),.94+reach*.19+p.curl*.19+lift*.52,.16+reach*.21+stanceGuard];
-        const hand=[side*(.43+reach*.26),.69+reach*.48+p.curl*.40+lift,.25+reach*.48+stanceGuard];
-        limb(root,shoulder,elbow,.117,fur);
-        limb(root,elbow,hand,.111,a.pattern==='point'?trim:fur);
-        draw(root,hand,[.156,.143,.156],fur);
-        if(long)draw(root,[side*.36,1.73,.24],[.152,.19,.18],fur,{rotate:tilt(-side*.46)});
-        if(a.pattern==='tabby'||a.pattern==='ticked'||a.pattern==='wave'){
-          for(let n=0;n<3;n++) draw(root,[side*(.33+(n%2)*.025),1.84+n*.113,.41],
-            [.065,.027,.021],trim,{rotate:tilt(side*.4),shape:'detail'});
+        draw(root,[side*.102,1.738,muzzleZ],[.126,.083,.088],cheekColor,{coat:neutralCoat});
+        draw(root,[side*.087,1.696,muzzleZ+.061],[.047,.010,.009],'#6d5354',
+          {shape:'detail',rotate:tilt(side*.29)});
+        if(!efficient){
+          for(let whisker=0;whisker<3;whisker++){
+            const origin=[side*(.108+whisker*.029),1.746-whisker*.019,muzzleZ+.076];
+            draw(root,origin,[.008,.009,.006],trim,{shape:'detail'});
+            const middle=[side*(.279+whisker*.024),origin[1]+.008+whisker*.015,muzzleZ+.039];
+            const tip=[side*(.414+whisker*.032),origin[1]+.042+whisker*.024,muzzleZ-.018];
+            const tint=a.pattern==='point'?'#d1bcb3':'#e8d7c4';
+            limb(root,origin,middle,.0045,tint);
+            limb(root,middle,tip,.0033,tint);
+          }
+          if(long){
+            for(let tuft=0;tuft<2;tuft++)draw(root,[side*(.354+tuft*.027),1.74+tuft*.045,.208+tuft*.008],
+              [.095,.15,.126],fur,{shape:'cone',rotate:tilt(side*(2.04+tuft*.16)),coat:neutralCoat});
+          }
         }
-        if(a.pattern==='spots'||a.pattern==='calico'||a.pattern==='patch'){
-          for(let n=0;n<3;n++)draw(root,[side*(.22+n*.058),1.13-n*.107,.269],
-            [a.pattern==='spots'?.061:.095,.044+n*.009,.052],trim,{shape:'detail'});
-        }
+        const lead=side===p.stance.lead,step=p.step*side;
+        const hip=[side*.211,.67,.017];
+        const toe=[side*p.stance.spread,.100+Math.max(0,step)*.31,.20+(lead?1:-1)*p.stance.depth+step*.42];
+        leg(root,feet,hip,toe,slim?.099:.119,pawColor,.05,neutralCoat);
+        catPaw(feet,toe,pawColor,neutralCoat);
+
+        const reach=lead?p.paw:p.offhand, stanceGuard=p.stance.depth*(lead?1:.46), lift=p.overhead*(lead?1:.36);
+        const shoulder=[side*.324,1.203,.018];
+        const elbow=[side*(.405+reach*.17),.96+reach*.19+p.curl*.19+lift*.52,.16+reach*.21+stanceGuard];
+        const hand=[side*(.398+reach*.26),.698+reach*.48+p.curl*.40+lift,.25+reach*.48+stanceGuard];
+        limb(root,shoulder,elbow,.109,fur,.05,coat);
+        limb(root,elbow,hand,.094,pawColor,.05,neutralCoat);
+        catPaw(root,hand,pawColor,neutralCoat,true);
       }
-      draw(root,[0,1.805,.605],[.071,.046,.045],'#84545e',{metal:.42});
-      draw(root,[0,1.685,.579],[.09,.024,.018],'#583745',{shape:'detail'});
-      if(a.pattern==='calico'||a.pattern==='patch')draw(root,[-.31,2.15,.389],[.125,.115,.042],trim,{shape:'detail'});
       if(a.tail!=='none'){
-        const count=a.tail==='bob'?2:5,thick=a.tail==='plume'?.145:a.tail==='thick'?.105:.07;
-        let last=[-.226,.66,-.19];
+        const count=a.tail==='bob'?2:6,thick=a.tail==='plume'?.131:a.tail==='thick'?.094:.061;
+        let last=[-.218,.675,-.226];
         for(let i=1;i<=count;i++){
-          const end=[-.24-i*.108,.66+i*.105+.093*Math.sin(t*2.9-i*.53),-.19-i*.087];
-          limb(root,last,end,thick*(1-i*.095),i%2===0&&a.pattern==='tabby'?trim:fur);
+          const end=[-.231-i*.093,.67+i*.087+.074*Math.sin(t*2.8-i*.50),-.22-i*.073];
+          limb(root,last,end,thick*(1-i*.088),i%2===0&&a.pattern==='tabby'?trim:fur,.04,neutralCoat);
           last=end;
         }
-        draw(root,last,[thick*.65,thick*.77,thick*.65],fur,{shape:'detail'});
+        draw(root,last,[thick*.58,thick*.64,thick*.58],fur,{shape:'detail',coat:neutralCoat});
       }
     }
     function houndModel(root,feet,a,p,t) {

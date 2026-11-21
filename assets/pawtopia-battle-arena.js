@@ -604,13 +604,15 @@
       busy=true;
       preview3d.disabled=true;
       const progress=save.read(),current=engine.matchInfo(progress);
-      const cat=current?.cat||engine.fighters(progress)[selectedPet]||{name:'Maine Coon (demo)',breed:'Maine Coon'};
+      const ownedCat=current?.cat||engine.fighters(progress)[selectedPet];
+      const cat=ownedCat||{name:'Maine Coon (demo)',breed:'Maine Coon'};
       const enemy=current?.foe||data.foes[selectedFoe],kit=data.kitFor(cat.breed);
       try{
         view3d.roster(characterArt?.getArt(cat.breed),foeArt?.profile(enemy),kit,{
           efficient:frameQuality==='efficient'||window.navigator?.connection?.saveData
         });
         el('stage-pet-name').textContent=cat.name;
+        if(!ownedCat)el('battle-cat-tag').textContent='DEMO';
         status('3D preview. This duel does not change your saved battle.');
         stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
         const pose=(side,state,ms,end)=>view3d.pose(side,state,reduced()?24:ms/playbackSpeed,end);
@@ -634,6 +636,13 @@
         busy=false;
         preview3d.disabled=false;
         render();
+        if(!ownedCat && view3d.active() && !engine.fighters(save.read()).length){
+          view3d.roster(characterArt?.getArt(cat.breed),foeArt?.profile(enemy),kit,{
+            efficient:frameQuality==='efficient'||window.navigator?.connection?.saveData
+          });
+          el('stage-pet-name').textContent=cat.name;
+          el('battle-cat-tag').textContent='DEMO';
+        }
         status('3D preview complete.');
       }
     });
