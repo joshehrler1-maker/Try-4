@@ -6,7 +6,8 @@
 <title>Town Square | Super Paw Heroes</title>
 <link rel="stylesheet" href="assets/pawtopia-town.css">
 <script defer src="assets/pawtopia-save.js"></script>
-<script defer src="assets/pawtopia-town.js"></script>
+<script defer src="assets/pawtopia-shop-stock.js?v=town-shops-1"></script>
+<script defer src="assets/pawtopia-town.js?v=town-shops-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-explore.css">
 <link rel="stylesheet" href="assets/pawtopia-world-shell.css">
 </head>
@@ -25,32 +26,34 @@
 <nav class="paw-world-nav" aria-label="Explore Pawtopia"><a href="index.html#pawtopia">Explore</a><a href="pawtopia-companions.html">Companions</a><a href="pawtopia-battle-arena.html">Battle Arena</a><a href="pawtopia-progress.html">Quests &amp; Backups</a><a href="pawtopia-arcade.html">Games Room</a><a href="pawtopia-town.html" aria-current="page">Shops</a><a href="pawtopia-town.html#dailies">Dailies</a><a href="pawtopia-town.html#card-album">Card Album</a><a href="index.html#crystal-regions">Crystal Regions</a></nav>
 
 <div class="banner"><h1>Pawtopia Town Square</h1></div>
-<nav class="town-map" aria-label="Illustrated Pawtopia shop map">
+<nav id="shop-map" class="town-map" aria-label="Illustrated Pawtopia shop map">
 <img src="assets/scenes/town-shop-map.webp" width="1024" height="1024" alt="">
-<a href="#shops" data-shop="Cottage Pantry" style="--x:23%;--y:9%">Companion Supplies</a>
-<a href="#shops" data-shop="Home Goods" style="--x:42%;--y:6%">Home Goods</a>
-<a href="#shops" data-shop="Health Food" style="--x:60%;--y:9%">Health Food</a>
-<a href="#shops" data-shop="Toy Shop" style="--x:91%;--y:6%">Toy Shop</a>
-<a href="#shops" data-shop="Hero Shirts" style="--x:29%;--y:24%">Hero Shirts</a>
-<a href="#shops" data-shop="Chocolate Factory" style="--x:58%;--y:34%">Chocolate Factory</a>
-<a href="#shops" data-shop="Crystal Exchange" style="--x:8%;--y:36%">Wizard Shop</a>
-<a href="pawtopia-companions.html" style="--x:32%;--y:40%">Grooming Cottage</a>
-<a href="#trading" style="--x:8%;--y:48%">Market Place</a>
-<a href="#shops" data-shop="" style="--x:92%;--y:47%">Main Shops</a>
-<a href="#shops" data-shop="Festival Cart" style="--x:52%;--y:61%">Snack Stand</a>
-<a href="#shops" data-shop="Fresh Smoothies" style="--x:72%;--y:61%">Fresh Smoothies</a>
-<a href="#shops" data-shop="Defense Gear" style="--x:8%;--y:66%">Defense Gear</a>
-<a href="#shops" data-shop="Flower Shop" style="--x:27%;--y:66%">Flower Shop</a>
-<a href="#shops" data-shop="Hero Clothing" style="--x:92%;--y:74%">Hero Clothing</a>
-<a href="#arena" style="--x:58%;--y:79%">Battle Academy</a>
-<a href="#shops" data-shop="Gifts Galore" style="--x:15%;--y:85%">Gifts Galore</a>
-<a href="#shops" data-shop="Garden Supplies" style="--x:32%;--y:86%">Garden Supplies</a>
-<a href="#shops" data-shop="Fine Furniture" style="--x:78%;--y:85%">Fine Furniture</a>
-<a href="#shops" data-shop="The Bakery" style="--x:50%;--y:95%">The Bakery</a>
-<a href="#shops" data-shop="Collector Cards" style="--x:92%;--y:95%">Collector Cards</a>
+<a href="pawtopia-shop-companion-supplies.html" style="--x:23%;--y:9%">Companion Supplies</a>
+<a href="pawtopia-shop-home-goods.html" style="--x:42%;--y:6%">Home Goods</a>
+<a href="pawtopia-shop-health-food.html" style="--x:60%;--y:9%">Health Food</a>
+<a href="pawtopia-shop-toy-shop.html" style="--x:91%;--y:6%">Toy Shop</a>
+<a href="pawtopia-shop-hero-shirts.html" style="--x:29%;--y:24%">Hero Shirts</a>
+<a href="pawtopia-shop-chocolate-factory.html" style="--x:58%;--y:34%">Chocolate Factory</a>
+<a href="pawtopia-shop-wizard-shop.html" style="--x:8%;--y:36%">Wizard Shop</a>
+<a href="pawtopia-shop-grooming-cottage.html" style="--x:32%;--y:40%">Grooming Cottage</a>
+<a href="pawtopia-shop-market-place.html" style="--x:8%;--y:48%">Market Place</a>
+<a href="pawtopia-shop-main-shops.html" style="--x:92%;--y:47%">Main Shops</a>
+<a href="pawtopia-shop-snack-stand.html" style="--x:52%;--y:61%">Snack Stand</a>
+<a href="pawtopia-shop-fresh-smoothies.html" style="--x:72%;--y:61%">Fresh Smoothies</a>
+<a href="pawtopia-shop-defense-gear.html" style="--x:8%;--y:66%">Defense Gear</a>
+<a href="pawtopia-shop-flower-shop.html" style="--x:27%;--y:66%">Flower Shop</a>
+<a href="pawtopia-shop-hero-clothing.html" style="--x:92%;--y:74%">Hero Clothing</a>
+<a href="pawtopia-shop-battle-academy.html" style="--x:58%;--y:79%">Battle Academy</a>
+<a href="pawtopia-shop-gifts-galore.html" style="--x:15%;--y:85%">Gifts Galore</a>
+<a href="pawtopia-shop-garden-supplies.html" style="--x:32%;--y:86%">Garden Supplies</a>
+<a href="pawtopia-shop-fine-furniture.html" style="--x:78%;--y:85%">Fine Furniture</a>
+<a href="pawtopia-shop-the-bakery.html" style="--x:50%;--y:95%">The Bakery</a>
+<a href="pawtopia-shop-collector-cards.html" style="--x:92%;--y:95%">Collector Cards</a>
 </nav>
 <p id="feedback" role="status" aria-live="polite"></p>
 <section id="shops"><h2>Town Shops</h2>
+<p><a href="#shop-map">Open the illustrated shop map</a></p>
+<details><summary>All Town Square shops</summary><ul class="shop-directory"><li><a href="pawtopia-shop-companion-supplies.html">Companion Supplies</a></li><li><a href="pawtopia-shop-home-goods.html">Home Goods</a></li><li><a href="pawtopia-shop-health-food.html">Health Food</a></li><li><a href="pawtopia-shop-toy-shop.html">Toy Shop</a></li><li><a href="pawtopia-shop-hero-shirts.html">Hero Shirts</a></li><li><a href="pawtopia-shop-chocolate-factory.html">Chocolate Factory</a></li><li><a href="pawtopia-shop-wizard-shop.html">Wizard Shop</a></li><li><a href="pawtopia-shop-grooming-cottage.html">Grooming Cottage</a></li><li><a href="pawtopia-shop-market-place.html">Market Place</a></li><li><a href="pawtopia-shop-main-shops.html">Main Shops</a></li><li><a href="pawtopia-shop-snack-stand.html">Snack Stand</a></li><li><a href="pawtopia-shop-fresh-smoothies.html">Fresh Smoothies</a></li><li><a href="pawtopia-shop-defense-gear.html">Defense Gear</a></li><li><a href="pawtopia-shop-flower-shop.html">Flower Shop</a></li><li><a href="pawtopia-shop-hero-clothing.html">Hero Clothing</a></li><li><a href="pawtopia-shop-battle-academy.html">Battle Academy</a></li><li><a href="pawtopia-shop-gifts-galore.html">Gifts Galore</a></li><li><a href="pawtopia-shop-garden-supplies.html">Garden Supplies</a></li><li><a href="pawtopia-shop-fine-furniture.html">Fine Furniture</a></li><li><a href="pawtopia-shop-the-bakery.html">The Bakery</a></li><li><a href="pawtopia-shop-collector-cards.html">Collector Cards</a></li></ul></details>
 <p><a href="pawtopia-items.html">Browse the Item Market &amp; Gear</a></p>
 <img class="shop-scene" src="assets/scenes/town-market.webp" width="500" height="500" loading="lazy" alt="">
 <label for="search">Shop Finder</label> <input id="search" type="search" placeholder="Find an item">
@@ -60,7 +63,7 @@
 <label for="quantity">Quantity</label> <input id="quantity" type="number" required min="1" max="9999" value="1">
 <button name="action" value="store">Store</button> <button name="action" value="retrieve">Retrieve</button></form>
 <p id="items"></p><p id="box"></p></section>
-<section id="card-album"><h2>Hero Card Album</h2><p>Collect hero cards from the <a href="#shops" data-shop="Collector Cards">Collector Cards shop</a>.</p><ul id="album"></ul></section>
+<section id="card-album"><h2>Hero Card Album</h2><p>Collect hero cards from the <a href="pawtopia-shop-collector-cards.html">Collector Cards shop</a>.</p><ul id="album"></ul></section>
 <section id="bank"><h2>Golden Paw Bank</h2>
 <img class="shop-scene" src="assets/scenes/town-bank.webp" width="500" height="500" loading="lazy" alt="">
 <p id="balance"></p><form id="bank-form"><label for="amount">Paw Coins</label> <input id="amount" type="number" required min="1" max="999999999" value="1">
@@ -78,7 +81,7 @@
 <p id="quest-brief"></p>
 <button id="quest-accept" type="button">Accept quest</button>
 <button id="quest-turn-in" type="button">Deliver items</button>
-<a href="#shops" id="quest-supplies" data-shop="">Find supplies</a>
+<a href="#shops" id="quest-supplies">Find supplies</a>
 </section>
 <section id="arena"><h2>Training Arena</h2><p><a href="pawtopia-battle-arena.html">⚔️ Enter the full animated Pet Battle Arena · 12 challengers, unique moves and XP</a></p>
 <img class="shop-scene" src="assets/scenes/town-arena.webp" width="500" height="500" loading="lazy" alt=""><p>Choose a move against Bolt’s practice bot. Strike beats Charge, Guard beats Strike, and Charge beats Guard. Reduce the bot to 0 HP to earn today’s 8-Paw-Coin prize. Strength boosts attacks, Defence reduces damage, Movement powers follow-up hits, Intelligence boosts Charge, and Endurance raises max HP.</p>

@@ -8,9 +8,14 @@
   const previous = $('market-prev'), next = $('market-next');
   const pageSize = 24;
   let page = 0;
+  const stock = window.PawtopiaShopStock;
+  const storefront = document.body.dataset.storefront;
+  const staples = document.getElementById('local-stock');
+  const shopItems = storefront ? market.items.filter(item => stock.shopFor(item)===storefront) : market.items;
   const query = new URLSearchParams(location.search);
-  if (['shop','achievement','ready'].includes(query.get('source'))) source.value = query.get('source');
-  const categories = [...new Set(market.items.map(item => item.category))];
+  if (storefront) source.value='shop';
+  else if (['shop','achievement','ready'].includes(query.get('source'))) source.value = query.get('source');
+  const categories = [...new Set(shopItems.map(item => item.category))];
   for (const name of categories) category.add(new Option(name,name));
   const add = (parent, tag, value, className) => {
     const node = document.createElement(tag);
@@ -29,8 +34,33 @@
       render(item.id);
     });
   }
+  function renderStaples(progress) {
+    if (!staples) return;
+    staples.replaceChildren();
+    const offers = stock.shops.filter(offer => offer.store===document.body.dataset.localStock);
+    for (const [index,offer] of offers.entries()) {
+      const name = offer.label || stock.labels[offer.item];
+      const row = add(staples,'li',name+' ');
+      const button = add(row,'button','Buy · '+offer.price+' coins');
+      button.type='button';
+      button.disabled=progress.coins<offer.price;
+      button.addEventListener('click',async () => {
+        button.disabled=true;
+        status.textContent=await save.update(current => stock.purchase(current,offer));
+        render();
+        const currentButton=staples.querySelectorAll('button')[index];
+        if (currentButton && !currentButton.disabled) currentButton.focus({preventScroll:true});
+        else {
+          const heading=staples.closest('section').querySelector('h2');
+          heading.tabIndex=-1;
+          heading.focus({preventScroll:true});
+        }
+      });
+    }
+  }
   function render(focusItem) {
     const p = save.read(), cat = p.companion;
+    renderStaples(p);
     $('market-player').textContent = (p.coins || 0) + ' Paw Coins · ' + (cat ? 'Active cat: ' + cat.name : 'Adopt a cat to use and equip items.');
     const loadout = $('market-loadout');
     loadout.replaceChildren();
@@ -39,7 +69,7 @@
     }
     add(loadout,'li','Cottage display: '+(market.exhibition(p)?.name || 'Empty'));
     const term=search.value.toLowerCase().trim();
-    const visible=market.items.filter(item => {
+    const visible=shopItems.filter(item => {
       if (category.value && item.category!==category.value) return false;
       if (tier.value && item.tier!==tier.value) return false;
       if (owned.checked && !market.stock(p,item.id)) return false;
@@ -52,7 +82,7 @@
     const pageCount=Math.max(1,Math.ceil(visible.length/pageSize));
     page=Math.min(page,pageCount-1);
     list.replaceChildren();
-    $('market-count').textContent=visible.length.toLocaleString()+' of '+market.items.length.toLocaleString()+' items';
+    $('market-count').textContent=visible.length.toLocaleString()+' of '+shopItems.length.toLocaleString()+' items';
     $('market-page').textContent='Page '+(page+1)+' of '+pageCount;
     previous.disabled=page===0;
     next.disabled=page+1>=pageCount;

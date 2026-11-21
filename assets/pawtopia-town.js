@@ -1,22 +1,7 @@
 (() => {
   const save = window.PawtopiaSave;
   const byId = id => document.getElementById(id);
-  const labels = { food: 'Cottage Snack', shards: 'Crystal Shard' };
-  const shops = [
-    { store: 'Cottage Pantry', item: 'food', price: 2 },
-    { store: 'Festival Cart', item: 'food', price: 3 },
-    { store: 'Crystal Exchange', item: 'shards', price: 6 },
-    ...[
-      ['Home Goods', 'Pawprint Rug', 7], ['Health Food', 'Garden Crunch', 3],
-      ['Toy Shop', 'Clockwork Mouse', 6], ['Hero Shirts', 'Paw Emblem Tee', 8],
-      ['Chocolate Factory', 'Chocolate Paw', 4], ['Fresh Smoothies', 'Moonberry Smoothie', 4],
-      ['Defense Gear', 'Crystal Shield', 12], ['Flower Shop', 'Glowbell Bouquet', 5],
-      ['Hero Clothing', 'Festival Cape', 10], ['Gifts Galore', 'Ribbon Gift Box', 5],
-      ['Garden Supplies', 'Glowbell Seeds', 4], ['Fine Furniture', 'Velvet Cat Bed', 12],
-      ['The Bakery', 'Honey Paw Roll', 3], ['Collector Cards', 'Whisker Collector Card', 7],
-      ['Collector Cards', 'Luna Collector Card', 7], ['Collector Cards', 'Bolt Collector Card', 7]
-    ].map(([store, label, price]) => ({ store, label, price }))
-  ];
+  const {labels,shops,purchase,locations} = window.PawtopiaShopStock;
   const quests = [
     { hero: 'Ivy', item: 'food', quantity: 2, label: 'Cottage Snacks', shop: 'Cottage Pantry', reward: 7 },
     { hero: 'Bolt', item: 'shards', quantity: 1, label: 'Crystal Shard', shop: 'Crystal Exchange', reward: 9 },
@@ -71,7 +56,7 @@
     byId('quest-turn-in').hidden = !accepted || delivered;
     byId('quest-turn-in').disabled = questItems(p, quest) < quest.quantity;
     byId('quest-supplies').hidden = delivered;
-    byId('quest-supplies').dataset.shop = quest.shop;
+    byId('quest-supplies').href = locations[quest.shop] || '#shops';
     byId('wish').disabled = p.lastWish === day;
     byId('wish').textContent = p.lastWish === day ? 'Gift collected today' : 'Visit the Wishing Well';
     byId('interest').disabled = p.lastInterest === day || p.bankCoins < 100;
@@ -103,13 +88,7 @@
       const button = document.createElement('button');
       button.textContent = 'Buy · ' + offer.price + ' coins';
       button.disabled = p.coins < offer.price;
-      button.addEventListener('click', () => act(progress => {
-        if (progress.coins < offer.price) return 'You need more Paw Coins.';
-        progress.coins -= offer.price;
-        if (offer.item) progress[offer.item]++;
-        else progress.townCollection[label] = (progress.townCollection[label] || 0) + 1;
-        return label + ' added to inventory.';
-      }, button));
+      button.addEventListener('click', () => act(progress => purchase(progress,offer), button));
       line.append(offer.store + ' · ' + label + ' ', button);
       list.append(line);
     }
@@ -131,12 +110,6 @@
     }
   }
 
-  document.querySelectorAll('[data-shop]').forEach(link => {
-    link.addEventListener('click', () => {
-      byId('search').value = link.dataset.shop;
-      render();
-    });
-  });
   byId('quest-accept').addEventListener('click', () => act(p => {
     const day = save.today();
     if (p.questAccepted === day || p.questDelivered === day) return 'Today’s quest is already recorded.';

@@ -1,0 +1,47 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grooming Cottage | Pawtopia Town Square</title>
+<meta name="description" content="Grooming remedies and soft accessories.">
+<link rel="stylesheet" href="assets/pawtopia-items.css?v=town-shops-1">
+<script defer src="assets/pawtopia-save.js?v=catalog-2569"></script>
+<script defer src="assets/pawtopia-item-tiers.js?v=shop-prices-3"></script>
+<script defer src="assets/pawtopia-items.js?v=catalog-2569"></script>
+<script defer src="assets/pawtopia-shop-stock.js?v=town-shops-1"></script>
+<script defer src="assets/pawtopia-items-ui.js?v=town-shops-1"></script>
+</head>
+<body data-storefront="grooming-cottage">
+<header><nav aria-label="Pawtopia"><a href="pawtopia-town.html#shop-map">Town Square map</a><a href="pawtopia-items.html">Full item catalog</a><a href="pawtopia-companions.html">Cottage</a><a href="pawtopia-scout-trails.html">Scout Trails</a><a href="pawtopia-battle-arena.html">Battle Arena</a></nav></header>
+<main>
+<h1>Grooming Cottage</h1>
+<p>Grooming remedies and soft accessories.</p>
+<p><a href="pawtopia-companions.html">Visit Companion Cottage</a></p>
+
+<p id="market-player"></p>
+<p id="market-status" role="status"></p>
+<section aria-labelledby="gear-title" class="loadout">
+<h2 id="gear-title">Active cat’s loadout</h2>
+<ul id="market-loadout"></ul>
+<p>Battle gear takes effect when the next match begins. Scout relics work on the active cat.</p>
+</section>
+<section aria-labelledby="catalog-title">
+<h2 id="catalog-title">Shop stock</h2>
+<div class="filters">
+<label>Search <input type="search" id="market-search" placeholder="Name or effect"></label>
+<label>Category <select id="market-category"><option value="">All categories</option></select></label>
+<label>Power tier <select id="market-tier"><option value="">All tiers</option><option>Low</option><option>Mid</option><option>High</option></select></label>
+<label hidden>Source <select id="market-source"><option value="">All sources</option><option value="shop">Shops</option><option value="achievement">Achievements</option><option value="ready">Ready to claim</option></select></label>
+<label class="owned"><input type="checkbox" id="market-owned"> My items only</label>
+</div>
+<p id="market-count"></p>
+<div id="market-list"></div>
+<nav class="market-pages" aria-label="Catalog pages">
+<button type="button" id="market-prev">Previous</button><span id="market-page"></span><button type="button" id="market-next">Next</button>
+</nav>
+</section>
+</main>
+</body>
+</html>

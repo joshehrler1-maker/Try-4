@@ -29,3 +29,9 @@ button:disabled {opacity:.5; cursor:default}
 .market-pages {align-items:center; justify-content:center; padding-bottom:2rem}
 #market-list .achievement-goals {padding-inline-start:1.2rem; margin-top:0}
 #market-list .achievement-goals li {margin-block:.25rem}
+
+.filters [hidden] {display:none}
+#local-stock {display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:.5rem; list-style:none; padding:0}
+#local-stock li {display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.5rem; background:#1a2d4b; border-radius:.75rem; padding:.75rem}
+.shop-directory {columns:auto 13rem; padding-inline-start:1.25rem}
+.shop-directory li {break-inside:avoid; margin-block:.25rem}
