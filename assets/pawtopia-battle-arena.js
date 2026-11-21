@@ -8,10 +8,11 @@
   const foeArt=window.PawtopiaBattleFoeArt;
   const cinematics=window.PawtopiaBattleCinematics;
   const watcher=window.PawtopiaBattleWatch;
+  const sound=window.PawtopiaBattleSound;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
   let challengerTier=0;
-  let selectedPet=0,selectedFoe=0,busy=false,soundOn=false,audio=null;
+  let selectedPet=0,selectedFoe=0,busy=false,soundOn=false;
   let watchMode=false,watchPaused=false,watchLoopRunning=false,waitForResume=null,playbackSpeed=1;
   let frameQuality=window.navigator?.connection?.saveData?'efficient':'smooth';
   const select=el('battle-pet-select');
@@ -25,18 +26,8 @@
     if(className)item.className=className;
     parent.append(item);return item;
   };
-  function noise(frequency,seconds=.09) {
-    if(!soundOn)return;
-    try {
-      const Context=window.AudioContext||window.webkitAudioContext;
-      if(!Context)return;
-      audio=audio||new Context();
-      const osc=audio.createOscillator(),gain=audio.createGain();
-      osc.type='triangle';osc.frequency.value=frequency;
-      gain.gain.value=.035;
-      gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+seconds);
-      osc.connect(gain);gain.connect(audio.destination);osc.start();osc.stop(audio.currentTime+seconds);
-    } catch {}
+  function cueSound(cue,options={}){
+    sound?.play(cue,{...options,speed:playbackSpeed});
   }
   function spriteArt(cat) {
     const kit=data.kitFor(cat?.breed);
@@ -361,9 +352,10 @@
       const visual=cueFor(evt,kit,currentFoe);
       showCue(visual);
       if(evt.who==='system'){
+        if(evt.fx==='victory'||evt.fx==='defeat')cueSound(evt.fx);
         if(evt.fx==='victory'){petSprite.classList.add('state-victory');await Promise.all([playArtFrames(cat,'victory',360),playFoeFrames(currentFoe,'defeat',360)]);pose('victory');foePose('defeat');}
         if(evt.fx==='defeat'){petSprite.classList.add('state-defeat');await Promise.all([playArtFrames(cat,'defeat',360),playFoeFrames(currentFoe,'victory',360)]);pose('defeat');foePose('victory');}
-        noise(evt.fx==='victory'?620:180,.22);
+
         await wait(450);
         hideCue();
         continue;
@@ -379,6 +371,10 @@
       let foeMotion=Promise.resolve();
       const action=guard?'guard':cast?(visual?.skill==='ultimate'?'ultimate':'signature'):'approach';
       const castDuration=cast?(characterArt?.timingFor(cat.breed,action)||650):0;
+      const skillAudio={theme:kit.theme.type,ultimate:action==='ultimate',side:evt.who};
+      if(guard)cueSound('guard',{side:evt.who});
+      else if(cast)cueSound('windup',skillAudio);
+      else cueSound(combat?.charge?'charge':'step',{side:evt.who});
       if(evt.who==='pet'){
         motion=playArtFrames(cat,action,guard?490:cast?castDuration:240);
       }else{
@@ -391,11 +387,15 @@
         await Promise.all([motion,foeMotion]);
         actor.classList.remove(effect);
         actor.classList.add('state-swipe');
+        cueSound('swipe',{side:evt.who});
         if(evt.who==='pet')motion=playArtFrames(cat,'swipe',characterArt?.timingFor(cat.breed,'swipe'));
         else foeMotion=playFoeFrames(currentFoe,combat?.foeMove||'swipe',combat?.charge?590:470);
       }
       const projectile=evt.who==='pet'&&cast
-        ? wait(castDuration*.60).then(()=>launchSkillProjectile(visual,kit))
+        ? wait(castDuration*.60).then(()=>{
+          cueSound('cast',skillAudio);
+          return launchSkillProjectile(visual,kit);
+        })
         : Promise.resolve();
       if(evt.who==='pet'&&!guard&&!cast){
         await wait((characterArt?.timingFor(cat.breed,'swipe')||480)*.60);
@@ -410,8 +410,13 @@
         else hitMotion=playFoeFrames(currentFoe,reaction,320);
         const tint=evt.who==='pet'?kit.theme.color:currentFoe.color;
         burst(evt,tint,visual);
-        noise(combat?.contact?(evt.who==='pet'?520:210):385,.08);
-      }else{burst(evt,'#84e4d8',visual);noise(380,.08);}
+        if(evt.damage>0){
+          if(cast)cueSound('spellHit',{...skillAudio,side:evt.target});
+          else cueSound('hit',{heavy:combat?.charge||evt.damage>=22,side:evt.target});
+        }else{
+          cueSound('block',{side:evt.target});
+        }
+      }else{burst(evt,'#84e4d8',visual);}
       barAfter(evt);
       await wait(cast?440:350);
       await Promise.all([motion,foeMotion,hitMotion]);
@@ -687,10 +692,10 @@
     }
   });
   el('battle-sound').addEventListener('click',()=>{
-    soundOn=!soundOn;
+    soundOn=Boolean(sound?.setEnabled(!soundOn));
     el('battle-sound').setAttribute('aria-pressed',String(soundOn));
     el('battle-sound').textContent='Sound: '+(soundOn?'On':'Off');
-    if(soundOn)noise(470,.08);
+    if(soundOn)cueSound('enabled');
   });
   window.addEventListener('pageshow',()=>{if(!busy)render();});
   window.addEventListener('storage',()=>{if(!busy)render();});
