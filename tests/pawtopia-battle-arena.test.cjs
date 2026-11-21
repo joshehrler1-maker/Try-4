@@ -26,7 +26,7 @@ function cat(name='Mochi',breed='Maine Coon',level=1){
 }
 const fresh=()=>({hero:'Whisker',coins:0,food:0,toy:false,shards:0,bankCoins:10,
   townCollection:{},companion:cat(),otherCompanions:[],lastClaim:'Today'});
-const guaranteed=.9;
+const guaranteed=()=>.9; // Engine accepts RNG functions; a bare number falls back to Math.random.
 
 test('all 56 approved breeds map to distinct current art cells and move identities',()=>{
   const {data}=createWorld();
