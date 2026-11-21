@@ -578,8 +578,14 @@
       petSprite.classList.remove('state-approach','state-swipe','state-cast','state-guard','state-impact','state-victory','state-defeat');
       if(actionClass)petSprite.classList.add(actionClass);
       status(cat.name+' performs '+pose+'. Art preview only — no battle move or reward used.');
+      if(pose==='recover'){
+        // Establish the source pose before displaying a standalone recovery.
+        await playArtFrames(cat,'signature',characterArt.timingFor(cat.breed,'signature'));
+      }
       await playArtFrames(cat,pose,pose==='idle'?1500:characterArt.timingFor(cat.breed,pose),
         pose==='recover'?'signature':'swipe');
+      if(pose!=='idle'&&pose!=='recover'&&!reduced())
+        await playArtFrames(cat,'recover',240,pose);
     }catch{
       status('This art preview could not be displayed.');
     }finally{
