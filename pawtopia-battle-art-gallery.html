@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#263459">
+<meta name="description" content="Preview original animated battle artwork and all four fighting moves for all 56 Super Paw Heroes adopted cat breeds. Free, no signup or purchases.">
+<link rel="canonical" href="https://joshehrler1-maker.github.io/Try-4/pawtopia-battle-art-gallery.html">
+<title>56-Cat Battle Art Gallery | Super Paw Heroes</title>
+<link rel="stylesheet" href="assets/pawtopia-battle-art-gallery.css">
+<script defer src="assets/pawtopia-battle-data.js"></script>
+<script defer src="assets/pawtopia-battle-character-art.js"></script>
+<script defer src="assets/pawtopia-battle-art-gallery.js"></script>
+</head>
+<body>
+<a class="skip" href="#gallery-title">Skip to gallery</a>
+<header class="site-top">
+<a class="logo" href="index.html#pawtopia">🐾 Super Paw Heroes</a>
+<nav aria-label="Pawtopia navigation">
+<a href="pawtopia-battle-arena.html">Battle Arena</a>
+<a href="pawtopia-companions.html">Adopt a Cat</a>
+<a href="index.html#pawtopia">World Map</a>
+</nav>
+</header>
+<main>
+<section class="intro">
+<div>
+<p class="eyebrow">Battle art workshop · 56 approved cat breeds</p>
+<h1 id="gallery-title">The 56 Cat Champions</h1>
+<p>See how each cat moves, guards, swipes and launches its own signature skill. Their faces are based on the approved original adoption artwork, with individually illustrated bodies and vector attack effects.</p>
+<p><a class="primary" href="pawtopia-battle-arena.html">Play the Battle Arena</a></p>
+</div>
+<img src="assets/scenes/town-arena.webp" width="500" height="500" loading="lazy" alt="Pawtopia's original training arena">
+</section>
+<section class="workshop" aria-labelledby="workshop-title">
+<h2 id="workshop-title">Choose any cat and preview its animation</h2>
+<div class="controls">
+<label for="gallery-breed">Select one of the 56 cat breeds</label>
+<select id="gallery-breed" aria-describedby="gallery-count"></select>
+<label for="gallery-speed">Playback speed</label>
+<select id="gallery-speed">
+<option value="1">Normal</option>
+<option value="1.7">Slow</option>
+</select>
+</div>
+<p id="gallery-count" class="caption">56 playable breed art designs</p>
+<div class="art-stage">
+<div class="art-aura" aria-hidden="true"></div>
+<div id="gallery-fighter" class="gallery-fighter" role="img" aria-label="Animated full-body character artwork for the selected cat"></div>
+</div>
+<div class="art-meta">
+<strong id="gallery-name">Choose a breed</strong>
+<span id="gallery-skill">Original signature move</span>
+<span id="gallery-ultimate">Individual ultimate move</span>
+<span id="gallery-markings">Breed markings</span>
+</div>
+<h3>Watch a move</h3>
+<div class="pose-actions" id="gallery-moves" role="group" aria-label="Preview animated character poses">
+<button type="button" data-pose="idle">Idle</button>
+<button type="button" data-pose="approach">Run</button>
+<button type="button" data-pose="swipe">Paw Swipe</button>
+<button type="button" data-pose="guard">Guard Curl</button>
+<button type="button" data-pose="signature">Unique Skill</button>
+<button type="button" data-pose="ultimate">Ultimate</button>
+<button type="button" data-pose="impact">Take Hit</button>
+<button type="button" data-pose="victory">Victory</button>
+<button type="button" data-pose="defeat">Defeat</button>
+</div>
+<p role="status" aria-live="polite" id="gallery-status">Select any breed to preview its moves.</p>
+</section>
+<details class="all-breeds">
+<summary>Browse all 56 breed designs</summary>
+<p>Select a breed below to display its full-body battle fighter.</p>
+<div id="gallery-roster" class="roster" role="group" aria-label="All 56 breeds"></div>
+</details>
+<section class="info">
+<h2>How these fight animations work</h2>
+<p>Each breed has its own fur and marking design, body, paw and tail details, six animated drawings per action, and a unique signature symbol. They are lightweight original vector artworks using the existing adoption pictures as face textures. They are not individually hand-painted feature-film frames.</p>
+<p>This is a visual-only preview: it does not modify your adopted cats, spend Paw Coins, level a pet, or change battle progress. The same characters appear in the <a href="pawtopia-battle-arena.html">Battle Arena</a>.</p>
+</section>
+</main>
+<footer>© Super Paw Heroes · Free visual character gallery · <a href="pawtopia-battle-arena.html">Return to the Battle Arena</a></footer>
+</body>
+</html>
