@@ -725,14 +725,16 @@
     const flowVars='--breath-period:'+flow.breathDuration+';--tail-period:'+flow.tailDuration+
       ';--ear-period:'+flow.earDuration+';--head-period:'+flow.headDuration+
       ';--stance-period:'+flow.stanceDuration;
-    const fighterImage=painting?paintedFighterMarkup(art,key,frame,balance):'';
+    const mesh=painting==='mesh';
+    const fighterImage=mesh?'<!-- Full-body painting on canvas -->':
+      painting?paintedFighterMarkup(art,key,frame,balance):'';
     const painted=litPalette('cat-light-'+art.uniq+'-',[
       [art.fur,false],[art.shade,false],[art.cape,false],['#f2bd69',true]
     ]);
     const markup=painted.shade('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" data-source-pose="'+
       (key==='recover'?fromPose:'idle')+'" style="'+flowVars+'" aria-hidden="true">'+
       safety+'<defs>'+painted.defs+'<clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+
-      '<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>'+
+      (mesh?'':'<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>')+
       (fighterImage||tail(art,key,frame)+
       '<g class="art-cape-weight" transform="'+bodyTransform+'">'+cape+'</g>'+
       backFeet+
@@ -758,7 +760,10 @@
        container.dataset.frame===String(frame)&&container.dataset.fromPose===fromPose&&container.dataset.fullArt===String(full)&&container.dataset.painting===String(painting)&&
        container.firstElementChild?.classList?.contains('paw-battle-full-body'))return true;
     // Markup contains ONLY our own trusted, fixed 56-breed design data.
-    container.innerHTML=svgForBreed(art.breed,pose,frame,fromPose,full,painting);
+    const markup=svgForBreed(art.breed,pose,frame,fromPose,full,painting);
+    const canvas=paintingCanvases.get(container)?.canvas;
+    if(painting==='mesh'&&canvas?.parentNode===container)container.firstElementChild.outerHTML=markup;
+    else container.innerHTML=markup;
     container.dataset.painting=String(painting);
     container.dataset.fullArt=String(full);
     container.classList.add('has-body-art');
@@ -770,6 +775,37 @@
     return true;
   }
   const fighterPaintings=new Map();
+  const paintingCanvases=new WeakMap();
+
+  function renderPainting(container,art,pose='idle',frame=3,fromPose='swipe',record){
+    const puppet=window.PawtopiaBattlePuppet,doc=container.ownerDocument;
+    if(puppet&&doc&&record.rig!==null){
+      try{
+        if(record.rig===undefined)record.rig=puppet.prepare(record.image,art,doc);
+        let state=paintingCanvases.get(container);
+        if(record.rig&&!state){
+          const canvas=doc.createElement('canvas');
+          canvas.className='battle-painted-body';
+          canvas.setAttribute('aria-hidden','true');
+          state={canvas,ctx:canvas.getContext('2d')};
+          paintingCanvases.set(container,state);
+        }
+        if(state?.ctx&&record.rig){
+          const {canvas,ctx}=state;
+          const changed=canvas.parentNode!==container||container.dataset.breed!==art.breed||
+            container.dataset.pose!==pose||container.dataset.frame!==String(frame)||container.dataset.fromPose!==fromPose;
+          if(changed)puppet.draw(ctx,canvas,record.rig,art,pose,frame,fromPose,personalMotion);
+          paint(container,art.breed,pose,frame,fromPose,true,'mesh');
+          if(canvas.parentNode!==container)container.append(canvas);
+          return true;
+        }
+      }catch{
+        // Keep the original painting available when Canvas is unavailable.
+        record.rig=null;
+      }
+    }
+    return paint(container,art.breed,pose,frame,fromPose,true,true);
+  }
 
   function paintingPath(art){
     return 'assets/scenes/pawtopia-fighters/cat-'+String(art.uniq+1).padStart(2,'0')+'.png';
@@ -795,12 +831,13 @@
       record={state:'loading',targets:new Set()};
       fighterPaintings.set(art.uniq,record);
       const image=new window.Image();
+      record.image=image;
       image.onload=()=>{
         record.state='ready';
         for(const target of record.targets){
           if(target.dataset.breed!==art.breed)continue;
           const {pose,frame,fromPose}=target.dataset;
-          paint(target,art.breed,pose,Number(frame),fromPose,true,true);
+          renderPainting(target,art,pose,Number(frame),fromPose,record);
         }
         record.targets.clear();
       };
@@ -811,7 +848,8 @@
       image.src=paintingPath(art);
     }
     if(record.state==='loading')record.targets.add(container);
-    return paint(container,art.breed,pose,frame,fromPose,true,record.state==='ready');
+    if(record.state==='ready')return renderPainting(container,art,pose,frame,fromPose,record);
+    return paint(container,art.breed,pose,frame,fromPose,true);
   }
 
   function timingFor(breed,pose){

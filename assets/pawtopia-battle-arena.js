@@ -317,7 +317,7 @@
       return;
     }
     const totalMs=duration||characterArt.timingFor(cat.breed,state);
-    const interval=Math.max(lightweight?28:18,Math.floor(totalMs/frames.length));
+    const minimumInterval=lightweight?28:18;
     const clock=()=>window.performance?.now?.()??Date.now();
     const started=clock();
     // A slow phone should skip delayed in-betweens, not stretch a 650ms
@@ -331,7 +331,9 @@
       const frame=frames[index];
       if(state==='recover')paintCat(el('battle-cat-art'),cat.breed,state,frame,fromPose);
       else paintCat(el('battle-cat-art'),cat.breed,state,frame);
-      await wait(interval);
+      if(index===frames.length-1)break;
+      const nextFrameAt=(index+1)*budget/(frames.length-1);
+      await wait(Math.max(minimumInterval,(nextFrameAt-(clock()-started))*playbackSpeed));
     }
   }
   async function playFoeFrames(foe,state,duration=440){
@@ -367,10 +369,10 @@
       let motion=Promise.resolve();
       let hitMotion=Promise.resolve();
       let foeMotion=Promise.resolve();
-      const projectile=evt.who==='pet'&&cast?launchSkillProjectile(visual,kit):Promise.resolve();
+      const action=guard?'guard':cast?(visual?.skill==='ultimate'?'ultimate':'signature'):'approach';
+      const castDuration=cast?(characterArt?.timingFor(cat.breed,action)||650):0;
       if(evt.who==='pet'){
-        const action=guard?'guard':cast?(evt.name.includes('Finale')?'ultimate':'signature'):'approach';
-        motion=playArtFrames(cat,action,guard?490:cast?characterArt?.timingFor(cat.breed,action):240);
+        motion=playArtFrames(cat,action,guard?490:cast?castDuration:240);
       }else{
         foeMotion=playFoeFrames(currentFoe,guard?'guard':combat?.charge?'charge':'approach',guard?380:combat?.charge?420:240);
       }
@@ -384,8 +386,14 @@
         if(evt.who==='pet')motion=playArtFrames(cat,'swipe',characterArt?.timingFor(cat.breed,'swipe'));
         else foeMotion=playFoeFrames(currentFoe,combat?.foeMove||'swipe',combat?.charge?590:470);
       }
-      await wait(cast?340:guard?230:190);
-      await projectile;
+      if(evt.who==='pet'&&cast){
+        await wait(castDuration*.60);
+        await launchSkillProjectile(visual,kit);
+      }else if(evt.who==='pet'&&!guard){
+        await wait((characterArt?.timingFor(cat.breed,'swipe')||480)*.60);
+      }else{
+        await wait(cast?340:guard?230:190);
+      }
       if(!guard){
         const reaction=combat?.defenderPose||'impact';
         defender.classList.add(combat?.contact?'state-impact':'state-guard');

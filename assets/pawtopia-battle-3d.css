@@ -42,3 +42,27 @@
 @media (prefers-reduced-motion: reduce) {
   .battle-stage svg.paw-battle-full-body[data-pose="idle"] .painted-fighter-image { animation: none; }
 }
+
+/* The painted body and SVG effects share the same 220:240 framing. */
+.cat-avatar.has-body-art[data-painting="mesh"] {position:relative;animation:none}
+.cat-avatar.has-body-art[data-painting="mesh"] svg.paw-battle-full-body {
+  position:relative;z-index:1;animation:none
+}
+.cat-avatar.has-body-art > .battle-painted-body {
+  position:absolute;inset:0;margin:auto;width:100%;height:100%;
+  max-width:210px;max-height:235px;object-fit:contain;pointer-events:none
+}
+.cat-avatar[data-pose="idle"] > .battle-painted-body {
+  transform-origin:50% 91%;animation:paw-flow-breathe 3s ease-in-out infinite
+}
+.fighter-sprite:is(.state-guard,.state-impact,.state-victory,.state-defeat):has(.cat-avatar[data-painting="mesh"]) {
+  animation:none
+}
+@media(max-width:450px) {
+  .cat-avatar.has-body-art > .battle-painted-body {max-width:138px;max-height:165px}
+}
+@media(prefers-reduced-motion:reduce) {
+  .cat-avatar[data-pose="idle"] > .battle-painted-body {animation:none}
+}
+
+.fighter-sprite[data-motion].state-approach .cat-avatar.has-body-art[data-painting="mesh"] {animation:none}
