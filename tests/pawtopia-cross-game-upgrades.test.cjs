@@ -69,7 +69,10 @@ test('unapproved or malformed milestones do not credit anything',async()=>{
  for(const args of [
   ['stage','game-25','stage-1'],['stage','game-1','stage-0'],
   ['mini','courier','score-99'],['3d-win','other','escape'],
-  ['battle-win','foe-13','victory'],['bonus','none','complete'],
+  ['battle-win','foe-13','victory'],['battle-win','foe-1','invented-win'],
+  ['clear','game-0','another-final'],['3d-win','maze-3','escape'],
+  ['3d-win','maze-0','fake-win'],['mini','fake-mode','score-1'],
+  ['guest-launch','publisher-snake','fake-win'],['bonus','none','complete'],
   ['guest-launch','../../evil','launch']
  ])assert.equal((await w.api.claim(...args)).granted,0);
  assert.equal(w.api.state().balance,0);
