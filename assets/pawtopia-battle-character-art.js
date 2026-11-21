@@ -396,7 +396,7 @@
     return values[start]+(values[end]-values[start])*amount;
   }
   function recoveryPose(art,fromPose,frame) {
-    const source=['swipe','signature','ultimate','guard','impact','approach','walk','run'].includes(fromPose)?fromPose:'swipe';
+    const source=['swipe','signature','ultimate','guard','impact','approach','walk','run','victory','defeat'].includes(fromPose)?fromPose:'swipe';
     const start=choreograph(art,source,5),finish=choreograph(art,'idle',3);
     const t=Math.max(0,Math.min(1,Number.isFinite(frame)?frame/5:1));
     const eased=t*t*(3-2*t);
@@ -405,8 +405,11 @@
       Math.round(item+(finish[i]-item)*eased));
   }
   function flowSignature(art){
+    const breath=2.45+(art.uniq%7)*.18;
     return Object.freeze({
-      breathDuration:(2.45+(art.uniq%7)*.18).toFixed(2)+'s',
+      breathDuration:breath.toFixed(2)+'s',
+      headDuration:(breath*1.8).toFixed(2)+'s',
+      stanceDuration:(breath*1.5).toFixed(2)+'s',
       tailDuration:(2.7+((art.uniq*3)%11)*.17).toFixed(2)+'s',
       earDuration:(3.2+((art.uniq*5)%9)*.21).toFixed(2)+'s',
       stride:8+art.uniq%8,
@@ -586,7 +589,8 @@
     const defeat=key==='defeat'?'<path d="M82 183 Q107 202 129 178" fill="none" stroke="'+art.shade+'" stroke-width="5" opacity=".6"/>':'';
     const flow=flowSignature(art);
     const flowVars='--breath-period:'+flow.breathDuration+';--tail-period:'+flow.tailDuration+
-      ';--ear-period:'+flow.earDuration;
+      ';--ear-period:'+flow.earDuration+';--head-period:'+flow.headDuration+
+      ';--stance-period:'+flow.stanceDuration;
     const markup='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" data-source-pose="'+
       (key==='recover'?fromPose:'idle')+'" style="'+flowVars+'" aria-hidden="true">'+
       safety+'<defs><clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+

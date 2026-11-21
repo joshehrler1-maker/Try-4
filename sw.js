@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v118-clipping-mobile-performance';
+const CACHE = 'try4-public-v119-gallery-recovery-android-timing';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-battle-art-gallery.html","assets/pawtopia-battle-art-gallery.css","assets/pawtopia-battle-art-gallery.js");
 FILES.push("assets/pawtopia-cat-flow.css");
@@ -30,6 +30,7 @@ FILES.push(
   'assets/animation/origin-world-enemy-rigs-v1.js?v=material-origin-017babeb',
   'assets/pawcade-side-scroll-no-badges-v2.js?v=approved-opening-art-batch1',
   'assets/pawcade-side-scroll-no-badges-v2.js?v=steamworks-parry-range',
+  'assets/pawcade-side-scroll-no-badges-v2.js?v=swept-hostile-rounds-20261120',
   'assets/pawcade-side-scroll.css?v=landscape-controls-68386cd',
   'assets/platform-worlds.js', 'assets/game-fullscreen.css', 'assets/game-fullscreen.js',
   'assets/touch-joystick.css', 'assets/touch-joystick.js', 'assets/touch-joystick.js?v=pointer-stability-v1', 'assets/whisker-luna-master.webp',
