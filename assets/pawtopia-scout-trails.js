@@ -59,7 +59,15 @@
   }
 
   async function explore(areaId, answer) {
-    const message = await save.update(progress => scout.solve(progress, areaId, answer, save.today()).message);
+    let solved=false;
+    const message = await save.update(progress => {
+      const outcome=scout.solve(progress, areaId, answer, save.today());
+      solved=outcome.ok;
+      return outcome.message;
+    });
+    // Only a successfully saved correct answer earns the game-only point.
+    if(solved&&scout.read(save.read(),save.today()).completed.includes(areaId))
+      void window.PawtopiaUpgradePoints?.claim('scout',areaId,'solved');
     render(message);
   }
   el('trail-cards').addEventListener('click', event => {
