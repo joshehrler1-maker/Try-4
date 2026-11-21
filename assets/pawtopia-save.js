@@ -100,7 +100,7 @@
       if(journal[period][id]<task.target)return 'Finish the quest before claiming its reward.';
       journal[claimedKey].push(id);
       progress.questJournal=journal;
-      progress.coins=Math.min(Number.MAX_SAFE_INTEGER,count(progress.coins)+task.coins);
+      progress.coins=Math.min(Number.MAX_SAFE_INTEGER,(Number.isSafeInteger(progress.coins)&&progress.coins>=0?progress.coins:0)+task.coins);
       awarded=true;
       return 'Claimed '+task.coins+' Paw Coins for '+task.title+'.';
     });
