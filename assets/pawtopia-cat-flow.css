@@ -12,7 +12,7 @@ svg.paw-battle-full-body[data-pose="idle"] .art-tail-flex{
 }
 svg.paw-battle-full-body[data-pose="idle"] .art-head-inner{
   transform-box:fill-box;transform-origin:50% 65%;
-  animation:paw-flow-look calc(var(--breath-period,3s) * 1.8) ease-in-out infinite;
+  animation:paw-flow-look var(--head-period,5.4s) ease-in-out infinite;
 }
 svg.paw-battle-full-body[data-pose="idle"] .art-ear-flex{
   transform-box:fill-box;transform-origin:50% 78%;
@@ -20,7 +20,7 @@ svg.paw-battle-full-body[data-pose="idle"] .art-ear-flex{
 }
 svg.paw-battle-full-body[data-pose="idle"] .art-paw-left{
   transform-box:fill-box;transform-origin:50% 12%;
-  animation:paw-flow-stance calc(var(--breath-period,3s) * 1.5) ease-in-out infinite;
+  animation:paw-flow-stance var(--stance-period,4.5s) ease-in-out infinite;
 }
 svg.paw-battle-full-body[data-pose="idle"] .art-paw-right{
   transform-box:fill-box;transform-origin:50% 12%;
