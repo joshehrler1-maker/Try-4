@@ -2387,6 +2387,7 @@
         const rank = escapeRetries === 0 && escape >= 55 && escapeCrystals >= 3 ? 'S' :
           escapeRetries === 0 && escape >= 40 ? 'A' : escape >= 25 ? 'B' : 'C';
         phase='won';
+        void window.PawtopiaUpgradePoints?.claim('clear','game-'+index,'complete');
         status(ending+'! · Rank '+rank+' · '+escapeCrystals+' crystals at reset · '+
           Math.ceil(escape)+'s left · '+escapeRetries+' retries');
         return;
@@ -2828,6 +2829,8 @@
     }
     if (stage > chapter && (p.on || (power==='swim' && p.x>=stageStarts[stage]+100))) {
       chapter=stage;
+      // Real stage checkpoint reached in one of the 25 playable adventures.
+      void window.PawtopiaUpgradePoints?.claim('stage','game-'+index,'stage-'+stage);
       syncControllerArt(chapter);
       chapterReveal=2;
       const checkpointSaved=saveCheckpoint();
@@ -3085,7 +3088,7 @@
           escapeCrystals=taken;
           playCue(700,185,.25);
           status('Reset triggered. Race back to the entrance! Finish with 55s left, 3 crystals at reset, and no retries for S rank.');
-        } else if (index!==20) {phase='won';status(ending+'!');}
+        } else if (index!==20) {phase='won';void window.PawtopiaUpgradePoints?.claim('clear','game-'+index,'complete');status(ending+'!');}
       }
     }
     // Distance-driven footfalls avoid the skating effect when movement is
