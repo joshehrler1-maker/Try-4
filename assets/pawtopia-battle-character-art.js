@@ -242,13 +242,16 @@
     const offset=pose==='victory'?24:pose==='swipe'?-22:pose==='defeat'?-10:
       pose==='ultimate'?20:pose==='run'?-17:pose==='walk'?-8:pose==='signature'?14:0;
     // Tail swing lags behind the torso and settles naturally at neutral.
-    const s=art.uniq%3*7-7+
-      Math.round((offset+Math.sin((phase-.18)*Math.PI*2)*art.choreography.tailSwing*.65)*envelope);
+    const raw=art.uniq%3*7-7+
+      (offset+Math.sin((phase-.18)*Math.PI*2)*art.choreography.tailSwing*.65)*envelope;
+    // Bound the secondary swing inside the 220px SVG viewBox. The previous
+    // tail extended to x246 on some breeds and clipped at the right edge.
+    const s=Math.round(Math.tanh(raw/20)*17);
     const d=art.tail==='bob'?
-      'M141 176 Q'+(175+s/3)+' 166 '+(174+s/2)+' 151':
-      'M142 175 Q'+(182+s)+' 205 '+(194+s)+' 133 Q'+(201+s)+' 103 '+(174+s)+' 92';
+      'M141 176 Q'+(169+s*.2)+' 166 '+(174+s*.45)+' 151':
+      'M142 175 Q'+(169+s*.55)+' 205 '+(177+s)+' 133 Q'+(184+s)+' 103 '+(169+s)+' 92';
     const width=art.tail==='plume'?25:art.tail==='thick'?20:art.tail==='taper'?12:9;
-    const brush=art.tail==='plume'?'<path d="M'+(175+s)+' 119 l-8 -13 l17 3 l-3 -19 l13 13" stroke="'+art.fur+'" stroke-width="4" fill="none"/>':'';
+    const brush=art.tail==='plume'?'<path d="M'+(169+s)+' 119 l-8 -13 l17 3 l-3 -19 l13 13" stroke="'+art.fur+'" stroke-width="4" fill="none"/>':'';
     return '<g class="art-tail-flex"><path d="'+d+'" fill="none" stroke="'+art.shade+'" stroke-width="'+(width+5)+'" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="'+art.fur+'" stroke-width="'+width+'" stroke-linecap="round"/>'+brush+'</g>';
   }
   function paw(art,x1,y1,x2,y2,side,pose) {
