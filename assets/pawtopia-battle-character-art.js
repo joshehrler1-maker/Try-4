@@ -76,6 +76,14 @@
     cape:index%4===0?'#643ca9':index%4===1?'#503b91':index%4===2?'#7544a8':'#593c83',
     motion:index%8, color:specialColors[index%8], style:types[index%8],
     uniq:index, kit:uniqueMoves[index]?.id || 'cat-kit-'+String(index+1).padStart(2,'0'),
+    choreography:Object.freeze({
+      reach:8+((index*13+5)%33),
+      arc:11+((index*17+9)%31),
+      castLift:7+((index*19+3)%27),
+      counter:4+((index*7+11)%19),
+      tempo:55+((index*11)%44),
+      tailSwing:5+((index*23+6)%19)
+    }),
     poses:poseKeys
   })));
   function getArt(breed) {
@@ -144,9 +152,9 @@
       'M134 53 Q161 17 173 '+(art.ears==='tuft'?2:12)+' L167 57 Z';
     return '<g fill="'+fur+'" stroke="'+shade+'" stroke-width="4" stroke-linejoin="round"><path d="'+left+'"/><path d="'+right+'"/></g><g fill="'+marks+'" opacity=".55"><path d="M61 42 L57 22 Q71 33 75 48 Z"/><path d="M147 48 L163 23 L161 47 Z"/></g>';
   }
-  function tail(art,pose) {
+  function tail(art,pose,frame=3) {
     if(art.tail==='none')return '';
-    const s=pose==='victory'?24:pose==='swipe'?-22:pose==='defeat'?-10:pose==='ultimate'?20:art.uniq%3*7-7;
+    const s=(pose==='victory'?24:pose==='swipe'?-22:pose==='defeat'?-10:pose==='ultimate'?20:art.uniq%3*7-7)+Math.round((frame-3)*art.choreography.tailSwing/3);
     const d=art.tail==='bob'?
       'M141 176 Q'+(175+s/3)+' 166 '+(174+s/2)+' 151':
       'M142 175 Q'+(182+s)+' 205 '+(194+s)+' 133 Q'+(201+s)+' 103 '+(174+s)+' 92';
@@ -174,10 +182,11 @@
     }).join(''):'';
     return '<g class="art-paw art-paw-'+(side?'right':'left')+'">'+back+limb+tip+toe+claws+'</g>';
   }
-  function abilityArt(art,pose){
+  function abilityArt(art,pose,frame=3){
     if(pose!=='signature'&&pose!=='ultimate')return '';
     const ultimate=pose==='ultimate',cnt=ultimate?9:5;
-    const r=ultimate?73:48,cx=ultimate?109:167,cy=ultimate?105:73;
+    const pulse=[.28,.5,.8,1,1.14,.86][Math.max(0,Math.min(5,frame))];
+    const r=Math.round((ultimate?73:48)*pulse),cx=ultimate?109:167,cy=ultimate?105:73;
     const glyph=art.style==='frost'?'❄':art.style==='leaf'?'❧':art.style==='star'?'✦':
       art.style==='water'?'◇':art.style==='wind'?'➳':art.style==='gear'?'⚙':
       art.style==='shadow'?'✧':'✴';
@@ -203,9 +212,39 @@
     victory:[[69,137,43,70],[151,136,172,65],[83,209,0],[145,205,0],-10],
     defeat:[[66,158,54,209],[151,157,165,213],[91,223,10],[144,222,14],17]
   };
-  function svgForBreed(breed,pose='idle'){
+  const animationFrames=Object.freeze([0,1,2,3,4,5]);
+  const motionWeight=Object.freeze([0,-.18,.25,1,.73,.13]);
+  function choreograph(art,pose,frame=3) {
+    const phase=Number.isInteger(frame)?Math.max(0,Math.min(5,frame)):3;
+    const base=poseDef.idle,target=poseDef[pose]||base,weight=motionWeight[phase];
+    const {reach,arc,castLift,counter}=art.choreography;
+    const active=pose!=='idle'&&pose!=='victory'&&pose!=='defeat';
+    const extra=pose==='swipe'?reach:pose==='signature'?Math.round(reach*.85):
+      pose==='ultimate'?reach+5:pose==='guard'?-counter:0;
+    const drawn=[];
+    for(let i=0;i<4;i++){
+      const idle=base[i],goal=target[i],front=i===1,foot=i>=2;
+      let x=Math.round(idle[0]+(goal[0]-idle[0])*weight);
+      let y=Math.round(idle[1]+(goal[1]-idle[1])*weight);
+      if(active&&front){
+        x+=Math.round(extra*weight);
+        y-=Math.round((pose==='signature'||pose==='ultimate'?castLift:arc/3)*Math.max(0,weight));
+      }else if(active&&i===0){
+        x-=Math.round(counter*weight*.32);
+        y+=Math.round(arc*weight*.18);
+      }else if(foot) {
+        x+=Math.round(((art.uniq%5)-2)*(i===2?1:-1)*weight);
+        y+=Math.round((art.uniq%4-1.5)*Math.max(0,weight));
+      }
+      drawn.push([x,y,goal[2]||0]);
+    }
+    const headAngle=Math.round(target[4]*weight+(pose==='impact'?-counter*.2:0));
+    drawn.push(headAngle);
+    return drawn;
+  }
+  function svgForBreed(breed,pose='idle',frame=3){
     const art=getArt(breed);
-    const key=poseKeys.includes(pose)?pose:'idle',p=poseDef[key];
+    const key=poseKeys.includes(pose)?pose:'idle',p=choreograph(art,key,frame);
     const type=art.pattern;
     const mane=art.tail==='plume'||art.ears==='tuft';
     const r=art.ears==='round'?37:art.ears==='large'?33:35;
@@ -221,7 +260,7 @@
       '<path d="M76 142 Q110 155 142 141 L140 171 Q105 174 78 167 Z" fill="'+art.cape+'" stroke="#d8b16c" stroke-width="3.5" opacity=".96"/>'+
       '<path d="M105 151 L116 151 L125 159 L115 171 L105 171 L96 159 Z" fill="#f2bd69" stroke="#fce0a8" stroke-width="2"/>'+
       '<path d="M106 161 Q112 152 117 161 Q112 169 106 161" fill="#6b4587"/></g>';
-    const cape='<path d="M75 124 Q'+(34+art.uniq%11)+' 145 37 '+(203-(art.uniq%9))+' Q80 '+(206+(art.uniq%7))+' 102 185 L98 122 Z" fill="'+art.cape+'" stroke="#dfb975" stroke-width="4" opacity=".88"/>';
+    const cape='<path d="M75 124 Q'+(34+art.uniq%11+Math.round((frame-3)*art.choreography.arc/8))+' 145 37 '+(203-(art.uniq%9))+' Q80 '+(206+(art.uniq%7))+' 102 185 L98 122 Z" fill="'+art.cape+'" stroke="#dfb975" stroke-width="4" opacity=".88"/>';
     const head='<g transform="rotate('+p[4]+' 109 80)">'+earsArt+
       '<ellipse cx="110" cy="83" rx="'+(r+25)+'" ry="'+(r+26)+'" fill="'+art.shade+'" opacity=".9"/>'+
       '<ellipse cx="110" cy="78" rx="63" ry="64" fill="'+art.fur+'" stroke="'+art.shade+'" stroke-width="5"/>'+
@@ -234,22 +273,31 @@
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" aria-hidden="true">'+
       safety+'<defs><clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+
       '<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>'+
-      tail(art,key)+cape+backFeet+body+
+      tail(art,key,frame)+cape+backFeet+body+
       paw(art,...p[0],false,key)+paw(art,...p[1],true,key)+head+smallClaws+defeat+
-      abilityArt(art,key)+
+      abilityArt(art,key,frame)+
       (key==='impact'?'<path d="M158 40 l7 -12 l5 12 l13 4 l-13 5 l-5 12 l-6 -13 l-13 -4 Z" fill="#ffe17c"/>':'')+
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
       '</svg>';
   }
-  function paint(container,breed,pose='idle'){
+  function paint(container,breed,pose='idle',frame=3){
     if(!container)return false;
     const art=getArt(breed);
     // Markup contains ONLY our own trusted, fixed 56-breed design data.
-    container.innerHTML=svgForBreed(art.breed,pose);
+    container.innerHTML=svgForBreed(art.breed,pose,frame);
     container.classList.add('has-body-art');
     container.dataset.pose=pose;
+    container.dataset.frame=String(frame);
     container.style.backgroundImage='none';
     return true;
   }
-  window.PawtopiaBattleCharacterArt=Object.freeze({collection,getArt,poseKeys,svgForBreed,paint});
+  function timingFor(breed,pose){
+    const art=getArt(breed);
+    const base=pose==='ultimate'?780:pose==='signature'?650:
+      pose==='guard'?430:pose==='impact'?310:pose==='swipe'?480:550;
+    return base+art.choreography.tempo;
+  }
+  window.PawtopiaBattleCharacterArt=Object.freeze({
+    collection,getArt,poseKeys,animationFrames,choreograph,timingFor,svgForBreed,paint
+  });
 })();
