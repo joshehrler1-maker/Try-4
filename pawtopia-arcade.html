@@ -254,6 +254,7 @@ function choosePuzzle(index) {
 const randomTile = () => Math.floor(Math.random() * tiles.length);
 const status = message => byId('status').textContent = message;
 const wallet = window.PawtopiaSave;
+const upgrades = window.PawtopiaUpgradePoints;
 function renderWallet(message = '') {
   byId('arcade-wallet').textContent = wallet.read().coins + ' Paw Coins' + (message ? ' · ' + message : '');
 }
@@ -262,6 +263,9 @@ addEventListener('pageshow', () => renderWallet());
 
 function scoreboard() {
   if (score > best) {
+    // Real puzzle-score milestones; each mode/threshold pays only once a day.
+    for(const target of [1,3,6])if(score>=target)
+      void upgrades?.claim('mini',mode,'score-'+target);
     const game = mode;
     const previousBest = best;
     const newBest = score;
