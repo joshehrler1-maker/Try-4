@@ -5,14 +5,16 @@
   const save=window.PawtopiaSave,data=window.PawtopiaBattleData,engine=window.PawtopiaBattleEngine;
   const characterArt=window.PawtopiaBattleCharacterArt;
   const foeArt=window.PawtopiaBattleFoeArt;
+  const watcher=window.PawtopiaBattleWatch;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
   let selectedPet=0,selectedFoe=0,busy=false,soundOn=false,audio=null;
+  let watchMode=false,watchPaused=false,watchLoopRunning=false,waitForResume=null,playbackSpeed=1;
   const select=el('battle-pet-select');
   const stage=el('battle-stage');
   const petSprite=el('battle-pet-sprite'),foeSprite=el('battle-foe-sprite');
   const reduced=()=>window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
-  const wait=ms=>new Promise(resolve=>setTimeout(resolve,reduced()?Math.min(ms,25):ms));
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,reduced()?Math.min(ms,25):Math.max(0,Math.round(ms/playbackSpeed))));
   const addText=(parent,tag,text,className)=>{
     const item=document.createElement(tag);item.textContent=text;
     if(className)item.className=className;
@@ -89,7 +91,7 @@
       const locked=enemy.rank>engine.unlocked(progress);
       const button=document.createElement('button');button.type='button';button.className='foe-choice'+(locked?' locked':'');
       button.dataset.foe=String(index);
-      button.disabled=locked||busy||Boolean(fighting);
+      button.disabled=locked||busy||Boolean(fighting)||watchMode;
       button.setAttribute('aria-pressed',String(selectedFoe===index));
       addText(button,'strong',(locked?'🔒 ':'')+enemy.glyph+' #'+enemy.rank+' '+enemy.name);
       addText(button,'small','Lv '+enemy.level+' · '+enemy.coins+' Paw Coins · '+(enemy.xp*3)+' XP');
@@ -97,9 +99,16 @@
       return button;
     });
     el('battle-foe-list').replaceChildren(...choices);
-    el('battle-start').disabled=busy||Boolean(fighting)||!pet||foe.rank>engine.unlocked(progress);
+    el('battle-start').disabled=busy||Boolean(fighting)||watchMode||!pet||foe.rank>engine.unlocked(progress);
+    el('battle-watch').disabled=busy||watchMode||!watcher||!pet||foe.rank>engine.unlocked(progress);
+    el('battle-watch').textContent=fighting?'▶ Watch Remaining Battle':'▶ Start & Watch Battle';
+    el('battle-pause').disabled=!watchMode;
+    el('battle-pause').textContent=watchPaused?'Resume Watching':'Pause after this turn';
+    el('battle-pause').setAttribute('aria-pressed',String(watchPaused));
+    el('battle-stop-watch').disabled=!watchMode;
+    el('battle-speed').value=String(playbackSpeed);
     el('battle-start').textContent=currentView?.match.finished?'Start a New Battle':'Enter Arena';
-    el('battle-forfeit').disabled=busy||!fighting;
+    el('battle-forfeit').disabled=busy||watchMode||!fighting;
     const activeCat=currentView?currentView.cat:pet,activeFoe=currentView?currentView.foe:foe;
     const kit=spriteArt(activeCat);
     stage.style.setProperty('--foe-color',activeFoe.color);
@@ -125,7 +134,7 @@
       const button=document.createElement('button');
       button.type='button';button.dataset.move=move.id;
       button.className='move-button'+(!move.unlocked?' locked':'');
-      button.disabled=!fighting||busy||!move.ready;
+      button.disabled=!fighting||busy||watchMode||!move.ready;
       addText(button,'strong',move.name);
       addText(button,'small',move.description);
       addText(button,'small',move.note||(move.unlocked?'Ready':'Level '+move.level+' required'));
@@ -307,21 +316,120 @@
     catch{status('Could not finish this match safely.');}
     finally{busy=false;render();}
   });
-  el('battle-moves').addEventListener('click',async event=>{
-    const button=event.target.closest('button[data-move]');
-    if(!button||button.disabled||busy)return;
+  async function performTurn(moveId,fromWatch=false) {
+    if(busy||(watchMode&&!fromWatch))return false;
     busy=true;
     const progress=save.read(),view=engine.matchInfo(progress);
     const cat=view?.cat;
-    el('battle-moves').querySelectorAll('button').forEach(b=>b.disabled=true);
-    try{
-      const result=await saveAction(progress=>engine.takeTurn(progress,button.dataset.move));
-      if(result){
-        await showEvents(result.events||[],cat);
-        status(result.message);
+    el('battle-moves').querySelectorAll('button').forEach(button=>button.disabled=true);
+    try {
+      const result=await saveAction(progress=>engine.takeTurn(progress,moveId));
+      if(!result)return false;
+      if(!result.ok){status(result.message);return false;}
+      await showEvents(result.events||[],cat);
+      status(result.message);
+      return true;
+    }catch{
+      status('This round could not be completed safely.');
+      return false;
+    }finally{
+      busy=false;
+      render();
+    }
+  }
+  function releaseWatchWait() {
+    const resolve=waitForResume;
+    waitForResume=null;
+    if(resolve)resolve();
+  }
+  async function runWatchMode() {
+    if(watchLoopRunning||!watcher)return;
+    watchLoopRunning=true;
+    let turns=0;
+    try {
+      while(watchMode&&turns<watcher.maxTurns) {
+        if(document.hidden&&!watchPaused) {
+          watchPaused=true;
+          status('Watch mode paused because the tab is hidden. Resume when you return.');
+          render();
+        }
+        if(watchPaused) {
+          await new Promise(resolve=>{waitForResume=resolve;});
+          continue;
+        }
+        const view=engine.matchInfo(save.read());
+        if(!view||view.match.finished)break;
+        const move=watcher.chooseMove(view,engine.moveList(view.cat,view.match));
+        if(!move){status('No ready move. Stop watching and choose an available attack.');break;}
+        const success=await performTurn(move,true);
+        if(!success)break;
+        turns++;
+        if(!watchMode)break;
+        await wait(310);
       }
-    }catch{status('This round could not be completed safely.');}
-    finally{busy=false;render();}
+      if(watchMode&&turns>=watcher.maxTurns)
+        status('Watch mode stopped after 75 rounds. The match is saved; finish manually if needed.');
+    }catch{
+      status('Watch mode stopped safely. Your saved battle remains available.');
+    }finally{
+      watchMode=false;watchPaused=false;watchLoopRunning=false;
+      releaseWatchWait();
+      render();
+    }
+  }
+  el('battle-moves').addEventListener('click',async event=>{
+    const button=event.target.closest('button[data-move]');
+    if(!button||button.disabled||busy||watchMode)return;
+    await performTurn(button.dataset.move);
+  });
+  el('battle-watch').addEventListener('click',async()=>{
+    if(watchMode||busy||!watcher)return;
+    const current=engine.matchInfo(save.read());
+    if(!current||current.match.finished) {
+      busy=true;
+      try{
+        const result=await saveAction(progress=>engine.start(progress,selectedPet,selectedFoe));
+        if(!result?.ok){if(result)status(result.message);return;}
+        status(result.message);
+      }catch{
+        status('Could not start the match safely.');
+        return;
+      }finally{
+        busy=false;render();
+      }
+    }
+    watchMode=true;
+    watchPaused=false;
+    render();
+    await runWatchMode();
+  });
+  el('battle-pause').addEventListener('click',()=>{
+    if(!watchMode)return;
+    watchPaused=!watchPaused;
+    if(!watchPaused)releaseWatchWait();
+    render();
+    status(watchPaused?'Watch will pause after the current turn. Resume whenever you want.':
+      'Watching the current battle again.');
+  });
+  el('battle-stop-watch').addEventListener('click',()=>{
+    if(!watchMode)return;
+    watchMode=false;watchPaused=false;
+    releaseWatchWait();
+    render();
+    status(busy?'Stopping after the current turn. You can continue manually.':
+      'Watch mode stopped. Your match is still available to finish manually.');
+  });
+  el('battle-speed').addEventListener('change',()=>{
+    playbackSpeed=watcher?.speed(el('battle-speed').value)||1;
+    render();
+    status('Battle animation speed: '+playbackSpeed+'×.');
+  });
+  document.addEventListener?.('visibilitychange',()=>{
+    if(document.hidden&&watchMode) {
+      watchPaused=true;
+      render();
+      status('Watch mode paused while this tab is hidden to save battery.');
+    }
   });
   const previewBox=el('battle-art-preview-actions');
   if(previewBox)previewBox.addEventListener('click',async event=>{
