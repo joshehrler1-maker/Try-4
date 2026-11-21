@@ -36,18 +36,22 @@
     // a capped launch bonus, not an invented completion or score.
     if(kind==='stage'&&!/^game-(?:[0-9]|1[0-9]|2[0-4])$/.test(game))
       return {granted:0,balance:state().balance,message:'Unknown Pawcade game.'};
+    if(kind==='clear'&&milestone!=='complete')
+      return {granted:0,balance:state().balance,message:'Invalid game clear.'};
     if(kind==='clear'&&!/^game-(?:[0-9]|1[0-9]|2[0-4])$/.test(game))
       return {granted:0,balance:state().balance,message:'Unknown Pawcade game.'};
     if(kind==='stage'&&!/^stage-[1-6]$/.test(milestone))
       return {granted:0,balance:state().balance,message:'Invalid stage.'};
-    if(kind==='3d-win'&&!/^maze-[0-9]{1,2}$/.test(game))
+    if(kind==='3d-win'&&(!['maze-0','maze-1','maze-2'].includes(game)||milestone!=='escape'))
       return {granted:0,balance:state().balance,message:'Unknown 3D game.'};
-    if(kind==='mini'&&(!/^[a-z-]{3,32}$/.test(game)||!/^score-(1|3|6)$/.test(milestone)))
+    if(kind==='mini'&&(!['courier','forge','beacons','lantern','crystal','defense'].includes(game)||!/^score-(1|3|6)$/.test(milestone)))
       return {granted:0,balance:state().balance,message:'Invalid arcade milestone.'};
     if(kind==='scout'&&(!['meadow','grotto','garden','frost'].includes(game)||milestone!=='solved'))
       return {granted:0,balance:state().balance,message:'Unknown scout trail.'};
-    if(kind==='battle-win'&&!/^foe-(?:[1-9]|1[0-2])$/.test(game))
+    if(kind==='battle-win'&&(!/^foe-(?:[1-9]|1[0-2])$/.test(game)||milestone!=='victory'))
       return {granted:0,balance:state().balance,message:'Invalid battle rank.'};
+    if((kind==='guest-launch'||kind==='guest3d-launch')&&milestone!=='launch')
+      return {granted:0,balance:state().balance,message:'Guest launches cannot claim win rewards.'};
     const k=today()+'|'+kind+'|'+game+'|'+milestone;
     const amount=kinds[kind];
     const guestKind=kind==='guest-launch'||kind==='guest3d-launch';
