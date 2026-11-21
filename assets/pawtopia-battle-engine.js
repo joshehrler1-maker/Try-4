@@ -139,6 +139,7 @@
         match.guard=clamp(2+Math.floor(s.defence/2),2,50)+safe(gear.guard)+safe(gear.marketCurl);
         const firstCurl = !match.marketCurlUsed ? safe(gear.marketMend) : 0;
         match.marketCurlUsed=true;
+        match.armoryCounterReady=!match.armoryCounterUsed && Boolean(gear.armoryRiposte);
         const restored=Math.min(petMaxHp-match.hp,safe(gear.guardHeal)+firstCurl);
         match.hp+=restored;
         makeEvent('pet','Guard Curl','pet',0,match.hp,'guard',restored?'Blocks the next blow · restored '+restored+' HP':'Blocks the next blow');
@@ -160,6 +161,8 @@
       }
       if(moveId==='signature')damage+=safe(gear.signature)+safe(gear.marketSignature);
       if(moveId==='ultimate')damage+=safe(gear.ultimate)+safe(gear.marketFinisher);
+      if(moveId==='swipe' && match.lastMove==='guard')damage+=safe(gear.armoryFollowup);
+      if(match.foeGuard)damage+=safe(gear.armoryBreak);
       match.foeGuard=0;
       let detail='';
       if(moveId==='signature'||moveId==='ultimate'){
@@ -171,7 +174,12 @@
         else if(bonus==='dodge'){match.dodge=1;detail='Evasion prepared';}
         else if(bonus==='extra'){damage+=2+Math.floor(s.movement/2);detail='Extra gear strike';}
         else if(bonus==='pierce'){damage+=2+Math.floor(foe.defence/2);detail='Piercing strike';}
-        if(moveId==='ultimate'){match.ultimateUsed=true;detail+=(detail?' · ':'')+'Ultimate!';}
+        if(moveId==='ultimate'){
+          match.ultimateUsed=true;
+          const recovery=Math.min(petMaxHp-match.hp,safe(gear.armoryVigor));
+          match.hp+=recovery;
+          detail+=(detail?' · ':'')+'Ultimate!'+(recovery?' Restored '+recovery+' HP from gear.':'');
+        }
         if(moveId==='signature'){
           match.signatureReadyAt=match.round+2;
           if(gear.firstSlow && !match.gearSlowUsed){
@@ -181,7 +189,7 @@
           }
         }
       }
-      if(rand()<Math.min(.17,.03+s.movement/400)){damage+=Math.max(1,Math.floor(damage/3));detail+=(detail?' · ':'')+'Critical!';}
+      if(rand()<Math.min(.17,.03+s.movement/400)){damage+=Math.max(1,Math.floor(damage/3))+safe(gear.armoryCritical);detail+=(detail?' · ':'')+'Critical!';}
       match.foeHp=Math.max(0,match.foeHp-damage);
       makeEvent('pet',move.name,'foe',damage,match.foeHp,
         moveId==='swipe'?'swipe':kit.theme.type,detail);
@@ -198,19 +206,37 @@
       damage=Math.max(1,damage);
       if(match.foeSlow){damage=Math.max(1,damage-2);match.foeSlow=0;}
       if(match.dodge){match.dodge=0;damage=0;}
+      const blockedByCurl=match.armoryCounterReady && match.guard>0 && damage>0;
       if(match.guard){damage=Math.max(0,damage-match.guard);match.guard=0;}
+      match.armoryCounterReady=false;
       if(rand()<Math.min(.12,.03+foe.rank/180))damage+=Math.max(0,2-safe(gear.critBlock));
       if(isHeavy)damage=Math.max(0,damage-safe(gear.heavyBlock)-safe(gear.marketHeavy));
       if(damage>0 && !match.firstBlocked){
         damage=Math.max(0,damage-safe(gear.firstBlock)-safe(gear.styleGuard));
         match.firstBlocked=true;
       }
+      if(match.round<=2)damage=Math.max(0,damage-safe(gear.armoryOpening));
+      if(match.hp*2<petMaxHp)damage=Math.max(0,damage-safe(gear.armoryRepeat));
       match.hp=Math.max(0,match.hp-damage);
       makeEvent('foe',isHeavy?'Gear Fang Charge':'Metal Paw Strike','pet',damage,match.hp,
         isHeavy?'impact':'swipe',damage===0?'Dodged or blocked!':'');
+      if(damage>0 && !match.armoryRecovered){
+        match.armoryRecovered=true;
+        const amount=match.hp>0 ? Math.min(petMaxHp-match.hp,safe(gear.armoryRecovery)) : 0;
+        if(amount){
+          match.hp+=amount;
+          makeEvent('pet','Armor Recovery','pet',0,match.hp,'guard','Restored '+amount+' HP');
+        }
+      }
+      if(blockedByCurl && match.hp>0){
+        match.armoryCounterUsed=true;
+        const counter=safe(gear.armoryRiposte);
+        match.foeHp=Math.max(0,match.foeHp-counter);
+        makeEvent('pet','Relic Counter','foe',counter,match.foeHp,'impact');
+      }
     };
     // Defensive curls must activate before the foe moves. Other moves use speed for initiative.
-    const petFirst=moveId==='guard'||s.movement+level(cat)/4+(match.round===1?safe(gear.initiative)+safe(gear.marketSpeed)+safe(gear.styleSpeed):0)+rand()*3 >= foe.speed+foe.level/4+rand()*3;
+    const petFirst=moveId==='guard'||s.movement+level(cat)/4+(match.round===1?safe(gear.initiative)+safe(gear.marketSpeed)+safe(gear.styleSpeed):safe(gear.armorySecond))+rand()*3 >= foe.speed+foe.level/4+rand()*3;
     if(petFirst){petAttack();enemyAttack();}else{enemyAttack();if(match.hp>0)petAttack();}
     match.lastMove=moveId;
     match.history=[...(Array.isArray(match.history)?match.history:[]),...events.map(e=>e.name+(e.damage?' dealt '+e.damage+' damage':'')+(e.detail?' · '+e.detail:''))].slice(-24);

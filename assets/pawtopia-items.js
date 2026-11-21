@@ -77,10 +77,11 @@
     else delete next[id];
     progress.catalogItems = next;
   }
+  const stackable = item => ['Food','Remedy','Material'].includes(item.category);
   function buy(progress,id) {
     const item = byId.get(id);
     if (!item?.price) return 'Find or craft this item.';
-    if (stock(progress,id) && !['Food','Remedy'].includes(item.category)) return 'You already own this item.';
+    if (stock(progress,id) && !stackable(item)) return 'You already own this item.';
     if (stock(progress,id)>=999) return 'Your stack is full.';
     if (count(progress.coins)<item.price) return 'You need more Paw Coins.';
     progress.coins -= item.price;
@@ -113,6 +114,36 @@
     for (const [material,amount] of Object.entries(item.recipe)) add(progress,material,-amount);
     add(progress,id,1);
     return 'Crafted ' + item.name + '.';
+  }
+  function refine(progress,id) {
+    const item = byId.get(id);
+    if (!item?.refine || !stock(progress,id)) return 'Obtain the material before refining it.';
+    const {shards,silk,cogs} = item.refine;
+    add(progress,id,-1);
+    progress.shards=Math.min(Number.MAX_SAFE_INTEGER,count(progress.shards)+shards);
+    if (silk) add(progress,'sunleaf-silk',silk);
+    if (cogs) add(progress,'garden-cog',cogs);
+    return 'Refined '+item.name+'.';
+  }
+  function workshop(progress,id) {
+    const item = byId.get(id);
+    const project = byId.get(item?.workshopTarget);
+    if (!project?.recipe || !stock(progress,id)) return 'Obtain the material before crafting.';
+    if (stock(progress,project.id)) return 'You already have '+project.name+'.';
+    add(progress,id,-1);
+    add(progress,project.id,1);
+    return 'Crafted '+project.name+'.';
+  }
+  function exhibition(progress) {
+    const current = byId.get(progress.catalogDisplay);
+    return current?.exhibit && stock(progress,current.id) ? current : null;
+  }
+  function display(progress,id) {
+    const item = byId.get(id);
+    if (!item?.exhibit || !stock(progress,id)) return 'Obtain this collectible first.';
+    const alreadyOnDisplay=progress.catalogDisplay===id;
+    progress.catalogDisplay=alreadyOnDisplay?'':id;
+    return alreadyOnDisplay?'Removed '+item.name+' from display.':'Displayed '+item.name+'.';
   }
   function equip(progress,id) {
     const item = byId.get(id), cat = progress.companion;
@@ -186,12 +217,15 @@
     const material = items.find(item => item.trail===area);
     if (!material) return '';
     const relic = worn(progress,pet,'relic');
-    const amount = relic?.scoutMaterial===material.id ? 2 : 1;
+    const display = exhibition(progress);
+    const prize = display && progress.catalogExhibitionDay!==day() ? display.exhibit : null;
+    if (prize) progress.catalogExhibitionDay=day();
+    const amount = (relic?.scoutMaterial===material.id ? 2 : 1)+(prize?.materials||0);
     add(progress,material.id,amount);
-    pet.bondPoints = Math.min(100,count(pet.bondPoints)+(relic?.scoutBond || 0));
-    progress.coins = Math.min(Number.MAX_SAFE_INTEGER,count(progress.coins)+(relic?.scoutCoins || 0));
+    pet.bondPoints = Math.min(100,count(pet.bondPoints)+(relic?.scoutBond || 0)+(prize?.bond||0));
+    progress.coins = Math.min(Number.MAX_SAFE_INTEGER,count(progress.coins)+(relic?.scoutCoins || 0)+(prize?.coins||0));
     return ' Found ' + amount + ' × ' + material.name + '.' +
-      (relic?.scoutBond?' Bonus friendship +1.':'') + (relic?.scoutCoins?' Bonus Paw Coin +1.':'');
+      (relic?.scoutBond?' Bonus friendship +1.':'') + (relic?.scoutCoins?' Bonus Paw Coin +1.':'')+(prize?' The displayed collectible granted its daily trail bonus.':'');
   }
   function arenaReward(progress,rank) {
     const collectible = items.find(item => item.rank===rank);
@@ -199,5 +233,5 @@
     add(progress,collectible.id,1);
     return collectible.name;
   }
-  window.PawtopiaItems = Object.freeze({items,byId,stock,buy,craft,equip,use,worn,arena,scoutReward,arenaReward,claim,hasClaimed,achievementProgress});
+  window.PawtopiaItems = Object.freeze({items,byId,stock,buy,craft,equip,use,worn,arena,scoutReward,arenaReward,claim,hasClaimed,achievementProgress,refine,workshop,exhibition,display,stackable});
 })();

@@ -37,6 +37,7 @@
     for (const [slot,name] of Object.entries({weapon:'Weapon',armor:'Armor',relic:'Relic',wearable:'Wearable'})){
       add(loadout,'li',name + ': ' + (market.worn(p,cat,slot)?.name || 'Empty'));
     }
+    add(loadout,'li','Cottage display: '+(market.exhibition(p)?.name || 'Empty'));
     const term=search.value.toLowerCase().trim();
     const visible=market.items.filter(item => {
       if (category.value && item.category!==category.value) return false;
@@ -82,9 +83,15 @@
       if (item.lore && units) add(card,'p',item.lore);
       const actions=add(card,'div','','actions');
       if (goals.length) control(actions,'Claim reward','claim',item,goals.some(goal => goal.current<goal.target));
-      const stackable=['Food','Remedy'].includes(item.category);
+      const stackable=market.stackable(item);
       if (item.price && (!units || stackable)) control(actions,'Buy · '+item.price+' coins','buy',item,p.coins<item.price || units>=999);
       if (item.recipe && !units) control(actions,'Craft','craft',item,Object.entries(item.recipe).some(([id,n]) => market.stock(p,id)<n));
+      if (item.refine && units) {
+        const project=market.byId.get(item.workshopTarget);
+        control(actions,'Refine','refine',item);
+        if (project && !market.stock(p,project.id)) control(actions,'Craft '+project.name,'workshop',item);
+      }
+      if (item.exhibit && units) control(actions,market.exhibition(p)?.id===item.id?'Remove display':'Display','display',item);
       if (item.slot && units) control(actions,cat?.catalogGear?.[item.slot]===item.id?'Unequip':'Equip','equip',item,!cat);
       if ((item.care || item.read) && units) control(actions,item.read?'Read':item.category==='Toy'?'Play':item.category==='Furnishing'?'Use furnishing':'Use','use',item,!cat);
     }

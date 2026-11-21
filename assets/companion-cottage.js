@@ -108,6 +108,12 @@
       marketWearable.textContent = wearable ? wearable.badge + ' ' + wearable.name : '';
       if (marketWearable.style) marketWearable.style.color = Number.isInteger(wearable?.hue) ? 'hsl('+wearable.hue+' 68% 40%)' : '';
     }
+    const displayLine=byId('cottage-market-exhibit');
+    if (displayLine) {
+      const exhibit=window.PawtopiaItems?.exhibition(progress);
+      displayLine.hidden=!exhibit;
+      displayLine.textContent=exhibit ? 'On display: '+exhibit.name : '';
+    }
     const pointState=upgrades?.state();
     byId('pet-upgrade-balance').textContent=String(pointState?.balance||0);
     byId('pet-upgrade-earned-today').textContent=String(pointState?.daily||0)+' of '+(upgrades?.maxDaily||30);

@@ -23,7 +23,130 @@
       'Lantern Stone','Spring Cuff','Hinge Shield','Dusk Sigil','Counter Baton','Felt Shell',
       'Forge Token','Wind Gauntlet','Birch Buckler','Compass Seal']
   };
-  const categoryIds = {Food:'food',Toy:'toy',Book:'book',Wearable:'wearable','Battle Gear':'gear'};
+  Object.assign(forms, {
+    "Remedy": [
+      "Calming Balm",
+      "Restorative Tonic",
+      "Soothing Poultice",
+      "Mint Compress",
+      "Warm Infusion",
+      "Sleep Salve",
+      "Honey Liniment",
+      "Cottage Elixir",
+      "Mist Vapor",
+      "Gentle Ointment",
+      "Recovery Draught",
+      "Herbal Patch",
+      "Cooling Rub",
+      "Comfort Tea",
+      "Bramble Syrup"
+    ],
+    "Weapon": [
+      "Drive Knuckle",
+      "Sparring Fan",
+      "Arc Baton",
+      "Counter Bell",
+      "Pulse Rod",
+      "Joust Paddle",
+      "Ridge Club",
+      "Tempo Mallet",
+      "Snap Flail",
+      "Rune Wand",
+      "Braid Whip",
+      "Clatter Cane",
+      "Cushion Saber",
+      "Tuning Staff",
+      "Pounce Hook"
+    ],
+    "Armor": [
+      "Quilted Carapace",
+      "Brace Vest",
+      "Rebound Suit",
+      "Petal Cuirass",
+      "Letdown Plate",
+      "Ridge Cloak",
+      "Softsteel Guard",
+      "Timber Harness",
+      "Buckle Shell",
+      "Bristle Wrap",
+      "Tumble Pads",
+      "Bark Brigandine",
+      "Weave Jacket",
+      "Felt Panoply",
+      "Copper Coating"
+    ],
+    "Relic": [
+      "Recall Prism",
+      "Steady Hourglass",
+      "Coiled Amulet",
+      "Northlight Lens",
+      "Folded Mapstone",
+      "Trail Seal",
+      "Tempo Lodestone",
+      "Breeze Effigy",
+      "Moon Dial",
+      "Hint Tablet",
+      "Rest Gem",
+      "Resonance Bead",
+      "Quiet Idol",
+      "Skylight Totem",
+      "Glass Compass"
+    ],
+    "Material": [
+      "Timber Blank",
+      "Felt Coil",
+      "Glass Bead",
+      "Cotton Spool",
+      "Brass Offcut",
+      "Copper Foil",
+      "Cottage Rivet",
+      "Root Fiber",
+      "Clay Lump",
+      "Quartz Sliver",
+      "Harbor Button",
+      "Lantern Cord",
+      "Pressed Leaf",
+      "Crystal Thread",
+      "Carved Dowel"
+    ],
+    "Furnishing": [
+      "Nap Hammock",
+      "Reading Nook",
+      "Porch Perch",
+      "Breeze Screen",
+      "Window Bench",
+      "Snooze Mat",
+      "Braid Basket",
+      "Hearth Lounger",
+      "Paw Washstand",
+      "Loft Cushion",
+      "Willow Chair",
+      "Climbing Shelf",
+      "Quiet Tent",
+      "Cat Tunnel",
+      "Sunroom Cot"
+    ],
+    "Collectible": [
+      "Trail Postcard",
+      "Founders’ Cameo",
+      "Parade Pennant",
+      "Clockwork Etching",
+      "Festival Plate",
+      "Copper Foil Print",
+      "Miniature Diorama",
+      "Scout Album Page",
+      "Town Portrait",
+      "Enamel Token",
+      "Story Scroll",
+      "Porcelain Figure",
+      "Route Rubbing",
+      "Moon Map",
+      "Sparring Lithograph"
+    ]
+  });
+  const categoryIds = {Food:'food',Toy:'toy',Book:'book',Wearable:'wearable','Battle Gear':'gear',
+    Remedy:'remedy',Weapon:'weapon',Armor:'armor',Relic:'relic',Material:'material',
+    Furnishing:'furnishing',Collectible:'collectible'};
   const guides = {
     care: ['care moments','pawtopia-companions.html'],
     game: ['original game milestones','pawtopia-arcade.html'],
@@ -68,13 +191,19 @@
 
   function challenge(categoryIndex, band, rank) {
     const activity = ['care','scout','game','town','battle'];
-    const primary = activity[categoryIndex], secondary = activity[(categoryIndex+1)%activity.length];
+    const primary = activity[categoryIndex%activity.length], secondary = activity[(categoryIndex+1)%activity.length];
     const tertiary = activity[(categoryIndex+2)%activity.length];
     const n = rank+1;
     let requirements;
     if (band===0) requirements = [[primary,1+Math.floor(rank/4)],[secondary,rank%4]];
     else if (band===1) requirements = [[primary,7+n],[secondary,3+Math.floor(n/2)],[tertiary,2+n%3]];
     else requirements = [[primary,22+3*n],[secondary,12+n],[tertiary,6+Math.floor(n/2)],['rank',8+Math.floor(rank/4)]];
+    if (categoryIndex>=5) {
+      const offset=1+categoryIndex-5;
+      requirements[0][1]+=band===0 ? offset%3 : offset;
+      if (band===0) requirements.push([tertiary,1+Math.floor((offset-1)/3)]);
+      if (band===3) requirements.push([activity[(categoryIndex+3)%activity.length],3+offset+Math.floor(rank/2)]);
+    }
     return requirements.filter(([,target]) => target>0)
       .map(([key,target]) => ({key,target,label:guides[key][0],href:guides[key][1]}));
   }
@@ -103,11 +232,64 @@
     };
   }
 
+
+  const craftProjects = [
+    ['rest-shell','Hushwood Rest Shell'],['hush-coil','Hush Coil'],
+    ['field-scope','Scoutglass Lens'],['harvest-loop','Frostbell Harvest Loop'],
+    ['festival-mantle','Sunset Scout Mantle'],['woven-cushion','Sunleaf Window Cushion'],
+    ['window-lamp','Frostglass Window Lamp']
+  ];
+  function bonuses(values, labels) {
+    return values.flatMap((amount,i) => amount ? ['+'+amount+' '+labels[i]] : []).join(' · ');
+  }
+  function extendedEffect(category,value,form,bandIndex) {
+    const [a,b,c]=value;
+    switch (category) {
+      case 'Remedy': {
+        const meter = form%2 ? 'fullness':'happiness';
+        const limit = [50,60,70,80][bandIndex];
+        return {care:value,below:[meter,limit],description:'Use when '+meter+' is below '+limit+': '+describeCare(value)+'.'};
+      }
+      case 'Weapon':
+        return {slot:'weapon',arena:{armoryFollowup:a,armoryBreak:b,armoryCritical:c},
+          description:bonuses(value,['Paw Swipe damage after a Guard Curl','damage against Iron Guard','damage on critical hits'])+'.'};
+      case 'Armor':
+        return {slot:'armor',arena:{armoryRecovery:a,armoryOpening:b,armoryRepeat:c},
+          description:bonuses(value,['HP after surviving the first damaging hit','damage blocked in rounds 1–2','damage blocked below half HP'])+'.'};
+      case 'Relic':
+        return {slot:'relic',arena:{armorySecond:a,armoryVigor:b,armoryRiposte:c},
+          description:bonuses(value,['initiative from round two onward','HP after using an ultimate','damage on the first Guard Curl counter'])+'.'};
+      case 'Material': {
+        const [id,name]=craftProjects[form%craftProjects.length];
+        return {refine:{shards:a,silk:b,cogs:c},workshopTarget:id,
+          description:'Refine for '+bonuses(value,['Crystal Shards','Sunleaf Silk','Garden Clock Cogs'])+
+            ', or spend one to craft '+name+'.'};
+      }
+      case 'Furnishing':
+        return {care:value,daily:true,description:'Use once per day at the Cottage: '+describeCare(value)+'.'};
+      case 'Collectible':
+        return {exhibit:{coins:a,bond:b,materials:c},
+          description:'Display it to earn '+bonuses(value,['Paw Coins','friendship','trail materials'])+
+            ' on your first completed Scout Trail each UTC day.'};
+      default:
+        return {};
+    }
+  }
   const statPools = bands.map((band,bandIndex) => {
     const [foodMin,foodMax] = [[13,29],[33,48],[52,63],[67,78]][bandIndex];
     const [toyMin,toyMax] = [[10,29],[32,42],[46,55],[59,68]][bandIndex];
     const bookPoints = [4,6,8,10][bandIndex];
+    const [min,max] = [[5,12],[13,16],[17,19],[20,23]][bandIndex];
+    const combinationRange = (bounds, multiplier=1) => allocations(min,max,bounds)
+      .map(values => values.map(value => value*multiplier));
     return {
+      Remedy: combinationRange([[1,15],[1,15],[0,8]],3),
+      Weapon: combinationRange([[0,10],[0,10],[0,10]]),
+      Armor: combinationRange([[0,12],[0,8],[0,10]]),
+      Relic: combinationRange([[0,10],[0,12],[0,10]]),
+      Material: combinationRange([[0,11],[0,9],[0,9]]),
+      Furnishing: combinationRange([[1,12],[1,14],[0,9]],2),
+      Collectible: combinationRange([[0,10],[0,17],[0,6]]),
       Food: allocations(foodMin,foodMax,[[7,60],[0,36],[0,18]]).filter(value => !oldFoodStats.includes(value.join(','))),
       Toy: allocations(toyMin,toyMax,[[6,52],[0,28]]).filter(value => !oldToyStats.includes(value.join(','))),
       Book: allocations(bookPoints,bookPoints,studyStats.map(() => [0,5])),
@@ -152,6 +334,7 @@
             const effects = Object.entries(read).map(([key,amount]) => '+'+amount+' '+statNames[key]).join(', ');
             Object.assign(entry,{read,description:'Read once per cat for '+effects+'.'});
           }
+          if (categoryIndex>=5) Object.assign(entry,extendedEffect(category,value,form,bandIndex));
           if (category==='Wearable') {
             const [health,guard,speed] = value;
             const benefits = [health&&'+'+health+' Arena max HP',guard&&'blocks '+guard+' from the first enemy hit',

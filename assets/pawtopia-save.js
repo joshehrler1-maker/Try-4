@@ -134,7 +134,7 @@
     for(const [name,item] of Object.entries(value)){
       if(['__proto__','constructor','prototype'].includes(name)||name.length>150)throw Error('Backup has an unsafe field.');
       const isCatalog = depth===0 && ['catalogItems','catalogDaily','catalogClaims'].includes(name);
-      safeBackupValue(item,depth+1,budget,isCatalog?1400:500);
+      safeBackupValue(item,depth+1,budget,isCatalog?3000:500);
     }
   }
   function validateBackup(backup) {
