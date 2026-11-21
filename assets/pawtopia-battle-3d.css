@@ -1,0 +1,26 @@
+
+.battle-3d-canvas {display:none}
+.battle-stage.battle-has-3d {min-height:440px; align-items:start; overflow:hidden; background:#17253d}
+.battle-has-3d .battle-backdrop {
+  opacity:1;
+  background-image:radial-gradient(ellipse at 45% 25%,#9dc5f03b,#0b182494 69%,#080f1ccc),
+    url("scenes/town-arena.webp");
+  filter:saturate(.86);
+}
+.battle-has-3d .battle-3d-canvas {
+  display:block; position:absolute; inset:46px 0 0; width:100%; height:calc(100% - 46px);
+  z-index:0; pointer-events:none;
+}
+.battle-has-3d .fighter-sprite {visibility:hidden}
+.battle-has-3d .fighter-sprite [id] {visibility:hidden}
+.battle-has-3d .fighter-sprite .fighter-tag {visibility:visible; bottom:auto; top:0}
+.battle-has-3d .fighter-sprite[class*="state-"] {animation:none;filter:none}
+.battle-has-3d .battler {z-index:2}
+.battle-has-3d .battler-ui {background:#0b172cdd}
+@media(max-width:650px){
+  .battle-stage.battle-has-3d {min-height:315px}
+  .battle-has-3d .battle-3d-canvas {inset:55px 0 0;height:calc(100% - 55px)}
+}
+@media(max-width:400px){.battle-stage.battle-has-3d {min-height:285px}}
+
+#arena-3d-preview[hidden] {display:none}

@@ -14,6 +14,7 @@
   let frameQuality=window.navigator?.connection?.saveData?'efficient':'smooth';
   const select=el('battle-pet-select');
   const stage=el('battle-stage');
+  const view3d=window.PawtopiaBattle3D?.create(el('battle-3d'),stage);
   const petSprite=el('battle-pet-sprite'),foeSprite=el('battle-foe-sprite');
   const reduced=()=>window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
   const wait=ms=>new Promise(resolve=>setTimeout(resolve,reduced()?Math.min(ms,25):Math.max(0,Math.round(ms/playbackSpeed))));
@@ -133,6 +134,10 @@
     el('battle-forfeit').disabled=busy||watchMode||!fighting;
     const activeCat=currentView?currentView.cat:pet,activeFoe=currentView?currentView.foe:foe;
     const kit=spriteArt(activeCat);
+    view3d?.roster(activeCat?characterArt?.getArt(activeCat.breed):null,foeArt?.profile(activeFoe),kit,{
+      efficient:frameQuality==='efficient'||window.navigator?.connection?.saveData,
+      finished:currentView?.match.finished?currentView.match.result:null,busy
+    });
     stage.style.setProperty('--foe-color',activeFoe.color);
     el('battle-foe-emblem').textContent=activeFoe.glyph;
     if(foeArt&&el('battle-foe-art')){
@@ -292,6 +297,14 @@
   }
   async function playArtFrames(cat,state,duration,fromPose='swipe'){
     if(!characterArt||!cat)return;
+    if(view3d?.active()){
+      const ms=duration||characterArt.timingFor(cat.breed,state);
+      if(state!=='recover')view3d.pose('pet',state,reduced()?24:ms/playbackSpeed,
+        state==='victory'||state==='defeat'?state:'idle');
+      else view3d.pose('pet','idle');
+      await wait(ms);
+      return;
+    }
     const lightweight=frameQuality==='efficient'||window.navigator?.connection?.saveData;
     const quick=['approach','walk','run','guard','impact','recover'].includes(state);
     const smooth=(!lightweight&&(quick?characterArt.smoothFrames:characterArt.flowFrames))||null;
@@ -326,6 +339,12 @@
   }
   async function playFoeFrames(foe,state,duration=440){
     if(!foeArt||!foe||!el('battle-foe-art'))return;
+    if(view3d?.active()){
+      view3d.pose('foe',state,reduced()?24:duration/playbackSpeed,
+        state==='victory'||state==='defeat'?state:'idle');
+      await wait(duration);
+      return;
+    }
     const frames=reduced()?[3]:foeArt.frameIds;
     for(const frame of frames){
       foeArt.paint(el('battle-foe-art'),foe,state,frame);
@@ -381,7 +400,9 @@
         defender.classList.add(combat?.contact?'state-impact':'state-guard');
         if(evt.who==='foe')hitMotion=playArtFrames(cat,reaction,310);
         else hitMotion=playFoeFrames(currentFoe,reaction,320);
-        burst(evt,evt.who==='pet'?kit.theme.color:stage.style.getPropertyValue('--foe-color'),visual);
+        const tint=evt.who==='pet'?kit.theme.color:currentFoe.color;
+        if(evt.damage>0)view3d?.hit(evt.target,tint,visual?.power==='ultimate');
+        burst(evt,tint,visual);
         noise(combat?.contact?(evt.who==='pet'?520:210):385,.08);
       }else{burst(evt,'#84e4d8',visual);noise(380,.08);}
       barAfter(evt);
@@ -556,7 +577,8 @@
     const next=el('battle-quality').value;
     frameQuality=next==='efficient'?'efficient':'smooth';
     render();
-    status(frameQuality==='efficient'?'Battery saver uses six illustrated poses per action.':
+    if (view3d?.active()) status(frameQuality==='efficient'?'Battery saver lowers 3D rendering detail.':'Cinematic 3D detail enabled.');
+    else status(frameQuality==='efficient'?'Battery saver uses six illustrated poses per action.':
       'Smooth mode uses up to 21 drawings per attack and 11 for quick transitions.');
   });
   document.addEventListener?.('visibilitychange',()=>{
@@ -566,6 +588,48 @@
       status('Watch mode paused while this tab is hidden to save battery.');
     }
   });
+  const preview3d=el('arena-3d-preview');
+  if(preview3d&&view3d?.active()){
+    preview3d.hidden=false;
+    preview3d.addEventListener('click',async()=>{
+      if(busy||watchMode||!view3d.active())return;
+      busy=true;
+      preview3d.disabled=true;
+      const progress=save.read(),current=engine.matchInfo(progress);
+      const cat=current?.cat||engine.fighters(progress)[selectedPet]||{name:'Maine Coon (demo)',breed:'Maine Coon'};
+      const enemy=current?.foe||data.foes[selectedFoe],kit=data.kitFor(cat.breed);
+      try{
+        view3d.roster(characterArt?.getArt(cat.breed),foeArt?.profile(enemy),kit,{
+          efficient:frameQuality==='efficient'||window.navigator?.connection?.saveData
+        });
+        el('stage-pet-name').textContent=cat.name;
+        status('3D preview. This duel does not change your saved battle.');
+        stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
+        const pose=(side,state,ms,end)=>view3d.pose(side,state,reduced()?24:ms/playbackSpeed,end);
+        pose('pet','approach',440);
+        pose('foe','approach',440);
+        await wait(420);
+        pose('foe','charge',600);
+        pose('pet','guard',580);
+        await wait(290);
+        view3d.hit('pet','#9ef7df',false);
+        await wait(390);
+        pose('pet','ultimate',850);
+        await wait(410);
+        pose('foe','impact',350);
+        view3d.hit('foe',kit.theme.color,true);
+        await wait(450);
+        pose('pet','victory',480,'victory');
+        pose('foe','defeat',510,'defeat');
+        await wait(1000);
+      }finally{
+        busy=false;
+        preview3d.disabled=false;
+        render();
+        status('3D preview complete.');
+      }
+    });
+  }
   const previewBox=el('battle-art-preview-actions');
   if(previewBox)previewBox.addEventListener('click',async event=>{
     const button=event.target.closest('button[data-battle-pose]');

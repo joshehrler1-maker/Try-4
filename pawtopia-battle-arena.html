@@ -21,7 +21,9 @@
 <script defer src="assets/pawtopia-battle-foe-art.js"></script>
 <script defer src="assets/pawtopia-battle-watch.js"></script>
 <script defer src="assets/pawtopia-battle-cinematics.js"></script>
-<script defer src="assets/pawtopia-battle-arena.js"></script>
+<script defer src="assets/pawtopia-battle-3d.js?v=motion-1"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=motion-1"></script>
+<link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=motion-1">
 </head>
 <body>
 <a class="skip" href="#arena-main">Skip to Battle Arena</a>
@@ -37,7 +39,7 @@
 <p class="eyebrow">Pawtopia · Original, free pet battles</p>
 <h1>Battle Arena</h1>
 <p>Every adopted cat can become a champion! Choose your companion, challenge a clockwork foe, and <strong>watch the fight</strong> as pets move, strike, cast their unique skills, and celebrate victories.</p>
-<p>12 increasingly difficult challengers · 56 breed-specific battle art kits · 4 moves per cat</p>
+<p>56 cat breeds in 3D · 12 clockwork challengers · 4 moves per cat</p>
 <a class="primary" href="pawtopia-companions.html">Adopt or train a cat</a>
 <a class="secondary" href="pawtopia-battle-art-gallery.html">Preview all 56 fighter designs</a>
 </div>
@@ -69,7 +71,7 @@
 <div class="watch-speed"><label for="battle-speed">Animation speed</label>
 <select id="battle-speed" aria-label="Battle animation speed"><option value="1">Normal · 1×</option><option value="1.5">Faster · 1.5×</option><option value="2">Fast · 2×</option></select></div>
 <div class="watch-speed"><label for="battle-quality">Character animation detail</label>
-<select id="battle-quality" aria-label="Character animation detail"><option value="smooth">Flowing · up to 21 drawings</option><option value="efficient">Battery saver · 6 drawings</option></select></div>
+<select id="battle-quality" aria-label="Character animation detail"><option value="smooth">Cinematic</option><option value="efficient">Battery saver</option></select></div>
 <button id="battle-forfeit" type="button" class="secondary">Forfeit current battle</button>
 <button id="battle-sound" type="button" class="secondary" aria-pressed="false">Sound: Off</button>
 </div>
@@ -78,8 +80,10 @@
 <section class="fight-section" aria-labelledby="fight-title">
 <h2 id="fight-title">Watch the Battle</h2>
 <p class="arena-status" id="battle-status" role="status" aria-live="polite">Choose your adopted cat and a challenger to start the fight.</p>
+<p class="mini"><button type="button" id="arena-3d-preview" hidden>Preview a 3D duel</button></p>
 <div class="battle-stage" id="battle-stage" aria-label="Animated turn-based battle field">
 <div class="battle-backdrop" aria-hidden="true"></div>
+<canvas id="battle-3d" class="battle-3d-canvas" aria-hidden="true"></canvas>
 <div class="battler battler-pet" id="battle-pet-fighter">
 <div class="battler-ui"><span id="stage-pet-name">Your Cat</span><strong id="stage-pet-level">Lv 1</strong></div>
 <div class="hp-row"><progress id="stage-pet-hp" max="20" value="20"></progress><span id="stage-pet-hp-text">20/20 HP</span></div>
@@ -120,7 +124,7 @@
 <div class="battle-outcome" id="battle-outcome" role="status" aria-live="polite"></div>
 <details class="battle-art-gallery" id="battle-art-gallery">
 <summary>Preview your cat's custom art and nine individual poses</summary>
-<p class="mini">Select any animation to watch a free art-only preview. No battle turns, XP or Paw Coins are used. The illustrations retain your cat's original adoption portrait.</p>
+<p class="mini">Select any animation to watch a free art-only preview. No battle turns, XP or Paw Coins are used. The 3D fighter uses your cat’s breed traits. The art gallery keeps the original adoption portrait.</p>
 <div class="battle-art-preview-actions" id="battle-art-preview-actions" role="group" aria-label="Preview character animations">
   <button type="button" data-battle-pose="idle">Idle</button>
   <button type="button" data-battle-pose="walk">Walk</button>
