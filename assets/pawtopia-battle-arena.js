@@ -5,6 +5,7 @@
   const save=window.PawtopiaSave,data=window.PawtopiaBattleData,engine=window.PawtopiaBattleEngine;
   const characterArt=window.PawtopiaBattleCharacterArt;
   const foeArt=window.PawtopiaBattleFoeArt;
+  const cinematics=window.PawtopiaBattleCinematics;
   const watcher=window.PawtopiaBattleWatch;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
@@ -169,13 +170,65 @@
   function status(message) {
     if(typeof message==='string'&&message)el('battle-status').textContent=message;
   }
-  function burst(evt,color) {
+  function cueFor(evt,kit,foe) {
+    return cinematics?.presentation(evt,kit,foe)||null;
+  }
+  function showCue(visual) {
+    const cue=el('battle-cue');
+    if(!cue||!visual)return;
+    el('battle-cue-source').textContent=visual.source;
+    el('battle-cue-title').textContent=visual.title;
+    el('battle-cue-detail').textContent=visual.subtitle;
+    cue.setAttribute('data-side',visual.side);
+    cue.setAttribute('data-power',visual.power);
+    cue.style.setProperty('--cue-color',visual.color);
+    cue.classList.add('is-visible');
+  }
+  function hideCue() {
+    el('battle-cue')?.classList.remove('is-visible');
+  }
+  async function launchSkillProjectile(visual,kit) {
+    if(!visual?.skill||!kit||reduced())return;
+    const bolt=document.createElement('span');
+    const name=String(kit.signature||'Skill');
+    const initials=name.split(/[^A-Za-z0-9]+/).filter(Boolean).slice(0,2)
+      .map(word=>word[0].toUpperCase()).join('');
+    bolt.className='battle-projectile';
+    bolt.dataset.skillId=visual.skillAssetId;
+    bolt.dataset.type=visual.skill;
+    bolt.dataset.fx=visual.fx;
+    bolt.textContent=visual.skill==='ultimate'?visual.symbol:initials||visual.symbol;
+    bolt.style.setProperty('--bolt-color',visual.color);
+    bolt.style.setProperty('--travel-time',Math.max(90,Math.round(320/playbackSpeed))+'ms');
+    el('battle-vfx').append(bolt);
+    try{await wait(330);}finally{bolt.remove();}
+  }
+  function cameraContact(evt,visual,color) {
+    if(reduced())return;
+    const ring=document.createElement('span');
+    ring.className='battle-impact-ring';
+    ring.dataset.strength=visual?.power||'normal';
+    ring.style.setProperty('--hit-x',evt.target==='pet'?'30%':'70%');
+    ring.style.setProperty('--hit-y','63%');
+    ring.style.setProperty('--effect-color',color);
+    const backdropClass=visual?.power==='ultimate'?'stage-power-contact':
+      evt.who==='pet'?'stage-contact-pet':'stage-contact-foe';
+    stage.classList.remove('stage-power-contact','stage-contact-pet','stage-contact-foe');
+    void stage.offsetWidth;
+    stage.classList.add(backdropClass);
+    el('battle-vfx').append(ring);
+    setTimeout(()=>{
+      ring.remove();
+      stage.classList.remove(backdropClass);
+    },500);
+  }
+  function burst(evt,color,visual) {
     const box=el('battle-vfx');
     const target=evt.target==='pet'?'30%':'70%';
     const glyph=evt.fx==='frost'?'❄':evt.fx==='leaf'?'❧':
       evt.fx==='water'?'◈':evt.fx==='gear'?'⚙':evt.fx==='wind'?'➶':
       evt.fx==='shadow'?'✧':evt.fx==='star'?'★':evt.fx==='guard'?'◈':'✦';
-    const count=evt.fx==='guard'?6:evt.fx==='swipe'?8:16;
+    const count=reduced()?0:evt.fx==='guard'?6:evt.fx==='swipe'?8:16;
     for(let n=0;n<count;n++){
       const particle=document.createElement('span');particle.className='burst-particle';particle.textContent=glyph;
       particle.style.setProperty('--hit-x',target);particle.style.setProperty('--hit-y','65%');
@@ -186,6 +239,7 @@
       particle.style.setProperty('--spin',(n%2?80:-80)+'deg');
       box.append(particle);setTimeout(()=>particle.remove(),900);
     }
+    cameraContact(evt,visual,color);
     if(evt.damage>0) {
       const label=document.createElement('span');label.className='damage-popup';
       label.textContent='−'+evt.damage;
@@ -233,11 +287,15 @@
     const pose=state=>{if(characterArt&&cat)characterArt.paint(el('battle-cat-art'),cat.breed,state);};
     const foePose=state=>{if(foeArt&&currentFoe)foeArt.paint(el('battle-foe-art'),currentFoe,state);};
     for(const evt of events){
+      const visual=cueFor(evt,kit,currentFoe);
+      showCue(visual);
       if(evt.who==='system'){
         if(evt.fx==='victory'){petSprite.classList.add('state-victory');await Promise.all([playArtFrames(cat,'victory',360),playFoeFrames(currentFoe,'defeat',360)]);pose('victory');foePose('defeat');}
         if(evt.fx==='defeat'){petSprite.classList.add('state-defeat');await Promise.all([playArtFrames(cat,'defeat',360),playFoeFrames(currentFoe,'victory',360)]);pose('defeat');foePose('victory');}
         noise(evt.fx==='victory'?620:180,.22);
-        await wait(450);continue;
+        await wait(450);
+        hideCue();
+        continue;
       }
       const actor=evt.who==='pet'?petSprite:foeSprite;
       const defender=evt.who==='pet'?foeSprite:petSprite;
@@ -247,6 +305,7 @@
       let motion=Promise.resolve();
       let hitMotion=Promise.resolve();
       let foeMotion=Promise.resolve();
+      const projectile=evt.who==='pet'&&cast?launchSkillProjectile(visual,kit):Promise.resolve();
       if(evt.who==='pet'){
         const action=guard?'guard':cast?(evt.name.includes('Finale')?'ultimate':'signature'):'approach';
         motion=playArtFrames(cat,action,guard?490:cast?characterArt?.timingFor(cat.breed,action):240);
@@ -264,13 +323,14 @@
         else foeMotion=playFoeFrames(currentFoe,'swipe',470);
       }
       await wait(cast?340:guard?230:190);
+      await projectile;
       if(!guard){
         defender.classList.add('state-impact');
         if(evt.who==='foe')hitMotion=playArtFrames(cat,'impact',310);
         else hitMotion=playFoeFrames(currentFoe,'impact',320);
-        burst(evt,evt.who==='pet'?kit.theme.color:stage.style.getPropertyValue('--foe-color'));
+        burst(evt,evt.who==='pet'?kit.theme.color:stage.style.getPropertyValue('--foe-color'),visual);
         noise(evt.who==='pet'?520:210,.10);
-      }else{burst(evt,'#84e4d8');noise(380,.08);}
+      }else{burst(evt,'#84e4d8',visual);noise(380,.08);}
       barAfter(evt);
       await wait(cast?440:350);
       await Promise.all([motion,foeMotion,hitMotion]);
@@ -278,6 +338,7 @@
       defender.classList.remove('state-impact');
       pose('idle');
       foePose('idle');
+      hideCue();
     }
   }
   async function saveAction(callback) {
@@ -306,7 +367,10 @@
     if(busy)return;busy=true;
     try{
       const result=await saveAction(progress=>engine.start(progress,selectedPet,selectedFoe));
-      if(result)status(result.message);
+      if(result){
+        status(result.message);
+        if(result.ok)stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
+      }
     }catch{status('The battle could not be started safely.');}
     finally{busy=false;render();}
   });
@@ -401,6 +465,7 @@
     watchMode=true;
     watchPaused=false;
     render();
+    stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
     await runWatchMode();
   });
   el('battle-pause').addEventListener('click',()=>{
