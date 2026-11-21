@@ -81,7 +81,7 @@ test('individual geometry varies by coat pattern, ears, body colors, and tail ty
   assert.notEqual(bengal,bombay);
   assert.notEqual(bombay,manx);
   assert.ok(coon.includes('stroke-width="25"'),'Long-haired cat should have thick tail');
-  assert.ok(sphynx.includes('c18 6 32 -1'),'Hairless cat gets skin wrinkles');
+  assert.ok(sphynx.includes('q18 6 32 -1'),'Hairless cat gets skin wrinkles');
   assert.ok(bengal.includes('opacity=".7"'),'Bengal receives spot markings');
   assert.ok(!manx.includes('Q192 205'),'Manx naturally lacks a long tail');
 });
