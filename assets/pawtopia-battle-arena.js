@@ -91,6 +91,11 @@
     select.value=pet?String(selectedPet):'';
     select.disabled=busy||Boolean(fighting)||!cats.length;
     const stats=pet?engine.profile(pet):null;
+    const gearSummary=el('arena-loadout');
+    if (gearSummary) {
+      const gear=['weapon','armor','relic'].map(slot=>window.PawtopiaItems?.worn(progress,pet,slot)?.name).filter(Boolean);
+      gearSummary.textContent=gear.length?'Gear for next match: '+gear.join(' · '):'Equip gear at the market before your next match.';
+    }
     el('battle-pet-detail').textContent=pet
       ?pet.breed+' · Fighting style: '+(characterArt?.identityFor(pet.breed)?.label||'Balanced Claw')+
         ' · Strength '+engine.training(pet).strength+' · Defence '+engine.training(pet).defence+

@@ -88,9 +88,10 @@
     pet.bondPoints = Math.min(100, Math.max(0, Number.isSafeInteger(pet.bondPoints) ? pet.bondPoints : 0) + 1);
     const coins = Number.isSafeInteger(progress.coins) && progress.coins >= 0 ? progress.coins : 0;
     progress.coins = Math.min(Number.MAX_SAFE_INTEGER, coins + 2);
+    const material = window.PawtopiaItems?.scoutReward(progress,pet,areaId) || '';
     const title = newStamp ? ' You unlocked the ' + area.accessory.name + ' for this cat!' : '';
     return { ok: true, message: 'Trail solved! ' + pet.name + ' found the ' + area.stamp +
-      '. Friendship +1 and 2 free Paw Coins.' + title, area: areaId };
+      '. Friendship +1 and 2 free Paw Coins.' + title + material, area: areaId };
   }
   function equip(progress, accessoryId) {
     const pet = progress?.companion;

@@ -1,0 +1,37 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Item Market &amp; Gear | Super Paw Heroes</title>
+<meta name="description" content="Find, buy, craft and equip original Pawtopia items for your cats.">
+<link rel="stylesheet" href="assets/pawtopia-items.css">
+<script defer src="assets/pawtopia-save.js"></script>
+<script defer src="assets/pawtopia-items.js"></script>
+<script defer src="assets/pawtopia-items-ui.js"></script>
+</head>
+<body>
+<header><nav aria-label="Pawtopia"><a href="pawtopia-town.html">Town Square</a><a href="pawtopia-companions.html">Cottage</a><a href="pawtopia-scout-trails.html">Scout Trails</a><a href="pawtopia-battle-arena.html">Battle Arena</a></nav></header>
+<main>
+<h1>Item Market &amp; Gear</h1>
+<p id="market-player"></p>
+<section aria-labelledby="gear-title" class="loadout">
+<h2 id="gear-title">Active cat’s loadout</h2>
+<ul id="market-loadout"></ul>
+<p>Battle gear takes effect when the next match begins. Scout relics work on the active cat.</p>
+</section>
+<section aria-labelledby="catalog-title">
+<h2 id="catalog-title">Item catalog</h2>
+<div class="filters">
+<label>Search <input type="search" id="market-search" placeholder="Name or effect"></label>
+<label>Category <select id="market-category"><option value="">All categories</option></select></label>
+<label class="owned"><input type="checkbox" id="market-owned"> My items only</label>
+</div>
+<p id="market-status" role="status"></p>
+<p id="market-count"></p>
+<div id="market-list"></div>
+</section>
+</main>
+</body>
+</html>

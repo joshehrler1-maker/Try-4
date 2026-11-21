@@ -101,6 +101,12 @@
   function render(message) {
     const progress=save.read();
     const { companion, coins, food, toy, townCollection, capeEquipped, bedPlaced, lastBedRest, otherCompanions } = progress;
+    const wearable = window.PawtopiaItems?.worn(progress,companion,'wearable');
+    const marketWearable = byId('market-wearable');
+    if (marketWearable) {
+      marketWearable.hidden = !wearable;
+      marketWearable.textContent = wearable ? wearable.badge + ' ' + wearable.name : '';
+    }
     const pointState=upgrades?.state();
     byId('pet-upgrade-balance').textContent=String(pointState?.balance||0);
     byId('pet-upgrade-earned-today').textContent=String(pointState?.daily||0)+' of '+(upgrades?.maxDaily||30);
