@@ -274,6 +274,36 @@
     }catch{status('This round could not be completed safely.');}
     finally{busy=false;render();}
   });
+  const previewBox=el('battle-art-preview-actions');
+  if(previewBox)previewBox.addEventListener('click',async event=>{
+    const button=event.target.closest('button[data-battle-pose]');
+    if(!button||busy||!characterArt)return;
+    const cat=engine.fighters(save.read())[selectedPet];
+    if(!cat){status('Adopt a cat first to preview battle art.');return;}
+    const pose=button.dataset.battlePose;
+    if(!characterArt.poseKeys.includes(pose))return;
+    busy=true;
+    const actionClass={
+      idle:'',approach:'state-approach',swipe:'state-swipe',
+      guard:'state-guard',signature:'state-cast',ultimate:'state-cast',
+      impact:'state-impact',victory:'state-victory',defeat:'state-defeat'
+    }[pose];
+    try{
+      previewBox.querySelectorAll('button').forEach(item=>item.disabled=true);
+      petSprite.classList.remove('state-approach','state-swipe','state-cast','state-guard','state-impact','state-victory','state-defeat');
+      if(actionClass)petSprite.classList.add(actionClass);
+      characterArt.paint(el('battle-cat-art'),cat.breed,pose);
+      status(cat.name+' performs '+pose+'. Art preview only — no battle move or reward used.');
+      await wait(pose==='ultimate'?1100:pose==='signature'?950:750);
+    }catch{
+      status('This art preview could not be displayed.');
+    }finally{
+      petSprite.classList.remove('state-approach','state-swipe','state-cast','state-guard','state-impact','state-victory','state-defeat');
+      busy=false;
+      previewBox.querySelectorAll('button').forEach(item=>item.disabled=false);
+      render();
+    }
+  });
   el('battle-sound').addEventListener('click',()=>{
     soundOn=!soundOn;
     el('battle-sound').setAttribute('aria-pressed',String(soundOn));
