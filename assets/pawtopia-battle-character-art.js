@@ -632,6 +632,7 @@
   }
   window.PawtopiaBattleCharacterArt=Object.freeze({
     collection,getArt,poseKeys,animationFrames,smoothFrames,flowFrames,keyframeValue,
-    torsoWeight,personalMotion,choreograph,recoveryPose,flowSignature,timingFor,svgForBreed,paint,fightingStyles,identityFor
+    torsoWeight,personalMotion,choreograph,recoveryPose,flowSignature,timingFor,svgForBreed,paint,
+    cacheSize:()=>svgCache.size,fightingStyles,identityFor
   });
 })();
