@@ -242,13 +242,16 @@
     const offset=pose==='victory'?24:pose==='swipe'?-22:pose==='defeat'?-10:
       pose==='ultimate'?20:pose==='run'?-17:pose==='walk'?-8:pose==='signature'?14:0;
     // Tail swing lags behind the torso and settles naturally at neutral.
-    const s=art.uniq%3*7-7+
-      Math.round((offset+Math.sin((phase-.18)*Math.PI*2)*art.choreography.tailSwing*.65)*envelope);
+    const raw=art.uniq%3*7-7+
+      (offset+Math.sin((phase-.18)*Math.PI*2)*art.choreography.tailSwing*.65)*envelope;
+    // Bound the secondary swing inside the 220px SVG viewBox. The previous
+    // tail extended to x246 on some breeds and clipped at the right edge.
+    const s=Math.round(Math.tanh(raw/20)*17);
     const d=art.tail==='bob'?
-      'M141 176 Q'+(175+s/3)+' 166 '+(174+s/2)+' 151':
-      'M142 175 Q'+(182+s)+' 205 '+(194+s)+' 133 Q'+(201+s)+' 103 '+(174+s)+' 92';
+      'M141 176 Q'+(169+s*.2)+' 166 '+(174+s*.45)+' 151':
+      'M142 175 Q'+(169+s*.55)+' 205 '+(177+s)+' 133 Q'+(184+s)+' 103 '+(169+s)+' 92';
     const width=art.tail==='plume'?25:art.tail==='thick'?20:art.tail==='taper'?12:9;
-    const brush=art.tail==='plume'?'<path d="M'+(175+s)+' 119 l-8 -13 l17 3 l-3 -19 l13 13" stroke="'+art.fur+'" stroke-width="4" fill="none"/>':'';
+    const brush=art.tail==='plume'?'<path d="M'+(169+s)+' 119 l-8 -13 l17 3 l-3 -19 l13 13" stroke="'+art.fur+'" stroke-width="4" fill="none"/>':'';
     return '<g class="art-tail-flex"><path d="'+d+'" fill="none" stroke="'+art.shade+'" stroke-width="'+(width+5)+'" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="'+art.fur+'" stroke-width="'+width+'" stroke-linecap="round"/>'+brush+'</g>';
   }
   function paw(art,x1,y1,x2,y2,side,pose) {
@@ -531,9 +534,19 @@
       '<circle cx="'+apex[2]+'" cy="'+apex[3]+'" r="'+
       (pose==='ultimate'?7:4)+'" fill="'+art.eyes+'" opacity=".8"/></g>';
   }
+  // Small bounded markup cache avoids rebuilding elaborate art geometry for
+  // repeated previews. Never caches user saves or persistent data.
+  const svgCache=new Map(),svgCacheLimit=96;
   function svgForBreed(breed,pose='idle',frame=3,fromPose='swipe'){
     const art=getArt(breed);
     const key=poseKeys.includes(pose)?pose:'idle';
+    const cacheKey=art.uniq+'|'+key+'|'+String(frame)+'|'+fromPose;
+    if(svgCache.has(cacheKey)){
+      const hit=svgCache.get(cacheKey);
+      svgCache.delete(cacheKey);
+      svgCache.set(cacheKey,hit);
+      return hit;
+    }
     const p=key==='recover'?recoveryPose(art,fromPose,frame):choreograph(art,key,frame);
     const type=art.pattern;
     const mane=art.tail==='plume'||art.ears==='tuft';
@@ -574,7 +587,7 @@
     const flow=flowSignature(art);
     const flowVars='--breath-period:'+flow.breathDuration+';--tail-period:'+flow.tailDuration+
       ';--ear-period:'+flow.earDuration;
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" data-source-pose="'+
+    const markup='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" data-source-pose="'+
       (key==='recover'?fromPose:'idle')+'" style="'+flowVars+'" aria-hidden="true">'+
       safety+'<defs><clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+
       '<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>'+
@@ -589,13 +602,22 @@
       (key==='impact'?'<path d="M158 40 l7 -12 l5 12 l13 4 l-13 5 l-5 12 l-6 -13 l-13 -4 Z" fill="#ffe17c"/>':'')+
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
       '</svg>';
+    svgCache.set(cacheKey,markup);
+    if(svgCache.size>svgCacheLimit)svgCache.delete(svgCache.keys().next().value);
+    return markup;
   }
   function paint(container,breed,pose='idle',frame=3,fromPose='swipe'){
     if(!container)return false;
     const art=getArt(breed);
+    // Avoid destroying and recreating the face texture for an unchanged
+    // pose. Preserves the mounted idle CSS animations and saves mobile work.
+    if(container.dataset.breed===art.breed&&container.dataset.pose===pose&&
+       container.dataset.frame===String(frame)&&container.dataset.fromPose===fromPose&&
+       container.firstElementChild?.classList?.contains('paw-battle-full-body'))return true;
     // Markup contains ONLY our own trusted, fixed 56-breed design data.
     container.innerHTML=svgForBreed(art.breed,pose,frame,fromPose);
     container.classList.add('has-body-art');
+    container.dataset.breed=art.breed;
     container.dataset.pose=pose;
     container.dataset.frame=String(frame);
     container.dataset.fromPose=fromPose;
@@ -610,6 +632,7 @@
   }
   window.PawtopiaBattleCharacterArt=Object.freeze({
     collection,getArt,poseKeys,animationFrames,smoothFrames,flowFrames,keyframeValue,
-    torsoWeight,personalMotion,choreograph,recoveryPose,flowSignature,timingFor,svgForBreed,paint,fightingStyles,identityFor
+    torsoWeight,personalMotion,choreograph,recoveryPose,flowSignature,timingFor,svgForBreed,paint,
+    cacheSize:()=>svgCache.size,fightingStyles,identityFor
   });
 })();

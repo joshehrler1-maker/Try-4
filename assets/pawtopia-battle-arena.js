@@ -301,9 +301,19 @@
       await wait(duration||characterArt.timingFor(cat.breed,state));
       return;
     }
-    const interval=Math.max(lightweight?28:18,
-      Math.floor((duration||characterArt.timingFor(cat.breed,state))/frames.length));
-    for(const frame of frames){
+    const totalMs=duration||characterArt.timingFor(cat.breed,state);
+    const interval=Math.max(lightweight?28:18,Math.floor(totalMs/frames.length));
+    const clock=()=>window.performance?.now?.()??Date.now();
+    const started=clock();
+    // A slow phone should skip delayed in-betweens, not stretch a 650ms
+    // attack into several seconds or delay the entire Watch Battle.
+    const budget=Math.max(1,totalMs/playbackSpeed);
+    for(let index=0;index<frames.length;index++){
+      const elapsed=Math.max(0,clock()-started);
+      const due=Math.min(frames.length-1,
+        Math.floor(elapsed/budget*(frames.length-1)));
+      index=Math.max(index,due);
+      const frame=frames[index];
       if(state==='recover')characterArt.paint(el('battle-cat-art'),cat.breed,state,frame,fromPose);
       else characterArt.paint(el('battle-cat-art'),cat.breed,state,frame);
       await wait(interval);
