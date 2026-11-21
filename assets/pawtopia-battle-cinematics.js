@@ -45,5 +45,21 @@
       fx:skill?type:event.fx
     });
   }
-  window.PawtopiaBattleCinematics=Object.freeze({skillId,presentation,symbols,effects});
+  // Visual truth is derived solely from the already-authoritative turn event.
+  // A fully blocked/dodged blow must never look like a damaging hit.
+  function combatVisual(event) {
+    const guard=event?.fx==='guard';
+    const amount=Number.isFinite(event?.damage)?event.damage:0;
+    const contact=!guard&&amount>0;
+    const defense=guard||!contact;
+    const charge=event?.who==='foe'&&event?.name==='Gear Fang Charge';
+    return Object.freeze({
+      contact,defense,charge,
+      foeMove:charge?'charge':'swipe',
+      defenderPose:contact?'impact':'guard',
+      label:guard?'GUARD':!contact?'BLOCKED / DODGED':'',
+      cameraShake:contact
+    });
+  }
+  window.PawtopiaBattleCinematics=Object.freeze({skillId,presentation,combatVisual,symbols,effects});
 })();
