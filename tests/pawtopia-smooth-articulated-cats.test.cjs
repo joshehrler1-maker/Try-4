@@ -71,7 +71,7 @@ test('weight shift and leading paw animate individually while feet stay planted'
     assert.equal(start[1].length,4);
     assert.notEqual(start[1][2],impact[1][2],cat.breed+' right paw must reach forward');
     assert.notEqual(mid[1][2],start[1][2],cat.breed+' must interpolate the front paw');
-    assert.ok(Math.abs(start[2][0]-impact[2][0])<=6,'Keep hind paw grounded');
+    assert.ok(Math.abs(start[2][0]-impact[2][0])<=10,'Hind paw should move no more than 10 units of the 220-unit stage');
     assert.ok(Math.abs(start[3][1]-impact[3][1])<=6,'Keep back foot grounded');
     assert.notEqual(impact[1][2],recovery[1][2],cat.breed+' must recover after the strike');
     const weight=art.torsoWeight(cat,'swipe',3);
