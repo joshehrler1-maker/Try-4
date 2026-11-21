@@ -44,7 +44,7 @@ test('defensive moves and zero-damage blows never trigger damaging impact or cam
 });
 test('all 12 rank-specific enemies have distinct charge frames, not regular swipes',()=>{
  const w=loadPure(),art=w.PawtopiaBattleFoeArt;
- assert.equal(art.models.length,12);
+ assert.equal(art.models.length,208);
  assert.ok(art.states.includes('charge'));
  const chargeShapes=new Set;
  let total=0;

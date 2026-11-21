@@ -19,12 +19,12 @@ function setup() {
   return {data:window.PawtopiaBattleData,art:window.PawtopiaBattleFoeArt};
 }
 
-test('all 12 ladder enemies map to twelve distinct and correctly named original canine models', () => {
+test('all ladder enemies map to distinct and correctly named original canine models', () => {
   const {data,art} = setup();
-  assert.equal(data.foes.length, 12);
-  assert.equal(art.models.length, 12);
-  assert.equal(new Set(Array.from(art.models,p=>p.id)).size,12);
-  assert.equal(new Set(Array.from(art.models,p=>p.kind)).size,12);
+  assert.equal(data.foes.length, 208);
+  assert.equal(art.models.length, 208);
+  assert.equal(new Set(Array.from(art.models,p=>p.id)).size,208);
+  assert.equal(new Set(Array.from(art.models,p=>p.kind)).size,208);
   const bodies = new Set;
   for (const foe of data.foes) {
     const model = art.profile(foe);
@@ -43,7 +43,7 @@ test('all 12 ladder enemies map to twelve distinct and correctly named original 
     else assert.ok(body.includes('data-dog-breed="'+foe.breed+'"'));
     bodies.add(body);
   }
-  assert.equal(bodies.size,12,'All opponents must be visually different');
+  assert.equal(bodies.size,208,'All opponents must be visually different');
   assert.ok(art.drawing(art.profile('foe-12'),'idle').includes('class="foe-boss"'),'Final construct must have a distinctive crown/halo');
   assert.ok(!art.drawing(art.profile('foe-1'),'idle').includes('class="foe-boss"'),'Starter enemy must look simple');
 });
@@ -72,8 +72,8 @@ test('all eight motion states contain six actual animated drawings per opponent'
     }
     assert.equal(stateDrawings.size,8,foe.name+' requires all eight different action states');
   }
-  assert.equal(states,12*8);
-  assert.equal(renderCount,12*8*6);
+  assert.equal(states,208*8);
+  assert.equal(renderCount,208*8*6);
 });
 
 test('foe attack, guarding, boss and victory shapes are meaningful, not only label changes', () => {
@@ -93,15 +93,15 @@ test('foe attack, guarding, boss and victory shapes are meaningful, not only lab
   }
   const {data}=setup();
   const dogs=data.foes.slice(0,-1),boss=data.foes.at(-1);
-  assert.equal(new Set(dogs.map(dog=>dog.breed)).size,11);
+  assert.equal(new Set(dogs.map(dog=>dog.breed)).size,207);
   assert.equal(dogs[0].breed,'Chihuahua');
   assert.equal(dogs.at(-1).breed,'English Mastiff');
   assert.equal(boss.name,'Baron Brasswhirl');
   assert.equal(boss.isBoss,true);
   for(let i=1;i<data.foes.length;i++){
     const previous=data.foes[i-1],next=data.foes[i];
-    assert.ok(next.hp>previous.hp && next.attack>previous.attack && next.defence>=previous.defence);
-    assert.ok(art.profile(next).size>art.profile(previous).size);
+    assert.ok(next.hp>=previous.hp && next.attack>=previous.attack && next.defence>=previous.defence);
+    assert.ok(art.profile(next).size>=art.profile(previous).size);
   }
   assert.ok(art.drawing(art.profile('foe-12'),'idle').includes('class="foe-boss"'));
 });

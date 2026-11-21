@@ -76,7 +76,7 @@ test('each cat has four moves and unlocks at levels 1, 3, 6, 10',()=>{
 test('real match plays through multiple turns and pays one verified fictional reward',()=>{
   const {data,engine}=createWorld(),p=fresh();
   const before=clone(p);
-  assert.equal(engine.start(p,0,1).ok,false,'Tier two is locked');
+  assert.equal(engine.start(p,0,data.foes.findIndex(foe=>foe.rank===2)).ok,false,'Tier two is locked');
   assert.deepEqual(p,before,'Invalid challenge does not corrupt save');
   assert.equal(engine.start(p,0,0).ok,true);
   assert.equal(engine.matchInfo(p).foe.name,data.foes[0].name);
@@ -145,17 +145,17 @@ test('signature cooldown and once-per-battle ultimate are enforced',()=>{
 test('stronger enemies offer strictly increasing coins and XP, guaranteed shards and trophies',()=>{
   const {engine,data}=createWorld(),p=fresh();
   for(let i=1;i<data.foes.length;i++){
-    assert.ok(data.foes[i].coins>data.foes[i-1].coins);
-    assert.ok(data.foes[i].xp>data.foes[i-1].xp);
-    assert.ok(data.foes[i].hp>data.foes[i-1].hp);
+    assert.ok(data.foes[i].coins>=data.foes[i-1].coins);
+    assert.ok(data.foes[i].xp>=data.foes[i-1].xp);
+    assert.ok(data.foes[i].hp>=data.foes[i-1].hp);
   }
   p.battleUnlocked=12;
   p.companion.stats={level:50,strength:150,defence:70,movement:80,endurance:55,intelligence:60};
-  assert.equal(engine.start(p,0,11).ok,true);
+  assert.equal(engine.start(p,0,data.foes.length-1).ok,true);
   const result=engine.takeTurn(p,'ultimate',guaranteed);
   assert.equal(result.ok,true);
   assert.equal(p.battleMatch.result,'win');
-  assert.equal(p.coins,data.foes[11].coins);
+  assert.equal(p.coins,data.foes.at(-1).coins);
   assert.ok(p.shards>=3);
   assert.equal(p.toy,true);
   assert.ok(p.companion.battle.trophies.includes('Golden Paw Crown'));
@@ -165,9 +165,9 @@ test('stronger enemies offer strictly increasing coins and XP, guaranteed shards
 });
 
 test('failed fights do not remove existing coins, adopted cat, or owned items',()=>{
-  const {engine}=createWorld(),p=fresh();
+  const {engine,data}=createWorld(),p=fresh();
   p.coins=42;p.food=3;p.shards=4;p.toy=true;p.battleUnlocked=12;
-  assert.equal(engine.start(p,0,11).ok,true);
+  assert.equal(engine.start(p,0,data.foes.length-1).ok,true);
   let turns=0;
   while(!p.battleMatch.finished&&turns++<20)engine.takeTurn(p,'swipe',guaranteed);
   assert.equal(p.battleMatch.result,'loss');

@@ -99,7 +99,8 @@ function app(reduced=false){
 
 test('visible unique-skill projectile and active cue are played during a saved turn',async()=>{
   const a=app(false);
-  const target=a.el('battle-foe-list').children[11];
+  await a.el('battle-foe-tier').events.change({target:{value:'12'}});
+  const target=a.el('battle-foe-list').children[0];
   await a.el('battle-foe-list').events.click({target});
   await a.el('battle-start').events.click();
   const base=a.getSaved();

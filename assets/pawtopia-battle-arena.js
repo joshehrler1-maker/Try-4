@@ -10,6 +10,7 @@
   const watcher=window.PawtopiaBattleWatch;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
+  let challengerTier=0;
   let selectedPet=0,selectedFoe=0,busy=false,soundOn=false,audio=null;
   let watchMode=false,watchPaused=false,watchLoopRunning=false,waitForResume=null,playbackSpeed=1;
   let frameQuality=window.navigator?.connection?.saveData?'efficient':'smooth';
@@ -109,14 +110,19 @@
     el('battle-xp-text').textContent=stats?(stats.level>=200?'Maximum level':stats.xp+' / '+stats.nextXp+' XP'):'0 / 18 XP';
     el('battle-record').textContent=stats?stats.wins+' wins · '+stats.losses+' losses · Highest rank '+stats.bestRank:'No battles yet';
     el('battle-trophies').textContent=stats&&stats.trophies.length?stats.trophies.join(' · '):'No trophies yet. Defeat ranked opponents to earn them.';
-    el('next-challenge').textContent='Unlocked: rank '+engine.unlocked(progress)+' · '+data.foes[engine.unlocked(progress)-1].name;
-    const choices=data.foes.map((enemy,index)=>{
+    const unlockedTier=engine.unlocked(progress);
+    const tier=challengerTier||foe.rank;
+    const filter=el('battle-foe-tier');
+    if(filter)filter.value=String(tier);
+    el('next-challenge').textContent=unlockedTier===data.bossRank?'Baron Brasswhirl unlocked':'Unlocked through tier '+unlockedTier+' of '+data.bossRank;
+    const choices=data.foes.flatMap((enemy,index)=>{
+      if(enemy.rank!==tier)return [];
       const locked=enemy.rank>engine.unlocked(progress);
       const button=document.createElement('button');button.type='button';button.className='foe-choice'+(locked?' locked':'');
       button.dataset.foe=String(index);
       button.disabled=locked||busy||Boolean(fighting)||watchMode;
       button.setAttribute('aria-pressed',String(selectedFoe===index));
-      addText(button,'strong',(locked?'🔒 ':'')+enemy.glyph+' #'+enemy.rank+' '+enemy.name);
+      addText(button,'strong',(locked?'🔒 ':'')+enemy.glyph+' '+enemy.name);
       addText(button,'small',enemy.sizeLabel+' · Lv '+enemy.level+' · '+enemy.coins+' Paw Coins · '+(enemy.xp*3)+' XP');
       addText(button,'small',enemy.loot);
       return button;
@@ -435,6 +441,15 @@
   select.addEventListener('change',()=>{
     const num=Number(select.value);
     if(Number.isInteger(num)){selectedPet=num;render();}
+  });
+  el('battle-foe-tier')?.addEventListener('change',event=>{
+    const tier=Number(event.target.value);
+    const index=data.foes.findIndex(enemy=>enemy.rank===tier);
+    if(index<0||busy)return;
+    challengerTier=tier;
+    const match=engine.matchInfo(save.read())?.match;
+    if(!match||match.finished)selectedFoe=index;
+    render();
   });
   el('battle-foe-list').addEventListener('click',event=>{
     const choice=event.target.closest('button[data-foe]');

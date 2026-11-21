@@ -13,17 +13,17 @@
 <link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
 <script defer src="assets/pawtopia-save.js?v=catalog-2569"></script>
 <script defer src="assets/pawtopia-upgrade-points.js"></script>
-<script defer src="assets/pawtopia-battle-data.js?v=dogs-1"></script>
+<script defer src="assets/pawtopia-battle-data.js?v=dogs-all"></script>
 <script defer src="assets/pawtopia-item-tiers.js?v=shop-prices-3"></script>
 <script defer src="assets/pawtopia-items.js?v=catalog-2569"></script>
-<script defer src="assets/pawtopia-battle-engine.js?v=dogs-1"></script>
+<script defer src="assets/pawtopia-battle-engine.js?v=dogs-all"></script>
 <script defer src="assets/pawtopia-battle-puppet.js?v=1"></script>
 <script defer src="assets/pawtopia-battle-character-art.js?v=motion-1"></script>
-<script defer src="assets/pawtopia-battle-foe-art.js?v=dogs-1"></script>
+<script defer src="assets/pawtopia-battle-foe-art.js?v=dogs-all"></script>
 <script defer src="assets/pawtopia-battle-watch.js"></script>
-<script defer src="assets/pawtopia-battle-cinematics.js?v=dogs-1"></script>
+<script defer src="assets/pawtopia-battle-cinematics.js?v=dogs-all"></script>
 <script defer src="assets/pawtopia-battle-3d.js?v=painted-1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=dogs-1"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=dogs-all"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=motion-1">
 </head>
 <body>
@@ -40,7 +40,7 @@
 <p class="eyebrow">Pawtopia · Original, free pet battles</p>
 <h1>Battle Arena</h1>
 <p>Every adopted cat can become a champion! Choose your companion, face a dog challenger, and <strong>watch the fight</strong> as pets move, strike, cast their unique skills, and celebrate victories.</p>
-<p>Battle through 11 dog breeds from smallest to largest, then face Baron Brasswhirl in his Clockwork Avatar.</p>
+<p>Battle through 207 dog challengers from smallest to largest, then face Baron Brasswhirl in his Clockwork Avatar.</p>
 <a class="primary" href="pawtopia-companions.html">Adopt or train a cat</a>
 <a class="secondary" href="pawtopia-battle-art-gallery.html">Preview all 56 fighter designs</a>
 </div>
@@ -59,10 +59,12 @@
 <div>
 <h2>Next challenge</h2>
 <div id="next-challenge" class="next-challenge">Training arena</div>
-<p class="mini">Defeat the highest unlocked challenger to unlock the next. Previously unlocked opponents can be replayed for training.</p>
+<p class="mini">Win against any dog in your highest unlocked tier to unlock the next tier. Replay any unlocked breed.</p>
 </div>
 </div>
-<h2 id="foe-list-title">The 12-step challenger ladder</h2>
+<h2 id="foe-list-title">Challenger ladder by size</h2>
+<label for="battle-foe-tier">Challenger tier</label>
+<select id="battle-foe-tier"><option value="1">1 · Tiny</option><option value="2">2 · Tiny</option><option value="3">3 · Toy</option><option value="4">4 · Toy</option><option value="5">5 · Small</option><option value="6">6 · Small</option><option value="7">7 · Medium</option><option value="8">8 · Medium</option><option value="9">9 · Large</option><option value="10">10 · Large</option><option value="11">11 · Giant</option><option value="12">12 · Baron Brasswhirl</option></select>
 <div id="battle-foe-list" class="foe-list" role="group" aria-labelledby="foe-list-title"></div>
 <div class="setup-actions">
 <button id="battle-start" type="button" class="primary">Enter Arena</button>

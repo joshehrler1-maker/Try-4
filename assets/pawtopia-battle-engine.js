@@ -34,7 +34,7 @@
     if (!Array.isArray(cat.battle.trophies)) cat.battle.trophies=[];
     return cat;
   }
-  const unlocked = progress => clamp(safe(progress?.battleUnlocked,1),1,data.foes.length);
+  const unlocked = progress => clamp(safe(progress?.battleUnlocked,1),1,data.bossRank || data.foes.length);
   const foeById = id => data.foes.find(foe=>foe.id===id);
   const opponent = progress => foeById(progress?.battleMatch?.foeId);
   const battlingCat = progress => fighters(progress).find(cat=>cat.battleId && cat.battleId===progress?.battleMatch?.petId);
@@ -88,7 +88,7 @@
       cat.stats.level++;
     }
     if (cat.stats.level>=MAX_LEVEL) a.xp=0;
-    progress.battleUnlocked=Math.max(unlocked(progress),Math.min(data.foes.length,foe.rank+1));
+    progress.battleUnlocked=Math.max(unlocked(progress),Math.min(data.bossRank || data.foes.length,foe.rank+1));
     progress.coins=Math.min(Number.MAX_SAFE_INTEGER,safe(progress.coins)+foe.coins);
     const rewards=['+'+foe.coins+' Paw Coins','+'+xpAward+' XP'];
     if (foe.rank===1 || foe.rank===2 || foe.rank===3) {

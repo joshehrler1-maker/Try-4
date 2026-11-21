@@ -17,19 +17,32 @@
     [77,52,39,40,24,18,"fold","short","points","#33313b","#cc874a","#201f28"], // Rottweiler
     [79,54,43,44,27,17,"fold","straight","mask","#be946d","#efd4ad","#443036"], // English Mastiff
   ]);
-  const models=Object.freeze(foes.map((foe,index)=>{
+  const bodyBuilds=[[63,34,31,34,16,13,"fold","upright","points",2],[58,39,41,31,19,5,"fold","nub","mask",8],[76,40,36,24,16,18,"drop","straight","saddle",1],[71,34,28,54,14,22,"half","straight","solid",4],[68,43,34,40,19,15,"upright","curved","cream",7],[67,38,32,43,17,16,"long","plume","silky",3],[78,53,42,43,25,17,"fold","straight","mask",9],[71,41,34,39,18,17,"long","feather","solid",4],[73,42,33,43,18,17,"half","feather","tuxedo",10],[72,39,34,45,18,19,"drop","upright","saddle",1],[61,33,31,41,14,14,"upright","straight","solid",3],[56,31,32,31,15,9,"upright","curved","blaze",2]];
+  const coats=[["#c28d55","#f3d3a0","#765033"],["#996745","#fff1d8","#38313a"],["#354055","#ce9260","#231e2b"],["#7e859e","#c8bec5","#504b64"],["#a96c44","#e6b58a","#714331"],["#a76335","#edd3a2","#654634"],["#ece2d1","#fff2df","#a49491"],["#80919b","#f3e1ca","#38495b"],["#424651","#f6e6ce","#262b36"],["#bb8861","#f1d3a3","#4f3835"],["#4a3e46","#f6e8d5","#aa6542"],["#e9ded2","#fff2dd","#362f3d"]];
+  function shapeFor(foe){
+    const legacy=/^foe-(\d+)$/.exec(foe.id);
+    if(legacy)return dogShapes[Number(legacy[1])-1];
+    if(!foe.breed)return null;
+    const preset=bodyBuilds[foe.build];
+    const seed=Array.from(foe.id).reduce((n,ch)=>(n*33+ch.charCodeAt(0))>>>0,5381);
+    const dimensions=preset.slice(0,6).map((base,index)=>base+((seed>>>(index*4))&7)-3);
+    const coat=foe.breed==='Dalmatian'?'spots':preset[8];
+    return [...dimensions,preset[6],preset[7],coat,...coats[foe.palette??preset[9]]];
+  }
+  const models=Object.freeze(foes.map(foe=>{
+    const tier=foe.rank-1;
     const tiers=['trainer','scout','terrrier','garden','frost','bolt','recruit','striker','cryo','brass','commander','avatar'];
     return Object.freeze({
-      id:foe.id,name:foe.name,rank:foe.rank,kind:foe.breed||tiers[index],
-      breed:foe.breed,shape:dogShapes[index],
-      color:foe.color,eye:index>=7?'#ffd1b4':index>=4?'#a2edff':'#ffebad',
-      body:index%3===0?'#465f72':index%3===1?'#625b75':'#49576c',
-      metal:index%3===0?'#9facc0':index%3===1?'#c6b6a2':'#a4b7b7',
-      ear:index%4,tail:index%3,plate:index>=6,
+      id:foe.id,name:foe.name,rank:foe.rank,kind:foe.breed||tiers[tier],
+      breed:foe.breed,shape:shapeFor(foe),
+      color:foe.color,eye:tier>=7?'#ffd1b4':tier>=4?'#a2edff':'#ffebad',
+      body:tier%3===0?'#465f72':tier%3===1?'#625b75':'#49576c',
+      metal:tier%3===0?'#9facc0':tier%3===1?'#c6b6a2':'#a4b7b7',
+      ear:tier%4,tail:tier%3,plate:tier>=6,
       size:foe.visualSize||1.19,
-      armor:1+Math.floor(index/3),
-      crest:index>=9?'crown':index>=6?'shield':index>=3?'bolt':'paw',
-      gearTeeth:7+index,tag:'hound-'+(index+1)
+      armor:1+Math.floor(tier/3),
+      crest:tier>=9?'crown':tier>=6?'shield':tier>=3?'bolt':'paw',
+      gearTeeth:7+tier,tag:'hound-'+(tier+1)
     });
   }));
   const byId=Object.fromEntries(models.map(model=>[model.id,model]));
@@ -108,6 +121,7 @@
     }
     const chest='<path d="M86 '+(shoulderY+4)+' Q105 '+(shoulderY+7)+' 117 '+(shoulderY+20)+' L107 '+(shoulderY+depth-1)+' Q80 '+(shoulderY+depth-8)+' 80 '+(shoulderY+16)+' Z" fill="'+light+'"/>';
     const saddle=coat==='saddle'?'<path d="M106 '+(shoulderY+4)+' Q135 '+(shoulderY-8)+' '+(hip-1)+' '+(hipY+6)+' L'+(hip-4)+' '+(hipY+depth*.58)+' Q130 '+(shoulderY+depth*.76)+' 106 '+(shoulderY+6)+' Z" fill="'+dark+'"/>':'';
+    const spots=coat==='spots'?[[-36,12,6],[-22,23,5],[-12,8,4],[-5,26,5],[-54,20,5]].map(([dx,dy,r])=>'<circle cx="'+(hip+dx)+'" cy="'+(hipY+dy)+'" r="'+r+'" fill="'+dark+'"/>').join(''):'';
     const chestCoat=['tuxedo','blaze','saddle','cream','silky'].includes(coat)?chest:'';
     const blaze=['tuxedo','blaze'].includes(coat)?'<path d="M'+(headX-3)+' '+(headY-headRadius*.81)+' Q'+(headX-10)+' '+(headY-headRadius*.28)+' '+(headX-16)+' '+(headY+3)+'" stroke="'+light+'" fill="none" stroke-width="8" stroke-linecap="round"/>':'';
     const facialPoints=coat==='points'?'<ellipse cx="'+(headX-9)+'" cy="'+(headY-13)+'" rx="7" ry="3" fill="'+light+'"/>':'';
@@ -130,7 +144,7 @@
       leg(hip-1,hipY+depth*.62,walk,Math.max(0,walk)*.49,true,'foe-far-hind')+
       '<path d="M83 '+(shoulderY+7)+' Q110 '+(shoulderY-9)+' '+(hip-3)+' '+hipY+' Q'+(hip+20)+' '+(hipY+2)+' '+(hip+9)+' '+(hipY+depth*.76)+
       ' Q'+(hip-11)+' '+(hipY+depth*.85)+' 131 '+(shoulderY+depth*.82)+' Q112 '+(shoulderY+depth+8)+' 84 '+(shoulderY+depth-2)+' Q74 '+(shoulderY+depth*.54)+' 83 '+(shoulderY+7)+' Z" fill="'+fur+'" stroke="'+dark+'" stroke-width="3"/>'+
-      chestCoat+saddle+fringe+
+      chestCoat+saddle+spots+fringe+
       leg(hip-9,hipY+depth*.67,-walk*.68,Math.max(0,-walk)*.6,false,'foe-right-arm')+
       leg(shoulder-4,shoulderY+depth*.68,walk*.77-reach,Math.max(0,walk)*.63+Math.max(0,reach)*.78,false,'foe-left-arm')+
       '<path d="M85 '+(shoulderY+2)+' Q92 '+(shoulderY+19)+' 106 '+(shoulderY+27)+'" fill="none" stroke="'+collar+'" stroke-width="7" stroke-linecap="round"/>'+
