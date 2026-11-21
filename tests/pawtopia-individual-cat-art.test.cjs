@@ -42,10 +42,10 @@ test('every approved cat has a distinct full-body art identity and original phot
   }
 });
 
-test('all 504 pose variants contain distinct attack/guard/ultimate limb drawings',()=>{
+test('all 672 pose variants contain 12 articulated motion states across all 56 cats',()=>{
   const {data,art}=setup();
   assert.deepEqual(Array.from(art.poseKeys),[
-    'idle','approach','swipe','guard','signature','ultimate','impact','victory','defeat'
+    'idle','walk','run','approach','swipe','guard','signature','ultimate','impact','recover','victory','defeat'
   ]);
   let variants=0;
   const keys=new Set();
@@ -65,9 +65,9 @@ test('all 504 pose variants contain distinct attack/guard/ultimate limb drawings
       variantsForBreed.push(drawing.replace(/data-pose="[^"]+"/,'').replace(/<desc>.*?<\/desc>/,''));
       variants++;
     }
-    assert.equal(new Set(variantsForBreed).size,9,'Distinct geometry for all 9 '+breed+' poses');
+    assert.equal(new Set(variantsForBreed).size,12,'Distinct geometry for all 12 '+breed+' poses');
   }
-  assert.equal(variants,504);
+  assert.equal(variants,672);
 });
 
 test('individual geometry varies by coat pattern, ears, body colors, and tail types',()=>{
@@ -107,7 +107,7 @@ test('paint uses a generated full-body SVG, not only a moving square picture',()
   assert.match(target.innerHTML,/class="art-ability"/);
 });
 
-test('arena uses posed characters during live attacks, and provides 9 free previews',()=>{
+test('arena uses posed characters during live attacks, and provides 12 free previews',()=>{
   assert.match(html,/assets\/pawtopia-battle-character-art\.js/);
   assert.ok(html.indexOf('pawtopia-battle-character-art.js')<html.indexOf('pawtopia-battle-arena.js'));
   assert.match(html,/id="battle-art-preview-actions"/);
@@ -119,7 +119,7 @@ test('arena uses posed characters during live attacks, and provides 9 free previ
     assert.ok(uiScript.includes(action),'Missing live action sequence '+action);
   }
   assert.ok(uiScript.includes("characterArt.paint(el('battle-cat-art'),cat.breed,state,frame)"));
-  assert.ok(uiScript.includes("await playArtFrames(cat,pose,characterArt.timingFor(cat.breed,pose))"));
+  assert.ok(uiScript.includes("await playArtFrames(cat,pose,pose==='idle'?1500:characterArt.timingFor(cat.breed,pose)"));
   assert.match(read('sw.js'),/assets\/pawtopia-battle-character-art\.js/);
   assert.match(read('.github/workflows/verify.yml'),/tests\/pawtopia-individual-cat-art\.test\.cjs/);
   assert.doesNotMatch(artScript,/\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon/);
