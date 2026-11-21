@@ -5,14 +5,16 @@
   const save=window.PawtopiaSave,data=window.PawtopiaBattleData,engine=window.PawtopiaBattleEngine;
   const characterArt=window.PawtopiaBattleCharacterArt;
   const foeArt=window.PawtopiaBattleFoeArt;
+  const watcher=window.PawtopiaBattleWatch;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
   let selectedPet=0,selectedFoe=0,busy=false,soundOn=false,audio=null;
+  let watchMode=false,watchPaused=false,watchLoopRunning=false,waitForResume=null,playbackSpeed=1;
   const select=el('battle-pet-select');
   const stage=el('battle-stage');
   const petSprite=el('battle-pet-sprite'),foeSprite=el('battle-foe-sprite');
   const reduced=()=>window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
-  const wait=ms=>new Promise(resolve=>setTimeout(resolve,reduced()?Math.min(ms,25):ms));
+  const wait=ms=>new Promise(resolve=>setTimeout(resolve,reduced()?Math.min(ms,25):Math.max(0,Math.round(ms/playbackSpeed))));
   const addText=(parent,tag,text,className)=>{
     const item=document.createElement(tag);item.textContent=text;
     if(className)item.className=className;
@@ -89,7 +91,7 @@
       const locked=enemy.rank>engine.unlocked(progress);
       const button=document.createElement('button');button.type='button';button.className='foe-choice'+(locked?' locked':'');
       button.dataset.foe=String(index);
-      button.disabled=locked||busy||Boolean(fighting);
+      button.disabled=locked||busy||Boolean(fighting)||watchMode;
       button.setAttribute('aria-pressed',String(selectedFoe===index));
       addText(button,'strong',(locked?'🔒 ':'')+enemy.glyph+' #'+enemy.rank+' '+enemy.name);
       addText(button,'small','Lv '+enemy.level+' · '+enemy.coins+' Paw Coins · '+(enemy.xp*3)+' XP');
@@ -97,9 +99,16 @@
       return button;
     });
     el('battle-foe-list').replaceChildren(...choices);
-    el('battle-start').disabled=busy||Boolean(fighting)||!pet||foe.rank>engine.unlocked(progress);
+    el('battle-start').disabled=busy||Boolean(fighting)||watchMode||!pet||foe.rank>engine.unlocked(progress);
+    el('battle-watch').disabled=busy||watchMode||!watcher||!pet||foe.rank>engine.unlocked(progress);
+    el('battle-watch').textContent=fighting?'▶ Watch Remaining Battle':'▶ Start & Watch Battle';
+    el('battle-pause').disabled=!watchMode;
+    el('battle-pause').textContent=watchPaused?'Resume Watching':'Pause after this turn';
+    el('battle-pause').setAttribute('aria-pressed',String(watchPaused));
+    el('battle-stop-watch').disabled=!watchMode;
+    el('battle-speed').value=String(playbackSpeed);
     el('battle-start').textContent=currentView?.match.finished?'Start a New Battle':'Enter Arena';
-    el('battle-forfeit').disabled=busy||!fighting;
+    el('battle-forfeit').disabled=busy||watchMode||!fighting;
     const activeCat=currentView?currentView.cat:pet,activeFoe=currentView?currentView.foe:foe;
     const kit=spriteArt(activeCat);
     stage.style.setProperty('--foe-color',activeFoe.color);
@@ -125,7 +134,7 @@
       const button=document.createElement('button');
       button.type='button';button.dataset.move=move.id;
       button.className='move-button'+(!move.unlocked?' locked':'');
-      button.disabled=!fighting||busy||!move.ready;
+      button.disabled=!fighting||busy||watchMode||!move.ready;
       addText(button,'strong',move.name);
       addText(button,'small',move.description);
       addText(button,'small',move.note||(move.unlocked?'Ready':'Level '+move.level+' required'));
