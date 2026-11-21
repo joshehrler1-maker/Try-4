@@ -76,6 +76,7 @@
     cape:index%4===0?'#643ca9':index%4===1?'#503b91':index%4===2?'#7544a8':'#593c83',
     motion:index%8, color:specialColors[index%8], style:types[index%8],
     uniq:index, kit:uniqueMoves[index]?.id || 'cat-kit-'+String(index+1).padStart(2,'0'),
+    skill:uniqueMoves[index]?.signature || 'Hero Spark',
     choreography:Object.freeze({
       reach:8+((index*13+5)%33),
       arc:11+((index*17+9)%31),
@@ -201,6 +202,82 @@
     if(ultimate)fx+='<path d="M41 147 Q110 '+(60+(art.uniq%5)*3)+' 179 147" fill="none" stroke="'+art.color+'" stroke-width="6" stroke-linecap="round" opacity=".85"/>';
     return fx;
   }
+
+  /* An original, recognizable visual signature for EACH of 56 breeds.
+     Individual skill titles determine the seal initials. Its geometry depends
+     on the breed's own seed, cast posture and action frame, not just 8 themes. */
+  function signatureSeal(art,pose,frame=3) {
+    if(pose!=='signature'&&pose!=='ultimate')return '';
+    const final=pose==='ultimate';
+    const seed=art.uniq+1;
+    const cycle=Math.max(0,Math.min(5,frame));
+    const growth=[.25,.46,.74,1,1.12,.79][cycle];
+    const x=final?113:166,y=final?105:75;
+    const radius=Math.round((final?61:35)*growth);
+    const corners=5+seed%6;
+    const rotation=seed*.32+(cycle-3)*.09;
+    const outer=[],inner=[];
+    for(let i=0;i<corners;i++){
+      const angle=rotation+Math.PI*2*i/corners-Math.PI/2;
+      const depth=.33+(seed*7+i*3)%7/25;
+      outer.push([Math.round(x+Math.cos(angle)*radius),Math.round(y+Math.sin(angle)*radius)]);
+      inner.push([Math.round(x+Math.cos(angle+.19)*(radius*depth)),Math.round(y+Math.sin(angle+.19)*(radius*depth))]);
+    }
+    const coords=outer.flatMap((p,i)=>[p,inner[i]]);
+    const path='M'+coords.map(p=>p[0]+' '+p[1]).join(' L')+' Z';
+    const label=String(art.skill).split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase();
+    const arcs=Array.from({length:3+(seed%3)},(_,i)=>{
+      const a=rotation+Math.PI*2*i/(3+seed%3);
+      const r=Math.max(8,radius*(.57+i%2*.15));
+      const x1=Math.round(x+Math.cos(a)*r),y1=Math.round(y+Math.sin(a)*r);
+      const x2=Math.round(x+Math.cos(a+.72)*r),y2=Math.round(y+Math.sin(a+.72)*r);
+      return '<path d="M'+x1+' '+y1+' Q'+Math.round(x+Math.cos(a+.3)*(r+8))+' '+
+        Math.round(y+Math.sin(a+.3)*(r+8))+' '+x2+' '+y2+
+        '" fill="none" stroke="'+(i%2?art.eyes:art.color)+'" stroke-width="'+(final?3:2)+'" opacity=".8"/>';
+    }).join('');
+    const accent=final?'M'+x+' '+(y-radius-9)+' L'+(x+7)+' '+y+' L'+x+' '+(y+radius+9)+' L'+(x-7)+' '+y+' Z':'';
+    return '<g class="art-skill-sigil" data-skill-id="'+(seed)+'" data-skill-pose="'+pose+'">'+
+      '<path d="'+path+'" stroke="'+art.color+'" stroke-width="'+(final?3:2.2)+
+      '" fill="'+art.shade+'" fill-opacity=".37" stroke-linejoin="round"/>'+
+      (accent?'<path d="'+accent+'" stroke="'+art.eyes+'" stroke-width="1.5" fill="none" opacity=".8"/>':'')+
+      arcs+
+      '<text x="'+x+'" y="'+(y+5)+'" fill="#fff7dd" stroke="'+art.shade+
+      '" stroke-width="2" paint-order="stroke" font-size="'+(final?16:12)+
+      '" font-weight="900" text-anchor="middle">'+label+'</text></g>';
+  }
+  function individualAttackTrail(art,pose,frame=3) {
+    if(!['swipe','guard','approach','impact'].includes(pose))return '';
+    const phase=Math.max(0,Math.min(5,frame));
+    const seed=art.uniq+1;
+    const brightness=[.2,.38,.65,1,.7,.23][phase];
+    if(pose==='guard'){
+      const span=33+seed%17,y=149;
+      return '<g class="art-personal-guard" data-guard-id="'+seed+'" opacity="'+brightness+'">'+
+        '<path d="M111 '+(y-span)+' Q'+(168+seed%11)+' '+(y-12)+' 111 '+(y+span)+
+        ' Q'+(54-seed%9)+' '+(y-12)+' 111 '+(y-span)+' Z" fill="'+art.color+
+        '" fill-opacity=".16" stroke="'+art.eyes+'" stroke-width="4"/>'+
+        '<path d="M111 '+(y-span+12)+' V'+(y+span-10)+' M'+(111-span/2)+' '+y+' H'+(111+span/2)+
+        '" stroke="'+art.color+'" stroke-width="3" fill="none"/></g>';
+    }
+    if(pose==='impact'){
+      const x=141+seed%9,y=100;
+      return '<g class="art-personal-impact" opacity="'+brightness+'"><path d="M'+x+' '+(y-18)+' l'+
+        (8+seed%8)+' '+(11+seed%5)+' l17 -4 l-12 12 l8 14 l-19 -8 l-12 12 l4 -20 Z" stroke="'+art.color+
+        '" stroke-width="2" fill="'+art.eyes+'"/></g>';
+    }
+    const x=pose==='swipe'?152:55,y=pose==='swipe'?84:161;
+    const stroke=art.color,lines=2+seed%3, length=22+seed%17;
+    const marks=Array.from({length:lines},(_,i)=>{
+      const offset=i*9-11;
+      const xx=pose==='swipe'?x+offset:x-offset;
+      const yy=y+offset;
+      const end=pose==='swipe'?xx+length:xx-length;
+      return '<path d="M'+xx+' '+(yy+length*.45)+' Q'+(xx+end)/2+' '+(yy-length*.58-seed%9)+
+        ' '+end+' '+(yy-length*.24)+'" stroke="'+stroke+'" fill="none" stroke-width="'+(2+(seed+i)%3)+
+        '" stroke-linecap="round"/>';
+    }).join('');
+    return '<g class="art-personal-motion" data-motion-id="'+seed+'" opacity="'+brightness+'">'+marks+'</g>';
+  }
   const poseDef={
     idle:[[68,149,57,188],[152,149,164,190],[78,207,0],[141,206,0],0],
     approach:[[66,143,51,162],[152,141,177,158],[89,206,-7],[151,208,6],-8],
@@ -282,7 +359,7 @@
       '<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>'+
       tail(art,key,frame)+cape+backFeet+body+
       paw(art,...p[0],false,key)+paw(art,...p[1],true,key)+head+smallClaws+defeat+
-      abilityArt(art,key,frame)+
+      abilityArt(art,key,frame)+signatureSeal(art,key,frame)+individualAttackTrail(art,key,frame)+
       (key==='impact'?'<path d="M158 40 l7 -12 l5 12 l13 4 l-13 5 l-5 12 l-6 -13 l-13 -4 Z" fill="#ffe17c"/>':'')+
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
       '</svg>';
