@@ -1,0 +1,44 @@
+
+.illustrated-shop {
+  background:radial-gradient(ellipse at 55% 0,color-mix(in srgb,var(--shop-tint) 18%,#182644),#10203b 44rem);
+}
+.illustrated-shop .shop-entry {
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);
+  align-items:center; gap:clamp(1rem,3vw,2rem);
+  padding:clamp(.8rem,2.4vw,1.8rem); margin:0 0 1rem;
+  border:1px solid color-mix(in srgb,var(--shop-tint) 62%,#273950);
+  border-radius:1.2rem; background:#15253de8; box-shadow:0 18px 48px #07102088;
+}
+.illustrated-shop .shop-entry h1 {color:var(--shop-tint); line-height:1.05}
+.illustrated-shop .shop-entry-copy > :last-child {margin-bottom:0}
+.illustrated-shop .shop-entry-copy #market-player {color:#ffe1a2}
+.illustrated-shop .shop-interior {
+  width:100%; height:auto; aspect-ratio:500 / 330; object-fit:cover; display:block;
+  border-radius:.8rem; border:1px solid var(--shop-tint); box-shadow:0 8px 22px #0007;
+}
+.illustrated-shop .loadout {border-color:color-mix(in srgb,var(--shop-tint) 52%,#34465f)}
+.illustrated-shop .shop-shelves {margin-block:1.3rem}
+.illustrated-shop .shop-shelf-title {
+  background-image:linear-gradient(90deg,#101c32 5%,#101c32bc 65%,#101c324a),var(--shop-scene);
+  background-size:cover; background-position:center;
+  border:1px solid color-mix(in srgb,var(--shop-tint) 52%,#34465f);
+  padding:.85rem 1rem; border-radius:.75rem; margin-bottom:.9rem;
+}
+.illustrated-shop .shop-shelf-title h2 {margin:0; color:#fff3df}
+.illustrated-shop #market-list article {overflow:hidden; border-color:color-mix(in srgb,var(--shop-tint) 34%,#34465f)}
+.illustrated-shop .shop-card-art {
+  align-self:stretch; height:2.65rem; margin-bottom:.7rem; display:grid; place-items:center;
+  font-size:1.27rem; border-radius:.4rem; border:1px solid color-mix(in srgb,var(--shop-tint) 55%,#34465f);
+  background-image:linear-gradient(90deg,#132340ac,#132340f0 48%,#132340a5),var(--shop-scene);
+  background-size:cover; background-position:center 61%;
+}
+.illustrated-shop #market-list article:nth-child(3n+2) .shop-card-art {background-position:center 32%}
+.illustrated-shop #market-list article:nth-child(3n+3) .shop-card-art {background-position:center 78%}
+.illustrated-shop #local-stock li {
+  border-left:3px solid var(--shop-tint);
+  background-image:linear-gradient(90deg,#1a2d4bf2,#1a2d4bfa 62%,#1a2d4bd9),var(--shop-scene);
+  background-size:cover; background-position:center;
+}
+@media(max-width:640px) {
+  .illustrated-shop .shop-entry {grid-template-columns:1fr; gap:.85rem}
+}

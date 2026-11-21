@@ -7,6 +7,10 @@
   const tier = $('market-tier'), source = $('market-source');
   const previous = $('market-prev'), next = $('market-next');
   const pageSize = 24;
+  const itemMotifs = {
+    Food:'🍲',Toy:'🧸',Remedy:'🌿',Weapon:'⚔️',Armor:'🛡️',Relic:'🔮',
+    Book:'📚',Material:'🧵',Wearable:'🎀',Furnishing:'🪑',Collectible:'🖼️','Battle Gear':'⚙️'
+  };
   let page = 0;
   const stock = window.PawtopiaShopStock;
   const storefront = document.body.dataset.storefront;
@@ -90,6 +94,10 @@
     for (const item of visible.slice(page*pageSize,(page+1)*pageSize)){
       const units=market.stock(p,item.id), card=add(list,'article','');
       card.id='item-'+item.id;
+      if (storefront) {
+        const art = add(card,'div',item.badge || itemMotifs[item.category] || '🐾','shop-card-art');
+        art.setAttribute('aria-hidden','true');
+      }
       add(card,'h3',item.badge ? item.badge+' '+item.name : item.name);
       const classification=item.tier?' · '+item.tier+' tier · Power '+item.rating:'';
       const acquisition=item.achievement?' · Achievement reward':item.price?' · Shop':'';

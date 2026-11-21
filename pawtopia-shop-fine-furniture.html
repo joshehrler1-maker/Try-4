@@ -11,15 +11,21 @@
 <script defer src="assets/pawtopia-item-tiers.js?v=shop-prices-3"></script>
 <script defer src="assets/pawtopia-items.js?v=catalog-2569"></script>
 <script defer src="assets/pawtopia-shop-stock.js?v=town-shops-1"></script>
-<script defer src="assets/pawtopia-items-ui.js?v=town-shops-1"></script>
+<link rel="stylesheet" href="assets/pawtopia-storefront.css?v=1">
+<script defer src="assets/pawtopia-items-ui.js?v=illustrated-shops-1"></script>
 </head>
-<body data-storefront="fine-furniture" data-local-stock="Fine Furniture">
+<body class="illustrated-shop" style="--shop-scene:url('assets/scenes/town-shops/fine-furniture.jpg');--shop-tint:#e6aa91" data-storefront="fine-furniture" data-local-stock="Fine Furniture">
 <header><nav aria-label="Pawtopia"><a href="pawtopia-town.html#shop-map">Town Square map</a><a href="pawtopia-items.html">Full item catalog</a><a href="pawtopia-companions.html">Cottage</a><a href="pawtopia-scout-trails.html">Scout Trails</a><a href="pawtopia-battle-arena.html">Battle Arena</a></nav></header>
 <main>
-<h1>Fine Furniture</h1>
+<section class="shop-entry" aria-labelledby="shop-name">
+<div class="shop-entry-copy">
+<h1 id="shop-name">Fine Furniture</h1>
 <p>Beds, benches, and larger Cottage furnishings.</p>
 
 <p id="market-player"></p>
+</div>
+<img class="shop-interior" src="assets/scenes/town-shops/fine-furniture.jpg" width="500" height="330" alt="Velvet cat beds and benches in the furniture shop" decoding="async" fetchpriority="high">
+</section>
 <p id="market-status" role="status"></p>
 <section aria-labelledby="gear-title" class="loadout">
 <h2 id="gear-title">Active cat’s loadout</h2>
@@ -27,8 +33,8 @@
 <p>Battle gear takes effect when the next match begins. Scout relics work on the active cat.</p>
 </section>
 <section aria-labelledby="local-title"><h2 id="local-title">Pawtopia staples</h2><ul id="local-stock"></ul></section>
-<section aria-labelledby="catalog-title">
-<h2 id="catalog-title">Shop stock</h2>
+<section class="shop-shelves" aria-labelledby="catalog-title">
+<div class="shop-shelf-title"><h2 id="catalog-title">Shop stock</h2></div>
 <div class="filters">
 <label>Search <input type="search" id="market-search" placeholder="Name or effect"></label>
 <label>Category <select id="market-category"><option value="">All categories</option></select></label>
