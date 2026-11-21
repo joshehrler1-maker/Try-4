@@ -222,3 +222,88 @@ footer{padding:16px 0 28px;text-align:center}
   .watch-speed{width:100%}
   .watch-speed select{width:100%}
 }
+
+/* Cinematic combat readability: distinct active move, thrown personal skill
+   glyph, targeted contact flash and camera reaction (never changes hit logic). */
+.battle-cue{
+  position:absolute;z-index:6;pointer-events:none;
+  left:50%;top:19%;width:min(75%,370px);
+  transform:translate(-50%,-10px) scale(.96);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 12px;color:#fff8df;text-align:center;
+  border:2px solid var(--cue-color,#f5d99d);border-radius:16px;
+  background:linear-gradient(120deg,#172744ee,#38416aeb);
+  box-shadow:0 5px 22px #0a1528aa,0 0 16px var(--cue-color,#f5d99d);
+  opacity:0;transition:opacity .14s ease-out,transform .14s ease-out;
+}
+.battle-cue.is-visible{opacity:1;transform:translate(-50%,0) scale(1)}
+.battle-cue[data-side="pet"]{left:45%}
+.battle-cue[data-side="foe"]{left:55%}
+.battle-cue #battle-cue-source{text-transform:uppercase;letter-spacing:.08em;font-weight:800;font-size:.66rem;color:#ddeafa}
+.battle-cue #battle-cue-title{font-family:Georgia,serif;font-size:clamp(.9rem,2.1vw,1.25rem);line-height:1.1}
+.battle-cue #battle-cue-detail{font-size:.72rem;color:#e5ebf4;max-width:100%;overflow-wrap:anywhere}
+.battle-cue[data-power="ultimate"]{background:linear-gradient(130deg,#44366fe9,#2f284eef)}
+.battle-cue[data-power="strong"]{border-width:3px}
+.battle-projectile{
+  position:absolute;z-index:7;display:grid;place-items:center;
+  left:var(--bolt-start,32%);top:51%;width:clamp(28px,7vw,56px);aspect-ratio:1;
+  border:3px solid var(--bolt-color,#f5daa5);border-radius:50%;
+  background:radial-gradient(circle,#fff9de 3%,var(--bolt-color,#f5daa5) 42%,#222e648c 82%);
+  color:#1b2550;font-weight:1000;font-size:clamp(.76rem,2vw,1.2rem);font-family:Georgia,serif;
+  box-shadow:0 0 14px var(--bolt-color,#f5daa5),0 0 25px var(--bolt-color,#f5daa5);
+  pointer-events:none;transform:translate(-50%,-50%) rotate(-13deg);
+  animation:arena-skill-shot var(--travel-time,330ms) cubic-bezier(.22,.8,.3,1) forwards;
+}
+.battle-projectile::after{
+  content:"";position:absolute;inset:-8px;border-radius:45% 55%;
+  border:2px dashed var(--bolt-color,#f5daa5);animation:arena-sigil-spin .65s linear infinite
+}
+.battle-projectile[data-type="ultimate"]{width:clamp(40px,10vw,78px);border-width:4px}
+.battle-projectile[data-fx="wind"]{border-radius:12% 80% 20% 80%}
+.battle-projectile[data-fx="gear"]{border-radius:24%}
+.battle-projectile[data-fx="star"]{border-radius:36% 64% 36% 64%}
+.battle-projectile[data-fx="shadow"]{filter:drop-shadow(4px 4px 1px #3d377bcc)}
+.battle-impact-ring{
+  position:absolute;z-index:7;pointer-events:none;
+  width:clamp(55px,13vw,112px);aspect-ratio:1;
+  left:var(--hit-x,50%);top:var(--hit-y,65%);
+  border:5px solid var(--effect-color,#fce9bb);border-radius:50%;
+  background:radial-gradient(circle,#fff3b36b,transparent 66%);
+  transform:translate(-50%,-50%) scale(.4);opacity:0;
+  animation:arena-contact .47s ease-out both;
+}
+.battle-impact-ring[data-strength="ultimate"]{border-width:9px;box-shadow:0 0 22px var(--effect-color,#fce9bb)}
+.battle-impact-ring[data-strength="strong"]{border-width:7px}
+.battle-stage.stage-contact-pet .battle-backdrop,
+.battle-stage.stage-contact-foe .battle-backdrop{animation:arena-camera-shiver .29s ease-out both}
+.battle-stage.stage-power-contact .battle-backdrop{animation:arena-camera-heavy .4s ease-out both}
+@keyframes arena-skill-shot{
+  0%{opacity:.1;transform:translate(-50%,-50%) scale(.45) rotate(-13deg)}
+  35%{opacity:1;transform:translate(-50%,-75%) scale(1.23) rotate(18deg)}
+  100%{opacity:0;left:var(--bolt-end,68%);transform:translate(-50%,-50%) scale(.8) rotate(80deg)}
+}
+@keyframes arena-sigil-spin{to{transform:rotate(360deg)}}
+@keyframes arena-contact{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(.16)}
+  45%{opacity:.88;transform:translate(-50%,-50%) scale(1.05)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}
+}
+@keyframes arena-camera-shiver{
+  0%,100%{transform:translateX(0)}25%{transform:translateX(5px)}55%{transform:translateX(-4px)}
+}
+@keyframes arena-camera-heavy{
+  0%,100%{transform:translate(0,0) scale(1)}20%{transform:translate(7px,-3px) scale(1.035)}40%{transform:translate(-6px,3px) scale(1.04)}70%{transform:translate(4px,-2px) scale(1.015)}
+}
+@media(max-width:560px){
+  .battle-cue{left:50%!important;top:15%;width:82%;padding:5px 7px}
+  .battle-cue #battle-cue-title{font-size:.8rem}
+  .battle-cue #battle-cue-detail{font-size:.65rem}
+  .battle-cue #battle-cue-source{font-size:.58rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .battle-cue{transition:none}
+  .battle-projectile,.battle-impact-ring{display:none}
+  .battle-stage.stage-contact-pet .battle-backdrop,
+  .battle-stage.stage-contact-foe .battle-backdrop,
+  .battle-stage.stage-power-contact .battle-backdrop{animation:none}
+}
