@@ -69,6 +69,7 @@ jobs:
           node --test tests/pawtopia-battle-cinematics.test.cjs
           node --test tests/pawtopia-smooth-articulated-cats.test.cjs
           node --test tests/pawtopia-personal-fighting-styles.test.cjs
+          node --test tests/pawtopia-battle-visual-truth.test.cjs
           node --test tests/guest-arcade.test.cjs
           node --test tests/guest-3d-arcade.test.cjs
           node tests/side-scroll-cinematic-stage34.test.cjs
