@@ -10,6 +10,7 @@
 <meta property="og:description" content="Watch your adopted cat battle 12 original clockwork foes, unlock special moves and earn free rewards.">
 <title>Pawtopia Battle Arena | Super Paw Heroes</title>
 <link rel="stylesheet" href="assets/pawtopia-battle-arena.css">
+<link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/pawtopia-battle-data.js"></script>
 <script defer src="assets/pawtopia-battle-engine.js"></script>
@@ -63,7 +64,7 @@
 <div class="watch-speed"><label for="battle-speed">Animation speed</label>
 <select id="battle-speed" aria-label="Battle animation speed"><option value="1">Normal · 1×</option><option value="1.5">Faster · 1.5×</option><option value="2">Fast · 2×</option></select></div>
 <div class="watch-speed"><label for="battle-quality">Character animation detail</label>
-<select id="battle-quality" aria-label="Character animation detail"><option value="smooth">Smooth · 11 drawings</option><option value="efficient">Battery saver · 6 drawings</option></select></div>
+<select id="battle-quality" aria-label="Character animation detail"><option value="smooth">Flowing · up to 21 drawings</option><option value="efficient">Battery saver · 6 drawings</option></select></div>
 <button id="battle-forfeit" type="button" class="secondary">Forfeit current battle</button>
 <button id="battle-sound" type="button" class="secondary" aria-pressed="false">Sound: Off</button>
 </div>
@@ -117,12 +118,15 @@
 <p class="mini">Select any animation to watch a free art-only preview. No battle turns, XP or Paw Coins are used. The illustrations retain your cat's original adoption portrait.</p>
 <div class="battle-art-preview-actions" id="battle-art-preview-actions" role="group" aria-label="Preview character animations">
   <button type="button" data-battle-pose="idle">Idle</button>
+  <button type="button" data-battle-pose="walk">Walk</button>
+  <button type="button" data-battle-pose="run">Run</button>
   <button type="button" data-battle-pose="approach">Run forward</button>
   <button type="button" data-battle-pose="swipe">Paw Swipe</button>
   <button type="button" data-battle-pose="guard">Guard Curl</button>
   <button type="button" data-battle-pose="signature">Unique Skill</button>
   <button type="button" data-battle-pose="ultimate">Ultimate</button>
   <button type="button" data-battle-pose="impact">Hit Reaction</button>
+  <button type="button" data-battle-pose="recover">Smooth Recovery</button>
   <button type="button" data-battle-pose="victory">Victory</button>
   <button type="button" data-battle-pose="defeat">Defeat</button>
 </div>

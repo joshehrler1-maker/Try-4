@@ -64,7 +64,7 @@
     ['Kurilian Bobtail','#b7a188','#725f4c','#584b40','#b9c875','tabby','tuft','bob'],
     ['Sokoke','#b29368','#6b523b','#49372d','#d5d478','spots','large','thin']
   ];
-  const poseKeys = Object.freeze(['idle','approach','swipe','guard','signature','ultimate','impact','victory','defeat']);
+  const poseKeys = Object.freeze(['idle','walk','run','approach','swipe','guard','signature','ultimate','impact','recover','victory','defeat']);
   const specialColors = ['#ffe39e','#94d5fa','#a5ebb1','#d7b7ff','#8fe4d5','#fff0a4','#f1b58b','#b9b5ed'];
   const types = ['spark','frost','leaf','star','water','wind','gear','shadow'];
   const uniqueMoves = window.PawtopiaBattleData?.kits || [];
@@ -233,17 +233,23 @@
       art.ears==='fold'?'M135 55 L151 35 Q191 18 164 54 Z':
       art.ears==='curl'?'M134 50 Q148 11 173 18 Q189 28 164 55 Z':
       'M134 53 Q161 17 173 '+(art.ears==='tuft'?2:12)+' L167 57 Z';
-    return '<g fill="'+fur+'" stroke="'+shade+'" stroke-width="4" stroke-linejoin="round"><path d="'+left+'"/><path d="'+right+'"/></g><g fill="'+marks+'" opacity=".55"><path d="M61 42 L57 22 Q71 33 75 48 Z"/><path d="M147 48 L163 23 L161 47 Z"/></g>';
+    return '<g class="art-ear-flex" fill="'+fur+'" stroke="'+shade+'" stroke-width="4" stroke-linejoin="round"><path d="'+left+'"/><path d="'+right+'"/></g><g fill="'+marks+'" opacity=".55"><path d="M61 42 L57 22 Q71 33 75 48 Z"/><path d="M147 48 L163 23 L161 47 Z"/></g>';
   }
   function tail(art,pose,frame=3) {
     if(art.tail==='none')return '';
-    const s=(pose==='victory'?24:pose==='swipe'?-22:pose==='defeat'?-10:pose==='ultimate'?20:art.uniq%3*7-7)+Math.round((frame-3)*art.choreography.tailSwing/3);
+    const phase=Math.max(0,Math.min(5,Number.isFinite(frame)?frame:3))/5;
+    const envelope=Math.sin(Math.PI*phase);
+    const offset=pose==='victory'?24:pose==='swipe'?-22:pose==='defeat'?-10:
+      pose==='ultimate'?20:pose==='run'?-17:pose==='walk'?-8:pose==='signature'?14:0;
+    // Tail swing lags behind the torso and settles naturally at neutral.
+    const s=art.uniq%3*7-7+
+      Math.round((offset+Math.sin((phase-.18)*Math.PI*2)*art.choreography.tailSwing*.65)*envelope);
     const d=art.tail==='bob'?
       'M141 176 Q'+(175+s/3)+' 166 '+(174+s/2)+' 151':
       'M142 175 Q'+(182+s)+' 205 '+(194+s)+' 133 Q'+(201+s)+' 103 '+(174+s)+' 92';
     const width=art.tail==='plume'?25:art.tail==='thick'?20:art.tail==='taper'?12:9;
     const brush=art.tail==='plume'?'<path d="M'+(175+s)+' 119 l-8 -13 l17 3 l-3 -19 l13 13" stroke="'+art.fur+'" stroke-width="4" fill="none"/>':'';
-    return '<g><path d="'+d+'" fill="none" stroke="'+art.shade+'" stroke-width="'+(width+5)+'" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="'+art.fur+'" stroke-width="'+width+'" stroke-linecap="round"/>'+brush+'</g>';
+    return '<g class="art-tail-flex"><path d="'+d+'" fill="none" stroke="'+art.shade+'" stroke-width="'+(width+5)+'" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="'+art.fur+'" stroke-width="'+width+'" stroke-linecap="round"/>'+brush+'</g>';
   }
   function paw(art,x1,y1,x2,y2,side,pose) {
     const dx=x2-x1,dy=y2-y1;
@@ -362,12 +368,15 @@
   }
   const poseDef={
     idle:[[68,149,57,188],[152,149,164,190],[78,207,0],[141,206,0],0],
+    walk:[[66,145,53,174],[151,144,170,172],[84,207,0],[145,207,0],-3],
+    run:[[66,138,50,153],[152,137,179,155],[89,205,0],[148,204,0],-8],
     approach:[[66,143,51,162],[152,141,177,158],[89,206,-7],[151,208,6],-8],
     swipe:[[69,143,58,169],[151,139,193,86],[85,211,0],[152,207,-5],-14],
     guard:[[70,137,104,139],[150,136,114,151],[81,209,0],[146,209,0],0],
     signature:[[66,145,61,161],[151,134,173,65],[85,210,-5],[151,206,0],-16],
     ultimate:[[69,135,41,64],[150,134,179,59],[82,213,-8],[148,211,7],-8],
     impact:[[69,142,48,166],[151,144,166,163],[80,213,-12],[146,210,10],12],
+    recover:[[68,149,57,188],[152,149,164,190],[78,207,0],[141,206,0],0],
     victory:[[69,137,43,70],[151,136,172,65],[83,209,0],[145,205,0],-10],
     defeat:[[66,158,54,209],[151,157,165,213],[91,223,10],[144,222,14],17]
   };
@@ -375,12 +384,32 @@
   // Half-step in-betweens improve the motion without a new paid sprite pipeline.
   // Six original poses are preserved for older previews and regression tests.
   const smoothFrames=Object.freeze([0,.5,1,1.5,2,2.5,3,3.5,4,4.5,5]);
+  const flowFrames=Object.freeze(Array.from({length:21},(_,i)=>i/4));
   const motionWeight=Object.freeze([0,-.18,.25,1,.73,.13]);
   function keyframeValue(values,frame=3) {
     const phase=Number.isFinite(frame)?Math.max(0,Math.min(5,frame)):3;
     const start=Math.floor(phase),end=Math.min(start+1,5);
     const amount=phase-start;
     return values[start]+(values[end]-values[start])*amount;
+  }
+  function recoveryPose(art,fromPose,frame) {
+    const source=['swipe','signature','ultimate','guard','impact','approach','walk','run'].includes(fromPose)?fromPose:'swipe';
+    const start=choreograph(art,source,5),finish=choreograph(art,'idle',3);
+    const t=Math.max(0,Math.min(1,Number.isFinite(frame)?frame/5:1));
+    const eased=t*t*(3-2*t);
+    return start.map((item,i)=>Array.isArray(item)?
+      item.map((v,j)=>Math.round(v+(finish[i][j]-v)*eased)):
+      Math.round(item+(finish[i]-item)*eased));
+  }
+  function flowSignature(art){
+    return Object.freeze({
+      breathDuration:(2.45+(art.uniq%7)*.18).toFixed(2)+'s',
+      tailDuration:(2.7+((art.uniq*3)%11)*.17).toFixed(2)+'s',
+      earDuration:(3.2+((art.uniq*5)%9)*.21).toFixed(2)+'s',
+      stride:8+art.uniq%8,
+      gaitLift:6+art.uniq%7,
+      agility:1+art.fightingStyle.tempo/20
+    });
   }
   function personalMotion(art,pose,frame=3){
     const style=art.fightingStyle||identityFor(art.breed);
@@ -406,17 +435,18 @@
   function torsoWeight(art,pose,frame=3) {
     const weight=keyframeValue(motionWeight,frame);
     const attack=['swipe','signature','ultimate'].includes(pose);
-    const guard=pose==='guard',hit=pose==='impact';
+    const guard=pose==='guard',hit=pose==='impact',travel=['walk','run','approach'].includes(pose);
     const shift=Math.round((attack?art.choreography.reach/6:guard?-3:hit?-4:0)*weight);
     const lift=Math.round((pose==='ultimate'?-7:pose==='signature'?-5:attack?-2:hit?3:0)*Math.max(0,weight));
     const tilt=Math.round((attack?Math.min(6,art.choreography.arc/5):guard?-3:hit?-5:0)*weight);
     const personal=personalMotion(art,pose,frame);
+    const gait=travel?Math.sin((frame/5)*Math.PI*2*(pose==='run'?2:1))*Math.min(3,art.choreography.arc/12):0;
     // Do not translate the feet with this body movement. The rear paws stay
     // planted even when the cat performs a forceful heavy or acrobatic move.
     return Object.freeze({
-      shift:shift+Math.round(personal.torso[0]*.65),
-      lift:lift+Math.round(personal.torso[1]*.5),
-      tilt:tilt+Math.round(personal.torso[0]*.16)
+      shift:shift+Math.round(personal.torso[0]*.65)+Math.round(gait*.3),
+      lift:lift+Math.round(personal.torso[1]*.5)-Math.round(Math.abs(gait)),
+      tilt:tilt+Math.round(personal.torso[0]*.16)+Math.round(gait*.5)
     });
   }
   function choreograph(art,pose,frame=3) {
@@ -449,6 +479,21 @@
         y+=Math.round((art.uniq%4-1.5)*Math.max(0,weight));
         drawn.push([x,y,goal[2]||0]);
       }
+    }
+    if(['walk','run','approach'].includes(pose)){
+      const signature=flowSignature(art),cycle=pose==='run'?2:1;
+      const wave=Math.sin(frame/5*Math.PI*2*cycle);
+      const step=signature.stride*(pose==='walk'?.55:pose==='run'?1.15:.85);
+      const lift=signature.gaitLift*(pose==='walk'?.55:pose==='run'?1.2:1);
+      for(let i=2;i<4;i++){
+        const stride=i===2?wave:-wave;
+        drawn[i][0]+=Math.round(stride*step);
+        drawn[i][1]-=Math.round(Math.max(0,stride)*lift);
+      }
+      drawn[0][2]-=Math.round(wave*step*.85);
+      drawn[1][2]+=Math.round(wave*step*.85);
+      drawn[0][3]-=Math.round(Math.max(0,-wave)*lift*.45);
+      drawn[1][3]-=Math.round(Math.max(0,wave)*lift*.45);
     }
     const individual=personalMotion(art,pose,frame);
     for(let i=0;i<2;i++){
@@ -486,16 +531,25 @@
       '<circle cx="'+apex[2]+'" cy="'+apex[3]+'" r="'+
       (pose==='ultimate'?7:4)+'" fill="'+art.eyes+'" opacity=".8"/></g>';
   }
-  function svgForBreed(breed,pose='idle',frame=3){
+  function svgForBreed(breed,pose='idle',frame=3,fromPose='swipe'){
     const art=getArt(breed);
-    const key=poseKeys.includes(pose)?pose:'idle',p=choreograph(art,key,frame);
+    const key=poseKeys.includes(pose)?pose:'idle';
+    const p=key==='recover'?recoveryPose(art,fromPose,frame):choreograph(art,key,frame);
     const type=art.pattern;
     const mane=art.tail==='plume'||art.ears==='tuft';
     const r=art.ears==='round'?37:art.ears==='large'?33:35;
     const earsArt=ears(art);
     const glow=pose==='ultimate'?'#ffdaa6':art.color;
     const overlay=furMarkings(art,pose);
-    const balance=torsoWeight(art,key,frame);
+    const recoveryProgress=Math.max(0,Math.min(1,(Number.isFinite(frame)?frame:5)/5));
+    const fromWeight=key==='recover'?torsoWeight(art,fromPose,5):null;
+    const neutral=torsoWeight(art,'idle',3);
+    const settle=1-recoveryProgress*recoveryProgress*(3-2*recoveryProgress);
+    const balance=key==='recover'?{
+      shift:Math.round(neutral.shift+(fromWeight.shift-neutral.shift)*settle),
+      lift:Math.round(neutral.lift+(fromWeight.lift-neutral.lift)*settle),
+      tilt:Math.round(neutral.tilt+(fromWeight.tilt-neutral.tilt)*settle)
+    }:torsoWeight(art,key,frame);
     const bodyTransform='translate('+balance.shift+' '+balance.lift+') rotate('+balance.tilt+' 109 171)';
     const backFeet='<ellipse cx="'+p[2][0]+'" cy="'+p[2][1]+'" rx="24" ry="11" fill="'+art.shade+'" opacity=".95"/>'+
       '<ellipse cx="'+p[3][0]+'" cy="'+p[3][1]+'" rx="23" ry="11" fill="'+art.shade+'" opacity=".95"/>'+
@@ -506,8 +560,9 @@
       '<path d="M76 142 Q110 155 142 141 L140 171 Q105 174 78 167 Z" fill="'+art.cape+'" stroke="#d8b16c" stroke-width="3.5" opacity=".96"/>'+
       '<path d="M105 151 L116 151 L125 159 L115 171 L105 171 L96 159 Z" fill="#f2bd69" stroke="#fce0a8" stroke-width="2"/>'+
       '<path d="M106 161 Q112 152 117 161 Q112 169 106 161" fill="#6b4587"/></g>';
-    const cape='<path d="M75 124 Q'+(34+art.uniq%11+Math.round((frame-3)*art.choreography.arc/8))+' 145 37 '+(203-(art.uniq%9))+' Q80 '+(206+(art.uniq%7))+' 102 185 L98 122 Z" fill="'+art.cape+'" stroke="#dfb975" stroke-width="4" opacity=".88"/>';
-    const head='<g transform="rotate('+p[4]+' 109 80)">'+earsArt+
+    const capeFrame=key==='recover'?5-2*(1-settle):frame;
+    const cape='<path d="M75 124 Q'+(34+art.uniq%11+Math.round((capeFrame-3)*art.choreography.arc/8))+' 145 37 '+(203-(art.uniq%9))+' Q80 '+(206+(art.uniq%7))+' 102 185 L98 122 Z" fill="'+art.cape+'" stroke="#dfb975" stroke-width="4" opacity=".88"/>';
+    const head='<g class="art-head-inner" transform="rotate('+p[4]+' 109 80)">'+earsArt+
       '<ellipse cx="110" cy="83" rx="'+(r+25)+'" ry="'+(r+26)+'" fill="'+art.shade+'" opacity=".9"/>'+
       '<ellipse cx="110" cy="78" rx="63" ry="64" fill="'+art.fur+'" stroke="'+art.shade+'" stroke-width="5"/>'+
       portrait(art)+
@@ -516,7 +571,11 @@
     const safety='<desc>Original battle body design for '+art.breed+', retaining its existing adoption portrait. '+key+' attack pose.</desc>';
     const smallClaws=key==='swipe'?'<path d="M195 76 l22 -9 M196 85 l21 -2 M198 94 l19 7" stroke="#fff3d2" stroke-width="3" fill="none" stroke-linecap="round"/>':'';
     const defeat=key==='defeat'?'<path d="M82 183 Q107 202 129 178" fill="none" stroke="'+art.shade+'" stroke-width="5" opacity=".6"/>':'';
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" aria-hidden="true">'+
+    const flow=flowSignature(art);
+    const flowVars='--breath-period:'+flow.breathDuration+';--tail-period:'+flow.tailDuration+
+      ';--ear-period:'+flow.earDuration;
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" data-source-pose="'+
+      (key==='recover'?fromPose:'idle')+'" style="'+flowVars+'" aria-hidden="true">'+
       safety+'<defs><clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+
       '<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>'+
       tail(art,key,frame)+
@@ -531,14 +590,15 @@
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
       '</svg>';
   }
-  function paint(container,breed,pose='idle',frame=3){
+  function paint(container,breed,pose='idle',frame=3,fromPose='swipe'){
     if(!container)return false;
     const art=getArt(breed);
     // Markup contains ONLY our own trusted, fixed 56-breed design data.
-    container.innerHTML=svgForBreed(art.breed,pose,frame);
+    container.innerHTML=svgForBreed(art.breed,pose,frame,fromPose);
     container.classList.add('has-body-art');
     container.dataset.pose=pose;
     container.dataset.frame=String(frame);
+    container.dataset.fromPose=fromPose;
     container.style.backgroundImage='none';
     return true;
   }
@@ -549,6 +609,7 @@
     return base+art.choreography.tempo+(art.fightingStyle?.tempo||0);
   }
   window.PawtopiaBattleCharacterArt=Object.freeze({
-    collection,getArt,poseKeys,animationFrames,smoothFrames,keyframeValue,torsoWeight,personalMotion,choreograph,timingFor,svgForBreed,paint,fightingStyles,identityFor
+    collection,getArt,poseKeys,animationFrames,smoothFrames,flowFrames,keyframeValue,
+    torsoWeight,personalMotion,choreograph,recoveryPose,flowSignature,timingFor,svgForBreed,paint,fightingStyles,identityFor
   });
 })();

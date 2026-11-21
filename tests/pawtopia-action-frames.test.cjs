@@ -84,13 +84,13 @@ test('source routes six-frame drawings through both combat events and the no-cos
   const script=read('assets/pawtopia-battle-arena.js');
   const art=read('assets/pawtopia-battle-character-art.js');
   const page=read('pawtopia-battle-arena.html');
-  assert.ok(script.includes('async function playArtFrames(cat,state,duration)'));
+  assert.ok(script.includes("async function playArtFrames(cat,state,duration,fromPose='swipe')"));
   assert.ok(script.includes('characterArt.smoothFrames)||characterArt.animationFrames||[3]'));
   assert.ok(script.includes("characterArt.paint(el('battle-cat-art'),cat.breed,state,frame)"));
   assert.ok(script.includes("motion=playArtFrames(cat,'swipe'"));
   assert.ok(script.includes("hitMotion=playArtFrames(cat,reaction,310)"));
   assert.ok(script.includes('await Promise.all([motion,foeMotion,hitMotion])'));
-  assert.ok(script.includes('await playArtFrames(cat,pose,characterArt.timingFor(cat.breed,pose))'));
+  assert.ok(script.includes("await playArtFrames(cat,pose,pose==='idle'?1500:characterArt.timingFor(cat.breed,pose)"));
   assert.ok(script.includes('if(reduced())'));
   assert.match(page,/id="battle-art-preview-actions"/);
   assert.match(art,/function choreograph\(art,pose,frame=3\)/);

@@ -1,0 +1,63 @@
+/* All 56 original cat art rigs: layered idle acting and follow-through.
+   CSS runs only on the single currently displayed fighter; each breed has
+   its own timing variables from the original character-art profile.
+   This sheet is shared by the Arena and the 56-cat Art Gallery. */
+svg.paw-battle-full-body[data-pose="idle"] .art-body{
+  transform-box:fill-box;transform-origin:50% 68%;
+  animation:paw-flow-breathe var(--breath-period,3s) ease-in-out infinite;
+}
+svg.paw-battle-full-body[data-pose="idle"] .art-tail-flex{
+  transform-box:fill-box;transform-origin:12% 82%;
+  animation:paw-flow-tail var(--tail-period,3.3s) ease-in-out infinite;
+}
+svg.paw-battle-full-body[data-pose="idle"] .art-head-inner{
+  transform-box:fill-box;transform-origin:50% 65%;
+  animation:paw-flow-look calc(var(--breath-period,3s) * 1.8) ease-in-out infinite;
+}
+svg.paw-battle-full-body[data-pose="idle"] .art-ear-flex{
+  transform-box:fill-box;transform-origin:50% 78%;
+  animation:paw-flow-ears var(--ear-period,3.5s) ease-in-out infinite;
+}
+svg.paw-battle-full-body[data-pose="idle"] .art-paw-left{
+  transform-box:fill-box;transform-origin:50% 12%;
+  animation:paw-flow-stance calc(var(--breath-period,3s) * 1.5) ease-in-out infinite;
+}
+svg.paw-battle-full-body[data-pose="idle"] .art-paw-right{
+  transform-box:fill-box;transform-origin:50% 12%;
+  animation:paw-flow-stance calc(var(--breath-period,3s) * 1.5) ease-in-out infinite reverse;
+}
+@keyframes paw-flow-breathe{
+  0%,100%{transform:scale(1,1)}
+  40%{transform:translateY(-1px) scale(1.012,1.022)}
+  70%{transform:translateY(0) scale(.998,1.008)}
+}
+@keyframes paw-flow-tail{
+  0%,100%{transform:rotate(-3deg)}
+  32%{transform:rotate(5deg)}
+  64%{transform:rotate(-5deg)}
+}
+@keyframes paw-flow-look{
+  0%,100%{transform:rotate(-1.5deg) translateY(0)}
+  40%{transform:rotate(1.2deg) translateY(-.7px)}
+  75%{transform:rotate(.3deg) translateY(.6px)}
+}
+@keyframes paw-flow-ears{
+  0%,69%,100%{transform:rotate(0)}
+  74%{transform:rotate(2.2deg)}
+  79%{transform:rotate(-1.5deg)}
+}
+@keyframes paw-flow-stance{
+  0%,100%{transform:translate(0,0)}
+  45%{transform:translate(.5px,-.65px)}
+  75%{transform:translate(-.3px,.3px)}
+}
+@media(prefers-reduced-motion:reduce){
+  svg.paw-battle-full-body[data-pose="idle"] .art-body,
+  svg.paw-battle-full-body[data-pose="idle"] .art-tail-flex,
+  svg.paw-battle-full-body[data-pose="idle"] .art-head-inner,
+  svg.paw-battle-full-body[data-pose="idle"] .art-ear-flex,
+  svg.paw-battle-full-body[data-pose="idle"] .art-paw-left,
+  svg.paw-battle-full-body[data-pose="idle"] .art-paw-right{
+    animation:none!important;transform:none!important;
+  }
+}
