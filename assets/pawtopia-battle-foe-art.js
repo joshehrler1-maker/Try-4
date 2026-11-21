@@ -27,6 +27,28 @@
   function clampFrame(frame) {
     return Number.isInteger(frame)?Math.max(0,Math.min(5,frame)):3;
   }
+
+  function litPalette(prefix, entries) {
+    const blend=(hex,target,amount)=>{
+      const channels=[1,3,5].map(i=>Math.round(parseInt(hex.slice(i,i+2),16)*(1-amount)+target[i>>1]*amount));
+      return '#'+channels.map(channel=>channel.toString(16).padStart(2,'0')).join('');
+    };
+    const colors=new Map(entries.filter(([color])=>/^#[0-9a-f]{6}$/i.test(color))
+      .map(([color,reflective],i)=>[color,{id:prefix+i,reflective}]));
+    let defs='';
+    for(const [color,{id,reflective}] of colors){
+      const glow=blend(color,[255,235,206],reflective?.65:.45);
+      const shine=blend(color,[255,241,216],reflective?.27:.12);
+      const matte=blend(color,[26,27,57],reflective?.49:.39);
+      const rim=blend(color,[112,166,217],reflective?.48:.30);
+      defs+='<linearGradient id="'+id+'" x1="16%" y1="0%" x2="88%" y2="100%">'+
+        '<stop stop-color="'+glow+'"/><stop offset="'+(reflective?.24:.31)+'" stop-color="'+shine+'"/>'+
+        '<stop offset=".53" stop-color="'+color+'"/><stop offset=".85" stop-color="'+matte+'"/>'+
+        '<stop offset="1" stop-color="'+rim+'"/></linearGradient>';
+    }
+    return {defs,shade(markup){return markup.replace(/fill="(#[0-9a-f]{6})"/gi,
+      (match,color)=>colors.has(color)?'fill="url(#'+colors.get(color).id+')"':match);}};
+  }
   function drawing(model,state='idle',frame=3) {
     const pose=states.includes(state)?state:'idle';
     const f=clampFrame(frame),phase=[0,-.15,.35,1,.66,.1][f];
@@ -113,8 +135,12 @@
       ' 45 L'+(169+Math.round(31*phase))+' 65 Z" fill="'+col+'"/></g>':'';
     const impact=pose==='impact'?'<path class="foe-impact-mark" d="M58 51 L50 29 L67 37 L78 20 L75 48 L92 57 L70 60 L65 78 Z" fill="#ffe0aa"/>':'';
     const circle='<circle cx="107" cy="114" r="'+gearR+'" stroke="'+col+'" fill="none" opacity=".3" stroke-width="3"/>';
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" class="foe-body-illustration"'+
+    const painted=litPalette('hound-light-'+n+'-',[
+      [model.body,true],[model.metal,true],[model.color,true]
+    ]);
+    return painted.shade('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" class="foe-body-illustration"'+
       ' data-foe-id="'+model.id+'" data-foe-rank="'+n+'" data-pose="'+pose+'" data-frame="'+f+'" role="img" aria-hidden="true">'+
+      '<defs>'+painted.defs+'</defs>'+
       '<desc>Original individual '+model.name+' clockwork canine fighter, '+pose+' pose.</desc>'+
       '<ellipse cx="109" cy="222" rx="66" ry="11" fill="#07152b" opacity=".34"/>'+
       '<g class="foe-gear-frame">'+circle+teeth+'</g>'+
@@ -140,7 +166,7 @@
       '</g>'+frost+sparks+boss+'</g>'+
       shield+attack+charge+impact+
       (pose==='victory'?'<path d="M62 22 L72 3 L81 22 L104 27 L80 33 L73 55 L63 34 L44 28 Z" fill="'+model.eye+'" opacity=".85"/>':'')+
-      '</svg>';
+      '</svg>');
   }
   function paint(container,foe,pose='idle',frame=3) {
     if(!container)return false;

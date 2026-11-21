@@ -540,6 +540,28 @@
   // Small bounded markup cache avoids rebuilding elaborate art geometry for
   // repeated previews. Never caches user saves or persistent data.
   const svgCache=new Map(),svgCacheLimit=96;
+
+  function litPalette(prefix, entries) {
+    const blend=(hex,target,amount)=>{
+      const channels=[1,3,5].map(i=>Math.round(parseInt(hex.slice(i,i+2),16)*(1-amount)+target[i>>1]*amount));
+      return '#'+channels.map(channel=>channel.toString(16).padStart(2,'0')).join('');
+    };
+    const colors=new Map(entries.filter(([color])=>/^#[0-9a-f]{6}$/i.test(color))
+      .map(([color,reflective],i)=>[color,{id:prefix+i,reflective}]));
+    let defs='';
+    for(const [color,{id,reflective}] of colors){
+      const glow=blend(color,[255,235,206],reflective?.65:.45);
+      const shine=blend(color,[255,241,216],reflective?.27:.12);
+      const matte=blend(color,[26,27,57],reflective?.49:.39);
+      const rim=blend(color,[112,166,217],reflective?.48:.30);
+      defs+='<linearGradient id="'+id+'" x1="16%" y1="0%" x2="88%" y2="100%">'+
+        '<stop stop-color="'+glow+'"/><stop offset="'+(reflective?.24:.31)+'" stop-color="'+shine+'"/>'+
+        '<stop offset=".53" stop-color="'+color+'"/><stop offset=".85" stop-color="'+matte+'"/>'+
+        '<stop offset="1" stop-color="'+rim+'"/></linearGradient>';
+    }
+    return {defs,shade(markup){return markup.replace(/fill="(#[0-9a-f]{6})"/gi,
+      (match,color)=>colors.has(color)?'fill="url(#'+colors.get(color).id+')"':match);}};
+  }
   function svgForBreed(breed,pose='idle',frame=3,fromPose='swipe'){
     const art=getArt(breed);
     const key=poseKeys.includes(pose)?pose:'idle';
@@ -591,9 +613,12 @@
     const flowVars='--breath-period:'+flow.breathDuration+';--tail-period:'+flow.tailDuration+
       ';--ear-period:'+flow.earDuration+';--head-period:'+flow.headDuration+
       ';--stance-period:'+flow.stanceDuration;
-    const markup='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" data-source-pose="'+
+    const painted=litPalette('cat-light-'+art.uniq+'-',[
+      [art.fur,false],[art.shade,false],[art.cape,false],['#f2bd69',true]
+    ]);
+    const markup=painted.shade('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" role="img" class="paw-battle-full-body" data-breed-index="'+art.uniq+'" data-pose="'+key+'" data-source-pose="'+
       (key==='recover'?fromPose:'idle')+'" style="'+flowVars+'" aria-hidden="true">'+
-      safety+'<defs><clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+
+      safety+'<defs>'+painted.defs+'<clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+
       '<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>'+
       tail(art,key,frame)+
       '<g class="art-cape-weight" transform="'+bodyTransform+'">'+cape+'</g>'+
@@ -605,7 +630,7 @@
       abilityArt(art,key,frame)+signatureSeal(art,key,frame)+individualAttackTrail(art,key,frame)+fightingStyleTrail(art,key,frame)+
       (key==='impact'?'<path d="M158 40 l7 -12 l5 12 l13 4 l-13 5 l-5 12 l-6 -13 l-13 -4 Z" fill="#ffe17c"/>':'')+
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
-      '</svg>';
+      '</svg>');
     svgCache.set(cacheKey,markup);
     if(svgCache.size>svgCacheLimit)svgCache.delete(svgCache.keys().next().value);
     return markup;

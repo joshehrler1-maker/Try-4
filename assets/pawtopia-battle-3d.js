@@ -152,7 +152,7 @@
     }
     return p;
   }
-  function create(canvas,stage) {
+  function create(canvas,stage,{floorOnly=false}={}) {
     if(!canvas||!stage)return null;
     let gl;
     try{gl=canvas.getContext('webgl',{alpha:true,antialias:true,premultipliedAlpha:false});}catch{return null;}
@@ -499,7 +499,7 @@
       if(efficient&&now-lastFrame<31){schedule();return;}
       lastFrame=now;
       const width=canvas.clientWidth,height=canvas.clientHeight;
-      if(width<2||height<2){schedule();return;}
+      if(width<2||height<2){if(!floorOnly)schedule();return;}
       const pixel=Math.min(window.devicePixelRatio||1,efficient?1:1.65);
       const w=Math.round(width*pixel),h=Math.round(height*pixel);
       if(w!==canvas.width||h!==canvas.height){canvas.width=w;canvas.height=h;}
@@ -539,7 +539,7 @@
         }
         gl.depthMask(true);
       }
-      if(!steady||Object.values(tracks).some(t=>t.name!=='idle'&&now-t.time<t.duration))schedule();
+      if(!floorOnly&&(!steady||Object.values(tracks).some(t=>t.name!=='idle'&&now-t.time<t.duration)))schedule();
     }
     function schedule(){
       if(!raf && !lost && visible && !document.hidden)raf=window.requestAnimationFrame(render);
@@ -566,7 +566,7 @@
       event.preventDefault();
       lost=true;
       if(raf)window.cancelAnimationFrame(raf);
-      stage.classList.remove('battle-has-3d');
+      stage.classList.remove(floorOnly?'battle-has-floor':'battle-has-3d');
     });
     if(typeof IntersectionObserver==='function'){
       new IntersectionObserver(entries=>{visible=entries[0]?.isIntersecting!==false;schedule();}).observe(stage);
@@ -574,7 +574,8 @@
     if(typeof ResizeObserver==='function')new ResizeObserver(schedule).observe(canvas);
     document.addEventListener('visibilitychange',schedule);
     reduced?.addEventListener?.('change',schedule);
-    stage.classList.add('battle-has-3d');
+    stage.classList.add(floorOnly?'battle-has-floor':'battle-has-3d');
+    schedule();
     return {roster,pose,
       active:()=>!lost,
       hit(who,tint,power){impact={time:window.performance.now(),x:who==='pet'?-1.59:1.59,tint,power};schedule();}
