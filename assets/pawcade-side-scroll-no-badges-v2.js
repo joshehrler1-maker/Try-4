@@ -2367,6 +2367,10 @@
     p.jumps=0;
     p.ledgeGrip=null;
   }
+  function hostileShotTouchesPlayer(fromX,toX,y,p) {
+    return Math.abs(p.y-y)<22 &&
+      Math.min(fromX,toX)<p.x+18 && Math.max(fromX,toX)>p.x-18;
+  }
   function step(dt) {
     clock += dt;
     chapterReveal=Math.max(0,chapterReveal-dt);
@@ -2905,9 +2909,13 @@
     for (const shot of hazards) {
       const nextX=shot.x+shot.v*dt;
       if(wallBlocksShot(shot.x,nextX,shot.y)){shot.life=0;continue;}
+      const previousX=shot.x;
       shot.x=nextX;
       shot.life-=dt;
-      if (shot.life>0 && close(p,shot,18,22)) {shot.life=0;if (hit()) return;}
+      if (shot.life>0 && hostileShotTouchesPlayer(previousX,nextX,shot.y,p)) {
+        shot.life=0;
+        if (hit()) return;
+      }
     }
     // Discard projectiles well beyond the playable view, freeing the
     // shared projectile budget for enemies the player can actually see.
