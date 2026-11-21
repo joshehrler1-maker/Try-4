@@ -445,6 +445,10 @@
       if(!result)return false;
       if(!result.ok){status(result.message);return false;}
       await showEvents(result.events||[],cat);
+      // Reward this match only after the authoritative save confirms a win.
+      const finished=engine.matchInfo(save.read());
+      if(result.events?.some(evt=>evt.fx==='victory') && finished?.match.finished && finished.match.result==='win')
+        void window.PawtopiaUpgradePoints?.claim('battle-win',finished.foe.id,'victory');
       status(result.message);
       return true;
     }catch{
