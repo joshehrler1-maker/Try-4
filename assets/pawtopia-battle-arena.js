@@ -11,6 +11,7 @@
   if(!save||!data||!engine||!el('battle-stage'))return;
   let selectedPet=0,selectedFoe=0,busy=false,soundOn=false,audio=null;
   let watchMode=false,watchPaused=false,watchLoopRunning=false,waitForResume=null,playbackSpeed=1;
+  let frameQuality=window.navigator?.connection?.saveData?'efficient':'smooth';
   const select=el('battle-pet-select');
   const stage=el('battle-stage');
   const petSprite=el('battle-pet-sprite'),foeSprite=el('battle-foe-sprite');
@@ -108,6 +109,7 @@
     el('battle-pause').setAttribute('aria-pressed',String(watchPaused));
     el('battle-stop-watch').disabled=!watchMode;
     el('battle-speed').value=String(playbackSpeed);
+    el('battle-quality').value=frameQuality;
     el('battle-start').textContent=currentView?.match.finished?'Start a New Battle':'Enter Arena';
     el('battle-forfeit').disabled=busy||watchMode||!fighting;
     const activeCat=currentView?currentView.cat:pet,activeFoe=currentView?currentView.foe:foe;
@@ -261,13 +263,14 @@
   }
   async function playArtFrames(cat,state,duration){
     if(!characterArt||!cat)return;
-    const frames=characterArt.animationFrames||[3];
+    const lightweight=frameQuality==='efficient'||window.navigator?.connection?.saveData||duration<370;
+    const frames=(!lightweight&&characterArt.smoothFrames)||characterArt.animationFrames||[3];
     if(reduced()){
       characterArt.paint(el('battle-cat-art'),cat.breed,state,3);
       await wait(25);
       return;
     }
-    const interval=Math.max(35,Math.floor((duration||characterArt.timingFor(cat.breed,state))/frames.length));
+    const interval=Math.max(28,Math.floor((duration||characterArt.timingFor(cat.breed,state))/frames.length));
     for(const frame of frames){
       characterArt.paint(el('battle-cat-art'),cat.breed,state,frame);
       await wait(interval);
@@ -488,6 +491,13 @@
     playbackSpeed=watcher?.speed(el('battle-speed').value)||1;
     render();
     status('Battle animation speed: '+playbackSpeed+'×.');
+  });
+  el('battle-quality').addEventListener('change',()=>{
+    const next=el('battle-quality').value;
+    frameQuality=next==='efficient'?'efficient':'smooth';
+    render();
+    status(frameQuality==='efficient'?'Battery saver uses six illustrated poses per action.':
+      'Smooth mode uses eleven illustrated poses per attack.');
   });
   document.addEventListener?.('visibilitychange',()=>{
     if(document.hidden&&watchMode) {
