@@ -207,7 +207,7 @@ test('actual UI displays moving fighters and has no account or paid APIs',()=>{
   for(const movement of ['bounce','dash','sway','spring','glide','spin','float','sprint']){
     assert.ok(css.includes('[data-motion="'+movement+'"]'),movement);
   }
-  assert.match(ui,/async function showEvents\(events,cat\)/);
+  assert.match(ui,/async function showEvents\(events,cat,preview=false\)/);
   assert.match(ui,/async function saveAction/);
   assert.match(ui,/progress\.value=evt\.remaining/);
   assert.match(read('sw.js'),/pawtopia-battle-arena\.html/);
