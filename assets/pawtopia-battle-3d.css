@@ -66,3 +66,23 @@
 }
 
 .fighter-sprite[data-motion].state-approach .cat-avatar.has-body-art[data-painting="mesh"] {animation:none}
+
+.foe-avatar[data-dog-painting="true"] {position:relative}
+.foe-avatar[data-dog-painting="true"] svg.foe-body-illustration {position:relative;z-index:1}
+.foe-avatar > .battle-dog-painting {
+  position:absolute;inset:0;margin:auto;width:100%;height:100%;object-fit:contain;
+  pointer-events:none;transform-origin:50% 91.7%;transform:scale(var(--dog-scale,1))
+}
+.foe-avatar[data-pose="idle"] > .battle-dog-painting {
+  animation:dog-painted-breath 3.4s ease-in-out infinite
+}
+@keyframes dog-painted-breath {
+  0%,100% {transform:scale(var(--dog-scale,1))}
+  50% {transform:scale(var(--dog-scale,1)) scaleY(1.018)}
+}
+@media(prefers-reduced-motion:reduce) {
+  .foe-avatar[data-pose="idle"] > .battle-dog-painting {animation:none}
+}
+
+.foe-avatar[data-pose="defeat"] > .battle-dog-painting {filter:saturate(.72)}
+.foe-avatar[data-pose="impact"] > .battle-dog-painting {filter:brightness(1.09)}

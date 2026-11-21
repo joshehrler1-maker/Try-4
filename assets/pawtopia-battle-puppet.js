@@ -57,12 +57,64 @@
       [...lead,27,28],[...support,27,29],[rear+9,206,24,30],[front-9,206,23,30],
       [clamp(bounds(57)[1]-27,100,169),57,42,46],[Math.min(rear,79),146,34,40]
     ];
-    return {source,weights:grid.map(([x,y])=>joints.map(([cx,cy,rx,ry])=>{
+    let anchors=joints;
+    if(art.dog===true){
+      // Find the paws from the lower silhouette and the head from the
+      // upper silhouette. Dogs in the arena face left toward the cat.
+      let front=220,rear=0,headX=220,headY=108;
+      for(let y=190;y<=215;y+=2){
+        const [left,right]=bounds(y);
+        front=Math.min(front,left);rear=Math.max(rear,right);
+      }
+      if(rear-front<34){front=62;rear=165;}
+      for(let y=35;y<=151;y+=2){
+        const left=bounds(y)[0];
+        if(left<headX){headX=left;headY=y;}
+      }
+      const span=rear-front;
+      anchors=[
+        [front+3,207,17,30],[front+span*.25,205,15,30],
+        [rear-span*.20,207,17,30],[rear-5,207,18,31],
+        [headX+15,headY,36,40],[Math.min(208,rear+12),Math.max(56,headY+20),27,43]
+      ];
+    }
+    return {source,weights:grid.map(([x,y])=>anchors.map(([cx,cy,rx,ry])=>{
       const dx=(x/scale-cx)/rx,dy=(y/scale-cy)/ry;
       return Math.exp(-dx*dx-dy*dy);
     }))};
   }
+  const dogTracks={
+    swipe:[[4,0],[6,-14],[-28,-24],[-14,-7],[0,0]],
+    charge:[[3,3],[6,-15],[-18,-16],[-10,-8],[0,0]],
+    guard:[[0,0],[-5,0],[-10,-6],[-5,-2],[0,0]],
+    impact:[[5,-3],[11,-10],[7,-5],[2,0],[0,0]],
+    victory:[[0,0],[-5,-14],[-11,-18],[-1,-7],[0,0]],
+    defeat:[[0,0],[0,0],[-9,-12],[-14,-18],[-16,-22]]
+  };
+  const dogBody={
+    swipe:[[5,2],[3,2],[-12,-5],[-5,3],[0,0]],
+    charge:[[3,8],[5,1],[-17,-10],[-10,-5],[0,0]],
+    guard:[[2,2],[4,9],[5,18],[2,14],[0,5]],
+    impact:[[8,-1],[17,-7],[11,6],[4,5],[0,0]],
+    victory:[[0,4],[-3,-14],[-2,-18],[0,-6],[0,0]],
+    defeat:[[1,4],[2,15],[4,29],[6,38],[6,41]]
+  };
+  function dogMotion(art,pose,frame){
+    const stride=(pose==='approach'||pose==='charge')?
+      Math.sin(frame/5*Math.PI*(pose==='charge'?4:2))*(11+(art.build||0)*.48):0;
+    const [x,y]=at(dogTracks[pose],frame),[dx,dy]=at(dogBody[pose],frame);
+    const joy=pose==='victory'?Math.sin(frame/5*Math.PI)**2:0;
+    const sleep=pose==='defeat'?ease(frame/5):0;
+    const tail=(pose==='approach'||pose==='victory')?Math.sin(frame*2.3)*7:0;
+    return [[x-stride,y-Math.max(0,stride)*.65],
+      [stride+sleep*12,(pose==='swipe'?y*.19:y*.45)+Math.min(0,stride)*.66],
+      [stride+sleep*8,Math.min(0,stride)*.76+sleep*-6],
+      [-stride-sleep*8,-Math.max(0,stride)*.73+sleep*-9],
+      [dx*.53,dy*.37+joy*-4+sleep*8],
+      [-dx*.41,tail+sleep*15], [dx,dy-Math.abs(stride)*.25]];
+  }
   function movement(art,pose,frame,fromPose,personal){
+    if(art.dog===true)return dogMotion(art,pose,frame);
     if(pose==='recover'){
       const rest=1-ease(frame/5);
       return movement(art,fromPose==='recover'?'idle':fromPose,5,'idle',personal)
@@ -100,7 +152,7 @@
     if(pose==='idle'){ctx.putImageData(rig.source,0,0);return;}
     const offsets=movement(art,pose,frame,fromPose,personal);
     const [dx,dy]=offsets[6];
-    const lift=(pose==='victory'||pose==='signature'||pose==='ultimate')?ease(clamp((-dy-7)/12,0,1)):0;
+    const lift=(pose==='victory'||pose==='signature'||pose==='ultimate'||(art.dog===true&&pose==='charge'))?ease(clamp((-dy-7)/12,0,1)):0;
     const shifts=grid.map(([,y],i)=>{
       const body=Math.max(lift,clamp((218-y/scale)/67,0,1));
       let x=dx*body,z=dy*body;

@@ -4,6 +4,7 @@
   const foes=window.PawtopiaBattleData?.foes || [];
   const states=Object.freeze(['idle','approach','swipe','charge','guard','impact','victory','defeat']);
   const frameIds=Object.freeze([0,1,2,3,4,5]);
+  const smoothFrames=Object.freeze(Array.from({length:11},(_,i)=>i/2));
   const dogShapes=Object.freeze([
     [55,31,35,31,16,10,"upright","curved","cream","#bd7b47","#ffdeb0","#74422f"], // Chihuahua
     [65,34,32,29,14,11,"upright","short","silky","#485366","#dca472","#45332d"], // Yorkshire Terrier
@@ -34,7 +35,7 @@
     const tiers=['trainer','scout','terrrier','garden','frost','bolt','recruit','striker','cryo','brass','commander','avatar'];
     return Object.freeze({
       id:foe.id,name:foe.name,rank:foe.rank,kind:foe.breed||tiers[tier],
-      breed:foe.breed,shape:shapeFor(foe),
+      breed:foe.breed,dog:Boolean(foe.breed),shape:shapeFor(foe),build:foe.build,
       color:foe.color,eye:tier>=7?'#ffd1b4':tier>=4?'#a2edff':'#ffebad',
       body:tier%3===0?'#465f72':tier%3===1?'#625b75':'#49576c',
       metal:tier%3===0?'#9facc0':tier%3===1?'#c6b6a2':'#a4b7b7',
@@ -76,7 +77,7 @@
       (match,color)=>colors.has(color)?'fill="url(#'+colors.get(color).id+')"':match);}};
   }
 
-  function dogDrawing(model,pose,f){
+  function dogDrawing(model,pose,f,paintedBody=false){
     const [back,depth,headRadius,legLength,paw,muzzle,ears,tail,coat,fur,light,dark]=model.shape;
     const phase=[0,-.17,.31,1,.64,.13][f], n=model.rank, col=model.color;
     const positive=Math.max(0,phase);
@@ -138,7 +139,7 @@
       painted.defs+'</defs><desc>'+model.breed+', '+pose+' pose.</desc>'+
       '<ellipse cx="110" cy="222" rx="'+(62*size)+'" ry="'+(8*size)+'" fill="#07152b" opacity=".35"/>'+
       '<g class="foe-motion-body" transform="translate('+originX+' '+originY+') scale('+size+') translate(-'+originX+' -'+originY+')">'+
-      '<path d="'+tailPath+'" stroke="'+(coat==='saddle'?dark:fur)+'" stroke-width="'+(tail==='plume'||tail==='feather'?paw*.89:paw*.54)+'" fill="none" stroke-linecap="round"/>'+
+      (paintedBody?'':'<path d="'+tailPath+'" stroke="'+(coat==='saddle'?dark:fur)+'" stroke-width="'+(tail==='plume'||tail==='feather'?paw*.89:paw*.54)+'" fill="none" stroke-linecap="round"/>'+
       (coat==='saddle'?'<circle cx="'+tipX+'" cy="'+tipY+'" r="5" fill="'+light+'"/>':'')+
       leg(shoulder+11,shoulderY+depth*.64,-walk,Math.max(0,-walk)*.5,true,'foe-far-front')+
       leg(hip-1,hipY+depth*.62,walk,Math.max(0,walk)*.49,true,'foe-far-hind')+
@@ -158,7 +159,7 @@
       facialPoints+'<ellipse cx="'+(headX-11)+'" cy="'+(headY-9)+'" rx="5.7" ry="5" fill="#9b6340"/>'+
       '<circle cx="'+(headX-12)+'" cy="'+(headY-9)+'" r="3.1" fill="#221e30"/><circle cx="'+(headX-13)+'" cy="'+(headY-11)+'" r="1.4" fill="#fff3df"/>'+
       '<ellipse cx="'+(left+1)+'" cy="'+(headY+2)+'" rx="6.5" ry="4.6" fill="#211d2c"/>'+
-      '<path d="M'+(left+4)+' '+(headY+13)+' Q'+(left+14)+' '+(headY+17)+' '+(headX-9)+' '+(headY+13)+'" stroke="#302333" stroke-width="2" fill="none"/></g>'+
+      '<path d="M'+(left+4)+' '+(headY+13)+' Q'+(left+14)+' '+(headY+17)+' '+(headX-9)+' '+(headY+13)+'" stroke="#302333" stroke-width="2" fill="none"/></g>')+
       effects+'</g></svg>');
   }
   function sinBob(frame,rank){return Math.sin((frame+rank*.23)*Math.PI/3)*1.7;}
@@ -283,16 +284,300 @@
       (pose==='victory'?'<path d="M62 22 L72 3 L81 22 L104 27 L80 33 L73 55 L63 34 L44 28 Z" fill="'+model.eye+'" opacity=".85"/>':'')+
       '</svg>');
   }
+
+  // Each painting is fetched only when its challenger is shown.
+  const paintedDogs=new Set([
+    "foe-1",
+    "dog-pomeranian",
+    "dog-biewer-terrier",
+    "dog-russian-toy",
+    "dog-toy-fox-terrier",
+    "dog-maltese",
+    "foe-2",
+    "dog-russian-tsvetnaya-bolonka",
+    "dog-affenpinscher",
+    "foe-3",
+    "dog-brussels-griffon",
+    "dog-japanese-chin",
+    "dog-miniature-pinscher",
+    "dog-chinese-crested",
+    "dog-havanese",
+    "dog-silky-terrier",
+    "dog-italian-greyhound",
+    "dog-english-toy-spaniel",
+    "foe-4",
+    "dog-portuguese-podengo-pequeno",
+    "dog-toy-manchester-terrier",
+    "dog-coton-de-tulear",
+    "dog-norfolk-terrier",
+    "dog-norwich-terrier",
+    "dog-russell-terrier",
+    "dog-tibetan-spaniel",
+    "dog-shih-tzu",
+    "dog-lancashire-heeler",
+    "dog-schipperke",
+    "dog-border-terrier",
+    "dog-cairn-terrier",
+    "dog-pekingese",
+    "dog-bichon-frise",
+    "dog-lhasa-apso",
+    "dog-lowchen",
+    "dog-norwegian-lundehund",
+    "dog-parson-russell-terrier",
+    "dog-cavalier-king-charles-spaniel",
+    "dog-miniature-schnauzer",
+    "dog-pug",
+    "dog-smooth-fox-terrier",
+    "dog-teddy-roosevelt-terrier",
+    "dog-lakeland-terrier",
+    "dog-manchester-terrier",
+    "dog-wire-fox-terrier",
+    "dog-australian-terrier",
+    "dog-danish-swedish-farmdog",
+    "dog-rat-terrier",
+    "dog-west-highland-white-terrier",
+    "foe-5",
+    "dog-cesky-terrier",
+    "dog-american-hairless-terrier",
+    "dog-bedlington-terrier",
+    "dog-scottish-terrier",
+    "dog-shetland-sheepdog",
+    "dog-shiba-inu",
+    "dog-welsh-terrier",
+    "dog-american-eskimo-dog",
+    "dog-dandie-dinmont-terrier",
+    "dog-dachshund",
+    "foe-6",
+    "dog-pyrenean-shepherd",
+    "dog-basenji",
+    "dog-cirneco-delletna",
+    "dog-miniature-bull-terrier",
+    "dog-mudi",
+    "dog-sealyham-terrier",
+    "dog-tibetan-terrier",
+    "dog-cocker-spaniel",
+    "dog-nederlandse-kooikerhondje",
+    "dog-pumi",
+    "dog-irish-terrier",
+    "dog-finnish-spitz",
+    "dog-icelandic-sheepdog",
+    "dog-swedish-vallhund",
+    "dog-french-bulldog",
+    "dog-pembroke-welsh-corgi",
+    "dog-lagotto-romagnolo",
+    "foe-7",
+    "dog-miniature-american-shepherd",
+    "dog-puli",
+    "dog-basset-fauve-de-bretagne",
+    "dog-staffordshire-bull-terrier",
+    "dog-cardigan-welsh-corgi",
+    "dog-boykin-spaniel",
+    "dog-petit-basset-griffon-vendeen",
+    "dog-whippet",
+    "dog-xoloitzcuintli",
+    "dog-norwegian-buhund",
+    "dog-american-water-spaniel",
+    "dog-brittany",
+    "dog-german-pinscher",
+    "dog-soft-coated-wheaten-terrier",
+    "dog-glen-of-imaal-terrier",
+    "dog-kerry-blue-terrier",
+    "dog-keeshond",
+    "dog-polish-lowland-sheepdog",
+    "dog-skye-terrier",
+    "dog-spanish-water-dog",
+    "dog-spinone-italiano",
+    "dog-standard-schnauzer",
+    "dog-sussex-spaniel",
+    "dog-nova-scotia-duck-tolling-retriever",
+    "dog-australian-cattle-dog",
+    "foe-8",
+    "dog-field-spaniel",
+    "dog-grand-basset-griffon-vendeen",
+    "dog-finnish-lapphund",
+    "dog-azawakh",
+    "dog-bulldog",
+    "dog-canaan-dog",
+    "dog-english-springer-spaniel",
+    "dog-welsh-springer-spaniel",
+    "dog-boxer",
+    "dog-ibizan-hound",
+    "dog-irish-red-white-setter",
+    "dog-portuguese-water-dog",
+    "dog-siberian-husky",
+    "dog-barbet",
+    "dog-bearded-collie",
+    "dog-pharaoh-hound",
+    "dog-plott-hound",
+    "dog-samoyed",
+    "dog-norwegian-elkhound",
+    "dog-vizsla",
+    "dog-australian-shepherd",
+    "dog-basset-hound",
+    "dog-chinese-shar-pei",
+    "dog-entlebucher-mountain-dog",
+    "dog-harrier",
+    "dog-saluki",
+    "dog-wirehaired-pointing-griffon",
+    "dog-afghan-hound",
+    "dog-american-english-coonhound",
+    "dog-american-staffordshire-terrier",
+    "dog-poodle",
+    "dog-sloughi",
+    "dog-wirehaired-vizsla",
+    "dog-irish-water-spaniel",
+    "dog-chow-chow",
+    "dog-dalmatian",
+    "dog-german-shorthaired-pointer",
+    "dog-redbone-coonhound",
+    "dog-airedale-terrier",
+    "dog-belgian-laekenois",
+    "dog-belgian-malinois",
+    "dog-belgian-sheepdog",
+    "dog-belgian-tervuren",
+    "dog-berger-picard",
+    "dog-bull-terrier",
+    "dog-german-wirehaired-pointer",
+    "dog-pointer",
+    "dog-treeing-walker-coonhound",
+    "dog-bluetick-coonhound",
+    "dog-collie",
+    "dog-english-setter",
+    "dog-gordon-setter",
+    "dog-american-foxhound",
+    "dog-flat-coated-retriever",
+    "dog-golden-retriever",
+    "dog-greyhound",
+    "dog-irish-setter",
+    "dog-chesapeake-bay-retriever",
+    "dog-english-foxhound",
+    "foe-9",
+    "dog-bergamasco",
+    "dog-chinook",
+    "dog-clumber-spaniel",
+    "dog-german-shepherd-dog",
+    "dog-bracco-italiano",
+    "dog-weimaraner",
+    "dog-giant-schnauzer",
+    "dog-briard",
+    "dog-curly-coated-retriever",
+    "dog-rhodesian-ridgeback",
+    "dog-alaskan-malamute",
+    "dog-doberman-pinscher",
+    "dog-old-english-sheepdog",
+    "dog-borzoi",
+    "dog-black-and-tan-coonhound",
+    "dog-beauceron",
+    "dog-bouvier-des-flandres",
+    "dog-dogo-argentino",
+    "dog-komondor",
+    "dog-scottish-deerhound",
+    "dog-bernese-mountain-dog",
+    "dog-great-pyrenees",
+    "dog-kuvasz",
+    "dog-bloodhound",
+    "dog-otterhound",
+    "dog-akita",
+    "dog-dogue-de-bordeaux",
+    "dog-black-russian-terrier",
+    "dog-cane-corso",
+    "foe-10",
+    "dog-tibetan-mastiff",
+    "dog-greater-swiss-mountain-dog",
+    "dog-irish-wolfhound",
+    "dog-anatolian-shepherd-dog",
+    "dog-bullmastiff",
+    "dog-newfoundland",
+    "dog-leonberger",
+    "dog-neapolitan-mastiff",
+    "dog-great-dane",
+    "dog-saint-bernard",
+    "dog-boerboel",
+    "foe-11"
+  ]);
+  const paintings=new Map();
+  const activeCanvases=new WeakMap();
+  function paintingRecord(model){
+    if(!paintedDogs.has(model.id))return null;
+    if(paintings.has(model.id)){
+      const record=paintings.get(model.id);
+      paintings.delete(model.id);
+      paintings.set(model.id,record);
+      return record;
+    }
+    const image=new window.Image();
+    const record={image,state:'loading',targets:new Set()};
+    paintings.set(model.id,record);
+    image.onload=()=>{
+      record.state='ready';
+      for(const target of record.targets){
+        if(target.dataset.foe===model.id)paint(target,model.id,target.dataset.pose,Number(target.dataset.frame));
+      }
+      record.targets.clear();
+    };
+    image.onerror=()=>{
+      record.state='failed';
+      record.targets.clear();
+    };
+    image.src='assets/scenes/pawtopia-dogs/'+model.id+'.png';
+    if(paintings.size>12){
+      for(const [id,entry] of paintings){
+        if(entry.state==='loading'||id===model.id)continue;
+        paintings.delete(id);
+        break;
+      }
+    }
+    return record;
+  }
+
+  function paintPainting(container,model,pose,frame,record){
+    const puppet=window.PawtopiaBattlePuppet;
+    const doc=container.ownerDocument;
+    if(!puppet||!doc)return false;
+    try{
+      if(record.rig===undefined)record.rig=puppet.prepare(record.image,model,doc);
+      if(!record.rig)return false;
+      let state=activeCanvases.get(container);
+      if(!state){
+        const canvas=doc.createElement('canvas');
+        canvas.className='battle-dog-painting';
+        canvas.setAttribute('aria-hidden','true');
+        state={canvas,ctx:canvas.getContext('2d')};
+        activeCanvases.set(container,state);
+      }
+      if(!state.ctx)return false;
+      const {canvas,ctx}=state;
+      const markup=dogDrawing(model,pose,Math.round(frame),true);
+      puppet.draw(ctx,canvas,record.rig,model,pose,frame);
+      if(canvas.parentNode===container)container.firstElementChild.outerHTML=markup;
+      else{
+        container.innerHTML=markup;
+        container.append(canvas);
+      }
+      container.style.setProperty('--dog-scale',String(model.size));
+      return true;
+    }catch{
+      record.rig=null;
+      return false;
+    }
+  }
+
   function paint(container,foe,pose='idle',frame=3) {
     if(!container)return false;
     const model=profile(foe);
     if(!model)return false;
-    container.innerHTML=drawing(model,pose,frame);
+    pose=states.includes(pose)?pose:'idle';
+    frame=Number.isFinite(frame)?Math.min(5,Math.max(0,frame)):3;
     container.dataset.foe=model.id;
     container.dataset.pose=pose;
-    container.dataset.frame=String(clampFrame(frame));
+    container.dataset.frame=String(frame);
+    const record=model.dog&&typeof window.Image==='function'?paintingRecord(model):null;
+    if(record?.state==='loading')record.targets.add(container);
+    const painted=record?.state==='ready'&&paintPainting(container,model,pose,frame,record);
+    container.dataset.dogPainting=String(Boolean(painted));
+    if(!painted)container.innerHTML=drawing(model,pose,Math.round(frame));
     container.setAttribute('aria-label',model.name+(model.breed?' animated dog challenger':' in his animated Clockwork Avatar'));
     return true;
   }
-  window.PawtopiaBattleFoeArt=Object.freeze({models,states,frameIds,profile,drawing,paint});
+  window.PawtopiaBattleFoeArt=Object.freeze({models,states,frameIds,smoothFrames,profile,drawing,paint});
 })();

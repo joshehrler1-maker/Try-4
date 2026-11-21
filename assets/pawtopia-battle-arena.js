@@ -344,10 +344,12 @@
   }
   async function playFoeFrames(foe,state,duration=440){
     if(!foeArt||!foe||!el('battle-foe-art'))return;
-    const frames=reduced()?[3]:foeArt.frameIds;
+    const efficient=frameQuality==='efficient'||window.navigator?.connection?.saveData;
+    const painted=el('battle-foe-art').dataset.dogPainting==='true';
+    const frames=reduced()?[3]:painted&&!efficient?(foeArt.smoothFrames||foeArt.frameIds):foeArt.frameIds;
     for(const frame of frames){
       foeArt.paint(el('battle-foe-art'),foe,state,frame);
-      await wait(reduced()?25:Math.max(35,Math.floor(duration/frames.length)));
+      await wait(reduced()?25:Math.max(18,Math.floor(duration/frames.length)));
     }
   }
   async function showEvents(events,cat){
