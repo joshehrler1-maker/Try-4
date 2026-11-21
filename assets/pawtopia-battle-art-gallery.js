@@ -37,14 +37,14 @@
     for(const button of moves.querySelectorAll('button[data-pose]'))
       button.setAttribute('aria-pressed',String(button.dataset.pose===pose));
     status(breed+' · '+(pose==='signature'?data.kitFor(breed).signature:pose==='ultimate'?data.kitFor(breed).ultimate:pose)+' animation');
-    const frames=reduced()?[3]:Array.from(art.animationFrames);
+    const frames=reduced()?[3]:Array.from(art.smoothFrames||art.animationFrames);
     const multiplier=speedSelect.value==='1.7'?1.7:1;
     const duration=art.timingFor(breed,pose)*multiplier;
     try{
       for(const frame of frames) {
         if(token!==active)return;
         art.paint(fighter,breed,pose,frame);
-        await snooze(reduced()?25:Math.max(45,Math.round(duration/frames.length)));
+        await snooze(reduced()?25:Math.max(30,Math.round(duration/frames.length)));
       }
       if(token===active) {
         await snooze(reduced()?25:260);
