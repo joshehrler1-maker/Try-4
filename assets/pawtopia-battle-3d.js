@@ -190,8 +190,8 @@
           float mark=0.0;
           float twist=sin(p.x*3.0+coat.z)*.6;
           if(coat.y<1.5){
-            float wave=sin(p.y*17.0+p.z*3.4+twist+coat.z*.56);
-            mark=smoothstep(.38,.90,wave)*(.45+.55*abs(p.x));
+            float wave=sin(p.y*11.0 + p.z*2.3 + 1.9*p.x*p.x + twist + coat.z*.56);
+            mark=smoothstep(.34,.97,wave)*(.25+.51*abs(p.x));
           }else if(coat.y<2.5){
             vec2 d=fract(vec2(atan(p.z,p.x)*2.7,p.y*4.1)+vec2(coat.z,.34))-0.5;
             mark=(1.0-smoothstep(.09,.27,length(d*vec2(1.0,1.38))))*.91;
@@ -204,11 +204,15 @@
           }else {
             mark=.15+.10*sin(p.y*6.2+p.x*3.2);
           }
-          if(coat.w>.5) mark*=.85;
+          if(coat.w>.5) mark*=.79;
           float grain=sin(p.x*151.0+p.z*103.0+sin(p.y*17.0)*4.0)
             *sin(p.x*137.0+p.z*93.0+p.y*23.0);
           bristle=grain*coat.x;
           tint=mix(base,coatShade,mark);
+          if(coat.w>1.5){
+            float bib=smoothstep(.36,.89,p.z-p.x*p.x*.68+p.y*.13);
+            tint=mix(tint,base*1.18+vec3(.04,.022,.013),bib*.48);
+          }
           tint*=.97+bristle*.065;
         }
         vec3 lit=tint*light + vec3(.54,.71,1.0)*max(0.0,dot(v,rim))*edge*.36;
@@ -338,9 +342,8 @@
       const cheekColor=a.pattern==='point'?trim:a.pattern==='skin'?marks:
         ['solid','smoke','shag'].includes(a.pattern)?fur:marks;
 
-      draw(root,[0,1.02,0],[.413*shape,.56,.305],fur,{coat});
-      draw(root,[0,.825,.13],[.29,.29,.21],fur,{coat});
-      draw(root,[0,1.12,.192],[.31,.40,.148],a.pattern==='point'?fur:marks,{coat:neutralCoat});
+      const bodyCoat=coat?{params:[...coat.params.slice(0,3),2],shade:trim}:null;
+      draw(root,[0,1.02,.025],[.413*shape,.57,.324],fur,{coat:bodyCoat});
       draw(root,[0,1.39,.065],[long?.373:.296,.237,.272],fur,{coat});
       if(long)draw(root,[0,1.30,.11],[.44,.266,.31],fur,{coat});
       draw(root,[0,1.40,.11],[.356,.066,.299],a.cape,{metal:.28});
@@ -404,7 +407,7 @@
         const shoulder=[side*.324,1.203,.018];
         const elbow=[side*(.405+reach*.17),.96+reach*.19+p.curl*.19+lift*.52,.16+reach*.21+stanceGuard];
         const hand=[side*(.398+reach*.26),.698+reach*.48+p.curl*.40+lift,.25+reach*.48+stanceGuard];
-        limb(root,shoulder,elbow,.109,fur,.05,coat);
+        limb(root,shoulder,elbow,.109,fur,.05,neutralCoat);
         limb(root,elbow,hand,.094,pawColor,.05,neutralCoat);
         catPaw(root,hand,pawColor,neutralCoat,true);
       }
