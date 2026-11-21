@@ -24,7 +24,7 @@ svg.paw-battle-full-body[data-pose="idle"] .art-paw-left{
 }
 svg.paw-battle-full-body[data-pose="idle"] .art-paw-right{
   transform-box:fill-box;transform-origin:50% 12%;
-  animation:paw-flow-stance calc(var(--breath-period,3s) * 1.5) ease-in-out infinite reverse;
+  animation:paw-flow-stance var(--stance-period,4.5s) ease-in-out infinite reverse;
 }
 @keyframes paw-flow-breathe{
   0%,100%{transform:scale(1,1)}
