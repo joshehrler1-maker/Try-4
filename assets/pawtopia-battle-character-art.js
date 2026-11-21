@@ -226,17 +226,24 @@
       const idle=base[i],goal=target[i],front=i===1,foot=i>=2;
       let x=Math.round(idle[0]+(goal[0]-idle[0])*weight);
       let y=Math.round(idle[1]+(goal[1]-idle[1])*weight);
-      if(active&&front){
-        x+=Math.round(extra*weight);
-        y-=Math.round((pose==='signature'||pose==='ultimate'?castLift:arc/3)*Math.max(0,weight));
-      }else if(active&&i===0){
-        x-=Math.round(counter*weight*.32);
-        y+=Math.round(arc*weight*.18);
-      }else if(foot) {
+      if(!foot){
+        // Keep both shoulder AND paw-tip coordinates for articulated arms.
+        // Earlier code dropped the fourth value, making both paws render as right paws.
+        let handX=Math.round(idle[2]+(goal[2]-idle[2])*weight);
+        let handY=Math.round(idle[3]+(goal[3]-idle[3])*weight);
+        if(active&&front){
+          handX+=Math.round(extra*weight);
+          handY-=Math.round((pose==='signature'||pose==='ultimate'?castLift:arc/3)*Math.max(0,weight));
+        }else if(active&&i===0){
+          handX-=Math.round(counter*weight*.32);
+          handY+=Math.round(arc*weight*.18);
+        }
+        drawn.push([x,y,handX,handY]);
+      }else{
         x+=Math.round(((art.uniq%5)-2)*(i===2?1:-1)*weight);
         y+=Math.round((art.uniq%4-1.5)*Math.max(0,weight));
+        drawn.push([x,y,goal[2]||0]);
       }
-      drawn.push([x,y,goal[2]||0]);
     }
     const headAngle=Math.round(target[4]*weight+(pose==='impact'?-counter*.2:0));
     drawn.push(headAngle);
