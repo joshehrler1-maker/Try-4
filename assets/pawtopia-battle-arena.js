@@ -3,6 +3,7 @@
 (() => {
   'use strict';
   const save=window.PawtopiaSave,data=window.PawtopiaBattleData,engine=window.PawtopiaBattleEngine;
+  const characterArt=window.PawtopiaBattleCharacterArt;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
   let selectedPet=0,selectedFoe=0,busy=false,soundOn=false,audio=null;
@@ -32,9 +33,14 @@
   function spriteArt(cat) {
     const kit=data.kitFor(cat?.breed);
     const art=el('battle-cat-art');
-    art.style.backgroundImage='url("'+kit.sprite.src+'")';
-    art.style.backgroundSize=kit.sprite.backgroundSize;
-    art.style.backgroundPosition=kit.sprite.backgroundPosition;
+    if (characterArt && art.dataset.breed !== kit.breed) {
+      characterArt.paint(art,kit.breed,'idle');
+      art.dataset.breed=kit.breed;
+    } else if (!characterArt) {
+      art.style.backgroundImage='url("'+kit.sprite.src+'")';
+      art.style.backgroundSize=kit.sprite.backgroundSize;
+      art.style.backgroundPosition=kit.sprite.backgroundPosition;
+    }
     art.setAttribute('aria-label',(cat?.name||'Your cat')+' · '+kit.breed+' original adoption portrait');
     petSprite.dataset.motion=kit.movement;
     petSprite.style.setProperty('--cat-skill-color',kit.theme.color);
@@ -126,6 +132,9 @@
     const finished=currentView?.match.finished;
     if(finished){
       const result=currentView.match.result;
+      if(characterArt&&activeCat){
+        characterArt.paint(el('battle-cat-art'),activeCat.breed,result==='win'?'victory':result==='loss'?'defeat':'idle');
+      }
       el('battle-outcome').textContent=result==='win'?'🏆 Victory! Rewards added to this cat and Pawtopia inventory.':
         result==='loss'?'💫 Defeat. Train and try again; no coins lost.':'Match forfeited without a penalty.';
       petSprite.classList.toggle('state-victory',result==='win');
@@ -133,6 +142,9 @@
     }else{
       petSprite.classList.remove('state-victory','state-defeat');
       foeSprite.classList.remove('state-victory','state-defeat');
+      if(characterArt&&activeCat&&!busy){
+        characterArt.paint(el('battle-cat-art'),activeCat.breed,'idle');
+      }
       el('battle-outcome').textContent='';
     }
     if(!fighting&&busy)el('battle-moves').querySelectorAll('button').forEach(button=>button.disabled=true);
@@ -179,10 +191,11 @@
   }
   async function showEvents(events,cat){
     const kit=data.kitFor(cat?.breed);
+    const pose=state=>{if(characterArt&&cat)characterArt.paint(el('battle-cat-art'),cat.breed,state);};
     for(const evt of events){
       if(evt.who==='system'){
-        if(evt.fx==='victory')petSprite.classList.add('state-victory');
-        if(evt.fx==='defeat')petSprite.classList.add('state-defeat');
+        if(evt.fx==='victory'){petSprite.classList.add('state-victory');pose('victory');}
+        if(evt.fx==='defeat'){petSprite.classList.add('state-defeat');pose('defeat');}
         noise(evt.fx==='victory'?620:180,.22);
         await wait(450);continue;
       }
@@ -191,12 +204,14 @@
       const guard=evt.fx==='guard';
       const cast=!guard&&!['swipe','impact'].includes(evt.fx);
       const effect=guard?'state-guard':cast?'state-cast':'state-approach';
+      if(evt.who==='pet')pose(guard?'guard':cast?(evt.name.includes('Finale')?'ultimate':'signature'):'approach');
       actor.classList.remove('state-approach','state-swipe','state-cast','state-guard');
       void actor.offsetWidth;actor.classList.add(effect);
-      if(!guard&&!cast){await wait(245);actor.classList.remove(effect);actor.classList.add('state-swipe');}
+      if(!guard&&!cast){await wait(245);actor.classList.remove(effect);actor.classList.add('state-swipe');if(evt.who==='pet')pose('swipe');}
       await wait(cast?340:guard?230:190);
       if(!guard){
         defender.classList.add('state-impact');
+        if(evt.who==='foe')pose('impact');
         burst(evt,evt.who==='pet'?kit.theme.color:stage.style.getPropertyValue('--foe-color'));
         noise(evt.who==='pet'?520:210,.10);
       }else{burst(evt,'#84e4d8');noise(380,.08);}
@@ -204,6 +219,7 @@
       await wait(cast?440:350);
       actor.classList.remove(effect,'state-swipe');
       defender.classList.remove('state-impact');
+      pose('idle');
     }
   }
   async function saveAction(callback) {
