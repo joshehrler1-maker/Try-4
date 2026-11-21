@@ -15,6 +15,7 @@
 <script defer src="assets/pawtopia-battle-engine.js"></script>
 <script defer src="assets/pawtopia-battle-character-art.js"></script>
 <script defer src="assets/pawtopia-battle-foe-art.js"></script>
+<script defer src="assets/pawtopia-battle-watch.js"></script>
 <script defer src="assets/pawtopia-battle-arena.js"></script>
 </head>
 <body>
@@ -53,7 +54,17 @@
 </div>
 <h2 id="foe-list-title">The 12-step challenger ladder</h2>
 <div id="battle-foe-list" class="foe-list" role="group" aria-labelledby="foe-list-title"></div>
-<div class="setup-actions"><button id="battle-start" type="button" class="primary">Enter Arena</button><button id="battle-forfeit" type="button" class="secondary">Forfeit current battle</button><button id="battle-sound" type="button" class="secondary" aria-pressed="false">Sound: Off</button></div>
+<div class="setup-actions">
+<button id="battle-start" type="button" class="primary">Enter Arena</button>
+<button id="battle-watch" type="button" class="primary">▶ Start &amp; Watch Battle</button>
+<button id="battle-pause" type="button" class="secondary" disabled>Pause after this turn</button>
+<button id="battle-stop-watch" type="button" class="secondary" disabled>Stop watching</button>
+<div class="watch-speed"><label for="battle-speed">Animation speed</label>
+<select id="battle-speed" aria-label="Battle animation speed"><option value="1">Normal · 1×</option><option value="1.5">Faster · 1.5×</option><option value="2">Fast · 2×</option></select></div>
+<button id="battle-forfeit" type="button" class="secondary">Forfeit current battle</button>
+<button id="battle-sound" type="button" class="secondary" aria-pressed="false">Sound: Off</button>
+</div>
+<p class="watch-note">Watch mode automatically chooses from your cat's unlocked moves, including its unique skills, and plays one battle only. Pause or stop watching without forfeiting the match. Battles pause when the tab is hidden. No automatic repeat battles or purchases.</p>
 </section>
 <section class="fight-section" aria-labelledby="fight-title">
 <h2 id="fight-title">Watch the Battle</h2>
