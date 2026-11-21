@@ -64,6 +64,7 @@ jobs:
           node --test tests/pawtopia-individual-cat-art.test.cjs
           node --test tests/pawtopia-action-frames.test.cjs
           node --test tests/pawtopia-battle-gallery.test.cjs
+          node --test tests/pawtopia-battle-foe-art.test.cjs
           node --test tests/guest-arcade.test.cjs
           node --test tests/guest-3d-arcade.test.cjs
           node tests/side-scroll-cinematic-stage34.test.cjs
