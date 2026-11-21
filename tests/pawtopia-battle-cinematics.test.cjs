@@ -144,6 +144,7 @@ test('cinematic changes cannot affect battle saves, payments or free-only behavi
   for(const name of ['battle-projectile','battle-impact-ring','arena-camera-shiver','arena-skill-shot'])
     assert.ok(css.includes(name),name);
   assert.ok(ui.includes('await projectile;'));
+  assert.ok(ui.includes('stage.scrollIntoView?.'), 'Start/watch should reveal the fight stage on mobile');
   assert.ok(ui.includes('cameraContact(evt,visual,color)'));
   assert.ok(sw.includes('"assets/pawtopia-battle-cinematics.js"'));
   assert.ok(read('.github/workflows/verify.yml').includes('tests/pawtopia-battle-cinematics.test.cjs'));
