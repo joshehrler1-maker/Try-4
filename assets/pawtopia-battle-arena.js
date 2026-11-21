@@ -285,18 +285,26 @@
       el('stage-foe-hp-text').textContent=evt.remaining+'/'+progress.max+' HP';
     }
   }
-  async function playArtFrames(cat,state,duration){
+  async function playArtFrames(cat,state,duration,fromPose='swipe'){
     if(!characterArt||!cat)return;
     const lightweight=frameQuality==='efficient'||window.navigator?.connection?.saveData||duration<370;
-    const frames=(!lightweight&&characterArt.smoothFrames)||characterArt.animationFrames||[3];
+    const smooth=(!lightweight&&characterArt.flowFrames)||null;
+    const frames=smooth||(!lightweight&&characterArt.smoothFrames)||characterArt.animationFrames||[3];
     if(reduced()){
-      characterArt.paint(el('battle-cat-art'),cat.breed,state,3);
+      characterArt.paint(el('battle-cat-art'),cat.breed,state==='recover'?'idle':state,3);
       await wait(25);
       return;
     }
-    const interval=Math.max(28,Math.floor((duration||characterArt.timingFor(cat.breed,state))/frames.length));
+    if(state==='idle'){
+      characterArt.paint(el('battle-cat-art'),cat.breed,'idle',3);
+      await wait(duration||characterArt.timingFor(cat.breed,state));
+      return;
+    }
+    const interval=Math.max(lightweight?28:18,
+      Math.floor((duration||characterArt.timingFor(cat.breed,state))/frames.length));
     for(const frame of frames){
-      characterArt.paint(el('battle-cat-art'),cat.breed,state,frame);
+      if(state==='recover')characterArt.paint(el('battle-cat-art'),cat.breed,state,frame,fromPose);
+      else characterArt.paint(el('battle-cat-art'),cat.breed,state,frame);
       await wait(interval);
     }
   }
@@ -365,6 +373,12 @@
       await Promise.all([motion,foeMotion,hitMotion]);
       actor.classList.remove(effect,'state-swipe');
       defender.classList.remove('state-impact','state-guard');
+      // Do not snap from the last strike/recoil frame straight back to idle.
+      // This recovery uses the exact final pose as its first drawing.
+      const fromPose=evt.who==='pet'
+        ?guard?'guard':cast?(visual?.skill==='ultimate'?'ultimate':'signature'):'swipe'
+        :guard?null:(combat?.defenderPose||'impact');
+      if(fromPose&&cat)await playArtFrames(cat,'recover',220,fromPose);
       pose('idle');
       foePose('idle');
       hideCue();
@@ -542,16 +556,19 @@
     if(!characterArt.poseKeys.includes(pose))return;
     busy=true;
     const actionClass={
-      idle:'',approach:'state-approach',swipe:'state-swipe',
+      idle:'',walk:'state-approach',run:'state-approach',
+      approach:'state-approach',swipe:'state-swipe',
       guard:'state-guard',signature:'state-cast',ultimate:'state-cast',
-      impact:'state-impact',victory:'state-victory',defeat:'state-defeat'
+      impact:'state-impact',recover:'',
+      victory:'state-victory',defeat:'state-defeat'
     }[pose];
     try{
       previewBox.querySelectorAll('button').forEach(item=>item.disabled=true);
       petSprite.classList.remove('state-approach','state-swipe','state-cast','state-guard','state-impact','state-victory','state-defeat');
       if(actionClass)petSprite.classList.add(actionClass);
       status(cat.name+' performs '+pose+'. Art preview only — no battle move or reward used.');
-      await playArtFrames(cat,pose,characterArt.timingFor(cat.breed,pose));
+      await playArtFrames(cat,pose,pose==='idle'?1500:characterArt.timingFor(cat.breed,pose),
+        pose==='recover'?'signature':'swipe');
     }catch{
       status('This art preview could not be displayed.');
     }finally{
