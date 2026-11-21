@@ -106,6 +106,7 @@
     if (marketWearable) {
       marketWearable.hidden = !wearable;
       marketWearable.textContent = wearable ? wearable.badge + ' ' + wearable.name : '';
+      if (marketWearable.style) marketWearable.style.color = Number.isInteger(wearable?.hue) ? 'hsl('+wearable.hue+' 68% 40%)' : '';
     }
     const pointState=upgrades?.state();
     byId('pet-upgrade-balance').textContent=String(pointState?.balance||0);

@@ -8,6 +8,7 @@
 <meta name="description" content="Find, buy, craft and equip original Pawtopia items for your cats.">
 <link rel="stylesheet" href="assets/pawtopia-items.css">
 <script defer src="assets/pawtopia-save.js"></script>
+<script defer src="assets/pawtopia-item-tiers.js"></script>
 <script defer src="assets/pawtopia-items.js"></script>
 <script defer src="assets/pawtopia-items-ui.js"></script>
 </head>
@@ -26,11 +27,16 @@
 <div class="filters">
 <label>Search <input type="search" id="market-search" placeholder="Name or effect"></label>
 <label>Category <select id="market-category"><option value="">All categories</option></select></label>
+<label>Power tier <select id="market-tier"><option value="">All tiers</option><option>Low</option><option>Mid</option><option>High</option></select></label>
+<label>Source <select id="market-source"><option value="">All sources</option><option value="shop">Shops</option><option value="achievement">Achievements</option><option value="ready">Ready to claim</option></select></label>
 <label class="owned"><input type="checkbox" id="market-owned"> My items only</label>
 </div>
 <p id="market-status" role="status"></p>
 <p id="market-count"></p>
 <div id="market-list"></div>
+<nav class="market-pages" aria-label="Catalog pages">
+<button type="button" id="market-prev">Previous</button><span id="market-page"></span><button type="button" id="market-next">Next</button>
+</nav>
 </section>
 </main>
 </body>

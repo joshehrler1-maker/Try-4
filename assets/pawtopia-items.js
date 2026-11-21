@@ -64,12 +64,18 @@
     ['baron-invitation','Baron’s Sealed Challenge','Collectible',0,'Defeat Baron’s Clockwork Avatar to archive the final challenge letter.',{rank:12,lore:'The wax seal bears a tiny gear with one missing tooth.'}]
   ].map(([id,name,category,price,description,effect]) => ({id,name,category,price,description,...effect}));
 
+  const tiers = window.PawtopiaItemTiers;
+  items.push(...(tiers?.items || []));
   const byId = new Map(items.map(item => [item.id,item]));
   const day = () => new Date().toISOString().slice(0,10);
   const count = (value,fallback=0) => Number.isSafeInteger(value) && value>=0 ? value : fallback;
   const stock = (progress,id) => count(progress?.catalogItems?.[id]);
   function add(progress,id,delta) {
-    progress.catalogItems = {...progress.catalogItems,[id]:Math.max(0,Math.min(999,stock(progress,id)+delta))};
+    const next = {...progress.catalogItems};
+    const total = Math.max(0,Math.min(999,stock(progress,id)+delta));
+    if (total) next[id] = total;
+    else delete next[id];
+    progress.catalogItems = next;
   }
   function buy(progress,id) {
     const item = byId.get(id);
@@ -80,6 +86,23 @@
     progress.coins -= item.price;
     add(progress,id,1);
     return 'Purchased ' + item.name + '.';
+  }
+  function hasClaimed(progress,item) {
+    return Boolean(progress.catalogClaims?.[item.id]);
+  }
+  function achievementProgress(progress,item) {
+    return tiers?.progressFor(progress,item) || [];
+  }
+  function claim(progress,id) {
+    const item = byId.get(id);
+    if (!item?.achievement) return 'This item is available elsewhere.';
+    if (hasClaimed(progress,item) || stock(progress,id)) return 'This achievement reward was already collected.';
+    if (!achievementProgress(progress,item).every(goal => goal.current>=goal.target)) {
+      return 'Complete the listed achievement goals first.';
+    }
+    add(progress,id,1);
+    progress.catalogClaims = {...progress.catalogClaims,[id]:true};
+    return 'Achievement complete. Collected '+item.name+'.';
   }
   function craft(progress,id) {
     const item = byId.get(id);
@@ -111,15 +134,24 @@
     if (item.read) {
       const books = Array.isArray(cat.catalogBooks) ? cat.catalogBooks : [];
       if (books.includes(id)) return 'This cat already read that book.';
+      const nextStats = {...cat.stats};
+      let bond = count(cat.bondPoints);
+      let increased = false;
       for (const [stat,amount] of Object.entries(item.read)) {
         if (stat === 'bond') {
-          if (count(cat.bondPoints)>=100) return 'This cat’s friendship is already full.';
-          cat.bondPoints = Math.min(100,count(cat.bondPoints)+amount);
+          const nextBond = Math.min(100,bond+amount);
+          increased ||= nextBond>bond;
+          bond = nextBond;
         } else {
-          if (count(cat.stats?.[stat],2)>=200) return 'This cat’s stat is already at its limit.';
-          cat.stats = {...cat.stats,[stat]:count(cat.stats?.[stat],2)+amount};
+          const current = count(cat.stats?.[stat],2);
+          const next = Math.max(current,Math.min(200,current+amount));
+          increased ||= next>current;
+          nextStats[stat] = next;
         }
       }
+      if (!increased) return 'This cat has reached the limits for these book bonuses.';
+      cat.stats = nextStats;
+      cat.bondPoints = bond;
       cat.catalogBooks = [...books,id];
       return 'Read ' + item.name + ' together.';
     }
@@ -148,7 +180,7 @@
     return item && item.slot===slot && stock(progress,item.id) ? item : null;
   }
   function arena(progress,cat) {
-    return Object.assign({},...['weapon','armor','relic'].map(slot => worn(progress,cat,slot)?.arena));
+    return Object.assign({},...['weapon','armor','relic','wearable'].map(slot => worn(progress,cat,slot)?.arena));
   }
   function scoutReward(progress,pet,area) {
     const material = items.find(item => item.trail===area);
@@ -167,5 +199,5 @@
     add(progress,collectible.id,1);
     return collectible.name;
   }
-  window.PawtopiaItems = Object.freeze({items,byId,stock,buy,craft,equip,use,worn,arena,scoutReward,arenaReward});
+  window.PawtopiaItems = Object.freeze({items,byId,stock,buy,craft,equip,use,worn,arena,scoutReward,arenaReward,claim,hasClaimed,achievementProgress});
 })();

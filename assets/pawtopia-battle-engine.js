@@ -41,7 +41,7 @@
   function matchInfo(progress) {
     const match=progress?.battleMatch,foe=opponent(progress),cat=battlingCat(progress);
     if (!match || !foe || !cat) return null;
-    const petMaxHp=clamp(safe(match.gearMaxHp,maxHp(cat)),18,2002);
+    const petMaxHp=clamp(safe(match.gearMaxHp,maxHp(cat)),18,2040);
     const hp=clamp(safe(match.hp),0,petMaxHp);
     const foeHp=clamp(safe(match.foeHp),0,foe.hp);
     return { cat,foe,match,petHp:hp,petMaxHp,foeHp,foeMaxHp:foe.hp };
@@ -67,7 +67,7 @@
       return {ok:false,message:'Finish or forfeit your current match before starting another.'};
     ensure(cat);
     const gear=window.PawtopiaItems?.arena(progress,cat) || {};
-    const gearMaxHp=maxHp(cat)+(gear.health||0);
+    const gearMaxHp=maxHp(cat)+safe(gear.health)+safe(gear.marketHealth)+safe(gear.styleHealth);
     progress.battleMatch={
       petId:cat.battleId,foeId:foe.id,hp:gearMaxHp,foeHp:foe.hp,gear,gearMaxHp,
       round:1,guard:0,dodge:0,foeSlow:0,ultimateUsed:false,
@@ -103,7 +103,7 @@
       const trophy=foe.rank===4?'Bronze Paw Medal':foe.rank===8?'Silver Paw Medal':'Golden Paw Crown';
       if (!a.trophies.includes(trophy)){ a.trophies.push(trophy);rewards.push(trophy); }
     }
-    const gearCoins=safe(progress.battleMatch.gear?.winCoin);
+    const gearCoins=safe(progress.battleMatch.gear?.winCoin)+safe(progress.battleMatch.gear?.marketReward);
     if (gearCoins) {
       progress.coins=Math.min(Number.MAX_SAFE_INTEGER,progress.coins+gearCoins);
       rewards.push('+'+gearCoins+' gear bonus Paw Coin');
@@ -136,8 +136,10 @@
     });
     const petAttack=()=>{
       if (moveId==='guard') {
-        match.guard=clamp(2+Math.floor(s.defence/2),2,50)+safe(gear.guard);
-        const restored=Math.min(petMaxHp-match.hp,safe(gear.guardHeal));
+        match.guard=clamp(2+Math.floor(s.defence/2),2,50)+safe(gear.guard)+safe(gear.marketCurl);
+        const firstCurl = !match.marketCurlUsed ? safe(gear.marketMend) : 0;
+        match.marketCurlUsed=true;
+        const restored=Math.min(petMaxHp-match.hp,safe(gear.guardHeal)+firstCurl);
         match.hp+=restored;
         makeEvent('pet','Guard Curl','pet',0,match.hp,'guard',restored?'Blocks the next blow · restored '+restored+' HP':'Blocks the next blow');
         return;
@@ -152,8 +154,12 @@
       }
       if(match.round%3===0)damage+=safe(gear.thirdHit);
       if(match.hp*2<petMaxHp)damage+=safe(gear.lowHp);
-      if(moveId==='signature')damage+=safe(gear.signature);
-      if(moveId==='ultimate')damage+=safe(gear.ultimate);
+      if(!match.marketAttackUsed){
+        damage+=safe(gear.marketOpening);
+        match.marketAttackUsed=true;
+      }
+      if(moveId==='signature')damage+=safe(gear.signature)+safe(gear.marketSignature);
+      if(moveId==='ultimate')damage+=safe(gear.ultimate)+safe(gear.marketFinisher);
       match.foeGuard=0;
       let detail='';
       if(moveId==='signature'||moveId==='ultimate'){
@@ -194,9 +200,9 @@
       if(match.dodge){match.dodge=0;damage=0;}
       if(match.guard){damage=Math.max(0,damage-match.guard);match.guard=0;}
       if(rand()<Math.min(.12,.03+foe.rank/180))damage+=Math.max(0,2-safe(gear.critBlock));
-      if(isHeavy)damage=Math.max(0,damage-safe(gear.heavyBlock));
+      if(isHeavy)damage=Math.max(0,damage-safe(gear.heavyBlock)-safe(gear.marketHeavy));
       if(damage>0 && !match.firstBlocked){
-        damage=Math.max(0,damage-safe(gear.firstBlock));
+        damage=Math.max(0,damage-safe(gear.firstBlock)-safe(gear.styleGuard));
         match.firstBlocked=true;
       }
       match.hp=Math.max(0,match.hp-damage);
@@ -204,7 +210,7 @@
         isHeavy?'impact':'swipe',damage===0?'Dodged or blocked!':'');
     };
     // Defensive curls must activate before the foe moves. Other moves use speed for initiative.
-    const petFirst=moveId==='guard'||s.movement+level(cat)/4+(match.round===1?safe(gear.initiative):0)+rand()*3 >= foe.speed+foe.level/4+rand()*3;
+    const petFirst=moveId==='guard'||s.movement+level(cat)/4+(match.round===1?safe(gear.initiative)+safe(gear.marketSpeed)+safe(gear.styleSpeed):0)+rand()*3 >= foe.speed+foe.level/4+rand()*3;
     if(petFirst){petAttack();enemyAttack();}else{enemyAttack();if(match.hp>0)petAttack();}
     match.lastMove=moveId;
     match.history=[...(Array.isArray(match.history)?match.history:[]),...events.map(e=>e.name+(e.damage?' dealt '+e.damage+' damage':'')+(e.detail?' · '+e.detail:''))].slice(-24);

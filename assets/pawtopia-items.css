@@ -25,3 +25,7 @@ button:disabled {opacity:.5; cursor:default}
 #market-list article {display:flex; flex-direction:column; align-items:start}
 #market-list article .actions {display:flex; flex-wrap:wrap; gap:.45rem; margin-top:auto}
 #market-list .meta {margin:.35rem 0; color:#bed6ee}
+
+.market-pages {align-items:center; justify-content:center; padding-bottom:2rem}
+#market-list .achievement-goals {padding-inline-start:1.2rem; margin-top:0}
+#market-list .achievement-goals li {margin-block:.25rem}

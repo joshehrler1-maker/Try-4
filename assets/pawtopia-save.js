@@ -120,7 +120,7 @@
     const saved=questJournal().day===utcDay()&&questJournal()[claimedKey].includes(id);
     return {ok:awarded&&saved,message:awarded&&!saved?'Your browser could not save that reward.':message};
   }
-  function safeBackupValue(value,depth=0,budget={remaining:20000}){
+  function safeBackupValue(value,depth=0,budget={remaining:20000},maxKeys=500){
     if(depth>18||--budget.remaining<0)throw Error('Backup contains too much data.');
     if(value===null||typeof value==='boolean')return;
     if(typeof value==='string'){if(value.length>10000)throw Error('Backup has an oversized text field.');return;}
@@ -130,10 +130,11 @@
       for(const item of value)safeBackupValue(item,depth+1,budget);
       return;
     }
-    if(!value||typeof value!=='object'||Object.keys(value).length>500)throw Error('Backup has an invalid object.');
+    if(!value||typeof value!=='object'||Object.keys(value).length>maxKeys)throw Error('Backup has an invalid object.');
     for(const [name,item] of Object.entries(value)){
       if(['__proto__','constructor','prototype'].includes(name)||name.length>150)throw Error('Backup has an unsafe field.');
-      safeBackupValue(item,depth+1,budget);
+      const isCatalog = depth===0 && ['catalogItems','catalogDaily','catalogClaims'].includes(name);
+      safeBackupValue(item,depth+1,budget,isCatalog?1400:500);
     }
   }
   function validateBackup(backup) {
