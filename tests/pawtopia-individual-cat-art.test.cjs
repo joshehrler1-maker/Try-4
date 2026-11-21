@@ -118,7 +118,14 @@ test('arena uses posed characters during live attacks, and provides 12 free prev
   for(const action of ["playArtFrames(cat,'swipe'","hitMotion=playArtFrames(cat,reaction,310)","playArtFrames(cat,'victory'","playArtFrames(cat,'defeat'","guard?'guard'"]) {
     assert.ok(uiScript.includes(action),'Missing live action sequence '+action);
   }
-  assert.ok(uiScript.includes("characterArt.paint(el('battle-cat-art'),cat.breed,state,frame)"));
+  assert.ok(uiScript.includes("paintCat(el('battle-cat-art'),cat.breed,state,frame)"));
+  const {data,art}=setup();
+  for(const breed of data.breeds){
+    const target={innerHTML:'',dataset:{},style:{},classList:{add(){}}};
+    assert.equal(art.paintFighter(target,breed,'swipe',3),true);
+    assert.match(target.innerHTML,/cat-face-contour-/);
+    assert.doesNotMatch(target.innerHTML,/<image\b/);
+  }
   assert.ok(uiScript.includes("await playArtFrames(cat,pose,pose==='idle'?1500:characterArt.timingFor(cat.breed,pose)"));
   assert.match(read('sw.js'),/assets\/pawtopia-battle-character-art\.js/);
   assert.match(read('.github/workflows/verify.yml'),/tests\/pawtopia-individual-cat-art\.test\.cjs/);
