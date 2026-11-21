@@ -21,9 +21,9 @@
 <script defer src="assets/pawtopia-battle-foe-art.js"></script>
 <script defer src="assets/pawtopia-battle-watch.js"></script>
 <script defer src="assets/pawtopia-battle-cinematics.js"></script>
-<script defer src="assets/pawtopia-battle-3d.js?v=motion-1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=motion-1"></script>
-<link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=motion-1">
+<script defer src="assets/pawtopia-battle-3d.js?v=motion-2"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=motion-2"></script>
+<link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=motion-2">
 </head>
 <body>
 <a class="skip" href="#arena-main">Skip to Battle Arena</a>
@@ -39,7 +39,7 @@
 <p class="eyebrow">Pawtopia · Original, free pet battles</p>
 <h1>Battle Arena</h1>
 <p>Every adopted cat can become a champion! Choose your companion, challenge a clockwork foe, and <strong>watch the fight</strong> as pets move, strike, cast their unique skills, and celebrate victories.</p>
-<p>56 cat breeds in 3D · 12 clockwork challengers · 4 moves per cat</p>
+<p>56 cat breeds and 12 clockwork challengers with individual stances and attacks.</p>
 <a class="primary" href="pawtopia-companions.html">Adopt or train a cat</a>
 <a class="secondary" href="pawtopia-battle-art-gallery.html">Preview all 56 fighter designs</a>
 </div>
@@ -80,6 +80,7 @@
 <section class="fight-section" aria-labelledby="fight-title">
 <h2 id="fight-title">Watch the Battle</h2>
 <p class="arena-status" id="battle-status" role="status" aria-live="polite">Choose your adopted cat and a challenger to start the fight.</p>
+<p class="mini" id="arena-3d-stances" hidden></p>
 <p class="mini"><button type="button" id="arena-3d-preview" hidden>Preview a 3D duel</button></p>
 <div class="battle-stage" id="battle-stage" aria-label="Animated turn-based battle field">
 <div class="battle-backdrop" aria-hidden="true"></div>

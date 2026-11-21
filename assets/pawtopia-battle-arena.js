@@ -134,7 +134,15 @@
     el('battle-forfeit').disabled=busy||watchMode||!fighting;
     const activeCat=currentView?currentView.cat:pet,activeFoe=currentView?currentView.foe:foe;
     const kit=spriteArt(activeCat);
-    view3d?.roster(activeCat?characterArt?.getArt(activeCat.breed):null,foeArt?.profile(activeFoe),kit,{
+    const petModel=activeCat?characterArt?.getArt(activeCat.breed):null, houndModel=foeArt?.profile(activeFoe);
+    const stances=el('arena-3d-stances');
+    if(stances && view3d?.active() && houndModel){
+      const names=[petModel && window.PawtopiaBattle3D.profileFor(petModel).label,
+        window.PawtopiaBattle3D.profileFor(houndModel,true).label].filter(Boolean);
+      stances.textContent=names.join(' · ');
+      stances.hidden=false;
+    }
+    view3d?.roster(petModel,houndModel,kit,{
       efficient:frameQuality==='efficient'||window.navigator?.connection?.saveData,
       finished:currentView?.match.finished?currentView.match.result:null,busy
     });

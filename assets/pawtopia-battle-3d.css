@@ -23,4 +23,4 @@
 }
 @media(max-width:400px){.battle-stage.battle-has-3d {min-height:285px}}
 
-#arena-3d-preview[hidden] {display:none}
+#arena-3d-preview[hidden],#arena-3d-stances[hidden] {display:none}
