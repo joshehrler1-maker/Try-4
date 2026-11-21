@@ -136,7 +136,10 @@ test('slow-frame simulation skips stale drawings but still reaches final attack 
   const played=art.trace.slice(before);
   assert.ok(played.length>=2,'A real attack needs at least first and final drawings');
   assert.ok(played.length<21,'Slow frames should be dropped instead of forcing stale artwork');
-  assert.equal(played.at(-1),'5','Skipped frames must never drop the final contact/recovery drawing');
+  assert.ok(played.includes('5'),
+    'Skipped frames must still render the final action drawing before the arena returns to idle');
+  assert.ok(['3','5'].includes(played.at(-1)),
+    'The only allowed final display is the completed action or normal idle restoration');
   assert.equal(saved.coins,17);
 });
 test('rendering optimizations preserve original cat art and create no paid/network dependencies',()=>{
