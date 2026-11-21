@@ -66,6 +66,7 @@ jobs:
           node --test tests/pawtopia-battle-gallery.test.cjs
           node --test tests/pawtopia-battle-foe-art.test.cjs
           node --test tests/pawtopia-battle-watch.test.cjs
+          node --test tests/pawtopia-battle-cinematics.test.cjs
           node --test tests/guest-arcade.test.cjs
           node --test tests/guest-3d-arcade.test.cjs
           node tests/side-scroll-cinematic-stage34.test.cjs
