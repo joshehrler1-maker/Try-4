@@ -135,3 +135,56 @@ footer{padding:16px 0 28px;text-align:center}
 @keyframes kit-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px) rotate(-7deg)}}
 @keyframes kit-sprint{0%,100%{transform:translateX(0)}25%{transform:translateX(16px)}50%{transform:translateX(34px)}}
 @keyframes kit-powercast{0%,100%{transform:scale(1) rotate(0)}45%{transform:scale(1.13) rotate(-8deg);filter:drop-shadow(0 0 20px var(--cat-skill-color,#f4d4ff))}}
+
+/* V2: illustrated, articulated cat bodies with original adoption portrait
+   facial textures. All 56 cats retain their recognizable approved faces.
+   Individual paws/body and pose changes replace the square moving portraits. */
+.cat-avatar.has-body-art{
+  display:flex;align-items:center;justify-content:center;overflow:visible;
+  width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0;
+  box-shadow:none;background:none;filter:drop-shadow(0 12px 8px #08132677);
+  animation:none
+}
+.cat-avatar.has-body-art svg.paw-battle-full-body{
+  width:100%;height:100%;max-width:210px;max-height:235px;overflow:visible;
+  object-fit:contain;
+}
+.cat-avatar.has-body-art[data-pose="guard"] svg{
+  filter:drop-shadow(0 0 12px #a5edff)
+}
+.cat-avatar.has-body-art[data-pose="signature"] svg{
+  filter:drop-shadow(0 0 12px var(--cat-skill-color,#b6cfff))
+}
+.cat-avatar.has-body-art[data-pose="ultimate"] svg{
+  filter:drop-shadow(0 0 21px var(--cat-skill-color,#ffe1aa))
+}
+.cat-avatar.has-body-art[data-pose="impact"] svg{
+  filter:drop-shadow(0 0 10px #f69f93)
+}
+.fighter-sprite.state-approach .cat-avatar.has-body-art svg{
+  animation:whole-cat-advance .42s ease-in-out both
+}
+.fighter-sprite.state-swipe .cat-avatar.has-body-art svg{
+  animation:whole-cat-swipe .52s ease-in-out both
+}
+.fighter-sprite.state-cast .cat-avatar.has-body-art svg{
+  animation:whole-cat-power .72s ease-in-out both
+}
+.fighter-sprite.state-impact .cat-avatar.has-body-art svg{
+  animation:whole-cat-hit .45s ease-out both
+}
+.fighter-sprite.state-victory .cat-avatar.has-body-art svg{
+  animation:whole-cat-win .85s ease-in-out infinite
+}
+.fighter-sprite.state-defeat .cat-avatar.has-body-art svg{
+  animation:whole-cat-loss .6s ease-out forwards
+}
+@keyframes whole-cat-advance{0%,100%{transform:translateX(0)}55%{transform:translateX(12px) translateY(-7px)}}
+@keyframes whole-cat-swipe{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translateX(8px) rotate(7deg)}}
+@keyframes whole-cat-power{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-11px) scale(1.07)}}
+@keyframes whole-cat-hit{0%,100%{transform:translateX(0) rotate(0)}35%{transform:translateX(-9px) rotate(-7deg)}}
+@keyframes whole-cat-win{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px) rotate(3deg)}}
+@keyframes whole-cat-loss{to{transform:translateY(19px) rotate(9deg);opacity:.65}}
+@media(max-width:450px){
+.cat-avatar.has-body-art svg.paw-battle-full-body{max-width:138px;max-height:165px}
+}
