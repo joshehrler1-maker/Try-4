@@ -1,8 +1,5 @@
-/* Super Paw Heroes pet battle character art, v2.
-   Distinct vector body / articulated paw drawings for all 56 adopted breeds,
-   retaining the player's ORIGINAL official face/collar portrait as image texture.
-   Each breed has 9 actual action poses, not only a moving square portrait.
-   Runtime-generated SVG: no external APIs, reused 56 original approved images. */
+/* Pawtopia battle illustrations. Full-body paintings load by breed.
+   Articulated SVG drawings provide immediate and offline battle art. */
 (() => {
   'use strict';
   const faces = [
@@ -673,10 +670,10 @@
     return faceFill+'<g class="art-ear-flex">'+earsMarkup+'</g>'+path(outline,art.fur,'stroke="'+art.shade+'" stroke-width="2.6"')+
       '<g clip-path="url(#'+clipId+')">'+marking+path(outline,'url(#'+lightId+')')+'</g>'+eyes+muzzleArt+nose;
   }
-  function svgForBreed(breed,pose='idle',frame=3,fromPose='swipe',full=false){
+  function svgForBreed(breed,pose='idle',frame=3,fromPose='swipe',full=false,painting=false){
     const art=getArt(breed);
     const key=poseKeys.includes(pose)?pose:'idle';
-    const cacheKey=art.uniq+'|'+key+'|'+String(frame)+'|'+fromPose+'|'+full;
+    const cacheKey=art.uniq+'|'+key+'|'+String(frame)+'|'+fromPose+'|'+full+'|'+painting;
     if(svgCache.has(cacheKey)){
       const hit=svgCache.get(cacheKey);
       svgCache.delete(cacheKey);
@@ -728,6 +725,7 @@
     const flowVars='--breath-period:'+flow.breathDuration+';--tail-period:'+flow.tailDuration+
       ';--ear-period:'+flow.earDuration+';--head-period:'+flow.headDuration+
       ';--stance-period:'+flow.stanceDuration;
+    const fighterImage=painting?paintedFighterMarkup(art,key,frame,balance):'';
     const painted=litPalette('cat-light-'+art.uniq+'-',[
       [art.fur,false],[art.shade,false],[art.cape,false],['#f2bd69',true]
     ]);
@@ -735,14 +733,14 @@
       (key==='recover'?fromPose:'idle')+'" style="'+flowVars+'" aria-hidden="true">'+
       safety+'<defs>'+painted.defs+'<clipPath id="face"><ellipse cx="110" cy="75" rx="59" ry="60"/></clipPath></defs>'+
       '<ellipse cx="110" cy="225" rx="72" ry="12" fill="#07192c" opacity=".35"/>'+
-      tail(art,key,frame)+
+      (fighterImage||tail(art,key,frame)+
       '<g class="art-cape-weight" transform="'+bodyTransform+'">'+cape+'</g>'+
       backFeet+
       '<g class="art-torso-weight" transform="'+bodyTransform+'">'+body+'</g>'+
       paw(art,...p[0].map((v,i)=>full&&i===2?v-(reach-23)*.51:v),false,key)+
       paw(art,...p[1].map((v,i)=>full&&i===2?v+(reach-23)*.51:v),true,key)+
       '<g class="art-head-weight" transform="translate('+Math.round(balance.shift*.45)+' '+balance.lift+')">'+head+'</g>'+
-      smallClaws+defeat+
+      smallClaws+defeat)+
       abilityArt(art,key,frame)+signatureSeal(art,key,frame)+individualAttackTrail(art,key,frame)+fightingStyleTrail(art,key,frame)+
       (key==='impact'?'<path d="M158 40 l7 -12 l5 12 l13 4 l-13 5 l-5 12 l-6 -13 l-13 -4 Z" fill="#ffe17c"/>':'')+
       (key==='victory'?'<path d="M49 31 l9 -11 l6 12 l14 4 l-13 5 l-5 14 l-7 -15 Z" fill="'+glow+'"/>':'')+
@@ -751,16 +749,17 @@
     if(svgCache.size>svgCacheLimit)svgCache.delete(svgCache.keys().next().value);
     return markup;
   }
-  function paint(container,breed,pose='idle',frame=3,fromPose='swipe',full=false){
+  function paint(container,breed,pose='idle',frame=3,fromPose='swipe',full=false,painting=false){
     if(!container)return false;
     const art=getArt(breed);
     // Avoid destroying and recreating the face texture for an unchanged
     // pose. Preserves the mounted idle CSS animations and saves mobile work.
     if(container.dataset.breed===art.breed&&container.dataset.pose===pose&&
-       container.dataset.frame===String(frame)&&container.dataset.fromPose===fromPose&&container.dataset.fullArt===String(full)&&
+       container.dataset.frame===String(frame)&&container.dataset.fromPose===fromPose&&container.dataset.fullArt===String(full)&&container.dataset.painting===String(painting)&&
        container.firstElementChild?.classList?.contains('paw-battle-full-body'))return true;
     // Markup contains ONLY our own trusted, fixed 56-breed design data.
-    container.innerHTML=svgForBreed(art.breed,pose,frame,fromPose,full);
+    container.innerHTML=svgForBreed(art.breed,pose,frame,fromPose,full,painting);
+    container.dataset.painting=String(painting);
     container.dataset.fullArt=String(full);
     container.classList.add('has-body-art');
     container.dataset.breed=art.breed;
@@ -770,6 +769,51 @@
     container.style.backgroundImage='none';
     return true;
   }
+  const fighterPaintings=new Map();
+
+  function paintingPath(art){
+    return 'assets/scenes/pawtopia-fighters/cat-'+String(art.uniq+1).padStart(2,'0')+'.png';
+  }
+
+  function paintedFighterMarkup(art,pose,frame,balance){
+    const effort=Math.max(0,keyframeValue(motionWeight,frame));
+    const lowPose=pose==='guard'||pose==='impact'||pose==='defeat';
+    const stretch=pose==='ultimate'||pose==='signature'||pose==='victory';
+    const width=1+(lowPose ? .048 : stretch ? -.035 : .015)*effort;
+    const height=1+(pose==='defeat' ? -.29 : lowPose ? -.10 : stretch ? .065 : 0)*effort;
+    const transform='translate('+(balance.shift*.58)+' '+(balance.lift*.58)+') translate(110 221) rotate('+
+      (balance.tilt*.8)+') scale('+width+' '+height+') translate(-110 -221)';
+    return '<g transform="'+transform+'"><image class="painted-fighter-image" href="'+paintingPath(art)+
+      '" x="8" y="16" width="204" height="205" preserveAspectRatio="none"/></g>';
+  }
+
+  function paintFighter(container,breed,pose,frame,fromPose){
+    if(!container||typeof window.Image!=='function')return paint(container,breed,pose,frame,fromPose,true);
+    const art=getArt(breed);
+    let record=fighterPaintings.get(art.uniq);
+    if(!record){
+      record={state:'loading',targets:new Set()};
+      fighterPaintings.set(art.uniq,record);
+      const image=new window.Image();
+      image.onload=()=>{
+        record.state='ready';
+        for(const target of record.targets){
+          if(target.dataset.breed!==art.breed)continue;
+          const {pose,frame,fromPose}=target.dataset;
+          paint(target,art.breed,pose,Number(frame),fromPose,true,true);
+        }
+        record.targets.clear();
+      };
+      image.onerror=()=>{
+        record.state='failed';
+        record.targets.clear();
+      };
+      image.src=paintingPath(art);
+    }
+    if(record.state==='loading')record.targets.add(container);
+    return paint(container,art.breed,pose,frame,fromPose,true,record.state==='ready');
+  }
+
   function timingFor(breed,pose){
     const art=getArt(breed);
     const base=pose==='ultimate'?780:pose==='signature'?650:
@@ -779,7 +823,7 @@
   window.PawtopiaBattleCharacterArt=Object.freeze({
     collection,getArt,poseKeys,animationFrames,smoothFrames,flowFrames,keyframeValue,
     torsoWeight,personalMotion,choreograph,recoveryPose,flowSignature,timingFor,svgForBreed,paint,
-    paintFighter:(target,breed,pose,frame,fromPose)=>paint(target,breed,pose,frame,fromPose,true),
+    paintFighter,
     cacheSize:()=>svgCache.size,fightingStyles,identityFor
   });
 })();

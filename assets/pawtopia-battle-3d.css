@@ -33,3 +33,12 @@
 @media(max-width:650px){
   .battle-has-floor .fighter-sprite {width:min(100%,160px);margin-top:9px}
 }
+
+.battle-stage svg.paw-battle-full-body[data-pose="idle"] .painted-fighter-image {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: paw-flow-breathe var(--breath-period, 3s) ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .battle-stage svg.paw-battle-full-body[data-pose="idle"] .painted-fighter-image { animation: none; }
+}
