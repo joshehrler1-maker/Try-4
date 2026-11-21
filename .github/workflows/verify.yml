@@ -73,6 +73,7 @@ jobs:
           node --test tests/pawtopia-all-56-flowing-movement.test.cjs
           node --test tests/pawtopia-animation-performance.test.cjs
           node --test tests/pawtopia-gallery-animation-recovery.test.cjs
+          node --test tests/pawtopia-cross-game-upgrades.test.cjs
           node --test tests/guest-arcade.test.cjs
           node --test tests/guest-3d-arcade.test.cjs
           node tests/side-scroll-cinematic-stage34.test.cjs

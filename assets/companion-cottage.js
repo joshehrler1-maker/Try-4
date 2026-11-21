@@ -1,5 +1,6 @@
 (() => {
   const save = window.PawtopiaSave;
+  const upgrades = window.PawtopiaUpgradePoints;
   const byId = id => document.getElementById(id);
   const controls = {
     feed: byId('feed'), play: byId('play'), food: byId('buy-food'), toy: byId('buy-toy')
@@ -22,6 +23,7 @@
   const active = byId('active-cat');
   const training = byId('training-stat');
   const train = byId('train-cat');
+  const trainPoints=byId('train-pet-upgrade');
   function paintPortrait(element, breed) {
     const index = catalogBreeds.indexOf(breed);
     if (index < 0) {
@@ -79,7 +81,7 @@
     byId('breed-count').textContent = count + ' of ' + breeds.length + ' breeds';
   });
   function canTrain(values, stat) {
-    if (stat === 'level') return true;
+    if (stat === 'level') return values.level < 200;
     if (!Object.hasOwn(stats, stat)) return false;
     const baseCap = values.level * 2;
     return values[stat] < values.level * (stat === 'endurance' ? 3 : 2) &&
@@ -97,7 +99,12 @@
     };
   }
   function render(message) {
-    const { companion, coins, food, toy, townCollection, capeEquipped, bedPlaced, lastBedRest, otherCompanions } = save.read();
+    const progress=save.read();
+    const { companion, coins, food, toy, townCollection, capeEquipped, bedPlaced, lastBedRest, otherCompanions } = progress;
+    const pointState=upgrades?.state();
+    byId('pet-upgrade-balance').textContent=String(pointState?.balance||0);
+    byId('pet-upgrade-earned-today').textContent=String(pointState?.daily||0)+' of '+(upgrades?.maxDaily||30);
+    trainPoints.disabled = !upgrades?.canSpend(progress,training.value);
     byId('coins').textContent = coins;
     byId('inventory').textContent = 'Inventory · ' + food + (food === 1 ? ' snack' : ' snacks') + (toy ? ' · Crystal toy' : '');
     const allCats = [companion, ...otherCompanions].filter(Boolean).slice(0, maxCats);
@@ -187,6 +194,7 @@
       const values = save.battleStats(companion);
       showStats(byId('companion-stats'), values);
       train.disabled = coins < trainingPrice || !canTrain(values, training.value);
+      trainPoints.disabled = !upgrades?.canSpend(progress,training.value);
       byId('fullness').value = fullness;
       byId('fullness-label').textContent = fullness + '%';
       byId('happiness').value = happiness;
@@ -254,6 +262,10 @@
     });
   });
   training.addEventListener('change', render);
+  trainPoints.addEventListener('click',async()=>{
+    const outcome=await upgrades.train(training.value);
+    render(outcome.message);
+  });
   train.addEventListener('click', () => {
     const stat = training.value;
     act(progress => {

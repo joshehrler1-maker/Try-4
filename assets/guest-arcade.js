@@ -149,6 +149,10 @@
     }
     iframe.src=url.toString();
     frame.replaceChildren(iframe);
+    // The external publisher controls gameplay; credit only this explicit launch.
+    // Never pretend we can inspect wins or scores inside its iframe.
+    const id=(game.publisher+'-'+game.name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80);
+    if(id)void window.PawtopiaUpgradePoints?.claim('guest-launch',id,'launch');
     byId('player-title').textContent=game.name;
     byId('game-publisher').textContent='Hosted by '+game.publisher+'. This game is not created by Super Paw Heroes.';
     byId('open-provider').href=link;

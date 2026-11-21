@@ -122,6 +122,9 @@
        The publisher link remains available as a fallback. */
     iframe.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-pointer-lock');
     byId('frame').replaceChildren(iframe);
+    // An iframe launch is verifiable; the third-party win state is not.
+    const id=String(selected.id||selected.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80);
+    if(id)void window.PawtopiaUpgradePoints?.claim('guest3d-launch',id,'launch');
     byId('frame').classList.remove('empty');
     byId('notice').hidden=true;
     byId('load').hidden=true;
