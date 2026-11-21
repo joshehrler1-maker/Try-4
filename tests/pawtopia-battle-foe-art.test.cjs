@@ -116,7 +116,7 @@ test('displaying different opponents never writes to the player save', () => {
 });
 
 test('arena loads and animates the actual selected rank, while keeping fallback art', () => {
-  assert.ok(arenaHtml.includes('src="assets/pawtopia-battle-foe-art.js"'));
+  assert.match(arenaHtml, /src="assets\/pawtopia-battle-foe-art\.js(?:\?[^"]*)?"/);
   assert.ok(arenaHtml.indexOf('pawtopia-battle-foe-art.js')<arenaHtml.indexOf('pawtopia-battle-arena.js'));
   assert.ok(arenaHtml.includes('id="battle-foe-art"'));
   assert.ok(arenaHtml.includes('class="foe-illustration"'));
