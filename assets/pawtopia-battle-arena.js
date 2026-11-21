@@ -367,7 +367,10 @@
     if(busy)return;busy=true;
     try{
       const result=await saveAction(progress=>engine.start(progress,selectedPet,selectedFoe));
-      if(result)status(result.message);
+      if(result){
+        status(result.message);
+        if(result.ok)stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
+      }
     }catch{status('The battle could not be started safely.');}
     finally{busy=false;render();}
   });
@@ -462,6 +465,7 @@
     watchMode=true;
     watchPaused=false;
     render();
+    stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
     await runWatchMode();
   });
   el('battle-pause').addEventListener('click',()=>{
