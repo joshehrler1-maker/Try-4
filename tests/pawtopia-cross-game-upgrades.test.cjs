@@ -55,6 +55,15 @@ test('four total guest launch bonuses, with no invented external game wins',asyn
  assert.equal(w.api.state().guest,4);
  assert.equal(w.api.state().balance,4);
 });
+test('the four saved Scout Trail puzzles give one unique point each',async()=>{
+ const w=world();
+ for(const area of ['meadow','grotto','garden','frost']){
+   assert.equal((await w.api.claim('scout',area,'solved')).granted,1);
+   assert.equal((await w.api.claim('scout',area,'solved')).granted,0);
+ }
+ assert.equal(w.api.state().balance,4);
+ assert.equal((await w.api.claim('scout','wrong','solved')).granted,0);
+});
 test('unapproved or malformed milestones do not credit anything',async()=>{
  const w=world();
  for(const args of [
@@ -92,7 +101,7 @@ test('storage failures cannot report fake upgrades',async()=>{
 });
 test('all local and publisher game families use the shared save and declared reward hooks',()=>{
  for(const file of ['pawtopia-companions.html','pawtopia-arcade.html','pawcade-side-scroll.html',
-    '3d-games.html','guest-arcade.html','guest-3d-arcade.html','pawtopia-battle-arena.html']){
+    '3d-games.html','guest-arcade.html','guest-3d-arcade.html','pawtopia-battle-arena.html','pawtopia-scout-trails.html']){
    const s=read(file);
    assert.ok(s.includes('assets/pawtopia-save.js'),file);
    assert.ok(s.includes('assets/pawtopia-upgrade-points.js'),file);
@@ -105,7 +114,8 @@ test('all local and publisher game families use the shared save and declared rew
   ['pawtopia-arcade.html',"claim('mini',mode,'score-'+target)"],
   ['assets/guest-arcade.js',"claim('guest-launch',id,'launch')"],
   ['assets/guest-3d-arcade.js',"claim('guest3d-launch',id,'launch')"],
-  ['assets/pawtopia-battle-arena.js',"claim('battle-win',finished.foe.id,'victory')"]
+  ['assets/pawtopia-battle-arena.js',"claim('battle-win',finished.foe.id,'victory')"],
+  ['assets/pawtopia-scout-trails.js',"claim('scout',areaId,'solved')"]
  ])assert.ok(read(file).includes(expr),file);
  assert.ok(read('assets/companion-cottage.js').includes('upgrades.train(training.value)'));
  assert.ok(read('pawtopia-companions.html').includes('id="pet-upgrade-balance"'));
