@@ -386,14 +386,15 @@
         if(evt.who==='pet')motion=playArtFrames(cat,'swipe',characterArt?.timingFor(cat.breed,'swipe'));
         else foeMotion=playFoeFrames(currentFoe,combat?.foeMove||'swipe',combat?.charge?590:470);
       }
-      if(evt.who==='pet'&&cast){
-        await wait(castDuration*.60);
-        await launchSkillProjectile(visual,kit);
-      }else if(evt.who==='pet'&&!guard){
+      const projectile=evt.who==='pet'&&cast
+        ? wait(castDuration*.60).then(()=>launchSkillProjectile(visual,kit))
+        : Promise.resolve();
+      if(evt.who==='pet'&&!guard&&!cast){
         await wait((characterArt?.timingFor(cat.breed,'swipe')||480)*.60);
-      }else{
+      }else if(evt.who!=='pet'||!cast){
         await wait(cast?340:guard?230:190);
       }
+      await projectile;
       if(!guard){
         const reaction=combat?.defenderPose||'impact';
         defender.classList.add(combat?.contact?'state-impact':'state-guard');
