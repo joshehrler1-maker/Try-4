@@ -189,13 +189,27 @@
       el('stage-foe-hp-text').textContent=evt.remaining+'/'+progress.max+' HP';
     }
   }
+  async function playArtFrames(cat,state,duration){
+    if(!characterArt||!cat)return;
+    const frames=characterArt.animationFrames||[3];
+    if(reduced()){
+      characterArt.paint(el('battle-cat-art'),cat.breed,state,3);
+      await wait(25);
+      return;
+    }
+    const interval=Math.max(35,Math.floor((duration||characterArt.timingFor(cat.breed,state))/frames.length));
+    for(const frame of frames){
+      characterArt.paint(el('battle-cat-art'),cat.breed,state,frame);
+      await wait(interval);
+    }
+  }
   async function showEvents(events,cat){
     const kit=data.kitFor(cat?.breed);
     const pose=state=>{if(characterArt&&cat)characterArt.paint(el('battle-cat-art'),cat.breed,state);};
     for(const evt of events){
       if(evt.who==='system'){
-        if(evt.fx==='victory'){petSprite.classList.add('state-victory');pose('victory');}
-        if(evt.fx==='defeat'){petSprite.classList.add('state-defeat');pose('defeat');}
+        if(evt.fx==='victory'){petSprite.classList.add('state-victory');await playArtFrames(cat,'victory',360);pose('victory');}
+        if(evt.fx==='defeat'){petSprite.classList.add('state-defeat');await playArtFrames(cat,'defeat',360);pose('defeat');}
         noise(evt.fx==='victory'?620:180,.22);
         await wait(450);continue;
       }
@@ -204,19 +218,31 @@
       const guard=evt.fx==='guard';
       const cast=!guard&&!['swipe','impact'].includes(evt.fx);
       const effect=guard?'state-guard':cast?'state-cast':'state-approach';
-      if(evt.who==='pet')pose(guard?'guard':cast?(evt.name.includes('Finale')?'ultimate':'signature'):'approach');
+      let motion=Promise.resolve();
+      let hitMotion=Promise.resolve();
+      if(evt.who==='pet'){
+        const action=guard?'guard':cast?(evt.name.includes('Finale')?'ultimate':'signature'):'approach';
+        motion=playArtFrames(cat,action,guard?490:cast?characterArt?.timingFor(cat.breed,action):240);
+      }
       actor.classList.remove('state-approach','state-swipe','state-cast','state-guard');
       void actor.offsetWidth;actor.classList.add(effect);
-      if(!guard&&!cast){await wait(245);actor.classList.remove(effect);actor.classList.add('state-swipe');if(evt.who==='pet')pose('swipe');}
+      if(!guard&&!cast){
+        await wait(245);
+        await motion;
+        actor.classList.remove(effect);
+        actor.classList.add('state-swipe');
+        if(evt.who==='pet')motion=playArtFrames(cat,'swipe',characterArt?.timingFor(cat.breed,'swipe'));
+      }
       await wait(cast?340:guard?230:190);
       if(!guard){
         defender.classList.add('state-impact');
-        if(evt.who==='foe')pose('impact');
+        if(evt.who==='foe')hitMotion=playArtFrames(cat,'impact',310);
         burst(evt,evt.who==='pet'?kit.theme.color:stage.style.getPropertyValue('--foe-color'));
         noise(evt.who==='pet'?520:210,.10);
       }else{burst(evt,'#84e4d8');noise(380,.08);}
       barAfter(evt);
       await wait(cast?440:350);
+      await Promise.all([motion,hitMotion]);
       actor.classList.remove(effect,'state-swipe');
       defender.classList.remove('state-impact');
       pose('idle');
@@ -292,9 +318,8 @@
       previewBox.querySelectorAll('button').forEach(item=>item.disabled=true);
       petSprite.classList.remove('state-approach','state-swipe','state-cast','state-guard','state-impact','state-victory','state-defeat');
       if(actionClass)petSprite.classList.add(actionClass);
-      characterArt.paint(el('battle-cat-art'),cat.breed,pose);
       status(cat.name+' performs '+pose+'. Art preview only — no battle move or reward used.');
-      await wait(pose==='ultimate'?1100:pose==='signature'?950:750);
+      await playArtFrames(cat,pose,characterArt.timingFor(cat.breed,pose));
     }catch{
       status('This art preview could not be displayed.');
     }finally{
