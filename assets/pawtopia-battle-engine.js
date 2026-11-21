@@ -199,7 +199,7 @@
       const isHeavy=match.round%3===0;
       if(foe.rank>=4&&match.round%5===0){
         match.foeGuard=2+Math.floor(foe.rank/4);
-        makeEvent('foe','Iron Guard','foe',0,match.foeHp,'guard','Armor powered up');
+        makeEvent('foe',foe.isBoss?'Iron Guard':'Brace','foe',0,match.foeHp,'guard',foe.isBoss?'Armor powered up':'Braced for the next hit');
         return;
       }
       let damage=foe.attack+(isHeavy?2+Math.floor(foe.rank/4):0)-Math.floor(s.defence/2);
@@ -218,7 +218,7 @@
       if(match.round<=2)damage=Math.max(0,damage-safe(gear.armoryOpening));
       if(match.hp*2<petMaxHp)damage=Math.max(0,damage-safe(gear.armoryRepeat));
       match.hp=Math.max(0,match.hp-damage);
-      makeEvent('foe',isHeavy?'Gear Fang Charge':'Metal Paw Strike','pet',damage,match.hp,
+      makeEvent('foe',isHeavy?(foe.isBoss?'Gear Fang Charge':'Rushing Charge'):(foe.isBoss?'Metal Paw Strike':'Paw Strike'),'pet',damage,match.hp,
         isHeavy?'impact':'swipe',damage===0?'Dodged or blocked!':'');
       if(damage>0 && !match.armoryRecovered){
         match.armoryRecovered=true;

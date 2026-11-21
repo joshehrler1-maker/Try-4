@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#132e53">
-<meta name="description" content="Battle with your adopted cat in Pawtopia's free animated Battle Arena. Watch your cat fight clockwork challengers, unlock four moves, level up, and earn better loot against stronger foes.">
+<meta name="description" content="Battle with your adopted cat in Pawtopia's free animated Battle Arena. Watch your cat fight dog challengers and Baron Brasswhirl, unlock four moves, level up, and earn better loot against stronger foes.">
 <link rel="canonical" href="https://joshehrler1-maker.github.io/Try-4/pawtopia-battle-arena.html">
 <meta property="og:title" content="Pawtopia Battle Arena | Super Paw Heroes">
 <meta property="og:description" content="Watch your adopted cat battle 12 original clockwork foes, unlock special moves and earn free rewards.">
@@ -13,17 +13,17 @@
 <link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
 <script defer src="assets/pawtopia-save.js?v=catalog-2569"></script>
 <script defer src="assets/pawtopia-upgrade-points.js"></script>
-<script defer src="assets/pawtopia-battle-data.js"></script>
+<script defer src="assets/pawtopia-battle-data.js?v=dogs-1"></script>
 <script defer src="assets/pawtopia-item-tiers.js?v=shop-prices-3"></script>
 <script defer src="assets/pawtopia-items.js?v=catalog-2569"></script>
-<script defer src="assets/pawtopia-battle-engine.js?v=catalog-2569"></script>
+<script defer src="assets/pawtopia-battle-engine.js?v=dogs-1"></script>
 <script defer src="assets/pawtopia-battle-puppet.js?v=1"></script>
 <script defer src="assets/pawtopia-battle-character-art.js?v=motion-1"></script>
-<script defer src="assets/pawtopia-battle-foe-art.js?v=painted-1"></script>
+<script defer src="assets/pawtopia-battle-foe-art.js?v=dogs-1"></script>
 <script defer src="assets/pawtopia-battle-watch.js"></script>
-<script defer src="assets/pawtopia-battle-cinematics.js"></script>
+<script defer src="assets/pawtopia-battle-cinematics.js?v=dogs-1"></script>
 <script defer src="assets/pawtopia-battle-3d.js?v=painted-1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=motion-2"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=dogs-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=motion-1">
 </head>
 <body>
@@ -39,8 +39,8 @@
 <div class="welcome-copy">
 <p class="eyebrow">Pawtopia · Original, free pet battles</p>
 <h1>Battle Arena</h1>
-<p>Every adopted cat can become a champion! Choose your companion, challenge a clockwork foe, and <strong>watch the fight</strong> as pets move, strike, cast their unique skills, and celebrate victories.</p>
-<p>56 cat breeds and 12 clockwork challengers with their own illustrated stances and attacks.</p>
+<p>Every adopted cat can become a champion! Choose your companion, face a dog challenger, and <strong>watch the fight</strong> as pets move, strike, cast their unique skills, and celebrate victories.</p>
+<p>Battle through 11 dog breeds from smallest to largest, then face Baron Brasswhirl in his Clockwork Avatar.</p>
 <a class="primary" href="pawtopia-companions.html">Adopt or train a cat</a>
 <a class="secondary" href="pawtopia-battle-art-gallery.html">Preview all 56 fighter designs</a>
 </div>
@@ -98,11 +98,11 @@
 </div>
 <div class="battle-center" aria-hidden="true"><span>VS</span></div>
 <div class="battler battler-foe" id="battle-foe-fighter">
-<div class="battler-ui"><span id="stage-foe-name">Clockwork Challenger</span><strong id="stage-foe-level">Lv 1</strong></div>
+<div class="battler-ui"><span id="stage-foe-name">Dog Challenger</span><strong id="stage-foe-level">Lv 1</strong></div>
 <div class="hp-row"><progress id="stage-foe-hp" max="20" value="20"></progress><span id="stage-foe-hp-text">20/20 HP</span></div>
 <div class="fighter-sprite" id="battle-foe-sprite">
   <span class="fighter-shadow" aria-hidden="true"></span>
-  <svg class="foe-illustration" viewBox="0 0 190 190" role="img" aria-label="Original mechanical hound challenger art">
+  <svg class="foe-illustration" viewBox="0 0 190 190" role="img" aria-label="Challenger illustration">
     <circle class="gear-halo" cx="95" cy="100" r="74" fill="none" stroke-width="8" stroke-dasharray="12 9"/>
     <path class="foe-ear" d="M40 75 L29 18 L75 52 L113 52 L156 18 L150 80" stroke-width="7" stroke-linejoin="round"/>
     <path class="foe-head" d="M39 75 Q33 47 93 48 Q158 43 155 80 L159 128 Q154 162 95 168 Q33 162 31 126 Z" stroke-width="8"/>
@@ -111,7 +111,7 @@
     <path class="foe-nose" d="M86 131 L108 131 L98 144 Z"/>
     <path class="foe-plate" d="M51 72 L72 65 M118 65 L139 72 M47 126 L56 139 M144 126 L136 139" stroke-width="5"/>
   </svg>
-  <div class="foe-avatar" id="battle-foe-art" role="img" aria-label="Animated mechanical hound challenger"></div>
+  <div class="foe-avatar" id="battle-foe-art" role="img" aria-label="Animated arena challenger"></div>
   <span class="foe-emblem" id="battle-foe-emblem">⚙</span>
 </div>
 </div>

@@ -52,7 +52,7 @@
     const amount=Number.isFinite(event?.damage)?event.damage:0;
     const contact=!guard&&amount>0;
     const defense=guard||!contact;
-    const charge=event?.who==='foe'&&event?.name==='Gear Fang Charge';
+    const charge=event?.who==='foe'&&(event?.name==='Gear Fang Charge'||event?.name==='Rushing Charge');
     return Object.freeze({
       contact,defense,charge,
       foeMove:charge?'charge':'swipe',

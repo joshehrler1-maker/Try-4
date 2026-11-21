@@ -39,7 +39,8 @@ test('all 12 ladder enemies map to twelve distinct and correctly named original 
     assert.ok(body.includes('class="foe-head"'));
     assert.ok(body.includes('class="foe-arm foe-left-arm"'));
     assert.ok(body.includes('class="foe-arm foe-right-arm"'));
-    assert.ok(body.includes('class="foe-gear-frame"'));
+    if (foe.isBoss) assert.ok(body.includes('class="foe-gear-frame"'));
+    else assert.ok(body.includes('data-dog-breed="'+foe.breed+'"'));
     bodies.add(body);
   }
   assert.equal(bodies.size,12,'All opponents must be visually different');
@@ -90,9 +91,18 @@ test('foe attack, guarding, boss and victory shapes are meaningful, not only lab
     assert.notEqual(swipe,guard);
     assert.notEqual(guard,hit);
   }
-  assert.ok(art.drawing(art.profile('foe-5'),'idle').includes('class="foe-cold"'));
-  assert.ok(art.drawing(art.profile('foe-9'),'idle').includes('class="foe-cold"'));
-  assert.ok(art.drawing(art.profile('foe-10'),'idle').includes('class="foe-spark"'));
+  const {data}=setup();
+  const dogs=data.foes.slice(0,-1),boss=data.foes.at(-1);
+  assert.equal(new Set(dogs.map(dog=>dog.breed)).size,11);
+  assert.equal(dogs[0].breed,'Chihuahua');
+  assert.equal(dogs.at(-1).breed,'English Mastiff');
+  assert.equal(boss.name,'Baron Brasswhirl');
+  assert.equal(boss.isBoss,true);
+  for(let i=1;i<data.foes.length;i++){
+    const previous=data.foes[i-1],next=data.foes[i];
+    assert.ok(next.hp>previous.hp && next.attack>previous.attack && next.defence>=previous.defence);
+    assert.ok(art.profile(next).size>art.profile(previous).size);
+  }
   assert.ok(art.drawing(art.profile('foe-12'),'idle').includes('class="foe-boss"'));
 });
 

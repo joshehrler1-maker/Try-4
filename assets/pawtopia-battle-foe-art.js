@@ -1,19 +1,32 @@
-/* Original animated hound/cyborg challenger artwork for all 12 ranks.
-   No borrowed art, image calls, backend, or changes to the battle rules. */
+/* Original animated dog breeds and Baron Brasswhirl's Clockwork Avatar. */
 (() => {
   'use strict';
   const foes=window.PawtopiaBattleData?.foes || [];
   const states=Object.freeze(['idle','approach','swipe','charge','guard','impact','victory','defeat']);
   const frameIds=Object.freeze([0,1,2,3,4,5]);
+  const dogShapes=Object.freeze([
+    [55,31,35,31,16,10,"upright","curved","cream","#bd7b47","#ffdeb0","#74422f"], // Chihuahua
+    [65,34,32,29,14,11,"upright","short","silky","#485366","#dca472","#45332d"], // Yorkshire Terrier
+    [66,32,31,30,17,12,"butterfly","plume","blaze","#e8dbc5","#fff3dc","#a95333"], // Papillon
+    [75,40,39,22,15,20,"drop","straight","solid","#985338","#c47a51","#58302d"], // Miniature Dachshund
+    [69,37,36,39,21,6,"upright","nub","tuxedo","#343e4c","#fff0da","#202a35"], // Boston Terrier
+    [68,41,32,35,19,16,"drop","upright","saddle","#b87246","#f8e9d2","#353039"], // Beagle
+    [71,43,34,35,20,16,"long","feather","silky","#a16031","#eac08e","#6e3f2b"], // English Cocker Spaniel
+    [73,43,33,45,18,18,"half","feather","tuxedo","#303c54","#fff2db","#253047"], // Border Collie
+    [76,47,35,44,20,20,"drop","straight","solid","#c48d53","#f6d1a2","#765137"], // Labrador Retriever
+    [77,52,39,40,24,18,"fold","short","points","#33313b","#cc874a","#201f28"], // Rottweiler
+    [79,54,43,44,27,17,"fold","straight","mask","#be946d","#efd4ad","#443036"], // English Mastiff
+  ]);
   const models=Object.freeze(foes.map((foe,index)=>{
     const tiers=['trainer','scout','terrrier','garden','frost','bolt','recruit','striker','cryo','brass','commander','avatar'];
     return Object.freeze({
-      id:foe.id,name:foe.name,rank:foe.rank,kind:tiers[index],
+      id:foe.id,name:foe.name,rank:foe.rank,kind:foe.breed||tiers[index],
+      breed:foe.breed,shape:dogShapes[index],
       color:foe.color,eye:index>=7?'#ffd1b4':index>=4?'#a2edff':'#ffebad',
       body:index%3===0?'#465f72':index%3===1?'#625b75':'#49576c',
       metal:index%3===0?'#9facc0':index%3===1?'#c6b6a2':'#a4b7b7',
       ear:index%4,tail:index%3,plate:index>=6,
-      size:1+(index%4)*.065,
+      size:foe.visualSize||1.19,
       armor:1+Math.floor(index/3),
       crest:index>=9?'crown':index>=6?'shield':index>=3?'bolt':'paw',
       gearTeeth:7+index,tag:'hound-'+(index+1)
@@ -49,9 +62,97 @@
     return {defs,shade(markup){return markup.replace(/fill="(#[0-9a-f]{6})"/gi,
       (match,color)=>colors.has(color)?'fill="url(#'+colors.get(color).id+')"':match);}};
   }
+
+  function dogDrawing(model,pose,f){
+    const [back,depth,headRadius,legLength,paw,muzzle,ears,tail,coat,fur,light,dark]=model.shape;
+    const phase=[0,-.17,.31,1,.64,.13][f], n=model.rank, col=model.color;
+    const positive=Math.max(0,phase);
+    const stride=pose==='approach'||pose==='charge';
+    const walk=stride?Math.sin(f*Math.PI*.8)*(pose==='charge'?19:12):0;
+    const reach=pose==='swipe'?21*phase:pose==='charge'?12*phase:0;
+    const lean=pose==='impact'?13*phase:pose==='guard'?6*phase:-reach*.55;
+    const sink=(pose==='defeat'?35:pose==='guard'?12:pose==='victory'?-12:0)*positive;
+    const bob=sinBob(f,n)+Math.abs(walk)*-.17;
+    const shoulder=98,hip=shoulder+back;
+    const shoulderY=218-legLength-depth+sink+bob;
+    const hipY=shoulderY+2;
+    const headX=shoulder-headRadius*.9+lean;
+    const headY=shoulderY-headRadius*.39+sink*.28;
+    const left=headX-headRadius*.70-muzzle;
+    const baseY=Math.min(218,218+sink);
+    const earTop=headY-headRadius*(ears==='butterfly'?1.80:1.41);
+    const collar=col;
+    const tailX=hip-8,tailY=hipY+11,wag=Math.sin((f+n)*.85)*7;
+    const shortTail=tail==='nub'||tail==='short';
+    const tipX=Math.min(216,tailX+(shortTail?19:tail==='upright'?24:45));
+    const tipY=tailY+(shortTail?-9:tail==='upright'?-54:tail==='straight'?-14:-38)+wag;
+    const tailPath='M'+tailX+' '+tailY+' Q'+(tipX+7)+' '+(tailY+5)+' '+tipX+' '+tipY;
+    const earsArt=()=>{
+      const x=headX,y=headY;
+      if(ears==='drop'||ears==='long'||ears==='fold'){
+        const end=y+headRadius*(ears==='long'?1.47:ears==='drop'?.94:.31);
+        return '<path d="M'+(x+1)+' '+(y-headRadius*.72)+' Q'+(x+headRadius*.92)+' '+(y-headRadius*.92)+' '+(x+headRadius*.69)+' '+(y-headRadius*.10)+
+          ' L'+(x+headRadius*.51)+' '+end+' Q'+(x-7)+' '+(end+8)+' '+(x-4)+' '+(end-4)+' Z" fill="'+dark+'" stroke="'+fur+'" stroke-width="2"/>';
+      }
+      const wide=ears==='butterfly'?1.01:.73;
+      return '<path d="M'+(x-headRadius*.72)+' '+(y-headRadius*.35)+' Q'+(x-headRadius*1.05)+' '+(earTop+5)+' '+(x-headRadius*.61)+' '+(earTop+(ears==='half'?14:0))+
+        ' L'+(x-headRadius*.11)+' '+(y-headRadius*.68)+' M'+(x-.1*headRadius)+' '+(y-headRadius*.58)+' Q'+(x+headRadius*.39)+' '+(earTop-9)+' '+(x+headRadius*wide)+' '+earTop+
+        ' Q'+(x+headRadius*(ears==='half'?.50:.91))+' '+(y-headRadius*.76)+' '+(x+headRadius*.46)+' '+(y-headRadius*.32)+' Z" fill="'+fur+'" stroke="'+dark+'" stroke-width="3"/>'+
+        '<path d="M'+(x+headRadius*.13)+' '+(y-headRadius*.64)+' Q'+(x+headRadius*.34)+' '+(earTop+7)+' '+(x+headRadius*(wide-.14))+' '+(earTop+7)+' Q'+(x+headRadius*.62)+' '+(y-headRadius*.58)+' '+(x+headRadius*.42)+' '+(y-headRadius*.53)+' Z" fill="#dba5a1" opacity=".76"/>';
+    };
+    function leg(x,y,offset,lift,far,kind){
+      const endX=x+offset,endY=baseY-lift;
+      return '<g class="foe-arm '+kind+'"><path d="M'+x+' '+y+' Q'+(x+offset*.45+6)+' '+(y+legLength*.58)+' '+endX+' '+(endY-4)+
+        '" stroke="'+(far?dark:fur)+'" stroke-width="'+(paw*(far?.73:.84))+'" fill="none" stroke-linecap="round"/>'+
+        '<ellipse cx="'+(endX-2)+'" cy="'+(endY-4)+'" rx="'+(paw*.56)+'" ry="'+(paw*.32)+'" fill="'+(far?dark:light)+'" stroke="'+dark+'" stroke-width="2"/></g>';
+    }
+    const chest='<path d="M86 '+(shoulderY+4)+' Q105 '+(shoulderY+7)+' 117 '+(shoulderY+20)+' L107 '+(shoulderY+depth-1)+' Q80 '+(shoulderY+depth-8)+' 80 '+(shoulderY+16)+' Z" fill="'+light+'"/>';
+    const saddle=coat==='saddle'?'<path d="M106 '+(shoulderY+4)+' Q135 '+(shoulderY-8)+' '+(hip-1)+' '+(hipY+6)+' L'+(hip-4)+' '+(hipY+depth*.58)+' Q130 '+(shoulderY+depth*.76)+' 106 '+(shoulderY+6)+' Z" fill="'+dark+'"/>':'';
+    const chestCoat=['tuxedo','blaze','saddle','cream','silky'].includes(coat)?chest:'';
+    const blaze=['tuxedo','blaze'].includes(coat)?'<path d="M'+(headX-3)+' '+(headY-headRadius*.81)+' Q'+(headX-10)+' '+(headY-headRadius*.28)+' '+(headX-16)+' '+(headY+3)+'" stroke="'+light+'" fill="none" stroke-width="8" stroke-linecap="round"/>':'';
+    const facialPoints=coat==='points'?'<ellipse cx="'+(headX-9)+'" cy="'+(headY-13)+'" rx="7" ry="3" fill="'+light+'"/>':'';
+    const fringe=coat==='silky'||tail==='feather'?'<path d="M110 '+(shoulderY+20)+' q-5 20 -13 16 l7 6 q7 -1 13 -17 m23 -2 q-2 12 -9 18 l12 -4" fill="none" stroke="'+light+'" stroke-width="4" stroke-linecap="round" opacity=".7"/>':'';
+    const effects=pose==='swipe'?'<path class="foe-slash" d="M50 140 Q26 138 17 160 M48 151 Q25 151 13 172" stroke="'+col+'" fill="none" stroke-width="4" opacity="'+positive+'"/>':
+      pose==='charge'?'<path class="foe-charge-streak" d="M196 115 H218 M185 132 H216 M183 155 H210" stroke="'+col+'" fill="none" stroke-width="4" opacity="'+positive+'"/>':
+      pose==='guard'?'<path class="foe-guard" d="M48 148 L26 158 Q26 185 48 193 Q70 185 70 158 Z" fill="'+col+'" fill-opacity=".17" stroke="'+col+'" stroke-width="3" opacity="'+positive+'"/>':
+      pose==='impact'?'<path class="foe-impact-mark" d="M48 79 l6 9 11 1 -8 7 3 10 -12 -6 -9 6 2 -11 -8 -7 11 -1Z" fill="#ffde9c" opacity="'+positive+'"/>':
+      pose==='victory'?'<path d="M74 50 l4 9 10 3 -10 3 -4 10 -3 -10 -10 -3 10 -3Z" fill="#ffe0a0" opacity="'+positive+'"/>':'';
+    const painted=litPalette('dog-light-'+n+'-',[[fur,false],[light,false],[dark,false]]);
+    const size=model.size,originX=110,originY=218;
+    return painted.shade('<svg xmlns="http://www.w3.org/2000/svg" class="foe-body-illustration" viewBox="0 0 220 240" data-foe-id="'+model.id+
+      '" data-foe-rank="'+n+'" data-dog-breed="'+model.breed+'" data-pose="'+pose+'" data-frame="'+f+'" role="img" aria-hidden="true"><defs>'+
+      painted.defs+'</defs><desc>'+model.breed+', '+pose+' pose.</desc>'+
+      '<ellipse cx="110" cy="222" rx="'+(62*size)+'" ry="'+(8*size)+'" fill="#07152b" opacity=".35"/>'+
+      '<g class="foe-motion-body" transform="translate('+originX+' '+originY+') scale('+size+') translate(-'+originX+' -'+originY+')">'+
+      '<path d="'+tailPath+'" stroke="'+(coat==='saddle'?dark:fur)+'" stroke-width="'+(tail==='plume'||tail==='feather'?paw*.89:paw*.54)+'" fill="none" stroke-linecap="round"/>'+
+      (coat==='saddle'?'<circle cx="'+tipX+'" cy="'+tipY+'" r="5" fill="'+light+'"/>':'')+
+      leg(shoulder+11,shoulderY+depth*.64,-walk,Math.max(0,-walk)*.5,true,'foe-far-front')+
+      leg(hip-1,hipY+depth*.62,walk,Math.max(0,walk)*.49,true,'foe-far-hind')+
+      '<path d="M83 '+(shoulderY+7)+' Q110 '+(shoulderY-9)+' '+(hip-3)+' '+hipY+' Q'+(hip+20)+' '+(hipY+2)+' '+(hip+9)+' '+(hipY+depth*.76)+
+      ' Q'+(hip-11)+' '+(hipY+depth*.85)+' 131 '+(shoulderY+depth*.82)+' Q112 '+(shoulderY+depth+8)+' 84 '+(shoulderY+depth-2)+' Q74 '+(shoulderY+depth*.54)+' 83 '+(shoulderY+7)+' Z" fill="'+fur+'" stroke="'+dark+'" stroke-width="3"/>'+
+      chestCoat+saddle+fringe+
+      leg(hip-9,hipY+depth*.67,-walk*.68,Math.max(0,-walk)*.6,false,'foe-right-arm')+
+      leg(shoulder-4,shoulderY+depth*.68,walk*.77-reach,Math.max(0,walk)*.63+Math.max(0,reach)*.78,false,'foe-left-arm')+
+      '<path d="M85 '+(shoulderY+2)+' Q92 '+(shoulderY+19)+' 106 '+(shoulderY+27)+'" fill="none" stroke="'+collar+'" stroke-width="7" stroke-linecap="round"/>'+
+      '<circle cx="101" cy="'+(shoulderY+24)+'" r="4" fill="#ffe4a1"/>'+
+      '<g class="foe-head">'+
+      '<ellipse cx="'+headX+'" cy="'+headY+'" rx="'+(headRadius*.87)+'" ry="'+(headRadius*.76)+'" fill="'+fur+'" stroke="'+dark+'" stroke-width="3"/>'+
+      earsArt()+blaze+
+      '<path d="M'+(headX-12)+' '+(headY-1)+' Q'+(left+6)+' '+(headY-7)+' '+left+' '+(headY+1)+
+      ' L'+left+' '+(headY+11)+' Q'+(left+14)+' '+(headY+headRadius*.71)+' '+(headX+6)+' '+(headY+headRadius*.41)+
+      ' Q'+(headX+16)+' '+(headY+7)+' '+(headX-12)+' '+(headY-1)+' Z" fill="'+(['mask','tuxedo'].includes(coat)?dark:light)+'" stroke="'+dark+'" stroke-width="2"/>'+
+      facialPoints+'<ellipse cx="'+(headX-11)+'" cy="'+(headY-9)+'" rx="5.7" ry="5" fill="#9b6340"/>'+
+      '<circle cx="'+(headX-12)+'" cy="'+(headY-9)+'" r="3.1" fill="#221e30"/><circle cx="'+(headX-13)+'" cy="'+(headY-11)+'" r="1.4" fill="#fff3df"/>'+
+      '<ellipse cx="'+(left+1)+'" cy="'+(headY+2)+'" rx="6.5" ry="4.6" fill="#211d2c"/>'+
+      '<path d="M'+(left+4)+' '+(headY+13)+' Q'+(left+14)+' '+(headY+17)+' '+(headX-9)+' '+(headY+13)+'" stroke="#302333" stroke-width="2" fill="none"/></g>'+
+      effects+'</g></svg>');
+  }
+  function sinBob(frame,rank){return Math.sin((frame+rank*.23)*Math.PI/3)*1.7;}
+
   function drawing(model,state='idle',frame=3) {
     const pose=states.includes(state)?state:'idle';
     const f=clampFrame(frame),phase=[0,-.15,.35,1,.66,.1][f];
+    if(model.shape)return dogDrawing(model,pose,f);
     const n=model.rank,col=model.color;
     const forward=pose==='approach'?16+Math.floor(n/2):
       pose==='swipe'?23+Math.floor(n/2):pose==='charge'?34+n:pose==='guard'?-6:0;
@@ -176,7 +277,7 @@
     container.dataset.foe=model.id;
     container.dataset.pose=pose;
     container.dataset.frame=String(clampFrame(frame));
-    container.setAttribute('aria-label',model.name+' animated mechanical canine fighter');
+    container.setAttribute('aria-label',model.name+(model.breed?' animated dog challenger':' in his animated Clockwork Avatar'));
     return true;
   }
   window.PawtopiaBattleFoeArt=Object.freeze({models,states,frameIds,profile,drawing,paint});

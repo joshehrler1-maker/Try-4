@@ -139,7 +139,7 @@ test('cinematic changes cannot affect battle saves, payments or free-only behavi
   const sw=read('sw.js'),css=read('assets/pawtopia-battle-arena.css');
   assert.ok(html.includes('id="battle-cue"'));
   assert.ok(html.includes('id="battle-cue-title"'));
-  assert.ok(html.includes('src="assets/pawtopia-battle-cinematics.js"'));
+  assert.ok(/src="assets\/pawtopia-battle-cinematics\.js(?:\?[^"]*)?"/.test(html));
   assert.ok(html.indexOf('pawtopia-battle-cinematics.js')<html.indexOf('pawtopia-battle-arena.js'));
   for(const name of ['battle-projectile','battle-impact-ring','arena-camera-shiver','arena-skill-shot'])
     assert.ok(css.includes(name),name);
