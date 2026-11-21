@@ -9,6 +9,9 @@
 <link rel="stylesheet" href="assets/pawtopia-progress-center.css">
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/pawtopia-progress-center.js"></script>
+
+<script defer src="assets/pawtopia-adventure-book.js"></script>
+<link rel="stylesheet" href="assets/pawtopia-adventure-book.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to quests</a>
@@ -44,8 +47,20 @@
 <div class="section-heading"><div><p class="eyebrow">A longer adventure</p><h2 id="weekly-heading">Weekly quests</h2></div><p id="weekly-summary"></p></div>
 <div id="weekly-quest-list" class="quest-list"></div>
 </section>
+<section class="quests" id="adventure-book" aria-labelledby="book-title">
+<h2 id="book-title">Adventure Book</h2>
+<p>Record your cat’s milestones and unlock collectible coat variants.</p>
+<div id="achievement-list" class="quest-list"></div>
+</section>
+<section class="quests" id="festivals" aria-labelledby="festival-title">
+<h2 id="festival-title">Pawtopia Festivals</h2>
+<p id="festival-dates"></p>
+<p id="festival-points"></p>
+<div id="festival-chapters" class="quest-list"></div>
+</section>
 <section class="backup" aria-labelledby="backup-title">
 <h2 id="backup-title">Back up your Pawtopia progress</h2>
+<p data-pawtopia-online hidden><a href="pawtopia-online.html">Set up automatic sync or resolve a sync conflict</a></p>
 <p>Your cats, coins, quests, games and battle records currently save on <strong>this browser and device only</strong>. They are not linked to an online account. Export a backup periodically so clearing browser data doesn't erase your only copy.</p>
 <div class="backup-grid">
 <div class="backup-card">

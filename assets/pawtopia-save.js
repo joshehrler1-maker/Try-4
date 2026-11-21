@@ -71,6 +71,15 @@
       journal.weekly[id]=Math.min(100000,journal.weekly[id]+changes[id]);
     }
     after.questJournal=journal;
+    after.adventureTotals={...before.adventureTotals};
+    const season=day.slice(0,4)+'-'+Math.ceil(Number(day.slice(5,7))/3);
+    after.festival={season,points:before.festival?.season===season?count(before.festival.points):0};
+    for(const [id,amount] of Object.entries(changes)){
+      after.adventureTotals[id]=Math.min(100000,count(after.adventureTotals[id])+amount);
+      if(amount && journal.daily[id]-amount<2){
+        after.festival.points=Math.min(1000,after.festival.points+Math.min(amount,2-(journal.daily[id]-amount)));
+      }
+    }
   }
   async function update(change,options={}) {
     function write() {
@@ -78,7 +87,11 @@
       const message=change(progress);
       if(message){
         if(options.track!==false)trackJournal(before,progress);
-        localStorage.setItem(key,JSON.stringify(progress));
+        const serialized = JSON.stringify(progress);
+        localStorage.setItem(key,serialized);
+        if (serialized !== JSON.stringify(before) && typeof window.Event === 'function' && typeof window.dispatchEvent === 'function') {
+          window.dispatchEvent(new window.Event('pawtopia-save-changed'));
+        }
       }
       return message;
     }
@@ -149,6 +162,18 @@
       current.coins===incoming.coins;
     return {ok,message:ok?message:'Restore could not be verified in this browser.'};
   }
+  async function applyCloudBackup(backup, expected, stillConnected) {
+    const incoming = validateBackup(backup);
+    let applied = false;
+    await update(progress => {
+      if (!stillConnected() || JSON.stringify(progress) !== expected) return;
+      for (const name of Object.keys(progress)) delete progress[name];
+      Object.assign(progress, incoming);
+      applied = true;
+      return 'Online progress restored.';
+    }, {track:false});
+    return applied && JSON.stringify(read()) === JSON.stringify(incoming);
+  }
   const baseStats = { level: 1, strength: 2, defence: 2, movement: 2, endurance: 2, intelligence: 2 };
   function battleStats(cat) {
     return { ...baseStats, ...cat?.stats };
@@ -156,5 +181,25 @@
   function maxHealth(stats) {
     return 8 + stats.endurance * 2;
   }
-  window.PawtopiaSave = { read, update, battleStats, maxHealth, today: () => new Date().toDateString(), questDefs, questJournal, claimQuest, exportBackup, restoreBackup };
+  window.PawtopiaSave = { read, update, battleStats, maxHealth, today: () => new Date().toDateString(), questDefs, questJournal, claimQuest, exportBackup, restoreBackup, applyCloudBackup };
+  // The public site stays usable if online features are disabled or the service is down.
+  const source = typeof document !== 'undefined' && document.currentScript;
+  if (source && !document.querySelector('script[src$="pawtopia-cloud-save.js"]')) {
+    const config = document.createElement('script');
+    config.src = new URL('pawtopia-online-config.js', source.src).href;
+    config.onload = () => {
+      if (!window.PawtopiaOnlineConfig?.endpoint) return;
+      for (const link of document.querySelectorAll('[data-pawtopia-online]')) link.hidden = false;
+      try {
+        if (!localStorage.getItem('pawtopia-online-key')) return;
+      } catch { return; }
+      const sync = document.createElement('script');
+      sync.src = new URL('pawtopia-cloud-save.js', source.src).href;
+      document.head.append(sync);
+    };
+    // Wait for navigation links below the script to exist, including on arcade pages.
+    const mount = () => document.head.append(config);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount, {once:true});
+    else mount();
+  }
 })();

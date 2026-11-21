@@ -116,6 +116,7 @@
       portrait.className = 'pet-album-portrait';
       portrait.setAttribute('role', 'img');
       paintPortrait(portrait, cat.breed || 'Maine Coon');
+      portrait.dataset.coat = cat.coatVariant || '';
       const keepsake = scout.accessoryFor(cat);
       portrait.setAttribute('data-scout-icon', keepsake ? keepsake.icon : '');
       portrait.setAttribute('aria-label', (cat.breed || 'Cat') + ' portrait');
@@ -187,6 +188,7 @@
       image.hidden = !companion.breed;
       if (companion.breed) {
         paintPortrait(image, companion.breed);
+        image.dataset.coat = companion.coatVariant || '';
         image.setAttribute('aria-label', companion.breed + ' companion portrait');
         const accessory = scout.accessoryFor(companion);
         image.setAttribute('data-scout-icon', accessory ? accessory.icon : '');

@@ -1,0 +1,9 @@
+
+{
+  "name": "pawtopia-online",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-21",
+  "workers_dev": true,
+  "vars": {"PAWTOPIA_ORIGIN": "https://joshehrler1-maker.github.io"},
+  "d1_databases": [{"binding": "DB", "database_name": "pawtopia-online"}]
+}

@@ -14,6 +14,9 @@
 <link rel="stylesheet" href="assets/pawtopia-scenes.css">
 <link rel="stylesheet" href="assets/pawtopia-explore.css">
 <link rel="stylesheet" href="assets/pawtopia-world-shell.css">
+
+<script defer src="assets/pawtopia-adventure-book.js"></script>
+<link rel="stylesheet" href="assets/pawtopia-adventure-book.css">
 </head>
 <body class="pawtopia-scene cottage-art">
 <header class="top">
@@ -114,6 +117,13 @@
     <p class="hint">These free accessories are displayed as little keepsake badges on your cat's portrait, preserving its original artwork.</p>
   </section>
   <section class="panel" id="cottage-customization">
+    <div id="coat-panel">
+      <label for="cat-coat">Active cat’s coat</label>
+      <select id="cat-coat"><option value="">Original coat</option></select>
+      <button type="button" id="cat-coat-equip">Equip coat</button>
+      <p id="coat-status" role="status"></p>
+      <a href="pawtopia-progress.html#adventure-book">Find coats in the Adventure Book</a>
+    </div>
     <h2>Wardrobe and furnishings</h2>
     <p id="cottage-outfit"></p>
     <p id="cottage-furnishing"></p>
