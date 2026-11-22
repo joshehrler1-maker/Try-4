@@ -66,7 +66,19 @@
 <div class="home-welcome-copy">
 <h1 id="home-title">Super Paw<br>Heroes</h1>
 <p>Explore Pawtopia with Whisker and Luna, adopt a cat companion, and play your way through the Games Room.</p>
-<div class="home-actions"><a class="btn" href="#pawtopia">Explore Pawtopia</a><a class="btn alt" href="pawtopia-arcade.html">Play Games</a><a class="btn alt" href="guest-arcade.html">Guest Arcade · 600+ Titles</a></div>
+<div class="home-actions"><a class="btn" id="home-cat-entry" href="pawtopia-companions.html#starter-guide">Adopt Your First Cat</a><a class="btn alt" href="#pawtopia">Explore Pawtopia</a><a class="btn alt" href="pawtopia-arcade.html">Play Games</a></div>
+<script>
+(() => {
+  const link = document.getElementById('home-cat-entry');
+  function updateCatLink() {
+    const hasCat = Boolean(window.PawtopiaSave?.read().companion);
+    link.textContent = hasCat ? 'Visit Your Cat' : 'Adopt Your First Cat';
+    link.href = hasCat ? 'pawtopia-companions.html#companion-care' : 'pawtopia-companions.html#starter-guide';
+  }
+  updateCatLink();
+  window.addEventListener('pageshow', updateCatLink);
+})();
+</script>
 <p style="font-size:14px;margin:15px 0 0"><a href="coloring-book.html" style="color:#ffe36c;text-decoration:underline;font-weight:750">For parents &amp; caregivers: try 3 free printable coloring pages</a></p>
 </div>
 <img src="assets/whisker-luna-master.webp" alt="Whisker and Luna, the Super Paw Heroes" width="1229" height="1536" fetchpriority="high">
