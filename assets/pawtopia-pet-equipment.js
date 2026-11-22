@@ -24,7 +24,7 @@
   const query=new URLSearchParams(window.location.search);
   const pageSize=12;
   let selected=Number(query.get('pet'))||0,page=0,compared=null,busy=false;
-  selected=Number.isInteger(selected)?Math.max(0,Math.min(3,selected)):0;
+  selected=Number.isInteger(selected)?Math.max(0,Math.min(5,selected)):0;
   const format=new Intl.NumberFormat(undefined,{maximumFractionDigits:2});
   const number=value=>format.format(value);
   function add(parent,tag,value='',className=''){

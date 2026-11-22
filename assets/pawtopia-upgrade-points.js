@@ -29,6 +29,29 @@
     };
   }
   function state(){return ledger(save.read())}
+  function recordAward(progress,kind,game,milestone,amount) {
+    const item=ledger(progress);
+    const k=item.day+'|'+kind+'|'+game+'|'+milestone;
+    const isGuest=kind==='guest-launch'||kind==='guest3d-launch';
+    if(item.keys.includes(k)||item.daily+amount>maxDaily||item.balance+amount>maxBalance||
+       (isGuest&&item.guest+amount>guestDaily))return null;
+    item.balance+=amount;
+    item.earned=Math.min(Number.MAX_SAFE_INTEGER,item.earned+amount);
+    item.daily+=amount;
+    if(isGuest)item.guest+=amount;
+    item.keys.push(k);
+    progress.petUpgrades=item;
+    return {key:k,amount};
+  }
+  function awardBattleVictory(progress,foeId) {
+    const match=progress.battleMatch, roster=window.PawtopiaBattleData;
+    if(match?.foeId!==foeId||!match.finished||match.result!=='win')return null;
+    const challenger=roster?.foes?.find(foe=>foe.id===foeId);
+    if(!challenger)return null;
+    // Keep the same rank-based key across all breeds in a tier.
+    return recordAward(progress,'battle-win','foe-'+challenger.rank,'victory',
+      roster.battlePoints?.(challenger.rank)??kinds['battle-win']);
+  }
   async function claim(kind,game,milestone='complete'){
     if(!Object.hasOwn(kinds,kind)||!keyPart(game)||!keyPart(milestone))
       return {granted:0,balance:state().balance,message:'Invalid game milestone.'};
@@ -54,34 +77,16 @@
       return {granted:0,balance:state().balance,message:'Invalid challenger victory.'};
     if((kind==='guest-launch'||kind==='guest3d-launch')&&milestone!=='launch')
       return {granted:0,balance:state().balance,message:'Guest launches cannot claim win rewards.'};
-    // All breeds in one tier share the same daily award. Keep existing
-    // rank-based claim keys so an update cannot grant today's award twice.
-    const awardKey=challenger?'foe-'+challenger.rank:game;
-    const k=today()+'|'+kind+'|'+awardKey+'|'+milestone;
-    const amount=challenger?(roster.battlePoints?.(challenger.rank)??kinds[kind]):kinds[kind];
-    const guestKind=kind==='guest-launch'||kind==='guest3d-launch';
-    let changed=false;
+    let award;
     await save.update(progress=>{
-      if(challenger){
-        const match=progress.battleMatch;
-        if(match?.foeId!==game||!match.finished||match.result!=='win')return '';
-      }
-      const item=ledger(progress);
-      if(item.keys.includes(k)||item.daily+amount>maxDaily||item.balance+amount>maxBalance||
-         (guestKind&&item.guest+amount>guestDaily))return '';
-      item.balance+=amount;
-      item.earned=Math.min(Number.MAX_SAFE_INTEGER,item.earned+amount);
-      item.daily+=amount;
-      if(guestKind)item.guest+=amount;
-      item.keys.push(k);
-      progress.petUpgrades=item;
-      changed=true;
-      return '+'+amount+' pet upgrade '+(amount===1?'point':'points');
+      award=challenger
+        ?awardBattleVictory(progress,game)
+        :recordAward(progress,kind,game,milestone,kinds[kind]);
+      return award?'+'+award.amount+' pet upgrade points':'';
     });
-    // Confirm the same-origin save actually contains the award; never claim
-    // successful persistence based on a thrown/failed localStorage write.
+    // Confirm the browser persisted the award.
     const current=state();
-    const granted=changed&&current.keys.includes(k)?amount:0;
+    const granted=award&&current.keys.includes(award.key)?award.amount:0;
     if(granted&&typeof window.dispatchEvent==='function'&&typeof window.CustomEvent==='function')
       window.dispatchEvent(new CustomEvent('pawtopia-upgrade-points',{detail:{kind,game,granted,balance:current.balance}}));
     return {granted,balance:current.balance,
@@ -117,5 +122,5 @@
         message:'No points available, no active pet, or this stat has reached its current cap.',
       balance:state().balance};
   }
-  window.PawtopiaUpgradePoints=Object.freeze({claim,train,state,canSpend,kinds,stats,maxDaily,guestDaily});
+  window.PawtopiaUpgradePoints=Object.freeze({claim,awardBattleVictory,train,state,canSpend,kinds,stats,maxDaily,guestDaily});
 })();

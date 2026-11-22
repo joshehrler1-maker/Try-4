@@ -14,7 +14,7 @@
   if(!save||!data||!engine||!el('battle-stage'))return;
   let challengerTier=0;
   const requestedPet=window.location?.search?new URLSearchParams(window.location.search).get('pet'):null;
-  let selectedPet=/^[0-3]$/.test(requestedPet||'')?Number(requestedPet):0,selectedFoe=0,busy=false,soundOn=false;
+  let selectedPet=/^[0-5]$/.test(requestedPet||'')?Number(requestedPet):0,selectedFoe=0,busy=false,soundOn=false;
   let watchMode=false,watchPaused=false,watchLoopRunning=false,waitForResume=null,playbackSpeed=1;
   let frameQuality=window.navigator?.connection?.saveData?'efficient':'smooth';
   const select=el('battle-pet-select');
@@ -117,8 +117,11 @@
     }
     selectedPet=Math.min(Math.max(selectedPet,0),Math.max(0,cats.length-1));
     selectedFoe=Math.min(Math.max(selectedFoe,0),data.foes.length-1);
+    const unlockedTier=engine.unlocked(progress);
+    if(!fighting && data.foes[selectedFoe].rank>unlockedTier)
+      selectedFoe=data.foes.findIndex(enemy=>enemy.rank===unlockedTier);
     const pet=cats[selectedPet],foe=data.foes[selectedFoe];
-    const currentView=view&&view.cat===pet?view:null;
+    const currentView=view&&view.cat===pet&&view.foe.id===foe.id?view:null;
     select.replaceChildren(...cats.map((cat,index)=>{
       const option=document.createElement('option');
       option.value=String(index);
@@ -151,10 +154,18 @@
     el('battle-xp-text').textContent=stats?(stats.level>=200?'Maximum level':stats.xp+' / '+stats.nextXp+' XP'):'0 / 18 XP';
     el('battle-record').textContent=stats?stats.wins+' wins · '+stats.losses+' losses · Highest rank '+stats.bestRank:'No battles yet';
     el('battle-trophies').textContent=stats&&stats.trophies.length?stats.trophies.join(' · '):'No trophies yet. Defeat ranked opponents to earn them.';
-    const unlockedTier=engine.unlocked(progress);
     const tier=challengerTier||foe.rank;
     const filter=el('battle-foe-tier');
-    if(filter)filter.value=String(tier);
+    if(filter) {
+      filter.value=String(tier);
+      filter.disabled=busy||Boolean(fighting)||watchMode;
+    }
+    el('battle-tier-status').textContent=tier>unlockedTier
+      ?'Tier '+tier+' is locked. Win in Tier '+(tier-1)+' to unlock it. Selected match: '+foe.name+' (Tier '+foe.rank+').'
+      :'Selected challenger: '+foe.name+' (Tier '+foe.rank+').';
+    const target=Math.max(2,foe.level);
+    el('battle-preparation').textContent='Suggested preparation for '+foe.name+
+      ': level '+foe.level+' and about '+target+' in each combat stat. Gear can help make up the difference.';
     el('next-challenge').textContent=unlockedTier===data.bossRank?'Baron Brasswhirl unlocked':'Unlocked through tier '+unlockedTier+' of '+data.bossRank;
     const choices=data.foes.flatMap((enemy,index)=>{
       if(enemy.rank!==tier)return [];
@@ -509,8 +520,8 @@
     const index=data.foes.findIndex(enemy=>enemy.rank===tier);
     if(index<0||busy)return;
     challengerTier=tier;
-    const match=engine.matchInfo(save.read())?.match;
-    if(!match||match.finished)selectedFoe=index;
+    const progress=save.read(),match=engine.matchInfo(progress)?.match;
+    if(tier<=engine.unlocked(progress) && (!match||match.finished) && data.foes[selectedFoe].rank!==tier)selectedFoe=index;
     render();
   });
   el('battle-foe-list').addEventListener('click',event=>{
@@ -546,12 +557,15 @@
       const result=await saveAction(progress=>engine.takeTurn(progress,moveId));
       if(!result)return false;
       if(!result.ok){status(result.message);return false;}
-      await showEvents(result.events||[],cat);
-      // Reward this match only after the authoritative save confirms a win.
-      const finished=engine.matchInfo(save.read());
-      if(result.events?.some(evt=>evt.fx==='victory') && finished?.match.finished && finished.match.result==='win')
-        void window.PawtopiaUpgradePoints?.claim('battle-win',finished.foe.id,'victory');
-      status(result.message);
+      try {
+        await showEvents(result.events||[],cat);
+        status(result.message);
+      }catch{
+        hideCue();
+        for(const actor of [petSprite,foeSprite])
+          actor.classList.remove('state-approach','state-swipe','state-cast','state-guard','state-impact','state-victory','state-defeat');
+        status(result.message+' The animation could not be shown.');
+      }
       return true;
     }catch{
       status('This round could not be completed safely.');

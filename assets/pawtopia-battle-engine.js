@@ -270,6 +270,8 @@
     if(match.foeHp<=0){
       match.finished=true;match.result='win';
       rewards=grantVictory(progress,cat,foe);
+      const upgrade=window.PawtopiaUpgradePoints?.awardBattleVictory?.(progress,foe.id);
+      if(upgrade)rewards.push('+'+upgrade.amount+' Pet Upgrade Points');
       events.push({who:'system',name:'Victory!',target:'none',damage:0,remaining:0,fx:'victory',detail:rewards.join(' · ')});
       match.history.push('Victory! '+rewards.join(' · '));match.history=match.history.slice(-24);
     } else if(match.hp<=0){

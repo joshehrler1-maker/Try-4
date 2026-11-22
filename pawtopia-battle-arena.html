@@ -7,18 +7,18 @@
 <meta name="description" content="Battle with your adopted cat in Pawtopia's free animated Battle Arena. Watch your cat fight dog challengers and Baron Brasswhirl, unlock four moves, level up, and earn better loot against stronger foes.">
 <link rel="canonical" href="https://joshehrler1-maker.github.io/Try-4/pawtopia-battle-arena.html">
 <meta property="og:title" content="Pawtopia Battle Arena | Super Paw Heroes">
-<meta property="og:description" content="Watch your adopted cat battle 12 original clockwork foes, unlock special moves and earn free rewards.">
+<meta property="og:description" content="Watch your adopted cat face 207 dog challengers and Baron Brasswhirl, unlock special moves and earn free rewards.">
 <title>Pawtopia Battle Arena | Super Paw Heroes</title>
 <link rel="stylesheet" href="assets/pawtopia-battle-arena.css">
 <link rel="stylesheet" href="assets/pawtopia-item-art.css?v=painted-1">
 <link rel="stylesheet" href="assets/pawtopia-pet-equipment.css?v=1">
 <link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
 <script defer src="assets/pawtopia-save.js?v=catalog-2569"></script>
-<script defer src="assets/pawtopia-upgrade-points.js?v=balance-1"></script>
+<script defer src="assets/pawtopia-upgrade-points.js?v=arena-rewards-1"></script>
 <script defer src="assets/pawtopia-battle-data.js?v=balance-1"></script>
 <script defer src="assets/pawtopia-item-tiers.js?v=shop-prices-3"></script>
 <script defer src="assets/pawtopia-items.js?v=balance-1"></script>
-<script defer src="assets/pawtopia-battle-engine.js?v=balance-1"></script>
+<script defer src="assets/pawtopia-battle-engine.js?v=arena-rewards-1"></script>
 <script defer src="assets/pawtopia-battle-puppet.js?v=dogs-painted"></script>
 <script defer src="assets/pawtopia-battle-character-art.js?v=motion-1"></script>
 <script defer src="assets/pawtopia-battle-foe-art.js?v=dogs-painted"></script>
@@ -27,7 +27,7 @@
 <script defer src="assets/pawtopia-battle-3d.js?v=painted-1"></script>
 <script defer src="assets/pawtopia-battle-sound.js?v=1"></script>
 <script defer src="assets/pawtopia-item-art.js?v=painted-1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=balance-1"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=arena-rewards-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
@@ -76,8 +76,11 @@
 </div>
 <h2 id="foe-list-title">Challenger ladder by size</h2>
 <label for="battle-foe-tier">Challenger tier</label>
-<select id="battle-foe-tier"><option value="1">1 · Tiny</option><option value="2">2 · Tiny</option><option value="3">3 · Toy</option><option value="4">4 · Toy</option><option value="5">5 · Small</option><option value="6">6 · Small</option><option value="7">7 · Medium</option><option value="8">8 · Medium</option><option value="9">9 · Large</option><option value="10">10 · Large</option><option value="11">11 · Giant</option><option value="12">12 · Baron Brasswhirl</option></select>
+<select id="battle-foe-tier" aria-describedby="battle-tier-status"><option value="1">1 · Tiny</option><option value="2">2 · Tiny</option><option value="3">3 · Toy</option><option value="4">4 · Toy</option><option value="5">5 · Small</option><option value="6">6 · Small</option><option value="7">7 · Medium</option><option value="8">8 · Medium</option><option value="9">9 · Large</option><option value="10">10 · Large</option><option value="11">11 · Giant</option><option value="12">12 · Baron Brasswhirl</option></select>
+<p class="mini" id="battle-tier-status" role="status"></p>
 <div id="battle-foe-list" class="foe-list" role="group" aria-labelledby="foe-list-title"></div>
+<p class="mini" id="battle-preparation"></p>
+<p class="mini"><a href="pawtopia-companions.html#training-title">Train combat stats at Companion Cottage</a></p>
 <div class="setup-actions">
 <button id="battle-start" type="button" class="primary">Enter Arena</button>
 <button id="battle-watch" type="button" class="primary">▶ Start &amp; Watch Battle</button>
