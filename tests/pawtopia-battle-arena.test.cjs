@@ -214,3 +214,19 @@ test('actual UI displays moving fighters and has no account or paid APIs',()=>{
   assert.match(read('sitemap.xml'),/pawtopia-battle-arena\.html/);
   assert.doesNotMatch(battleData+engineData+ui,/\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon/);
 });
+
+test('starter wins advance training promptly and revised variants retain saved combat stats',()=>{
+  const {data,engine}=createWorld(), p=fresh();
+  assert.equal(engine.start(p,0,0).ok,true);
+  for(let i=0;i<20&&!p.battleMatch.finished;i++)engine.takeTurn(p,'swipe',()=>.5);
+  assert.equal(p.battleMatch.result,'win');
+  assert.equal(engine.level(p.companion),2);
+  assert.equal(engine.unlocked(p),2);
+  const variantIndex=data.foes.findIndex(foe=>foe.rank===1&&foe.hp>foe.legacyHp);
+  assert.ok(variantIndex>0);
+  assert.equal(engine.start(p,0,variantIndex).ok,true);
+  const variant=data.foes[variantIndex];
+  assert.equal(engine.matchInfo(p).foeMaxHp,variant.hp);
+  delete p.battleMatch.foeCombat;
+  assert.equal(engine.matchInfo(p).foeMaxHp,variant.legacyHp);
+});
