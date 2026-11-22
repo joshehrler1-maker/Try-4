@@ -70,7 +70,7 @@ const cache = {
    ok(url.href.startsWith(scope), `Offline URL outside app scope: ${entry}`);
    const file = decodeURIComponent(url.pathname.slice(new URL(scope).pathname.length)) || 'index.html';
    ok(known(file), `Missing offline file ${file}`);
-   cached.set(url.href, {file});
+   cached.set(url.href, {file: file + url.search});
   }
  },
  match: async request => cached.get(new URL(typeof request === 'string' ? request : request.url, scope).href)
@@ -85,7 +85,7 @@ async function request(url,method='GET') {let response;handlers.fetch({request:{
 ok((await request(scope+'index.html')).live, 'Online navigation must use network');
 offline = true;
 ok((await request(scope+'index.html')).file === 'index.html', 'Offline navigation must use cached page');
-ok((await request(scope+'assets/pawtopia-battle-arena.js?v=arena-rewards-1')).file === 'assets/pawtopia-battle-arena.js', 'Offline Arena must use the current reward and navigation script');
+ok((await request(scope+'assets/pawtopia-battle-arena.js?v=arena-rewards-1')).file === 'assets/pawtopia-battle-arena.js?v=arena-rewards-1', 'Offline Arena must use the current reward and navigation script');
 ok((await request(scope+'pawcade-side-scroll.html?game=24')).file === 'pawcade-side-scroll.html', 'Every Pawcade game must open offline');
 const sideScrollPage = read('pawcade-side-scroll.html');
 for (const [, asset] of sideScrollPage.matchAll(/(?:href|src)="(assets\/[^"]+\?[^"]+)"/g)) {
