@@ -13,7 +13,8 @@ const assets=[
 'assets/pawtopia-battle-foe-art.js',
 'assets/pawtopia-battle-watch.js',
 'assets/pawtopia-battle-cinematics.js',
-'assets/pawtopia-battle-arena.js'
+'assets/pawtopia-battle-arena.js',
+'assets/pawtopia-battle-motion.js'
 ].map(read);
 const clone=obj=>JSON.parse(JSON.stringify(obj));
 function loadPure(){
@@ -35,7 +36,10 @@ test('defensive moves and zero-damage blows never trigger damaging impact or cam
   assert.equal(item.defenderPose,'guard');
   assert.ok(item.label.length>0);
  }
- assert.equal(blocked.label,'BLOCKED / DODGED');
+ assert.equal(blocked.label,'BLOCKED');
+ const dodge=visual({who:'foe',fx:'swipe',damage:0,reaction:'dodge'});
+ assert.equal(dodge.label,'DODGED');
+ assert.equal(dodge.cameraShake,false);
  assert.equal(charge.charge,true);
  assert.equal(charge.foeMove,'charge');
  assert.equal(charge.contact,true);
@@ -87,6 +91,8 @@ class MockElement{
  closest(name){return name.startsWith('button')&&this.tag==='button'?this:null;}
  remove(){this.removed=true;}
  get offsetWidth(){return 120;}
+ get clientWidth(){return 440;}
+ getBoundingClientRect(){return {left:this.left||0,top:0,width:this.clientWidth,height:260};}
 }
 function arena(cat,foeIndex=0){
  const nodes=new Map;
@@ -99,7 +105,11 @@ function arena(cat,foeIndex=0){
    if(result)progress=current;
    return result;
   }}};
- const setTimeout=fn=>{Promise.resolve().then(fn);return 1;};
+ el('battle-pet-sprite').left=35;
+ el('battle-foe-sprite').left=265;
+ let clock=0;
+ window.performance={now:()=>clock};
+ const setTimeout=(fn,delay=0)=>{Promise.resolve().then(()=>{clock+=delay;fn();});return 1;};
  const deterministicMath=Object.create(Math);
  deterministicMath.random=()=>.5;
  for(const asset of assets)vm.runInNewContext(asset,{window,document,setTimeout,Math:deterministicMath});
@@ -166,9 +176,9 @@ test('new UI preserves zero-cost engine and makes visual guard vs hit explicit',
  assert.ok(css.includes('.defense-popup'));
  assert.ok(css.includes('.needs-adoption .cat-avatar'));
  assert.ok(css.includes('data-pose="charge"'));
- assert.ok(ui.includes("defender.classList.add(combat?.contact?'state-impact':'state-guard')"));
- assert.ok(ui.includes('if(combat?.cameraShake)cameraContact(evt,visual,color)'));
- assert.ok(ui.includes("foeMotion=playFoeFrames(currentFoe,combat?.foeMove||'swipe'"));
+ assert.ok(ui.includes('motion.reaction(clip,t,defenderWidth'));
+ assert.ok(ui.includes('if(combat?.cameraShake)cameraContact(evt,visual,color,point)'));
+ assert.ok(ui.includes('await playExchange(evt,visual,kit,cat,foe,equipped,stance'));
  assert.ok(read('.github/workflows/verify.yml').includes('tests/pawtopia-battle-visual-truth.test.cjs'));
  assert.doesNotMatch(assets[5]+assets[6],/\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon/);
 });

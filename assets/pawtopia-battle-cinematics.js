@@ -52,12 +52,13 @@
     const amount=Number.isFinite(event?.damage)?event.damage:0;
     const contact=!guard&&amount>0;
     const defense=guard||!contact;
+    const dodged=!contact&&event?.reaction==='dodge';
     const charge=event?.who==='foe'&&(event?.name==='Gear Fang Charge'||event?.name==='Rushing Charge');
     return Object.freeze({
       contact,defense,charge,
       foeMove:charge?'charge':'swipe',
       defenderPose:contact?'impact':'guard',
-      label:guard?'GUARD':!contact?'BLOCKED / DODGED':'',
+      label:guard?'GUARD':dodged?'DODGED':!contact?'BLOCKED':'',
       cameraShake:contact
     });
   }

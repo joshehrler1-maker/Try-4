@@ -132,10 +132,9 @@ test('arena loads and animates the actual selected rank, while keeping fallback 
   assert.ok(arenaHtml.includes('class="foe-illustration"'));
   assert.ok(arenaSource.includes("foeArt.paint(el('battle-foe-art'),activeFoe"));
   assert.match(arenaSource,/async function playFoeFrames\(foe,state,duration=440\)/);
-  assert.ok(arenaSource.includes("foeMotion=playFoeFrames(currentFoe,combat?.foeMove||'swipe',combat?.charge?590:470)"));
-  assert.ok(arenaSource.includes("hitMotion=playFoeFrames(currentFoe,reaction,320)"));
-  assert.ok(arenaSource.includes("playFoeFrames(currentFoe,'defeat',360)"));
-  assert.ok(arenaSource.includes("playFoeFrames(currentFoe,'victory',360)"));
+  assert.ok(arenaSource.includes("foeArt?.paint(el('battle-foe-art'),foe,pose,stepped,from)"));
+  assert.ok(arenaSource.includes('motion.reaction(clip,t,defenderWidth'));
+  assert.ok(arenaSource.includes("playFoeFrames(foe,won?'defeat':'victory',430)"));
   assert.ok(css.includes('.has-foe-art .foe-avatar'));
   assert.match(read('sw.js'),/assets\/pawtopia-battle-foe-art\.js/);
   assert.doesNotMatch(foeSource, /\bfetch\s*\(|XMLHttpRequest|WebSocket|localStorage|sendBeacon/);

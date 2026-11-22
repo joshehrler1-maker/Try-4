@@ -345,7 +345,7 @@ footer{padding:16px 0 28px;text-align:center}
 /* During an exchange the timeline is the only source of fighter travel. */
 .battle-stage.has-fighter-timeline .fighter-sprite {
   animation:none;
-  transform:translateX(var(--fighter-travel,0px));
+  transform:translate(var(--fighter-travel,0px),var(--fighter-depth,0px));
 }
 .battle-stage.has-fighter-timeline .fighter-sprite .cat-avatar,
 .battle-stage.has-fighter-timeline .fighter-sprite .cat-avatar svg,

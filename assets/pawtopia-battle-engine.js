@@ -158,8 +158,8 @@
     const rng=typeof random==='function'?random:Math.random;
     const rand=()=>clamp(Number(rng())||0,0,0.999999);
     const s=training(cat),kit=data.kitFor(cat.breed),events=[];
-    const makeEvent=(who,name,target,damage,remaining,fx,detail)=>events.push({
-      who,name,target,damage:Math.max(0,damage),remaining,fx,detail:detail||''
+    const makeEvent=(who,name,target,damage,remaining,fx,detail,reaction)=>events.push({
+      who,name,target,damage:Math.max(0,damage),remaining,fx,detail:detail||'',reaction
     });
     const petAttack=()=>{
       if (moveId==='guard') {
@@ -230,7 +230,8 @@
       let damage=foe.attack+(isHeavy?2+Math.floor(foe.rank/4):0)-Math.floor(s.defence/2);
       damage=Math.max(1,damage);
       if(match.foeSlow){damage=Math.max(1,damage-2);match.foeSlow=0;}
-      if(match.dodge){match.dodge=0;damage=0;}
+      const evaded=Boolean(match.dodge);
+      if(evaded){match.dodge=0;damage=0;}
       const blockedByCurl=match.armoryCounterReady && match.guard>0 && damage>0;
       if(match.guard){damage=Math.max(0,damage-match.guard);match.guard=0;}
       match.armoryCounterReady=false;
@@ -244,7 +245,8 @@
       if(match.hp*2<petMaxHp)damage=Math.max(0,damage-safe(gear.armoryRepeat));
       match.hp=Math.max(0,match.hp-damage);
       makeEvent('foe',isHeavy?(foe.isBoss?'Gear Fang Charge':'Rushing Charge'):(foe.isBoss?'Metal Paw Strike':'Paw Strike'),'pet',damage,match.hp,
-        isHeavy?'impact':'swipe',damage===0?'Dodged or blocked!':'');
+        isHeavy?'impact':'swipe',damage===0?(evaded?'Dodged!':'Blocked!'):'',
+        damage>0?'hit':evaded?'dodge':'block');
       if(damage>0 && !match.armoryRecovered){
         match.armoryRecovered=true;
         const amount=match.hp>0 ? Math.min(petMaxHp-match.hp,safe(gear.armoryRecovery)) : 0;
