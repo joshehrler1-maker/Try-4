@@ -5,6 +5,13 @@
 <script defer src="assets/platform-worlds.js?v=harbor-finale-e803531"></script>
 <script defer src="assets/pawtopia-save.js"></script><script defer src="assets/pawtopia-upgrade-points.js"></script><script>document.addEventListener('DOMContentLoaded',function(){const label=document.createElement('div');label.id='game-build-check';const runtime=document.querySelector('script[src*="pawcade-side-scroll-no-badges-v2.js"]');const build=runtime?new URL(runtime.src,location.href).searchParams.get('v'):null;label.textContent='Game assets: '+(build||'unversioned');label.style.cssText='font:600 12px system-ui,sans-serif;color:#ffe0a0;text-align:center;padding:3px;';const game=document.querySelector('canvas');if(game&&game.parentNode){game.parentNode.insertBefore(label,game)}else{document.body.appendChild(label)}});</script><script defer src="assets/animation/origin-world-enemy-rigs-v1.js?v=material-origin-017babeb"></script><script defer src="assets/animation/five-world-enemy-rigs-v1.js?v=material-five-9cc2586d"></script><script defer src="assets/animation/cloud-trail-enemy-rigs-v1.js?v=material-cloud-44c92967"></script><script defer src="assets/animation/mid-world-enemy-rigs-v1.js?v=material-mid-3af5a101"></script><script defer src="assets/animation/late-world-enemy-rigs-v1.js?v=material-late-hit-caf0ee32"></script><script defer src="assets/pawcade-side-scroll-no-badges-v2.js?v=swept-hostile-rounds-20261120"></script><link rel="stylesheet" href="assets/touch-joystick.css"><script src="assets/touch-joystick.js?v=pointer-stability-v1"></script><link rel="stylesheet" href="assets/game-fullscreen.css"><script defer src="assets/game-fullscreen.js"></script>
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
+<style>
+#guest-side-scrollers{margin-block:2rem;scroll-margin-top:1rem}
+.guest-side-games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:.75rem;margin:0;padding:0;list-style:none}
+.guest-side-games .side-card{height:100%;gap:.35rem;padding:.8rem;font-weight:400}
+.guest-side-games strong{font-size:1.05rem}
+.guest-side-games small{margin-top:auto;color:#e3ceff;font-size:.875rem}
+</style>
 </head>
 <body><header><a href="index.html">Super Paw Heroes</a><a href="pawtopia-arcade.html#side-scroll-games">Games Room</a></header>
 <main>
@@ -17,6 +24,37 @@
 <p id="side-status" role="status">Keyboard movement uses arrows or A/D. Space jumps X uses your power and C uses your technique.</p>
 </section>
 <figure class="paw-animation-preview" style="max-width:520px;margin:12px auto;text-align:center"><img src="assets/animation/super-paw-effects-v1.svg" alt="Super Paw Heroes original blue energy slash, purple crescent slash and glowing power paw animation effects" style="display:block;width:100%;height:auto" loading="lazy"><figcaption>Super Paw Heroes original game effects · asset version 1</figcaption></figure><h2>Side-Scroll Adventures</h2><p>Choose a challenge.</p><div id="side-catalog"></div>
+<section id="guest-side-scrollers" aria-labelledby="guest-side-title">
+<h2 id="guest-side-title">Guest 3D Side-Scrollers</h2>
+<p>Play free on the creators’ sites. Each game opens in a new tab.</p>
+<ul class="guest-side-games">
+<li><a class="side-card" href="https://mara.davidpalmero.dev/" target="_blank" rel="noopener noreferrer">
+<strong>Mara Vey and the Lost Sunstones</strong>
+Explore jungle ruins across nine stages.
+<small>Touch, keyboard or gamepad</small>
+</a></li>
+<li><a class="side-card" href="https://prasansoft.app/coin/" target="_blank" rel="noopener noreferrer">
+<strong>COIN</strong>
+Run, jump and collect coins on the way to the flag.
+<small>Touch or keyboard</small>
+</a></li>
+<li><a class="side-card" href="https://playpacoca.org/" target="_blank" rel="noopener noreferrer">
+<strong>Paçoca</strong>
+Spin-dash through fast stages or build your own.
+<small>Keyboard or gamepad</small>
+</a></li>
+<li><a class="side-card" href="https://adamwreed.itch.io/25d-platformer-pro" target="_blank" rel="noopener noreferrer">
+<strong>2.5D Platformer Pro</strong>
+Climb ladders, grab ledges and ride moving platforms.
+<small>Keyboard</small>
+</a></li>
+<li><a class="side-card" href="https://bubblebox.com/micro-pilots" target="_blank" rel="noopener noreferrer">
+<strong>Micro Pilots</strong>
+Fly a tiny plane around miniature planets.
+<small>Bonus flying game · keyboard or mouse</small>
+</a></li>
+</ul>
+</section>
 <p><a href="enemy-3d-prototype.html">Enemy prototype studio</a></p>
 
 <figure class="world-art" aria-hidden="true">
