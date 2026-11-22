@@ -528,11 +528,306 @@
       '<radialGradient id="'+k+'b"><stop stop-color="'+d.color+'" stop-opacity="'+(.11+finish*.075)+'"/><stop offset="1" stop-color="'+d.color+'" stop-opacity="0"/></radialGradient></defs>'+
       framing+surfaces+'</svg>';
   }
+  const paintedObjects={
+  "Food:bowl": "sheet-01-01",
+  "Food:roll": "sheet-01-02",
+  "Food:stew": "sheet-01-03",
+  "Food:pate": "sheet-01-04",
+  "Food:parcel": "sheet-01-05",
+  "Food:cup": "sheet-01-06",
+  "Food:flakes": "sheet-01-07",
+  "Food:bites": "sheet-01-08",
+  "Food:medal": "sheet-01-09",
+  "Food:plate": "sheet-01-10",
+  "Food:mousse": "sheet-01-11",
+  "Food:snack": "sheet-01-12",
+  "Food:fillet": "sheet-01-13",
+  "Food:crisp": "sheet-01-14",
+  "Food:terrine": "sheet-01-15",
+  "Toy:ribbon": "sheet-02-01",
+  "Toy:drum": "sheet-02-02",
+  "Toy:perch": "sheet-02-03",
+  "Toy:spinner": "sheet-02-04",
+  "Toy:hoop": "sheet-02-05",
+  "Toy:pendulum": "sheet-02-06",
+  "Toy:shuttle": "sheet-02-07",
+  "Toy:pad": "sheet-02-08",
+  "Toy:kite": "sheet-02-09",
+  "Toy:theater": "sheet-02-10",
+  "Toy:mouse": "sheet-02-11",
+  "Toy:tower": "sheet-02-12",
+  "Toy:maze": "sheet-02-13",
+  "Toy:bobbin": "sheet-02-14",
+  "Toy:track": "sheet-02-15",
+  "Book:almanac": "sheet-03-01",
+  "Book:balance": "sheet-03-02",
+  "Book:journal": "sheet-03-03",
+  "Book:handbook": "sheet-03-04",
+  "Book:atlas": "sheet-03-05",
+  "Book:primer": "sheet-03-06",
+  "Book:diary": "sheet-03-07",
+  "Book:notes": "sheet-03-08",
+  "Book:songs": "sheet-03-09",
+  "Book:ledger": "sheet-03-10",
+  "Book:manual": "sheet-03-11",
+  "Book:quiet": "sheet-03-12",
+  "Book:codex": "sheet-03-13",
+  "Book:courage": "sheet-03-14",
+  "Book:strategy": "sheet-03-15",
+  "Battle Gear:bracer": "sheet-05-01",
+  "Battle Gear:guard": "sheet-05-02",
+  "Battle Gear:charm": "sheet-05-03",
+  "Battle Gear:mitt": "sheet-05-04",
+  "Battle Gear:vest": "sheet-05-05",
+  "Battle Gear:stone": "sheet-05-06",
+  "Battle Gear:cuff": "sheet-05-07",
+  "Battle Gear:shield": "sheet-05-08",
+  "Battle Gear:sigil": "sheet-05-09",
+  "Battle Gear:baton": "sheet-05-10",
+  "Battle Gear:shell": "sheet-05-11",
+  "Battle Gear:token": "sheet-05-12",
+  "Battle Gear:gauntlet": "sheet-05-13",
+  "Battle Gear:buckler": "sheet-05-14",
+  "Battle Gear:seal": "sheet-05-15",
+  "Remedy:tin": "sheet-06-01",
+  "Remedy:tonic": "sheet-06-02",
+  "Remedy:poultice": "sheet-06-03",
+  "Remedy:compress": "sheet-06-04",
+  "Remedy:infusion": "sheet-06-05",
+  "Remedy:salve": "sheet-06-06",
+  "Remedy:liniment": "sheet-06-07",
+  "Remedy:elixir": "sheet-06-08",
+  "Remedy:vapor": "sheet-06-09",
+  "Remedy:jar": "sheet-06-10",
+  "Remedy:draught": "sheet-06-11",
+  "Remedy:patch": "sheet-06-12",
+  "Remedy:rub": "sheet-06-13",
+  "Remedy:tea": "sheet-06-14",
+  "Remedy:syrup": "sheet-06-15",
+  "Armor:carapace": "sheet-08-01",
+  "Armor:vest": "sheet-08-02",
+  "Armor:suit": "sheet-08-03",
+  "Armor:cuirass": "sheet-08-04",
+  "Armor:breastplate": "sheet-08-05",
+  "Armor:mantle": "sheet-08-06",
+  "Armor:guard": "sheet-08-07",
+  "Armor:harness": "sheet-08-08",
+  "Armor:shell": "sheet-08-09",
+  "Armor:wrap": "sheet-08-10",
+  "Armor:pads": "sheet-08-11",
+  "Armor:brigandine": "sheet-08-12",
+  "Armor:jacket": "sheet-08-13",
+  "Armor:panoply": "sheet-08-14",
+  "Armor:coating": "sheet-08-15",
+  "Relic:prism": "sheet-09-01",
+  "Relic:hourglass": "sheet-09-02",
+  "Relic:charm": "sheet-09-03",
+  "Relic:lens": "sheet-09-04",
+  "Relic:mapstone": "sheet-09-05",
+  "Relic:seal": "sheet-09-06",
+  "Relic:lodestone": "sheet-09-07",
+  "Relic:effigy": "sheet-09-08",
+  "Relic:dial": "sheet-09-09",
+  "Relic:tablet": "sheet-09-10",
+  "Relic:stone": "sheet-09-11",
+  "Relic:bead": "sheet-09-12",
+  "Relic:idol": "sheet-09-13",
+  "Relic:totem": "sheet-09-14",
+  "Relic:compass": "sheet-09-15",
+  "Material:timber": "sheet-10-01",
+  "Material:coil": "sheet-10-02",
+  "Material:bead": "sheet-10-03",
+  "Material:spool": "sheet-10-04",
+  "Material:offcut": "sheet-10-05",
+  "Material:foil": "sheet-10-06",
+  "Material:rivet": "sheet-10-07",
+  "Material:fiber": "sheet-10-08",
+  "Material:clay": "sheet-10-09",
+  "Material:prism": "sheet-10-10",
+  "Material:button": "sheet-10-11",
+  "Material:cord": "sheet-10-12",
+  "Material:leaf": "sheet-10-13",
+  "Material:thread": "sheet-10-14",
+  "Material:dowel": "sheet-10-15",
+  "Furnishing:hammock": "sheet-11-01",
+  "Furnishing:nook": "sheet-11-02",
+  "Furnishing:perch": "sheet-11-03",
+  "Furnishing:screen": "sheet-11-04",
+  "Furnishing:bench": "sheet-11-05",
+  "Furnishing:mat": "sheet-11-06",
+  "Furnishing:basket": "sheet-11-07",
+  "Furnishing:lounger": "sheet-11-08",
+  "Furnishing:washstand": "sheet-11-09",
+  "Furnishing:cushion": "sheet-11-10",
+  "Furnishing:chair": "sheet-11-11",
+  "Furnishing:shelf": "sheet-11-12",
+  "Furnishing:tent": "sheet-11-13",
+  "Furnishing:tunnel": "sheet-11-14",
+  "Furnishing:cot": "sheet-11-15",
+  "Collectible:postcard": "sheet-12-01",
+  "Collectible:cameo": "sheet-12-02",
+  "Collectible:pennant": "sheet-12-03",
+  "Collectible:etching": "sheet-12-04",
+  "Collectible:plate": "sheet-12-05",
+  "Collectible:print": "sheet-12-06",
+  "Collectible:diorama": "sheet-12-07",
+  "Collectible:album": "sheet-12-08",
+  "Collectible:portrait": "sheet-12-09",
+  "Collectible:token": "sheet-12-10",
+  "Collectible:scroll": "sheet-12-11",
+  "Collectible:figure": "sheet-12-12",
+  "Collectible:rubbing": "sheet-12-13",
+  "Collectible:map": "sheet-12-14",
+  "Collectible:lithograph": "sheet-12-15",
+  "sunfish-bites": "sheet-13-01",
+  "creekfish-stew": "sheet-13-02",
+  "supper-skewer": "sheet-13-03",
+  "moon-milk": "sheet-13-04",
+  "packed-lunch": "sheet-13-05",
+  "warm-platter": "sheet-13-06",
+  "spring-mouse": "sheet-13-07",
+  "feather-kite": "sheet-13-08",
+  "woven-ball": "sheet-13-09",
+  "puzzle-box": "sheet-13-10",
+  "soothing-wrap": "sheet-13-11",
+  "recovery-broth": "sheet-13-12",
+  "calm-drops": "sheet-13-13",
+  "paw-spring": "sheet-13-14",
+  "glass-needle": "sheet-13-15",
+  "gear-ram": "sheet-13-16",
+  "dawn-fork": "sheet-14-01",
+  "last-light": "sheet-14-02",
+  "hinge-hammer": "sheet-14-03",
+  "reed-buckler": "sheet-14-04",
+  "wool-lining": "sheet-14-05",
+  "copper-padding": "sheet-14-06",
+  "curled-plates": "sheet-14-07",
+  "rest-shell": "sheet-14-08",
+  "quickstep": "sheet-14-09",
+  "steady-spark": "sheet-14-10",
+  "salvage-ring": "sheet-14-11",
+  "hush-coil": "sheet-14-12",
+  "trail-knot": "sheet-14-13",
+  "field-scope": "sheet-14-14",
+  "harvest-loop": "sheet-14-15",
+  "ivys-notebook": "sheet-14-16",
+  "alley-fieldbook": "sheet-15-01",
+  "footwork-reader": "sheet-15-02",
+  "brace-reader": "sheet-15-03",
+  "mechanic-reader": "sheet-15-04",
+  "sunleaf-silk": "sheet-15-05",
+  "grotto-glass": "sheet-15-06",
+  "garden-cog": "sheet-15-07",
+  "frostbell-flake": "sheet-15-08",
+  "festival-mantle": "sheet-15-09",
+  "moonflower-pin": "sheet-15-10",
+  "gear-crown": "sheet-15-11",
+  "woven-cushion": "sheet-15-12",
+  "window-lamp": "sheet-15-13",
+  "scratch-deck": "sheet-15-14",
+  "copper-hound-sketch": "sheet-15-15",
+  "iron-fang-blueprint": "sheet-15-16",
+  "baron-invitation": "sheet-16-01",
+  "staple:Cottage Snack": "sheet-17-01",
+  "staple:Crystal Shard": "sheet-17-02",
+  "staple:Pawprint Rug": "sheet-17-03",
+  "staple:Garden Crunch": "sheet-17-04",
+  "staple:Clockwork Mouse": "sheet-17-05",
+  "staple:Paw Emblem Tee": "sheet-17-06",
+  "staple:Chocolate Paw": "sheet-17-07",
+  "staple:Moonberry Smoothie": "sheet-17-08",
+  "staple:Crystal Shield": "sheet-17-09",
+  "staple:Glowbell Bouquet": "sheet-17-10",
+  "staple:Festival Cape": "sheet-17-11",
+  "staple:Ribbon Gift Box": "sheet-17-12",
+  "staple:Glowbell Seeds": "sheet-17-13",
+  "staple:Velvet Cat Bed": "sheet-17-14",
+  "staple:Honey Paw Roll": "sheet-17-15",
+  "staple:Whisker Collector Card": "sheet-18-01",
+  "staple:Luna Collector Card": "sheet-18-02",
+  "staple:Bolt Collector Card": "sheet-18-03",
+  "Wearable:sash": "sheet-04-01",
+  "Wearable:neckerchief": "sheet-04-02",
+  "Wearable:collar": "sheet-04-03",
+  "Wearable:bow": "sheet-04-04",
+  "Wearable:mantle": "sheet-04-05",
+  "Wearable:cap": "sheet-04-06",
+  "Wearable:badge": "sheet-04-07",
+  "Wearable:brooch": "sheet-04-08",
+  "Wearable:kerchief": "sheet-04-09",
+  "Wearable:crown": "sheet-04-10",
+  "Wearable:medallion": "sheet-04-11",
+  "Wearable:hood": "sheet-04-12",
+  "Wearable:cuff": "sheet-04-13",
+  "Wearable:harness": "sheet-04-14",
+  "Wearable:rosette": "sheet-04-15",
+  "Weapon:knuckle": "sheet-07-01",
+  "Weapon:fan": "sheet-07-02",
+  "Weapon:baton": "sheet-07-03",
+  "Weapon:bell": "sheet-07-04",
+  "Weapon:rod": "sheet-07-05",
+  "Weapon:paddle": "sheet-07-06",
+  "Weapon:club": "sheet-07-07",
+  "Weapon:mallet": "sheet-07-08",
+  "Weapon:flail": "sheet-07-09",
+  "Weapon:wand": "sheet-07-10",
+  "Weapon:whip": "sheet-07-11",
+  "Weapon:cane": "sheet-07-12",
+  "Weapon:saber": "sheet-07-13",
+  "Weapon:staff": "sheet-07-14",
+  "Weapon:hook": "sheet-07-15"
+};
+  function pictureFor(item){
+    if(item.id.startsWith('shop-staple-'))return paintedObjects['staple:'+item.name]||null;
+    if(Object.hasOwn(paintedObjects,item.id))return paintedObjects[item.id];
+    return paintedObjects[item.category+':'+design(item).shape]||null;
+  }
   function mount(node,item){
     if(!node||!item)return;
+    const details=design(item), image=pictureFor(item);
     node.dataset.itemArt=item.id;
-    node.dataset.itemFinish=String(design(item).finish);
-    node.innerHTML=markup(item);
+    node.dataset.itemFinish=String(details.finish);
+    if(!image||!node.ownerDocument){
+      node.innerHTML=markup(item);
+      return;
+    }
+    const doc=node.ownerDocument;
+    const portrait=doc.createElement('span');
+    portrait.className='painted-item';
+    portrait.setAttribute('aria-hidden','true');
+    const {n,finish,district}=details;
+    // The object stays readable across palette variants. Food retains
+    // its natural colors, and metals and fabrics take stronger finishes.
+    const paletteStrength=item.category==='Food'?4:item.category==='Weapon'?16:22;
+    const shift=(n%paletteStrength)-Math.round(paletteStrength/2)+(district>=0?(district%6-3)*3:0);
+    portrait.style.setProperty('--item-color',details.color);
+    portrait.style.setProperty('--item-accent',details.accent);
+    portrait.style.setProperty('--item-turn',((n%19-9)/3)+'deg');
+    portrait.style.setProperty('--item-shift',shift+'deg');
+    portrait.style.setProperty('--item-saturation',String(.90+(n>>>8)%19/100+finish*.055));
+    portrait.style.setProperty('--item-scale',String(.94+(n>>>14)%8/100));
+    portrait.style.setProperty('--item-fore-x',((n>>>19)%7-3)+'%');
+    const photo=doc.createElement('img');
+    photo.alt='';
+    photo.width=168;
+    photo.height=168;
+    photo.draggable=false;
+    photo.decoding='async';
+    photo.loading=node.classList?.contains('item-illustration')?'lazy':'eager';
+    photo.addEventListener('error',()=>{
+      if(node.firstElementChild===portrait){
+        delete node.dataset.paintedItem;
+        node.innerHTML=markup(item);
+      }
+    },{once:true});
+    const mark=doc.createElement('span');
+    mark.className='painted-item-mark';
+    const crest=stamps[district>=0?district:n%stamps.length];
+    mark.innerHTML='<svg viewBox="-12 -12 24 24"><path d="'+crest+'" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    portrait.append(photo,mark);
+    node.replaceChildren(portrait);
+    node.dataset.paintedItem=image;
+    photo.src='assets/scenes/pawtopia-items/'+image+'.png';
   }
   function equipped(market,progress,cat,match){
     if(!market||!cat)return [];
@@ -580,5 +875,5 @@
   function staple(name,id){
     return {id:'shop-staple-'+(id||name),name,artForm:staples[name]||'snack'};
   }
-  window.PawtopiaItemArt=Object.freeze({design,markup,mount,equipped,effect,aura,staple});
+  window.PawtopiaItemArt=Object.freeze({design,markup,mount,pictureFor,equipped,effect,aura,staple});
 })();
