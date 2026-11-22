@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v137-arena-progression';
+const CACHE = 'try4-public-v138-world-art';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-battle-art-gallery.html","assets/pawtopia-battle-art-gallery.css","assets/pawtopia-battle-art-gallery.js");
 FILES.push("assets/pawtopia-cat-flow.css");
@@ -164,6 +164,7 @@ FILES.push('assets/pawtopia-battle-3d.js?v=painted-1','assets/pawtopia-battle-3d
   'assets/pawtopia-battle-cinematics.js?v=dogs-all');
 FILES.push('assets/pawtopia-item-art.css?v=painted-1','assets/pawtopia-item-art.js?v=painted-1','assets/pawtopia-items-ui.js?v=item-art-1');
 FILES.push('pawtopia-pet-equipment.html','assets/pawtopia-pet-equipment.css?v=1','assets/pawtopia-pet-equipment.js?v=1','assets/pawtopia-items.js?v=balance-1','assets/pawtopia-upgrade-points.js?v=balance-1');
+FILES.push('assets/super-paw-world-art.css?v=1','assets/scenes/world-art/scene-15.png');
 const gamePage = new URL('pawcade-side-scroll.html', self.registration.scope);
 const allowed = new Set(FILES.map(file => new URL(file, self.registration.scope).href));
 self.addEventListener('install', event => {

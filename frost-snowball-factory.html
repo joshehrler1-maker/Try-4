@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Frost’s Snowball Factory | Super Paw Heroes</title>
+<link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
+
 <style>
 *{box-sizing:border-box}body{margin:0;background:#08152c;color:#eefcff;font:600 1rem/1.4 system-ui}main{width:min(100% - 24px,680px);margin:16px auto}nav{display:flex;justify-content:space-between;gap:12px}a{color:#91f4ff}h1{font:700 clamp(30px,6vw,54px)/1.05 Georgia;margin:.4em 0}.hud,.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.hud span{padding:.4rem .7rem;background:#163454;border-radius:8px}.arena{position:relative;margin:.6rem 0;border:1px solid #79d7ee;border-radius:15px;overflow:hidden;background:#133859 url(assets/scenes/cyan-frost-caverns.webp) center/cover}canvas{width:100%;height:auto;display:block;touch-action:none}.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px;background:linear-gradient(0deg,#081429 1%,#081429d9 46%,#08142944),url(assets/scenes/pawcade-frost.webp) center/cover}.screen[hidden],button[hidden],.controls[hidden]{display:none}.screen h2{font:700 clamp(22px,5vw,42px)/1 Georgia;margin:0}.screen p{max-width:31rem;margin:.45em 0 .75em;font-size:clamp(13px,3vw,16px)}button{font:inherit;color:#092337;background:#b1f1fb;border:1px solid #e0fcff;border-radius:9px;min-height:44px;padding:.4rem .8rem;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #ffd36f;outline-offset:3px}button:disabled{opacity:.5}.hint{font-size:.875rem;color:#c8e1f2}#move button{min-width:49px}
 </style>
@@ -15,6 +17,11 @@
 <div class="screen" id="screen"><h2 id="title">Snowball Factory</h2><p id="summary">Help Frost dodge runaway snowballs, then push through the warehouse to the exit.</p><button id="action">Start game</button></div></div>
 <div class="controls"><button id="pause" disabled>Pause</button><button id="escape" hidden>Escape (−1 life)</button><div class="controls" id="move" aria-label="Movement controls" hidden><div class="touch-joystick" id="touch-stick" role="img" aria-label="Drag to move"><span></span></div></div></div>
 <p class="hint" id="hint">Move with your mouse, drag on touchscreens, or use the arrow keys. Watch for launchers that flash before they fire.</p></main>
+<figure class="world-art" aria-hidden="true">
+<img src="assets/scenes/cyan-frost-caverns.webp" alt="" loading="lazy" decoding="async">
+<img src="assets/scenes/pawcade-frost.webp" alt="" loading="lazy" decoding="async">
+</figure>
+
 <script src="assets/pawtopia-save.js"></script>
 <script src="assets/game-hd.js"></script>
 <script>
