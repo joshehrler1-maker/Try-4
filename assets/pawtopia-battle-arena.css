@@ -356,3 +356,78 @@ footer{padding:16px 0 28px;text-align:center}
 .battle-stage.has-fighter-timeline .fighter-shadow {
   transform:scale(calc(1 + var(--fighter-weight,0) * .16),calc(1 - var(--fighter-weight,0) * .12));
 }
+
+/* Fullscreen keeps one shared set of controls directly beneath the arena. */
+.arena-control-dock{display:grid;gap:.55rem;padding-top:.6rem}
+.arena-control-dock .setup-actions{margin:0}
+.arena-control-dock .arena-status{margin:0}
+.arena-control-dock .battle-outcome:empty{display:none}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded){
+  display:grid;
+  grid-template-rows:auto minmax(108px,1fr) auto;
+  gap:.4rem;
+  overflow:auto;
+  background:#101a32;
+}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded)>.game-fullscreen-tools{
+  position:static;
+  margin:0;
+}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .battle-stage{
+  min-height:108px;
+  padding:clamp(4px,1.4dvh,16px) clamp(6px,2vw,22px);
+  border-radius:14px;
+}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .fighter-sprite{
+  width:min(100%,clamp(65px,calc(48dvh - 62px),286px));
+  margin-top:4px;
+}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .arena-control-dock{
+  width:min(100%,70rem);
+  margin-inline:auto;
+  padding:0;
+  gap:.32rem;
+}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .move-grid{gap:.32rem}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .move-grid button{
+  min-height:44px;
+  padding:.28rem .45rem;
+  line-height:1.18;
+  border-radius:.6rem;
+}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .move-grid strong{font-size:.85rem;overflow-wrap:anywhere}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .move-description{display:none}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .setup-actions{
+  display:grid;
+  grid-template-columns:repeat(8,minmax(0,1fr));
+  gap:.28rem;
+  align-items:end;
+}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .setup-actions button,
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .setup-actions select{
+  min-width:0;
+  min-height:44px;
+  padding:.22rem .32rem;
+  font-size:.78rem;
+  line-height:1.15;
+}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .watch-speed{min-width:0;gap:0}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .watch-speed label{font-size:.67rem}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .arena-status{
+  min-height:0;
+  font-size:.77rem;
+  padding:.25rem .45rem;
+}
+#arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .battle-outcome{margin:0;padding:0;font-size:.78rem}
+@media(max-width:850px){
+  #arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .setup-actions{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:420px) and (orientation:portrait){
+  #arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .setup-actions{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(orientation:landscape){
+  #arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .move-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  #arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .battler-ui{padding:2px 5px;font-size:.74rem}
+  #arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .hp-row{margin-top:2px}
+  #arena-play-area:is(:fullscreen,.game-fullscreen-expanded) .hp-row progress{height:10px}
+}

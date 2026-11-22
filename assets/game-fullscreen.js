@@ -2,6 +2,24 @@
   const stage = document.querySelector('[data-fullscreen-game]');
   if (!stage) return;
 
+  const modal = stage.hasAttribute?.('data-fullscreen-modal');
+  const isolated = [];
+  function isolatePage(value) {
+    if (!modal) return;
+    if (!value) {
+      for (const node of isolated.splice(0)) node.inert = false;
+      return;
+    }
+    for (let node = stage; node && node !== document.body; node = node.parentElement) {
+      for (const sibling of node.parentElement.children) {
+        if (sibling !== node && !sibling.inert) {
+          sibling.inert = true;
+          isolated.push(sibling);
+        }
+      }
+    }
+  }
+
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'game-fullscreen-toggle';
@@ -24,6 +42,7 @@
     expanded = value;
     stage.classList.toggle('game-fullscreen-expanded', value);
     document.body.classList.toggle('game-fullscreen-lock', value);
+    isolatePage(value);
     sync();
     button.focus({preventScroll: true});
   }

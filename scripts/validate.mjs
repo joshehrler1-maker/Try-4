@@ -85,7 +85,7 @@ async function request(url,method='GET') {let response;handlers.fetch({request:{
 ok((await request(scope+'index.html')).live, 'Online navigation must use network');
 offline = true;
 ok((await request(scope+'index.html')).file === 'index.html', 'Offline navigation must use cached page');
-ok((await request(scope+'assets/pawtopia-battle-arena.js?v=duel-flow-1')).file === 'assets/pawtopia-battle-arena.js?v=duel-flow-1', 'Offline Arena must use the current reward and navigation script');
+ok((await request(scope+'assets/pawtopia-battle-arena.js?v=fullscreen-1')).file === 'assets/pawtopia-battle-arena.js?v=fullscreen-1', 'Offline Arena must use the current reward and navigation script');
 ok((await request(scope+'pawcade-side-scroll.html?game=24')).file === 'pawcade-side-scroll.html', 'Every Pawcade game must open offline');
 const sideScrollPage = read('pawcade-side-scroll.html');
 for (const [, asset] of sideScrollPage.matchAll(/(?:href|src)="(assets\/[^"]+\?[^"]+)"/g)) {

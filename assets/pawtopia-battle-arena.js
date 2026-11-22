@@ -19,6 +19,11 @@
   let frameQuality=window.navigator?.connection?.saveData?'efficient':'smooth';
   const select=el('battle-pet-select');
   const stage=el('battle-stage');
+  const playArea=el('arena-play-area');
+  function showBattleStage(){
+    if(document.fullscreenElement===playArea || playArea?.classList.contains('game-fullscreen-expanded'))return;
+    (playArea||stage).scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'start'});
+  }
   window.PawtopiaBattle3D?.create(el('battle-3d'),stage,{floorOnly:true});
   const petSprite=el('battle-pet-sprite'),foeSprite=el('battle-foe-sprite');
   const reduced=()=>window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
@@ -227,7 +232,7 @@
       button.className='move-button'+(!move.unlocked?' locked':'');
       button.disabled=!fighting||busy||watchMode||!move.ready;
       addText(button,'strong',move.name);
-      addText(button,'small',move.description);
+      addText(button,'small',move.description,'move-description');
       addText(button,'small',move.note||(move.unlocked?'Ready':'Level '+move.level+' required'));
       return button;
     }));
@@ -593,7 +598,7 @@
       const result=await saveAction(progress=>engine.start(progress,selectedPet,selectedFoe));
       if(result){
         status(result.message);
-        if(result.ok)stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
+        if(result.ok)showBattleStage();
       }
     }catch{status('The battle could not be started safely.');}
     finally{busy=false;render();}
@@ -696,7 +701,7 @@
     watchMode=true;
     watchPaused=false;
     render();
-    stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
+    showBattleStage();
     await runWatchMode();
   });
   el('battle-pause').addEventListener('click',()=>{
@@ -758,7 +763,7 @@
         paintCat(el('battle-cat-art'),cat.breed);
         foeArt.paint(el('battle-foe-art'),enemy);
         status('Preview duel. Your saved battle is untouched.');
-        stage.scrollIntoView?.({behavior:reduced()?'auto':'smooth',block:'center'});
+        showBattleStage();
         await showEvents([
           {who:'pet',target:'foe',name:'Paw Swipe',damage:0,fx:'swipe',remaining:20,reaction:'dodge'},
           {who:'pet',target:'pet',name:'Guard Curl',damage:0,fx:'guard',remaining:20},

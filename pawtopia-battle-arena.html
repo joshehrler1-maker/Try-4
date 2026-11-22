@@ -9,7 +9,8 @@
 <meta property="og:title" content="Pawtopia Battle Arena | Super Paw Heroes">
 <meta property="og:description" content="Watch your adopted cat face 207 dog challengers and Baron Brasswhirl, unlock special moves and earn free rewards.">
 <title>Pawtopia Battle Arena | Super Paw Heroes</title>
-<link rel="stylesheet" href="assets/pawtopia-battle-arena.css?v=duel-flow-1">
+<link rel="stylesheet" href="assets/game-fullscreen.css">
+<link rel="stylesheet" href="assets/pawtopia-battle-arena.css?v=fullscreen-1">
 <link rel="stylesheet" href="assets/pawtopia-item-art.css?v=painted-1">
 <link rel="stylesheet" href="assets/pawtopia-pet-equipment.css?v=1">
 <link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
@@ -28,7 +29,8 @@
 <script defer src="assets/pawtopia-battle-sound.js?v=1"></script>
 <script defer src="assets/pawtopia-item-art.js?v=painted-1"></script>
 <script defer src="assets/pawtopia-battle-motion.js?v=duel-flow-1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=duel-flow-1"></script>
+<script defer src="assets/game-fullscreen.js?v=arena-focus-1"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=fullscreen-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
@@ -82,25 +84,13 @@
 <div id="battle-foe-list" class="foe-list" role="group" aria-labelledby="foe-list-title"></div>
 <p class="mini" id="battle-preparation"></p>
 <p class="mini"><a href="pawtopia-companions.html#training-title">Train combat stats at Companion Cottage</a></p>
-<div class="setup-actions">
-<button id="battle-start" type="button" class="primary">Enter Arena</button>
-<button id="battle-watch" type="button" class="primary">▶ Start &amp; Watch Battle</button>
-<button id="battle-pause" type="button" class="secondary" disabled>Pause after this turn</button>
-<button id="battle-stop-watch" type="button" class="secondary" disabled>Stop watching</button>
-<div class="watch-speed"><label for="battle-speed">Animation speed</label>
-<select id="battle-speed" aria-label="Battle animation speed"><option value="1">Normal · 1×</option><option value="1.5">Faster · 1.5×</option><option value="2">Fast · 2×</option></select></div>
-<div class="watch-speed"><label for="battle-quality">Character animation detail</label>
-<select id="battle-quality" aria-label="Character animation detail"><option value="smooth">Cinematic</option><option value="efficient">Battery saver</option></select></div>
-<button id="battle-forfeit" type="button" class="secondary">Forfeit current battle</button>
-<button id="battle-sound" type="button" class="secondary" aria-pressed="false">Sound: Off</button>
-</div>
 <p class="watch-note">Watch mode automatically chooses from your cat's unlocked moves, including its unique skills, and plays one battle only. Pause or stop watching without forfeiting the match. Battles pause when the tab is hidden. No automatic repeat battles or purchases.</p>
 </section>
 <section class="fight-section" aria-labelledby="fight-title">
 <h2 id="fight-title">Watch the Battle</h2>
-<p class="arena-status" id="battle-status" role="status" aria-live="polite">Choose your adopted cat and a challenger to start the fight.</p>
 <p class="mini" id="arena-3d-stances" hidden></p>
 <p class="mini"><button type="button" id="arena-3d-preview" hidden>Preview an illustrated duel</button></p>
+<div class="arena-play-area" id="arena-play-area" data-fullscreen-game data-fullscreen-modal>
 <div class="battle-stage" id="battle-stage" aria-label="Animated turn-based battle field">
 <div class="battle-backdrop" aria-hidden="true"></div>
 <canvas id="battle-3d" class="battle-3d-canvas" aria-hidden="true"></canvas>
@@ -137,12 +127,25 @@
 <div id="battle-vfx" class="battle-vfx" aria-hidden="true"></div>
 <div id="battle-cue" class="battle-cue" aria-hidden="true"><span id="battle-cue-source"></span><strong id="battle-cue-title"></strong><span id="battle-cue-detail"></span></div>
 </div>
-<div class="battle-actions">
-<h3>Four unlockable moves</h3>
-<p class="mini">Level 1: Paw Swipe · Level 3: Guard Curl · Level 6: your pet's unique skill · Level 10: unique ultimate attack</p>
+<div class="arena-control-dock">
 <div id="battle-moves" class="move-grid" role="group" aria-label="Your cat's battle moves"></div>
+<div class="setup-actions" role="group" aria-label="Battle controls">
+<button id="battle-start" type="button" class="primary">Enter Arena</button>
+<button id="battle-watch" type="button" class="primary">▶ Start &amp; Watch Battle</button>
+<button id="battle-pause" type="button" class="secondary" disabled>Pause after this turn</button>
+<button id="battle-stop-watch" type="button" class="secondary" disabled>Stop watching</button>
+<div class="watch-speed"><label for="battle-speed">Animation speed</label>
+<select id="battle-speed" aria-label="Battle animation speed"><option value="1">Normal · 1×</option><option value="1.5">Faster · 1.5×</option><option value="2">Fast · 2×</option></select></div>
+<div class="watch-speed"><label for="battle-quality">Character animation detail</label>
+<select id="battle-quality" aria-label="Character animation detail"><option value="smooth">Cinematic</option><option value="efficient">Battery saver</option></select></div>
+<button id="battle-forfeit" type="button" class="secondary">Forfeit current battle</button>
+<button id="battle-sound" type="button" class="secondary" aria-pressed="false">Sound: Off</button>
 </div>
+<p class="arena-status" id="battle-status" role="status" aria-live="polite">Choose your adopted cat and a challenger to start the fight.</p>
 <div class="battle-outcome" id="battle-outcome" role="status" aria-live="polite"></div>
+</div>
+</div>
+<p class="mini">Moves unlock at levels 1, 3, 6, and 10.</p>
 <details class="battle-art-gallery" id="battle-art-gallery">
 <summary>Preview your cat's custom art and nine individual poses</summary>
 <p class="mini">Select any animation to watch a free art-only preview. No battle turns, XP or Paw Coins are used. Each fighter is drawn as a complete cat with its own breed features.</p>
