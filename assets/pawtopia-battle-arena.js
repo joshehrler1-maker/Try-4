@@ -277,7 +277,7 @@
   function hideCue() {
     el('battle-cue')?.classList.remove('is-visible');
   }
-  async function launchSkillProjectile(visual,kit) {
+  function launchSkillProjectile(visual,kit,travelMs) {
     if(!visual?.skill||!kit||reduced())return;
     const bolt=document.createElement('span');
     const name=String(kit.signature||'Skill');
@@ -289,9 +289,9 @@
     bolt.dataset.fx=visual.fx;
     bolt.textContent=visual.skill==='ultimate'?visual.symbol:initials||visual.symbol;
     bolt.style.setProperty('--bolt-color',visual.color);
-    bolt.style.setProperty('--travel-time',Math.max(90,Math.round(320/playbackSpeed))+'ms');
+    bolt.style.setProperty('--travel-time',Math.max(1,Math.round(travelMs))+'ms');
     el('battle-vfx').append(bolt);
-    try{await wait(330);}finally{bolt.remove();}
+    setTimeout(()=>bolt.remove(),travelMs);
   }
   function cameraContact(evt,visual,color) {
     if(reduced())return;
@@ -405,98 +405,126 @@
       await wait(reduced()?25:Math.max(18,Math.floor(duration/frames.length)));
     }
   }
+  async function playExchange(evt,visual,kit,cat,foe,equipped){
+    const motion=window.PawtopiaBattleMotion;
+    const isPet=evt.who==='pet';
+    const actor=isPet?petSprite:foeSprite, defender=isPet?foeSprite:petSprite;
+    const catArt=cat?characterArt?.getArt(cat.breed):null;
+    const clip=motion.plan(evt,visual,catArt,foe,
+      visual?.skill&&cat?characterArt?.timingFor(cat.breed,visual.skill):null);
+    const defenderProfile=motion.profile(catArt,foe,!isPet);
+    const reaction=evt.damage>0?'impact':'guard';
+    const direction=isPet?1:-1;
+    const actorWidth=(isPet?el('battle-cat-art'):el('battle-foe-art')).offsetWidth||actor.offsetWidth;
+    const defenderWidth=(isPet?el('battle-foe-art'):el('battle-cat-art')).offsetWidth||defender.offsetWidth;
+    const a=actor.getBoundingClientRect(), b=defender.getBoundingClientRect();
+    const distance=Math.abs(a.left+a.width/2-b.left-b.width/2);
+    const reach=Math.min(stage.clientWidth*.32,Math.max(actorWidth*.075,
+      distance-(actorWidth+defenderWidth)*clip.actor.reach));
+    const steps=Math.max(1,Math.min(3,Math.round(reach/Math.max(1,actorWidth*clip.actor.step))));
+    const simple=reduced();
+    const economical=frameQuality==='efficient'||window.navigator?.connection?.saveData;
+    const speed=playbackSpeed;
+    const duration=simple?130:clip.duration/speed;
+    const skillAudio={theme:kit.theme.type,ultimate:clip.skill==='ultimate',side:evt.who};
+    const previous=new Map();
+    function paint(pet,pose,frame,from){
+      const frameStep=economical?1:.5;
+      const stepped=Math.round(frame/frameStep)*frameStep;
+      const key=pose+'|'+stepped+'|'+(from||'');
+      if(previous.get(pet)===key)return;
+      previous.set(pet,key);
+      if(pet&&cat)paintCat(el('battle-cat-art'),cat.breed,pose,stepped,from);
+      else if(!pet&&foe)foeArt?.paint(el('battle-foe-art'),foe,pose,stepped,from);
+    }
+    function position(sprite,x,weight){
+      sprite.style.setProperty('--fighter-travel',x.toFixed(2)+'px');
+      sprite.style.setProperty('--fighter-weight',String(weight));
+    }
+    function impact(){
+      barAfter(evt);
+      showGearEffects(evt,equipped);
+      burst(evt,clip.guard?'#84e4d8':isPet?kit.theme.color:foe.color,visual);
+      if(!clip.guard)cueSound(evt.damage>0?(clip.skill?'spellHit':'hit'):'block',
+        {...skillAudio,heavy:clip.charge||evt.damage>=22,side:evt.target});
+    }
+    const release=t=> {
+      cueSound('cast',skillAudio);
+      launchSkillProjectile(visual,kit,duration*(clip.contact-t));
+    };
+    const setFrame=t=>{
+      const frame=motion.sample(clip,t,reach,steps);
+      const reactionT=Math.max(0,(t-clip.contact)/(1-clip.contact));
+      const hitWeight=Math.sin(Math.PI*reactionT)**2;
+      if(!simple){
+        position(actor,direction*frame.x,Math.abs(frame.x)/Math.max(1,reach));
+        position(defender,!clip.guard&&evt.damage>0?
+          direction*defenderWidth*defenderProfile.recoil*hitWeight:0,hitWeight*.35);
+      }
+      paint(isPet,frame.pose,frame.frame,frame.from);
+      if(!clip.guard&&t>=clip.contact){
+        if(reactionT<.72)paint(!isPet,reaction,5*reactionT/.72);
+        else paint(!isPet,'recover',5*(reactionT-.72)/.28,reaction);
+      }
+    };
+    stage.classList.add('has-fighter-timeline');
+    cueSound(clip.guard?'guard':clip.skill?'windup':clip.charge?'charge':'step',skillAudio);
+    try{
+      if(simple){
+        paint(isPet,clip.action,3);
+        if(!clip.guard)paint(!isPet,reaction,3);
+        impact();
+        await new Promise(resolve=>setTimeout(resolve,duration));
+        return;
+      }
+      const now=()=>window.performance?.now?.()??Date.now();
+      const start=now();
+      let released=false,landed=false,t=0;
+      for(;;){
+        t=Math.max(t,Math.min(1,(now()-start)/duration));
+        if(clip.release!==null&&!released&&t>=clip.release){
+          released=true;
+          if(t<clip.contact)release(t);
+        }
+        if(!landed&&t>=clip.contact){
+          landed=true;
+          setFrame(clip.contact);
+          if(!clip.skill&&!clip.guard)cueSound('swipe',skillAudio);
+          impact();
+        }else setFrame(t);
+        if(t===1)break;
+        const nextMark=!released&&clip.release!==null?clip.release:!landed?clip.contact:1;
+        const delay=Math.min(economical?45:24,Math.max(1,duration*(nextMark-t)));
+        await new Promise(resolve=>setTimeout(resolve,delay));
+      }
+    }finally{
+      position(actor,0,0);
+      position(defender,0,0);
+      paint(true,'idle',3);
+      paint(false,'idle',3);
+      stage.classList.remove('has-fighter-timeline');
+    }
+  }
   async function showEvents(events,cat,preview=false){
     const kit=data.kitFor(cat?.breed);
     const progress=save.read(), current=preview?null:engine.matchInfo(progress);
-    const currentFoe=current?.foe || data.foes[selectedFoe];
+    const foe=current?.foe||data.foes[selectedFoe];
     const equipped=gearFor(progress,cat,current?.match);
     gearAura(equipped);
-    const pose=state=>{if(characterArt&&cat)paintCat(el('battle-cat-art'),cat.breed,state);};
-    const foePose=state=>{if(foeArt&&currentFoe)foeArt.paint(el('battle-foe-art'),currentFoe,state);};
     for(const evt of events){
-      const visual=cueFor(evt,kit,currentFoe);
+      const visual=cueFor(evt,kit,foe);
       showCue(visual);
-      if(evt.who==='system'){
-        if(evt.fx==='victory'||evt.fx==='defeat')cueSound(evt.fx);
-        if(evt.fx==='victory'){petSprite.classList.add('state-victory');await Promise.all([playArtFrames(cat,'victory',360),playFoeFrames(currentFoe,'defeat',360)]);pose('victory');foePose('defeat');}
-        if(evt.fx==='defeat'){petSprite.classList.add('state-defeat');await Promise.all([playArtFrames(cat,'defeat',360),playFoeFrames(currentFoe,'victory',360)]);pose('defeat');foePose('victory');}
-
-        await wait(450);
-        hideCue();
-        continue;
-      }
-      const actor=evt.who==='pet'?petSprite:foeSprite;
-      const defender=evt.who==='pet'?foeSprite:petSprite;
-      const combat=cinematics?.combatVisual(evt);
-      const guard=evt.fx==='guard';
-      const cast=!guard&&!['swipe','impact'].includes(evt.fx);
-      const effect=guard?'state-guard':cast?'state-cast':'state-approach';
-      let motion=Promise.resolve();
-      let hitMotion=Promise.resolve();
-      let foeMotion=Promise.resolve();
-      const action=guard?'guard':cast?(visual?.skill==='ultimate'?'ultimate':'signature'):'approach';
-      const castDuration=cast?(characterArt?.timingFor(cat.breed,action)||650):0;
-      const skillAudio={theme:kit.theme.type,ultimate:action==='ultimate',side:evt.who};
-      if(guard)cueSound('guard',{side:evt.who});
-      else if(cast)cueSound('windup',skillAudio);
-      else cueSound(combat?.charge?'charge':'step',{side:evt.who});
-      if(evt.who==='pet'){
-        motion=playArtFrames(cat,action,guard?490:cast?castDuration:240);
-      }else{
-        foeMotion=playFoeFrames(currentFoe,guard?'guard':combat?.charge?'charge':'approach',guard?380:combat?.charge?420:240);
-      }
-      actor.classList.remove('state-approach','state-swipe','state-cast','state-guard');
-      void actor.offsetWidth;actor.classList.add(effect);
-      if(!guard&&!cast){
-        await wait(245);
-        await Promise.all([motion,foeMotion]);
-        actor.classList.remove(effect);
-        actor.classList.add('state-swipe');
-        cueSound('swipe',{side:evt.who});
-        if(evt.who==='pet')motion=playArtFrames(cat,'swipe',characterArt?.timingFor(cat.breed,'swipe'));
-        else foeMotion=playFoeFrames(currentFoe,combat?.foeMove||'swipe',combat?.charge?590:470);
-      }
-      const projectile=evt.who==='pet'&&cast
-        ? wait(castDuration*.60).then(()=>{
-          cueSound('cast',skillAudio);
-          return launchSkillProjectile(visual,kit);
-        })
-        : Promise.resolve();
-      if(evt.who==='pet'&&!guard&&!cast){
-        await wait((characterArt?.timingFor(cat.breed,'swipe')||480)*.60);
-      }else if(evt.who!=='pet'||!cast){
-        await wait(cast?340:guard?230:190);
-      }
-      await projectile;
-      if(!guard){
-        const reaction=combat?.defenderPose||'impact';
-        defender.classList.add(combat?.contact?'state-impact':'state-guard');
-        if(evt.who==='foe')hitMotion=playArtFrames(cat,reaction,310);
-        else hitMotion=playFoeFrames(currentFoe,reaction,320);
-        const tint=evt.who==='pet'?kit.theme.color:currentFoe.color;
-        burst(evt,tint,visual);
-        if(evt.damage>0){
-          if(cast)cueSound('spellHit',{...skillAudio,side:evt.target});
-          else cueSound('hit',{heavy:combat?.charge||evt.damage>=22,side:evt.target});
-        }else{
-          cueSound('block',{side:evt.target});
-        }
-      }else{burst(evt,'#84e4d8',visual);}
-      showGearEffects(evt,equipped);
-      barAfter(evt);
-      await wait(cast?440:350);
-      await Promise.all([motion,foeMotion,hitMotion]);
-      actor.classList.remove(effect,'state-swipe');
-      defender.classList.remove('state-impact','state-guard');
-      // Do not snap from the last strike/recoil frame straight back to idle.
-      // This recovery uses the exact final pose as its first drawing.
-      const fromPose=evt.who==='pet'
-        ?guard?'guard':cast?(visual?.skill==='ultimate'?'ultimate':'signature'):'swipe'
-        :guard?null:(combat?.defenderPose||'impact');
-      if(fromPose&&cat)await playArtFrames(cat,'recover',220,fromPose);
-      pose('idle');
-      foePose('idle');
-      hideCue();
+      try{
+        if(evt.who==='system'){
+          const won=evt.fx==='victory';
+          cueSound(won?'victory':'defeat');
+          await Promise.all([playArtFrames(cat,won?'victory':'defeat',430),
+            playFoeFrames(foe,won?'defeat':'victory',430)]);
+          if(cat)paintCat(el('battle-cat-art'),cat.breed,won?'victory':'defeat');
+          foeArt?.paint(el('battle-foe-art'),foe,won?'defeat':'victory');
+          await wait(320);
+        }else await playExchange(evt,visual,kit,cat,foe,equipped);
+      }finally{hideCue();}
     }
   }
   async function saveAction(callback) {
@@ -667,8 +695,8 @@
     const next=el('battle-quality').value;
     frameQuality=next==='efficient'?'efficient':'smooth';
     render();
-    status(frameQuality==='efficient'?'Battery saver uses six illustrated poses per action.':
-      'Smooth mode uses up to 21 drawings per attack and 11 for quick transitions.');
+    status(frameQuality==='efficient'?'Battery saver uses fewer drawings with the same hit timing.':
+      'Cinematic mode uses more drawings for smoother steps and recovery.');
   });
   document.addEventListener?.('visibilitychange',()=>{
     if(document.hidden&&watchMode) {

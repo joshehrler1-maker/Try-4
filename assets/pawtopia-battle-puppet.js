@@ -103,6 +103,7 @@
     const stride=(pose==='approach'||pose==='charge')?
       Math.sin(frame/5*Math.PI*(pose==='charge'?4:2))*(11+(art.build||0)*.48):0;
     const [x,y]=at(dogTracks[pose],frame),[dx,dy]=at(dogBody[pose],frame);
+    const [lagX,lagY]=at(dogBody[pose],Math.max(0,frame-.55));
     const joy=pose==='victory'?Math.sin(frame/5*Math.PI)**2:0;
     const sleep=pose==='defeat'?ease(frame/5):0;
     const tail=(pose==='approach'||pose==='victory')?Math.sin(frame*2.3)*7:0;
@@ -110,16 +111,16 @@
       [stride+sleep*12,(pose==='swipe'?y*.19:y*.45)+Math.min(0,stride)*.66],
       [stride+sleep*8,Math.min(0,stride)*.76+sleep*-6],
       [-stride-sleep*8,-Math.max(0,stride)*.73+sleep*-9],
-      [dx*.53,dy*.37+joy*-4+sleep*8],
-      [-dx*.41,tail+sleep*15], [dx,dy-Math.abs(stride)*.25]];
+      [lagX*.53,lagY*.37+joy*-4+sleep*8],
+      [-lagX*.48,tail+sleep*15-lagY*.16], [dx,dy-Math.abs(stride)*.25]];
   }
   function movement(art,pose,frame,fromPose,personal){
-    if(art.dog===true)return dogMotion(art,pose,frame);
     if(pose==='recover'){
       const rest=1-ease(frame/5);
       return movement(art,fromPose==='recover'?'idle':fromPose,5,'idle',personal)
         .map(pair=>pair.map(n=>n*rest));
     }
+    if(art.dog===true)return dogMotion(art,pose,frame);
     if(['walk','run','approach'].includes(pose)){
       const d=Math.sin(frame/5*Math.PI*(pose==='walk'?2:4))*(pose==='walk'?10:16)*(1+(art.uniq%7)*.05);
       const lift=Math.abs(d)*.6;
@@ -142,8 +143,11 @@
     }
     const [x,y]=at(tracks[pose],frame),[dx,dy]=at(bodyTracks[pose],frame);
     const guard=pose==='guard',loss=pose==='defeat';
-    return [[x,y],[x*(guard ? .7 : -.29),y*(guard||pose==='victory' ? .68 : .29)],
-      zero,[loss?8:0,0],[dx*(pose==='impact'? .7 : .28),dy*(loss? .55 : .14)],[-dx*.55,-dy*.25],[dx,dy]];
+    const [lagX,lagY]=at(bodyTracks[pose],Math.max(0,frame-.6));
+    const style=pose==='swipe'? .84+(art.uniq%7)*.053 : 1;
+    return [[x*style,y*style],[x*(guard ? .7 : -.29),y*(guard||pose==='victory' ? .68 : .29)],
+      zero,[loss?8:0,0],[lagX*(pose==='impact'? .7 : .28),lagY*(loss? .55 : .14)],
+      [-lagX*.63,-lagY*.32],[dx*style,dy]];
   }
   function area(a,b,c){return (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);}
   function draw(ctx,canvas,rig,art,pose,frame,fromPose,personal){
@@ -153,11 +157,15 @@
     const offsets=movement(art,pose,frame,fromPose,personal);
     const [dx,dy]=offsets[6];
     const lift=(pose==='victory'||pose==='signature'||pose==='ultimate'||(art.dog===true&&pose==='charge'))?ease(clamp((-dy-7)/12,0,1)):0;
+    const grounded=['swipe','guard','impact'].includes(pose)||
+      (pose==='recover'&&['swipe','guard','impact'].includes(fromPose));
     const shifts=grid.map(([,y],i)=>{
       const body=Math.max(lift,clamp((218-y/scale)/67,0,1));
       let x=dx*body,z=dy*body;
       for(let j=0;j<6;j++){x+=offsets[j][0]*rig.weights[i][j];z+=offsets[j][1]*rig.weights[i][j];}
-      return [x*scale,z*scale];
+      // Preserve the supporting silhouette near the floor while the shoulders turn.
+      const support=grounded?ease(clamp((211-y/scale)/32,0,1)):1;
+      return [x*scale*support,z*scale*support];
     });
     let mesh;
     for(let strength=1;;strength=strength<.25?0:strength*.8){

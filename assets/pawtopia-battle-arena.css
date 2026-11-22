@@ -341,3 +341,18 @@ footer{padding:16px 0 28px;text-align:center}
 @media(prefers-reduced-motion:reduce){
   .battle-vfx .defense-popup{animation:none}
 }
+
+/* During an exchange the timeline is the only source of fighter travel. */
+.battle-stage.has-fighter-timeline .fighter-sprite {
+  animation:none;
+  transform:translateX(var(--fighter-travel,0px));
+}
+.battle-stage.has-fighter-timeline .fighter-sprite .cat-avatar,
+.battle-stage.has-fighter-timeline .fighter-sprite .cat-avatar svg,
+.battle-stage.has-fighter-timeline .fighter-sprite .foe-avatar svg {
+  animation:none;
+}
+.battle-stage.has-fighter-timeline .fighter-sprite .motion-paw {display:none}
+.battle-stage.has-fighter-timeline .fighter-shadow {
+  transform:scale(calc(1 + var(--fighter-weight,0) * .16),calc(1 - var(--fighter-weight,0) * .12));
+}

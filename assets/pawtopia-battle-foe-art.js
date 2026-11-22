@@ -511,7 +511,7 @@
     image.onload=()=>{
       record.state='ready';
       for(const target of record.targets){
-        if(target.dataset.foe===model.id)paint(target,model.id,target.dataset.pose,Number(target.dataset.frame));
+        if(target.dataset.foe===model.id)paint(target,model.id,target.dataset.pose,Number(target.dataset.frame),target.dataset.fromPose);
       }
       record.targets.clear();
     };
@@ -530,7 +530,7 @@
     return record;
   }
 
-  function paintPainting(container,model,pose,frame,record){
+  function paintPainting(container,model,pose,frame,record,fromPose){
     const puppet=window.PawtopiaBattlePuppet;
     const doc=container.ownerDocument;
     if(!puppet||!doc)return false;
@@ -547,8 +547,9 @@
       }
       if(!state.ctx)return false;
       const {canvas,ctx}=state;
-      const markup=dogDrawing(model,pose,Math.round(frame),true);
-      puppet.draw(ctx,canvas,record.rig,model,pose,frame);
+      const recover=pose==='recover';
+      const markup=dogDrawing(model,recover?fromPose:pose,Math.round(recover?5-frame:frame),true);
+      puppet.draw(ctx,canvas,record.rig,model,pose,frame,fromPose);
       if(canvas.parentNode===container)container.firstElementChild.outerHTML=markup;
       else{
         container.innerHTML=markup;
@@ -562,20 +563,22 @@
     }
   }
 
-  function paint(container,foe,pose='idle',frame=3) {
+  function paint(container,foe,pose='idle',frame=3,fromPose='guard') {
     if(!container)return false;
     const model=profile(foe);
     if(!model)return false;
-    pose=states.includes(pose)?pose:'idle';
+    pose=states.includes(pose)||pose==='recover'?pose:'idle';
+    fromPose=states.includes(fromPose)?fromPose:'guard';
     frame=Number.isFinite(frame)?Math.min(5,Math.max(0,frame)):3;
     container.dataset.foe=model.id;
     container.dataset.pose=pose;
     container.dataset.frame=String(frame);
+    container.dataset.fromPose=fromPose;
     const record=model.dog&&typeof window.Image==='function'?paintingRecord(model):null;
     if(record?.state==='loading')record.targets.add(container);
-    const painted=record?.state==='ready'&&paintPainting(container,model,pose,frame,record);
+    const painted=record?.state==='ready'&&paintPainting(container,model,pose,frame,record,fromPose);
     container.dataset.dogPainting=String(Boolean(painted));
-    if(!painted)container.innerHTML=drawing(model,pose,Math.round(frame));
+    if(!painted)container.innerHTML=drawing(model,pose==='recover'?fromPose:pose,Math.round(pose==='recover'?5-frame:frame));
     container.setAttribute('aria-label',model.name+(model.breed?' animated dog challenger':' in his animated Clockwork Avatar'));
     return true;
   }
