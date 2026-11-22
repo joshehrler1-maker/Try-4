@@ -32,8 +32,31 @@
     await render();
     status(result.message || 'Saved.');
   }
+  const petSource = $('share-pet-source');
+  const nick = $('share-pet-nickname');
+  let localPets = [];
+  petSource.addEventListener('change', () => {
+    nick.value = localPets[Number(petSource.value)]?.name || '';
+  });
+  function renderAdoptions(records) {
+    const save = window.PawtopiaSave.read();
+    localPets = [save.companion,...(Array.isArray(save.otherCompanions)?save.otherCompanions:[])].filter(Boolean).slice(0,6);
+    const prior = petSource.value;
+    petSource.replaceChildren(new Option('Choose a pet',''),...localPets.map((pet,index) =>
+      new Option(pet.name+' · '+pet.breed,String(index))));
+    petSource.value = prior!=='' && localPets[Number(prior)] ? prior : '';
+    $('share-pet-submit').disabled = !localPets.length;
+    const list = $('shared-pets');
+    list.replaceChildren();
+    if (!records.length) output(list,'No nicknames shared.');
+    for (const pet of records) {
+      const row = output(list,pet.nickname+' · '+pet.breed);
+      button(row,'Remove shared nickname',() => action('/adoptions',{remove:pet.id}));
+    }
+  }
   async function render() {
-    const signedIn = Boolean(api.key());
+    const account = api.key();
+    const signedIn = Boolean(account);
     $('account-signin').hidden = signedIn;
     $('account-session').hidden = !signedIn;
     $('cloud-opt-in').checked = api.syncEnabled();
@@ -41,10 +64,20 @@
     if (!signedIn) {
       $('account-key').value = '';
       $('cloud-status').textContent = '';
+      nick.value = '';
+      petSource.replaceChildren();
+      $('shared-pets').replaceChildren();
+      $('gift-inbox').replaceChildren();
       return;
     }
-    const data = await api.call('/town');
-    const {player,mine,market,board,clubs,puzzle} = data;
+    const data = await api.call('/town','GET',undefined,account);
+    if (api.key()!==account) return;
+    const {player,mine,market,board,clubs,puzzle,adoptions=[],gifts=[]} = data;
+    renderAdoptions(adoptions);
+    const inbox = $('gift-inbox');
+    inbox.replaceChildren();
+    if (!gifts.length) output(inbox,'No gifts yet.');
+    for (const gift of gifts) output(inbox,(gift.pin||gift.tickets+' market tickets')+' · '+gift.sent_at.slice(0,10));
     $('player-profile').textContent = player.alias + ' · ' + player.tickets + ' market tickets';
     $('public-profile').checked = Boolean(player.public);
     $('player-club').value = player.club || '';
@@ -113,6 +146,13 @@
   button($('cloud-conflict'),'Use this device’s save',() => api.sync('local'));
   button($('cloud-conflict'),'Use the online save',() => api.sync('cloud'));
   button($('online-features'),'Refresh town',render);
+  submit('share-pet',async () => {
+    const pet = petSource.value==='' ? null : localPets[Number(petSource.value)];
+    if (!pet) throw Error('Choose a pet first.');
+    await action('/adoptions',{nickname:nick.value,breed:pet.breed});
+    nick.value = '';
+    petSource.value = '';
+  });
   submit('profile',() => action('/profile',{public:$('public-profile').checked,club:$('player-club').value || null}));
   submit('puzzle',() => action('/puzzle',{answer:$('puzzle-answer').valueAsNumber}));
   const sitekey = window.PawtopiaOnlineConfig.turnstileSiteKey;

@@ -69,6 +69,25 @@ export default {
       }
       const id = player.id;
       const day = new Date().toISOString().slice(0,10), month = day.slice(0,7);
+      if (route === 'POST /adoptions') {
+        const {nickname,breed,remove} = await body(request);
+        if (typeof remove === 'string' && uuidFormat.test(remove)) {
+          await db('DELETE FROM shared_pet WHERE id=? AND player_id=?',remove,id).run();
+          return json({message:'Pet removed from the private log.'});
+        }
+        const name = typeof nickname === 'string' ? nickname.trim().normalize('NFC') : '';
+        const petBreed = typeof breed === 'string' ? breed.trim().normalize('NFC') : '';
+        const safeLabel = /^[\p{L}\p{M}][\p{L}\p{M} ’'.-]*$/u;
+        if (!name || name.length>24 || !safeLabel.test(name) ||
+            !petBreed || petBreed.length>40 || !safeLabel.test(petBreed)) {
+          fail('Use a pet nickname made of letters and spaces, with optional apostrophes or hyphens.');
+        }
+        const result = await db(`INSERT OR IGNORE INTO shared_pet(id,player_id,nickname,breed)
+          SELECT ?,?,?,? WHERE (SELECT COUNT(*) FROM shared_pet WHERE player_id=?)<6`,
+          crypto.randomUUID(),id,name,petBreed,id).run();
+        if (!result.meta.changes) fail('This pet is already shared, or the six-pet limit was reached.',409);
+        return json({message:'Pet nickname shared privately with the game owner.'},201);
+      }
       if (route === 'GET /save') {
         const save = await db('SELECT revision,payload FROM save WHERE player_id=?',id).first();
         return json(save || {revision:0,payload:null});
@@ -95,16 +114,18 @@ export default {
       const first = parseInt(seed.slice(0,2),16) % 19 + 2;
       const second = parseInt(seed.slice(2,4),16) % 17 + 3;
       if (route === 'GET /town') {
-        const [mine,market,board,members,today] = await Promise.all([
+        const [mine,market,board,members,today,adoptions,gifts] = await Promise.all([
           db('SELECT i.id,i.kind,l.price,l.wanted,l.id AS listing FROM item i LEFT JOIN listing l ON l.id=i.id WHERE i.owner=? ORDER BY i.id LIMIT 300',id).all(),
           db('SELECT l.id,p.alias,i.kind,l.price,l.wanted,l.seller=? AS mine FROM listing l JOIN item i ON i.id=l.id JOIN player p ON p.id=l.seller ORDER BY l.id LIMIT 100',id).all(),
           db('SELECT p.alias,p.club,COUNT(*) AS score FROM solved s JOIN player p ON p.id=s.player_id WHERE s.month=? AND p.public=1 GROUP BY p.id ORDER BY score DESC,p.alias LIMIT 25',month).all(),
           db('SELECT club,COUNT(*) AS count FROM player WHERE public=1 AND club IS NOT NULL GROUP BY club').all(),
-          db('SELECT kind FROM solved WHERE player_id=? AND day=?',id,day).first()
+          db('SELECT kind FROM solved WHERE player_id=? AND day=?',id,day).first(),
+          db('SELECT id,nickname,breed FROM shared_pet WHERE player_id=? ORDER BY shared_at,id',id).all(),
+          db('SELECT pin,tickets,sent_at FROM owner_gift WHERE player_id=? ORDER BY sent_at DESC,id DESC LIMIT 30',id).all()
         ]);
         delete player.id;
         return json({player,mine:mine.results,market:market.results,board:board.results,clubs:members.results,
-          puzzle:{first,second,earned:today?.kind || null}});
+          adoptions:adoptions.results,gifts:gifts.results,puzzle:{first,second,earned:today?.kind || null}});
       }
       if (route === 'POST /puzzle') {
         const {answer} = await body(request);

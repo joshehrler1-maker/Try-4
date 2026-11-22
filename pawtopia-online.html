@@ -9,7 +9,7 @@
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/pawtopia-online-config.js"></script>
 <script defer src="assets/pawtopia-cloud-save.js"></script>
-<script defer src="assets/pawtopia-online-town.js"></script>
+<script defer src="assets/pawtopia-online-town.js?v=private-gifts-1"></script>
 <style>
   main section { margin-block: 1.25rem; }
   form label, form button { margin-block: .4rem; }
@@ -67,6 +67,23 @@
 <button>Save profile</button>
 </form>
 <ul id="club-members"></ul>
+</section>
+<section aria-labelledby="adoption-log-title">
+<h2 id="adoption-log-title">Private pet registration</h2>
+<p>Sharing is optional. Other players cannot see the nickname and breed you share with the game owner. Use a pet nickname that contains no personal information.</p>
+<form id="share-pet">
+<label for="share-pet-source">Choose a pet saved in this browser</label>
+<select id="share-pet-source" required></select>
+<label for="share-pet-nickname">Nickname to share</label>
+<input id="share-pet-nickname" required maxlength="24" autocomplete="off">
+<button type="submit" id="share-pet-submit">Share with game owner</button>
+</form>
+<ul id="shared-pets"></ul>
+</section>
+<section aria-labelledby="gift-inbox-title">
+<h2 id="gift-inbox-title">Gifts from Pawtopia</h2>
+<p>Gifts go directly to your pin inventory or market ticket balance.</p>
+<ul id="gift-inbox"></ul>
 </section>
 <section aria-labelledby="puzzle-title">
 <h2 id="puzzle-title">Daily town puzzle</h2>

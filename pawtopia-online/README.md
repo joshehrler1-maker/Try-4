@@ -10,3 +10,24 @@ The player features run separately from GitHub Pages. Keep the Cloudflare accoun
 5. If save sync is separately enabled, both the Worker setting (`PAWTOPIA_CLOUD_SAVES=enabled`) and browser configuration (`cloudSaves: true`) must be enabled. Each browser must then opt in separately. Cloud saves may contain player-entered game text such as cat bios. Test a two-browser conflict with disposable data before enabling this in production.
 
 Account keys are private sign-in credentials. The service stores only a hash of each key. Sync saves and shared market state are stored separately. Player-controlled browser saves cannot add pins or tickets or set a leaderboard score. Public standings use generated aliases and optional clubs.
+
+## Private pet log and owner gifts
+
+Apply the latest `schema.sql` before deploying the Worker. Players sign in and choose whether to share a pet nickname and breed in the online town. These entries are self-reported and contain the sharing date, which can differ from the adoption date. Existing offline pets and unshared nicknames are never imported. Players can remove their own entries.
+
+Use the signed-in Cloudflare D1 console for the private log and gifts. The Worker has no public gift-creation endpoint. To see player aliases available as recipients:
+
+```sql
+SELECT alias FROM player ORDER BY alias;
+SELECT alias, nickname, breed, shared_at FROM owner_adoption_log ORDER BY shared_at DESC;
+```
+
+Send one pin or 1–100 market tickets using the exact player alias. Gifts go directly to their inventory or balance, even while the recipient is offline. Each insert sends one gift.
+
+```sql
+INSERT INTO owner_gift (player_id, pin)
+SELECT id, 'Lantern pin' FROM player WHERE alias = 'PASTE-PLAYER-ALIAS-HERE';
+
+INSERT INTO owner_gift (player_id, tickets)
+SELECT id, 10 FROM player WHERE alias = 'PASTE-PLAYER-ALIAS-HERE';
+```

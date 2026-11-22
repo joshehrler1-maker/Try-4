@@ -50,3 +50,31 @@ CREATE TRIGGER IF NOT EXISTS exchange_items BEFORE INSERT ON swap BEGIN
   UPDATE item SET owner = NEW.buyer WHERE id = NEW.listing_id;
   DELETE FROM listing WHERE id = NEW.listing_id;
 END;
+
+-- Players choose which pet nicknames to share with the owner.
+CREATE TABLE IF NOT EXISTS shared_pet (
+  id TEXT PRIMARY KEY, player_id TEXT NOT NULL REFERENCES player(id) ON DELETE CASCADE,
+  nickname TEXT NOT NULL, breed TEXT NOT NULL, shared_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(player_id,nickname,breed)
+);
+CREATE VIEW IF NOT EXISTS owner_adoption_log AS
+  SELECT p.alias, s.nickname, s.breed, s.shared_at
+  FROM shared_pet s JOIN player p ON p.id=s.player_id;
+
+-- Only the database operator can insert gifts. No Worker route writes here.
+CREATE TABLE IF NOT EXISTS owner_gift (
+  id TEXT PRIMARY KEY NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+  player_id TEXT NOT NULL REFERENCES player(id),
+  pin TEXT CHECK(pin IN ('Lantern pin','Glowbell pin','Sunbeam pin','Crystal pin')),
+  tickets INTEGER CHECK(typeof(tickets)='integer' AND tickets BETWEEN 1 AND 100),
+  sent_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CHECK((pin IS NOT NULL) != (tickets IS NOT NULL))
+);
+CREATE INDEX IF NOT EXISTS owner_gift_recipient ON owner_gift(player_id,sent_at);
+CREATE TRIGGER IF NOT EXISTS deliver_owner_gift AFTER INSERT ON owner_gift BEGIN
+  UPDATE player SET tickets=tickets+NEW.tickets WHERE id=NEW.player_id AND NEW.tickets IS NOT NULL;
+  INSERT INTO item(id,owner,kind)
+    SELECT substr(NEW.id,1,8)||'-'||substr(NEW.id,9,4)||'-'||substr(NEW.id,13,4)||'-'||
+           substr(NEW.id,17,4)||'-'||substr(NEW.id,21,12), NEW.player_id, NEW.pin
+    WHERE NEW.pin IS NOT NULL;
+END;
