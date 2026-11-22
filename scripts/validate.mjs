@@ -63,7 +63,18 @@ const handlers = {};
 let offline = false, deleted = [];
 const scope = 'https://example.test/Try-4/';
 const cached = new Map();
-const cache = {addAll:async files => {for (const f of files) {ok(known(f.split("?")[0]), `Missing offline file ${f}`);cached.set(new URL(f,scope).href, {file:f});}},match:async request => cached.get(new URL(typeof request === 'string'?request:request.url,scope).href)};
+const cache = {
+ addAll: async files => {
+  for (const entry of files) {
+   const url = new URL(entry, scope);
+   ok(url.href.startsWith(scope), `Offline URL outside app scope: ${entry}`);
+   const file = decodeURIComponent(url.pathname.slice(new URL(scope).pathname.length)) || 'index.html';
+   ok(known(file), `Missing offline file ${file}`);
+   cached.set(url.href, {file});
+  }
+ },
+ match: async request => cached.get(new URL(typeof request === 'string' ? request : request.url, scope).href)
+};
 const context = {URL, Set, Promise, Response, self:{registration:{scope},addEventListener:(name,fn)=>handlers[name]=fn},caches:{open:async ()=>cache,keys:async ()=>['try4-public-v0','other-app'],delete:async name=>deleted.push(name)},fetch:async request=>{if(offline) throw Error('offline');return {live:request.url};}};
 vm.runInNewContext(read('sw.js'),context);
 let task;
@@ -74,6 +85,7 @@ async function request(url,method='GET') {let response;handlers.fetch({request:{
 ok((await request(scope+'index.html')).live, 'Online navigation must use network');
 offline = true;
 ok((await request(scope+'index.html')).file === 'index.html', 'Offline navigation must use cached page');
+ok((await request(scope+'assets/pawtopia-battle-arena.js?v=arena-rewards-1')).file === 'assets/pawtopia-battle-arena.js', 'Offline Arena must use the current reward and navigation script');
 ok((await request(scope+'pawcade-side-scroll.html?game=24')).file === 'pawcade-side-scroll.html', 'Every Pawcade game must open offline');
 const sideScrollPage = read('pawcade-side-scroll.html');
 for (const [, asset] of sideScrollPage.matchAll(/(?:href|src)="(assets\/[^"]+\?[^"]+)"/g)) {
