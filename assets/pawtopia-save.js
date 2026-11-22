@@ -196,7 +196,9 @@
       if (!window.PawtopiaOnlineConfig?.endpoint) return;
       for (const link of document.querySelectorAll('[data-pawtopia-online]')) link.hidden = false;
       try {
-        if (!localStorage.getItem('pawtopia-online-key')) return;
+        if (window.PawtopiaOnlineConfig.cloudSaves !== true ||
+          !localStorage.getItem('pawtopia-online-key') ||
+          localStorage.getItem('pawtopia-cloud-sync-opt-in') !== 'yes') return;
       } catch { return; }
       const sync = document.createElement('script');
       sync.src = new URL('pawtopia-cloud-save.js', source.src).href;

@@ -5,6 +5,8 @@
   const save = window.PawtopiaSave;
   const authKey = 'pawtopia-online-key';
   const syncKey = 'pawtopia-online-sync';
+  const consentKey = 'pawtopia-cloud-sync-opt-in';
+  const syncEnabled = () => config.cloudSaves === true && localStorage.getItem(consentKey) === 'yes';
   const progressKey = 'pawtopia-home-progress-v1';
   let busy = false, timer, conflict;
   function status(message) {
@@ -37,11 +39,11 @@
   }
   function schedule() {
     clearTimeout(timer);
-    if (key() && !conflict) timer = setTimeout(() => sync(), 1400);
+    if (syncEnabled() && key() && !conflict) timer = setTimeout(() => sync(), 1400);
   }
   async function sync(prefer) {
     const account = key();
-    if (!account || busy || (conflict && !prefer)) return;
+    if (!syncEnabled() || !account || busy || (conflict && !prefer)) return;
     busy = true;
     try {
       const backup = save.exportBackup();
@@ -49,7 +51,7 @@
       const digest = await fingerprint(local);
       const marker = readMarker();
       const remote = await call('/save','GET',undefined,account);
-      if (key() !== account) return;
+      if (key() !== account || !syncEnabled()) return;
       const remoteChanged = remote.revision !== marker?.revision;
       const localChanged = digest !== marker?.digest;
       if (!prefer && remote.payload && remoteChanged && localChanged && localStorage.getItem(progressKey)) {
@@ -66,7 +68,7 @@
       }
       if (remote.payload && (prefer === 'cloud' || (remoteChanged && prefer !== 'local'))) {
         const incoming = JSON.parse(remote.payload);
-        const applied = await save.applyCloudBackup(incoming, local, () => key() === account);
+        const applied = await save.applyCloudBackup(incoming, local, () => key() === account && syncEnabled());
         if (!applied) {
           schedule();
           return;
@@ -80,7 +82,7 @@
       }
       if (prefer === 'local' || localChanged || !remote.payload) {
         const result = await call('/save','PUT',{revision:remote.revision,payload:JSON.stringify(backup)},account);
-        if (key() !== account) return;
+        if (key() !== account || !syncEnabled()) return;
         localStorage.setItem(syncKey,JSON.stringify({revision:result.revision,digest}));
       }
       conflict = false;
@@ -100,27 +102,43 @@
   async function connect(account) {
     if (!/^[0-9a-f]{64}$/.test(account)) throw Error('Enter the complete Pawtopia account key.');
     if (key() !== account && key()) throw Error('Sign out before switching accounts.');
-    await call('/save','GET',undefined,account);
-    if (key() !== account) localStorage.removeItem(syncKey);
+    await call('/session','GET',undefined,account);
+    if (key() !== account) {
+      localStorage.removeItem(syncKey);
+      localStorage.removeItem(consentKey);
+    }
     localStorage.setItem(authKey,account);
     conflict = false;
     await sync();
   }
+  function setSyncEnabled(enabled) {
+    if (enabled && config.cloudSaves === true && key()) {
+      localStorage.setItem(consentKey,'yes');
+      schedule();
+      return;
+    }
+    localStorage.removeItem(consentKey);
+    clearTimeout(timer);
+    conflict = false;
+    controls();
+    status('Cloud sync is off on this browser.');
+  }
   function disconnect() {
+    localStorage.removeItem(consentKey);
     localStorage.removeItem(authKey);
     localStorage.removeItem(syncKey);
     clearTimeout(timer);
     conflict = false;
     controls();
   }
-  window.PawtopiaOnline = {call, key, connect, disconnect, sync};
+  window.PawtopiaOnline = {call, key, connect, disconnect, sync, syncEnabled, setSyncEnabled};
   addEventListener('pawtopia-save-changed',schedule);
   addEventListener('storage',event => {
-    if (event.key === progressKey || event.key === authKey) schedule();
+    if (event.key === progressKey || event.key === authKey || event.key === consentKey) schedule();
   });
   addEventListener('online',schedule);
   addEventListener('pageshow',schedule);
   document.addEventListener('visibilitychange',() => { if (!document.hidden) schedule(); });
-  setInterval(() => { if (!document.hidden && navigator.onLine && key() && !conflict) sync(); },60000);
+  setInterval(() => { if (!document.hidden && navigator.onLine && syncEnabled() && key() && !conflict) sync(); },60000);
   schedule();
 })();

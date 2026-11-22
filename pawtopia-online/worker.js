@@ -63,6 +63,10 @@ export default {
       if (!tokenFormat.test(key)) fail('Enter your Pawtopia account key.',401);
       const player = await db('SELECT id,alias,public,club,tickets FROM player WHERE token_hash=?',await hash(key)).first();
       if (!player) fail('Account key was not recognized.',401);
+      if (route === 'GET /session') return json({alias:player.alias});
+      if ((route === 'GET /save' || route === 'PUT /save') && env.PAWTOPIA_CLOUD_SAVES !== 'enabled') {
+        fail('Online save sync is disabled.', 404);
+      }
       const id = player.id;
       const day = new Date().toISOString().slice(0,10), month = day.slice(0,7);
       if (route === 'GET /save') {

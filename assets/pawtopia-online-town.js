@@ -6,6 +6,8 @@
   if (!api) return;
   $('online-disabled').hidden = true;
   $('online-enabled').hidden = false;
+  $('cloud-settings').hidden = window.PawtopiaOnlineConfig.cloudSaves !== true;
+  $('cloud-opt-in').addEventListener('change',event => api.setSyncEnabled(event.currentTarget.checked));
   function output(parent, value) {
     const item = document.createElement('li');
     item.textContent = value;
@@ -34,6 +36,7 @@
     const signedIn = Boolean(api.key());
     $('account-signin').hidden = signedIn;
     $('account-session').hidden = !signedIn;
+    $('cloud-opt-in').checked = api.syncEnabled();
     $('online-features').hidden = !signedIn;
     if (!signedIn) {
       $('account-key').value = '';

@@ -30,7 +30,7 @@
 <p><a href="pawtopia-town.html">Town Square</a> · <a href="pawtopia-progress.html#backup-title">Save backups</a></p>
 <section class="hero">
 <h1>Pawtopia Players</h1>
-<p>Sync your progress, visit player shops, trade collectible pins, and join a club.</p>
+<p>Visit player shops, trade collectible pins, and join a club.</p>
 </section>
 <p id="online-disabled">Online features are awaiting server setup. You can still <a href="pawtopia-progress.html#backup-title">download your progress and move it to another device</a>.</p>
 <div id="online-enabled" hidden>
@@ -44,10 +44,15 @@
 <div id="signup-challenge"></div><div id="signup-controls"></div>
 </form>
 <div id="account-session" hidden>
-<p>Save your key somewhere private. Enter it on your other device to sync.</p>
+<p>Keep this key private. It signs you into your Pawtopia player account.</p>
 <input id="key-display" aria-label="Your private account key" readonly hidden>
 <div id="account-buttons"></div>
+<div id="cloud-settings" hidden>
+<label><input type="checkbox" id="cloud-opt-in"> Sync this browser’s Pawtopia game save</label>
+<p>Sync uploads game progress, including cat names and any bios you wrote. Leave it off to keep game progress in this browser. Turning it off stops future sync from this browser.</p>
 <p id="cloud-status" role="status"></p><div id="cloud-conflict" hidden></div>
+</div>
+<p>Public listings show a generated player alias. Leaderboard sharing is optional.</p>
 </div>
 </section>
 <div id="online-features" hidden>
