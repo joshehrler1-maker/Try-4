@@ -59,8 +59,8 @@
     ['window-lamp','Frostglass Window Lamp','Furnishing',0,'Place it for a daily rest that restores 9 happiness and earns 4 friendship.',{care:[0,9,4],daily:true,recipe:{'frostbell-flake':1,'garden-cog':1}}],
     ['scratch-deck','Rafter Scratch Deck','Furnishing',13,'Place it for a daily stretch that restores 11 happiness and earns 6 friendship.',{care:[0,11,6],daily:true}],
 
-    ['copper-hound-sketch','Tin Hound Workshop Sketch','Collectible',0,'Defeat Tin Training Hound to archive Bolt’s first training bot sketch.',{rank:1,lore:'Its paws were cut from spare teapot lids.'}],
-    ['iron-fang-blueprint','Iron Fang Blueprint Fragment','Collectible',0,'Defeat Iron Fang Striker to archive a fragment of its blueprint.',{rank:8,lore:'A second hinge lets its tail fold flat during a charge.'}],
+    ['copper-hound-sketch','Tin Hound Workshop Sketch','Collectible',0,'Win a Tier 1 Arena battle to archive Bolt’s first training bot sketch.',{rank:1,lore:'Its paws were cut from spare teapot lids.'}],
+    ['iron-fang-blueprint','Iron Fang Blueprint Fragment','Collectible',0,'Win a Tier 8 Arena battle to archive a fragment of the Iron Fang blueprint.',{rank:8,lore:'A second hinge lets its tail fold flat during a charge.'}],
     ['baron-invitation','Baron’s Sealed Challenge','Collectible',0,'Defeat Baron’s Clockwork Avatar to archive the final challenge letter.',{rank:12,lore:'The wax seal bears a tiny gear with one missing tooth.'}]
   ].map(([id,name,category,price,description,effect]) => ({id,name,category,price,description,...effect}));
 
@@ -166,6 +166,7 @@
       const books = Array.isArray(cat.catalogBooks) ? cat.catalogBooks : [];
       if (books.includes(id)) return 'This cat already read that book.';
       const nextStats = {...cat.stats};
+      const studyLevel=Math.max(1,count(cat.stats?.level,1));
       let bond = count(cat.bondPoints);
       let increased = false;
       for (const [stat,amount] of Object.entries(item.read)) {
@@ -175,7 +176,15 @@
           bond = nextBond;
         } else {
           const current = count(cat.stats?.[stat],2);
-          const next = Math.max(current,Math.min(200,current+amount));
+          const perLevel=stat==='endurance'?3:2;
+          const ceiling=Math.min(200,studyLevel*perLevel+4);
+          if(current+amount>ceiling){
+            const neededLevel=Math.ceil((current+amount-4)/perLevel);
+            return current+amount>200
+              ?'This cat is too close to the permanent '+stat+' limit for this book.'
+              :'Train to level '+neededLevel+' to gain the full '+stat+' bonus from this book.';
+          }
+          const next=current+amount;
           increased ||= next>current;
           nextStats[stat] = next;
         }

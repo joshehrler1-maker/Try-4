@@ -164,7 +164,8 @@
       button.disabled=locked||busy||Boolean(fighting)||watchMode;
       button.setAttribute('aria-pressed',String(selectedFoe===index));
       addText(button,'strong',(locked?'🔒 ':'')+enemy.glyph+' '+enemy.name);
-      addText(button,'small',enemy.sizeLabel+' · Lv '+enemy.level+' · '+enemy.coins+' Paw Coins · '+(enemy.xp*3)+' XP');
+      addText(button,'small',enemy.sizeLabel+' · Recommended Lv '+enemy.level);
+      addText(button,'small',enemy.coins+' Paw Coins · '+(enemy.xp*3)+' XP · '+(data.battlePoints?.(enemy.rank)||2)+' daily upgrade points / tier');
       addText(button,'small',enemy.loot);
       return button;
     });

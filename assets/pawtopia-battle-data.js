@@ -238,10 +238,22 @@
   const foes=roster.map(([breed,weight,build,palette,id])=>{
     const index=limits.findIndex(limit=>weight<=limit);
     const tier=templates[index];
-    return Object.freeze({...tier,id,name:breed,breed,weight,build,palette,
+    const low=index?limits[index-1]:4.5,high=Math.min(limits[index],185);
+    const position=Math.max(0,Math.min(1,(weight-low)/(high-low)));
+    const hp=tier.hp+Math.floor(position*3);
+    const attack=tier.attack+(index>=6&&position>=.72?1:0);
+    const xp=(index===0?6:index===1?8:tier.xp)+Math.floor(position);
+    const coins=tier.coins+(position>=.78?1:0);
+    const loot=index<3?'Snack every second win':
+      (1+Math.floor((tier.rank-4)/3))+' crystal shard'+(tier.rank>=7?'s':'')+
+      (tier.rank===4||tier.rank===8?' · first win medal':'')+
+      (tier.rank>=7?' · first-win Crystal Toy if missing':'');
+    return Object.freeze({...tier,id,name:breed,breed,weight,build,palette,hp,attack,xp,coins,loot,
+      legacyHp:tier.hp,legacyAttack:tier.attack,
       visualSize:.5+.61*(Math.sqrt(weight)-Math.sqrt(4.5))/(Math.sqrt(185)-Math.sqrt(4.5))});
   });
-  foes.push(templates[bossRank-1]);
+  foes.push(Object.freeze({...templates[bossRank-1],loot:'3 crystal shards · first win Golden Paw Crown · Crystal Toy if missing'}));
+  const battlePoints=rank=>rank<=4?2:rank<=8?3:4;
   const animationStates = Object.freeze(['idle','approach','swipe','guard','cast','impact','victory','defeat']);
   const kits = breeds.map((breed,index) => {
     const isOriginal = index < originalBreeds.length;
@@ -279,7 +291,7 @@
   }
   window.PawtopiaBattleData = Object.freeze({
     breeds: Object.freeze(breeds), kits: Object.freeze(kits),
-    foes: Object.freeze(foes), bossRank, themes: Object.freeze(themes),
+    foes: Object.freeze(foes), bossRank, battlePoints, themes: Object.freeze(themes),
     animationStates, kitFor, movesFor
   });
 })();

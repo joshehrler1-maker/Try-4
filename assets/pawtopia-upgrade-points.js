@@ -48,15 +48,24 @@
       return {granted:0,balance:state().balance,message:'Invalid arcade milestone.'};
     if(kind==='scout'&&(!['meadow','grotto','garden','frost'].includes(game)||milestone!=='solved'))
       return {granted:0,balance:state().balance,message:'Unknown scout trail.'};
-    if(kind==='battle-win'&&(!/^foe-(?:[1-9]|1[0-2])$/.test(game)||milestone!=='victory'))
-      return {granted:0,balance:state().balance,message:'Invalid battle rank.'};
+    const roster=window.PawtopiaBattleData;
+    const challenger=kind==='battle-win'?roster?.foes?.find(foe=>foe.id===game):null;
+    if(kind==='battle-win'&&(!challenger||milestone!=='victory'))
+      return {granted:0,balance:state().balance,message:'Invalid challenger victory.'};
     if((kind==='guest-launch'||kind==='guest3d-launch')&&milestone!=='launch')
       return {granted:0,balance:state().balance,message:'Guest launches cannot claim win rewards.'};
-    const k=today()+'|'+kind+'|'+game+'|'+milestone;
-    const amount=kinds[kind];
+    // All breeds in one tier share the same daily award. Keep existing
+    // rank-based claim keys so an update cannot grant today's award twice.
+    const awardKey=challenger?'foe-'+challenger.rank:game;
+    const k=today()+'|'+kind+'|'+awardKey+'|'+milestone;
+    const amount=challenger?(roster.battlePoints?.(challenger.rank)??kinds[kind]):kinds[kind];
     const guestKind=kind==='guest-launch'||kind==='guest3d-launch';
     let changed=false;
     await save.update(progress=>{
+      if(challenger){
+        const match=progress.battleMatch;
+        if(match?.foeId!==game||!match.finished||match.result!=='win')return '';
+      }
       const item=ledger(progress);
       if(item.keys.includes(k)||item.daily+amount>maxDaily||item.balance+amount>maxBalance||
          (guestKind&&item.guest+amount>guestDaily))return '';

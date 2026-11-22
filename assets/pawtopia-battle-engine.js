@@ -55,7 +55,13 @@
   }
   const unlocked = progress => clamp(safe(progress?.battleUnlocked,1),1,data.bossRank || data.foes.length);
   const foeById = id => data.foes.find(foe=>foe.id===id);
-  const opponent = progress => foeById(progress?.battleMatch?.foeId);
+  function opponent(progress){
+    const match=progress?.battleMatch,foe=foeById(match?.foeId);
+    if(!foe)return null;
+    const recorded=match.foeCombat;
+    if(recorded)return {...foe,hp:safe(recorded.hp,foe.hp),attack:safe(recorded.attack,foe.attack)};
+    return {...foe,hp:foe.legacyHp??foe.hp,attack:foe.legacyAttack??foe.attack};
+  }
   const battlingCat = progress => fighters(progress).find(cat=>cat.battleId && cat.battleId===progress?.battleMatch?.petId);
   function matchInfo(progress) {
     const match=progress?.battleMatch,foe=opponent(progress),cat=battlingCat(progress);
@@ -90,7 +96,7 @@
     const gearArt=['weapon','armor','relic','wearable'].map(slot=>market?.worn?.(progress,cat,slot)?.id).filter(Boolean);
     const gearMaxHp=equippedMaxHp(cat,gear);
     progress.battleMatch={
-      petId:cat.battleId,foeId:foe.id,hp:gearMaxHp,foeHp:foe.hp,gear,gearMaxHp,gearArt,
+      petId:cat.battleId,foeId:foe.id,hp:gearMaxHp,foeHp:foe.hp,gear,gearMaxHp,gearArt,foeCombat:{hp:foe.hp,attack:foe.attack},
       round:1,guard:0,dodge:0,foeSlow:0,ultimateUsed:false,
       signatureReadyAt:0,finished:false,result:'',lastMove:'',history:['A new battle begins!']
     };

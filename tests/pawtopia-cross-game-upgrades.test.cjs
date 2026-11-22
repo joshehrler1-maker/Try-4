@@ -10,8 +10,10 @@ function world(fail=false){
   };
   const ctx={window,localStorage,navigator:{},Date};
   vm.runInNewContext(read('assets/pawtopia-save.js'),ctx);
+  vm.runInNewContext(read('assets/pawtopia-battle-data.js'),ctx);
   vm.runInNewContext(read('assets/pawtopia-upgrade-points.js'),ctx);
   return {api:window.PawtopiaUpgradePoints,save:window.PawtopiaSave,
+    roster:window.PawtopiaBattleData.foes,
     load:obj=>{raw=JSON.stringify(obj)},raw:()=>raw};
 }
 const cat=(level=1)=>({name:'Mochi',breed:'Bengal',stats:{
@@ -41,8 +43,20 @@ test('all six original mini modes and three 3D maze endings award distinct miles
    assert.equal((await w.api.claim('3d-win','maze-'+i,'escape')).granted,3);
    assert.equal((await w.api.claim('3d-win','maze-'+i,'escape')).granted,0);
  }
+ w.load({...w.save.read(),battleMatch:{foeId:'foe-1',finished:true,result:'win'}});
  assert.equal((await w.api.claim('battle-win','foe-1','victory')).granted,2);
  assert.equal(w.api.state().balance,29);
+});
+test('every breed can earn the same tier award once per day for a recorded victory',async()=>{
+ const w=world(), dog=w.roster.find(foe=>foe.rank===10&&foe.id.startsWith('dog-'));
+ assert.equal((await w.api.claim('battle-win',dog.id,'victory')).granted,0);
+ w.load({...w.save.read(),battleMatch:{foeId:dog.id,finished:true,result:'loss'}});
+ assert.equal((await w.api.claim('battle-win',dog.id,'victory')).granted,0);
+ w.load({...w.save.read(),battleMatch:{foeId:dog.id,finished:true,result:'win'}});
+ assert.equal((await w.api.claim('battle-win',dog.id,'victory')).granted,4);
+ w.load({...w.save.read(),battleMatch:{foeId:'foe-10',finished:true,result:'win'}});
+ assert.equal((await w.api.claim('battle-win','foe-10','victory')).granted,0);
+ assert.equal(w.api.state().balance,4);
 });
 test('four total guest launch bonuses, with no invented external game wins',async()=>{
  const w=world();
