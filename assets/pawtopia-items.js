@@ -159,6 +159,17 @@
     cat.catalogGear = {...next,[item.slot]:id};
     return 'Equipped ' + item.name + '.';
   }
+  function wishlist(progress,id) {
+    if (!byId.has(id)) return 'Item unavailable.';
+    const saved = Array.isArray(progress.itemWishlist) ? progress.itemWishlist : [];
+    if (saved.includes(id)) {
+      progress.itemWishlist = saved.filter(item => item!==id);
+      return 'Removed from wishlist.';
+    }
+    if (saved.length>=100) return 'Your wishlist holds up to 100 items.';
+    progress.itemWishlist = [...saved,id];
+    return 'Saved to wishlist.';
+  }
   function use(progress,id) {
     const item = byId.get(id), cat = progress.companion;
     if (!cat || !item || !stock(progress,id)) return 'Adopt a cat and obtain this item first.';
@@ -213,6 +224,11 @@
     Object.assign(cat,{fullness:nextFullness,happiness:nextHappiness,bondPoints:nextBond,updatedAt:now});
     if (item.daily) progress.catalogDaily = {...progress.catalogDaily,[id]:day()};
     else add(progress,id,-1);
+    if (item.category==='Food' || item.category==='Toy') {
+      const previous = cat.itemExperiences?.[item.category];
+      const seen = Array.isArray(previous) ? previous : [];
+      if (!seen.includes(id)) cat.itemExperiences = {...cat.itemExperiences,[item.category]:[...seen,id]};
+    }
     return 'Used ' + item.name + '.';
   }
   function worn(progress,cat,slot) {
@@ -242,5 +258,5 @@
     add(progress,collectible.id,1);
     return collectible.name;
   }
-  window.PawtopiaItems = Object.freeze({items,byId,stock,buy,craft,equip,use,worn,arena,scoutReward,arenaReward,claim,hasClaimed,achievementProgress,refine,workshop,exhibition,display,stackable});
+  window.PawtopiaItems = Object.freeze({items,byId,stock,buy,craft,equip,use,wishlist,worn,arena,scoutReward,arenaReward,claim,hasClaimed,achievementProgress,refine,workshop,exhibition,display,stackable});
 })();

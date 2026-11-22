@@ -13,7 +13,6 @@
   const breeds = [...originalBreeds, ...catalogBreeds];
   const stats = save.battleStats();
   const trainingPrice = 5;
-  const maxCats = 4;
   const petBond = window.PawtopiaPetBond;
   const scout = window.PawtopiaScout;
   const scoutChoice = byId('cottage-scout-accessory');
@@ -120,6 +119,7 @@
     trainPoints.disabled = !upgrades?.canSpend(progress,training.value);
     byId('coins').textContent = coins;
     byId('inventory').textContent = 'Inventory · ' + food + (food === 1 ? ' snack' : ' snacks') + (toy ? ' · Crystal toy' : '');
+    const maxCats = save.cottageCapacity(progress);
     const allCats = [companion, ...otherCompanions].filter(Boolean).slice(0, maxCats);
     byId('pet-album-count').textContent = allCats.length + ' of ' + maxCats + ' companions adopted';
     const albumCards = allCats.map((cat, index) => {
@@ -255,7 +255,7 @@
     const breed = new FormData(event.currentTarget).get('breed');
     if (!breeds.includes(breed)) return;
     act(progress => {
-      if (progress.companion && progress.otherCompanions.length >= maxCats - 1) return 'The cottage is full.';
+      if (progress.companion && progress.otherCompanions.length >= save.cottageCapacity(progress) - 1) return 'The cottage is full.';
       const cat = { name, breed, fullness: 65, happiness: 65, updatedAt: Date.now() };
       if (progress.companion) progress.otherCompanions.push(cat);
       else progress.companion = cat;

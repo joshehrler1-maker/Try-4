@@ -14,8 +14,10 @@
   const staples = document.getElementById('local-stock');
   const shopItems = storefront ? market.items.filter(item => stock.shopFor(item)===storefront) : market.items;
   const query = new URLSearchParams(location.search);
+  let focusedItem = shopItems.find(item => item.id===query.get('item'))?.id;
   if (storefront) source.value='shop';
   else if (['shop','achievement','ready'].includes(query.get('source'))) source.value = query.get('source');
+  if (focusedItem) search.value = market.byId.get(focusedItem).name;
   const categories = [...new Set(shopItems.map(item => item.category))];
   for (const name of categories) category.add(new Option(name,name));
   const add = (parent, tag, value, className) => {
@@ -92,6 +94,7 @@
     add(display,'span','Cottage display: '+(displayed?.name||'Empty'));
     const term=search.value.toLowerCase().trim();
     const visible=shopItems.filter(item => {
+      if (focusedItem && item.id!==focusedItem) return false;
       if (category.value && item.category!==category.value) return false;
       if (tier.value && item.tier!==tier.value) return false;
       if (owned.checked && !market.stock(p,item.id)) return false;
@@ -137,6 +140,8 @@
       if (item.lore && units) add(card,'p',item.lore);
       const actions=add(card,'div','','actions');
       if (goals.length) control(actions,'Claim reward','claim',item,goals.some(goal => goal.current<goal.target));
+      const saved = Array.isArray(p.itemWishlist) && p.itemWishlist.includes(item.id);
+      if (market.wishlist) control(actions,saved?'Remove from wishlist':'Save to wishlist','wishlist',item);
       const stackable=market.stackable(item);
       if (item.price && (!units || stackable)) control(actions,'Buy · '+item.price+' coins','buy',item,p.coins<item.price || units>=999);
       if (item.recipe && !units) control(actions,'Craft','craft',item,Object.entries(item.recipe).some(([id,n]) => market.stock(p,id)<n));
@@ -158,6 +163,7 @@
     }
   }
   function resetPage() {
+    focusedItem=undefined;
     page=0;
     render();
   }

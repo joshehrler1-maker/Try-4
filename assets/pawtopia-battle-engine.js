@@ -6,7 +6,7 @@
   const MAX_LEVEL = 200;
   const safe = (x, fallback = 0) => Number.isSafeInteger(x) && x >= 0 ? x : fallback;
   const clamp = (x, min, max) => Math.min(max, Math.max(min, x));
-  const fighters = progress => [progress?.companion, ...(Array.isArray(progress?.otherCompanions) ? progress.otherCompanions : [])].filter(Boolean).slice(0, 4);
+  const fighters = progress => [progress?.companion, ...(Array.isArray(progress?.otherCompanions) ? progress.otherCompanions : [])].filter(Boolean).slice(0, 6);
   const level = cat => clamp(safe(cat?.stats?.level, 1), 1, MAX_LEVEL);
   const training = cat => ({
     strength: safe(cat?.stats?.strength,2),

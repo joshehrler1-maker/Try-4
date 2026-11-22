@@ -14,6 +14,10 @@
       return defaults;
     }
   }
+  function cottageCapacity(progress) {
+    const extra = progress?.cottageExpansion;
+    return 4 + (Number.isInteger(extra) ? Math.max(0,Math.min(2,extra)) : 0);
+  }
   const utcDay = () => new Date().toISOString().slice(0, 10);
   const utcWeek = () => {
     const date = new Date();
@@ -182,7 +186,7 @@
   function maxHealth(stats) {
     return 8 + stats.endurance * 2;
   }
-  window.PawtopiaSave = { read, update, battleStats, maxHealth, today: () => new Date().toDateString(), questDefs, questJournal, claimQuest, exportBackup, restoreBackup, applyCloudBackup };
+  window.PawtopiaSave = { read, update, cottageCapacity, battleStats, maxHealth, today: () => new Date().toDateString(), questDefs, questJournal, claimQuest, exportBackup, restoreBackup, applyCloudBackup };
   // The public site stays usable if online features are disabled or the service is down.
   const source = typeof document !== 'undefined' && document.currentScript;
   if (source && !document.querySelector('script[src$="pawtopia-cloud-save.js"]')) {

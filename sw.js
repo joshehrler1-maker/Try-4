@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v140-quiet-hero-challenge';
+const CACHE = 'try4-public-v141-cottage-life';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-battle-art-gallery.html","assets/pawtopia-battle-art-gallery.css","assets/pawtopia-battle-art-gallery.js");
 FILES.push("assets/pawtopia-cat-flow.css");
@@ -194,6 +194,7 @@ FILES.push(
   'assets/pawtopia-progress-center.js',
   'assets/scenes/world-art/scene-02.png'
 );
+FILES.push("pawtopia-cottage-life.html", "assets/pawtopia-cottage-life.css", "assets/pawtopia-cottage-life.js", "assets/pawtopia-cottage-life-ui.js", "assets/scenes/town-trading.webp", "assets/scenes/town-market.webp", "assets/scenes/cottage.webp", "assets/scenes/games-world-map.webp", "assets/scenes/cottage-world-map.webp", "assets/scenes/town-shop-map.webp", "assets/scenes/pawtopia.webp");
 const gamePage = new URL('pawcade-side-scroll.html', self.registration.scope);
 const allowed = new Set(FILES.map(file => new URL(file, self.registration.scope).href));
 self.addEventListener('install', event => {
