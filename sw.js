@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v138-world-art';
+const CACHE = 'try4-public-v139-pawtopia-starter';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-battle-art-gallery.html","assets/pawtopia-battle-art-gallery.css","assets/pawtopia-battle-art-gallery.js");
 FILES.push("assets/pawtopia-cat-flow.css");
@@ -165,10 +165,39 @@ FILES.push('assets/pawtopia-battle-3d.js?v=painted-1','assets/pawtopia-battle-3d
 FILES.push('assets/pawtopia-item-art.css?v=painted-1','assets/pawtopia-item-art.js?v=painted-1','assets/pawtopia-items-ui.js?v=item-art-1');
 FILES.push('pawtopia-pet-equipment.html','assets/pawtopia-pet-equipment.css?v=1','assets/pawtopia-pet-equipment.js?v=1','assets/pawtopia-items.js?v=balance-1','assets/pawtopia-upgrade-points.js?v=balance-1');
 FILES.push('assets/super-paw-world-art.css?v=1','assets/scenes/world-art/scene-15.png');
+// Include the exact URLs used by the Pawtopia starter and backup pages.
+FILES.push(
+  './',
+  'pawtopia-items.html',
+  'pawtopia-progress.html',
+  'assets/pawtopia-illustrated.css',
+  'assets/baron-brasswhirl-master.webp',
+  'assets/pawtopia-shop-stock.js?v=town-shops-1',
+  'assets/pawtopia-town.js?v=town-shops-1',
+  'assets/scenes/pawcade-frost.webp',
+  'assets/scenes/world-art/scene-05.png',
+  'assets/animation/super-paw-effects-v1.svg',
+  'assets/scenes/platform-levels.webp',
+  'assets/scenes/platform-terrain.webp',
+  'assets/pawtopia-save.js?v=catalog-2569',
+  'assets/pawtopia-item-tiers.js?v=shop-prices-3',
+  'assets/companion-cottage.js?v=catalog-2569',
+  'assets/pawtopia-adventure-book.js',
+  'assets/pawtopia-adventure-book.css',
+  'assets/scenes/pawtopia-items/sheet-07-13.png',
+  'assets/scenes/pawtopia-items/sheet-05-08.png',
+  'assets/scenes/pawtopia-items/sheet-09-01.png',
+  'assets/scenes/platform-combat.webp',
+  'assets/pawtopia-items.css?v=town-shops-1',
+  'assets/scenes/world-art/scene-01.png',
+  'assets/pawtopia-progress-center.css',
+  'assets/pawtopia-progress-center.js',
+  'assets/scenes/world-art/scene-02.png'
+);
 const gamePage = new URL('pawcade-side-scroll.html', self.registration.scope);
 const allowed = new Set(FILES.map(file => new URL(file, self.registration.scope).href));
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)));
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll([...allowed])));
 });
 // Activate on the next visit, so an active game is never reloaded mid-session.
 self.addEventListener('activate', event => {
