@@ -145,17 +145,17 @@
     progress.catalogDisplay=alreadyOnDisplay?'':id;
     return alreadyOnDisplay?'Removed '+item.name+' from display.':'Displayed '+item.name+'.';
   }
-  function equip(progress,id) {
-    const item = byId.get(id), cat = progress.companion;
-    if (!cat || !item?.slot || !stock(progress,id)) return 'Choose an owned item and an active cat.';
+  function equip(progress,id,cat=progress.companion) {
+    const item = byId.get(id);
+    const cats=[progress.companion,...(Array.isArray(progress.otherCompanions)?progress.otherCompanions:[])].filter(Boolean);
+    if (!cats.includes(cat) || !item?.slot || !stock(progress,id)) return 'Choose an owned item and an active cat.';
     const next = {...cat.catalogGear};
     if (next[item.slot] === id) {
       delete next[item.slot];
       cat.catalogGear = next;
       return 'Unequipped ' + item.name + '.';
     }
-    const others = Array.isArray(progress.otherCompanions) ? progress.otherCompanions : [];
-    if (others.some(other => other?.catalogGear?.[item.slot]===id)) return 'Another cat is wearing this item.';
+    if (cats.some(other => other!==cat && other.catalogGear?.[item.slot]===id)) return 'Another cat is wearing this item.';
     cat.catalogGear = {...next,[item.slot]:id};
     return 'Equipped ' + item.name + '.';
   }

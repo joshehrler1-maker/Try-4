@@ -13,7 +13,8 @@
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
   let challengerTier=0;
-  let selectedPet=0,selectedFoe=0,busy=false,soundOn=false;
+  const requestedPet=window.location?.search?new URLSearchParams(window.location.search).get('pet'):null;
+  let selectedPet=/^[0-3]$/.test(requestedPet||'')?Number(requestedPet):0,selectedFoe=0,busy=false,soundOn=false;
   let watchMode=false,watchPaused=false,watchLoopRunning=false,waitForResume=null,playbackSpeed=1;
   let frameQuality=window.navigator?.connection?.saveData?'efficient':'smooth';
   const select=el('battle-pet-select');
@@ -129,12 +130,14 @@
       option.value='';select.append(option);
     }
     select.value=pet?String(selectedPet):'';
+    const equipment=el('battle-pet-equipment');
+    if(equipment)equipment.href='pawtopia-pet-equipment.html'+(pet?'?pet='+selectedPet:'');
     select.disabled=busy||Boolean(fighting)||!cats.length;
     const stats=pet?engine.profile(pet):null;
     const gearSummary=el('arena-loadout');
     if (gearSummary) {
       const gear=['weapon','armor','relic'].map(slot=>window.PawtopiaItems?.worn(progress,pet,slot)?.name).filter(Boolean);
-      gearSummary.textContent=gear.length?'Gear for next match: '+gear.join(' · '):'Equip gear at the market before your next match.';
+      gearSummary.textContent=gear.length?'Gear for next match: '+gear.join(' · '):'Equip gear in Pets Equipment before your next match.';
     }
     renderGear(progress,pet,currentView?.match.finished?null:currentView?.match);
     el('battle-pet-detail').textContent=pet

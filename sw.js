@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v135-painted-items';
+const CACHE = 'try4-public-v136-pet-equipment';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-battle-art-gallery.html","assets/pawtopia-battle-art-gallery.css","assets/pawtopia-battle-art-gallery.js");
 FILES.push("assets/pawtopia-cat-flow.css");
@@ -158,11 +158,12 @@ FILES.push(
   'assets/scenes/quarry-rescue/stage-05-quarry-defenses-cable.svg'
 );
 FILES.push('assets/pawtopia-battle-3d.js?v=painted-1','assets/pawtopia-battle-3d.css?v=dogs-painted',
-  'assets/pawtopia-battle-sound.js?v=1','assets/pawtopia-battle-arena.js?v=item-art-1','assets/pawtopia-battle-character-art.js?v=motion-1','assets/pawtopia-battle-puppet.js?v=dogs-painted',
+  'assets/pawtopia-battle-sound.js?v=1','assets/pawtopia-battle-arena.js?v=equipment-1','assets/pawtopia-battle-character-art.js?v=motion-1','assets/pawtopia-battle-puppet.js?v=dogs-painted',
   'assets/pawtopia-battle-foe-art.js?v=dogs-painted',
-  'assets/pawtopia-battle-data.js?v=dogs-all','assets/pawtopia-battle-engine.js?v=item-art-1',
+  'assets/pawtopia-battle-data.js?v=dogs-all','assets/pawtopia-battle-engine.js?v=equipment-1',
   'assets/pawtopia-battle-cinematics.js?v=dogs-all');
 FILES.push('assets/pawtopia-item-art.css?v=painted-1','assets/pawtopia-item-art.js?v=painted-1','assets/pawtopia-items-ui.js?v=item-art-1');
+FILES.push('pawtopia-pet-equipment.html','assets/pawtopia-pet-equipment.css?v=1','assets/pawtopia-pet-equipment.js?v=1','assets/pawtopia-items.js?v=equipment-1');
 const gamePage = new URL('pawcade-side-scroll.html', self.registration.scope);
 const allowed = new Set(FILES.map(file => new URL(file, self.registration.scope).href));
 self.addEventListener('install', event => {

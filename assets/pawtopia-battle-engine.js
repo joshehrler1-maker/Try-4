@@ -19,6 +19,25 @@
     const s = training(cat);
     return clamp(14 + s.endurance * 3 + level(cat) * 2, 18, 2000);
   };
+  const guardBlock=(stats,gear)=>clamp(2+Math.floor(stats.defence/2),2,50)+safe(gear.guard)+safe(gear.marketCurl);
+  const openingInitiative=(cat,stats,gear)=>stats.movement+level(cat)/4+safe(gear.initiative)+safe(gear.marketSpeed)+safe(gear.styleSpeed);
+  const equippedMaxHp=(cat,gear)=>maxHp(cat)+safe(gear.health)+safe(gear.marketHealth)+safe(gear.styleHealth);
+  function rawPower(move,cat,stats){
+    return move==='swipe'?3+stats.strength+Math.floor(level(cat)/3):
+      move==='signature'?5+stats.strength+stats.intelligence+Math.floor(level(cat)/2):
+      10+stats.strength*2+stats.intelligence+level(cat);
+  }
+  function loadoutProfile(cat,gear={}){
+    const stats=training(cat);
+    return {
+      health:clamp(equippedMaxHp(cat,gear),18,2040),
+      swipe:rawPower('swipe',cat,stats),
+      signature:rawPower('signature',cat,stats)+safe(gear.signature)+safe(gear.marketSignature),
+      ultimate:rawPower('ultimate',cat,stats)+safe(gear.ultimate)+safe(gear.marketFinisher),
+      guard:guardBlock(stats,gear),
+      initiative:openingInitiative(cat,stats,gear)
+    };
+  }
   function profile(cat) {
     const a = cat?.battle || {};
     return { level:level(cat), xp:safe(a.xp), nextXp:12+level(cat)*6, wins:safe(a.wins),
@@ -69,7 +88,7 @@
     const market=window.PawtopiaItems;
     const gear=market?.arena(progress,cat) || {};
     const gearArt=['weapon','armor','relic','wearable'].map(slot=>market?.worn?.(progress,cat,slot)?.id).filter(Boolean);
-    const gearMaxHp=maxHp(cat)+safe(gear.health)+safe(gear.marketHealth)+safe(gear.styleHealth);
+    const gearMaxHp=equippedMaxHp(cat,gear);
     progress.battleMatch={
       petId:cat.battleId,foeId:foe.id,hp:gearMaxHp,foeHp:foe.hp,gear,gearMaxHp,gearArt,
       round:1,guard:0,dodge:0,foeSlow:0,ultimateUsed:false,
@@ -138,7 +157,7 @@
     });
     const petAttack=()=>{
       if (moveId==='guard') {
-        match.guard=clamp(2+Math.floor(s.defence/2),2,50)+safe(gear.guard)+safe(gear.marketCurl);
+        match.guard=guardBlock(s,gear);
         const firstCurl = !match.marketCurlUsed ? safe(gear.marketMend) : 0;
         match.marketCurlUsed=true;
         match.armoryCounterReady=!match.armoryCounterUsed && Boolean(gear.armoryRiposte);
@@ -147,9 +166,7 @@
         makeEvent('pet','Guard Curl','pet',0,match.hp,'guard',restored?'Blocks the next blow · restored '+restored+' HP':'Blocks the next blow');
         return;
       }
-      let damage=moveId==='swipe'?3+s.strength+Math.floor(level(cat)/3):
-        moveId==='signature'?5+s.strength+s.intelligence+Math.floor(level(cat)/2):
-        10+s.strength*2+s.intelligence+level(cat);
+      let damage=rawPower(moveId,cat,s);
       damage=clamp(damage-Math.floor(foe.defence/2)-Math.max(0,safe(match.foeGuard)-safe(gear.pierce)),1,450);
       if(moveId==='swipe' && !match.firstSwipeUsed) {
         damage+=safe(gear.firstSwipe);
@@ -238,7 +255,7 @@
       }
     };
     // Defensive curls must activate before the foe moves. Other moves use speed for initiative.
-    const petFirst=moveId==='guard'||s.movement+level(cat)/4+(match.round===1?safe(gear.initiative)+safe(gear.marketSpeed)+safe(gear.styleSpeed):safe(gear.armorySecond))+rand()*3 >= foe.speed+foe.level/4+rand()*3;
+    const petFirst=moveId==='guard'||(match.round===1?openingInitiative(cat,s,gear):s.movement+level(cat)/4+safe(gear.armorySecond))+rand()*3 >= foe.speed+foe.level/4+rand()*3;
     if(petFirst){petAttack();enemyAttack();}else{enemyAttack();if(match.hp>0)petAttack();}
     match.lastMove=moveId;
     match.history=[...(Array.isArray(match.history)?match.history:[]),...events.map(e=>e.name+(e.damage?' dealt '+e.damage+' damage':'')+(e.detail?' · '+e.detail:''))].slice(-24);
@@ -260,6 +277,6 @@
       :cat.name+' used '+move.name+'. Round '+match.round+'.',events,rewards};
   }
   window.PawtopiaBattleEngine=Object.freeze({
-    fighters,level,training,maxHp,profile,unlocked,matchInfo,moveList,start,takeTurn,forfeit
+    fighters,level,training,maxHp,loadoutProfile,profile,unlocked,matchInfo,moveList,start,takeTurn,forfeit
   });
 })();
