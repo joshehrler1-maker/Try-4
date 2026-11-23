@@ -7,6 +7,7 @@ const vm = require('node:vm');
 
 const root = path.join(__dirname, '..');
 const read = filename => fs.readFileSync(path.join(root, filename), 'utf8');
+const saveScript = read('assets/pawtopia-save.js');
 const bondScript = read('assets/pawtopia-pet-bond.js');
 const scoutScript = read('assets/pawtopia-scout.js');
 const cottageScript = read('assets/companion-cottage.js');
@@ -57,7 +58,10 @@ function createCottage(seed = initial()) {
   };
   let progress = clone(seed);
   let day = 'Fri Nov 20 2026';
+  const saveWindow = {};
+  vm.runInNewContext(saveScript, {window: saveWindow}, {filename: 'pawtopia-save.js'});
   const save = {
+    cottageCapacity: saveWindow.PawtopiaSave.cottageCapacity,
     read: () => clone(progress),
     today: () => day,
     battleStats: cat => ({
