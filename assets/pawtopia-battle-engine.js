@@ -148,6 +148,17 @@
     view.match.history=[...(Array.isArray(view.match.history)?view.match.history:[]),'Match forfeited without a penalty.'].slice(-24);
     return {ok:true,message:'Match ended. No coins or XP were lost.'};
   }
+  function foeIntent(foe,match) {
+    if (!foe || !match || match.finished) return null;
+    if(foe.rank>=4 && match.round%5===0) return {id:'brace',pose:'guard',
+      text:foe.isBoss?'Baron’s armor powers up for Iron Guard.':'The challenger plants its paws to Brace.',
+      hint:'Use this opening to attack or let a skill recharge.'};
+    if(match.round%3===0) return {id:'charge',pose:'charge',
+      text:foe.isBoss?'Baron winds up for Gear Fang Charge.':'The challenger crouches for a rushing charge.',
+      hint:'Guard Curl can soften the heavy hit.'};
+    return {id:'strike',pose:'idle',text:'The challenger lines up a regular strike.',
+      hint:'Attack, guard, or save your stronger move.'};
+  }
   function takeTurn(progress,moveId,random=Math.random) {
     const view=matchInfo(progress);
     if (!view || view.match.finished)return {ok:false,message:'Choose a cat and challenger to begin.',events:[]};
@@ -219,10 +230,11 @@
       makeEvent('pet',move.name,'foe',damage,match.foeHp,
         moveId==='swipe'?'swipe':kit.theme.type,detail);
     };
+    const intent=foeIntent(foe,match);
     const enemyAttack=()=>{
       if(match.foeHp<=0)return;
-      const isHeavy=match.round%3===0;
-      if(foe.rank>=4&&match.round%5===0){
+      const isHeavy=intent.id==='charge';
+      if(intent.id==='brace'){
         match.foeGuard=2+Math.floor(foe.rank/4);
         makeEvent('foe',foe.isBoss?'Iron Guard':'Brace','foe',0,match.foeHp,'guard',foe.isBoss?'Armor powered up':'Braced for the next hit');
         return;
@@ -287,6 +299,6 @@
       :cat.name+' used '+move.name+'. Round '+match.round+'.',events,rewards};
   }
   window.PawtopiaBattleEngine=Object.freeze({
-    fighters,level,training,maxHp,loadoutProfile,profile,unlocked,matchInfo,moveList,start,takeTurn,forfeit
+    fighters,level,training,maxHp,loadoutProfile,profile,unlocked,matchInfo,foeIntent,moveList,start,takeTurn,forfeit
   });
 })();

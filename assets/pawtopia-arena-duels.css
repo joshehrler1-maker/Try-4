@@ -33,3 +33,5 @@
   .duel-actor { width: min(100%,9rem); min-height: 0; }
   #duel-summary { font-size: .83rem; }
 }
+
+#duel-clock { margin: 0 0 .5rem; color: #ffe8a1; font-variant-numeric: tabular-nums; }

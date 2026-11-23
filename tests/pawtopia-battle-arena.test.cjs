@@ -230,3 +230,19 @@ test('starter wins advance training promptly and revised variants retain saved c
   delete p.battleMatch.foeCombat;
   assert.equal(engine.matchInfo(p).foeMaxHp,variant.legacyHp);
 });
+
+test('solo cues match the actual strike, charge and brace for the current turn',()=>{
+  const {data,engine}=createWorld();
+  for(const [round,kind,name] of [[2,'strike','Paw Strike'],[3,'charge','Rushing Charge'],[15,'brace','Brace']]){
+    const progress=fresh();
+    progress.companion=cat('Mochi','Maine Coon',10);
+    progress.battleUnlocked=4;
+    const index=data.foes.findIndex(foe=>foe.rank===4);
+    assert.ok(engine.start(progress,0,index).ok);
+    const view=engine.matchInfo(progress);
+    view.match.round=round;
+    assert.equal(engine.foeIntent(view.foe,view.match).id,kind);
+    const turn=engine.takeTurn(progress,'guard',guaranteed);
+    assert.ok(turn.events.some(event=>event.who==='foe' && event.name===name));
+  }
+});

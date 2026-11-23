@@ -397,3 +397,48 @@ test('move previews match applied damage and waiting status keeps the opponent m
   const played=await move(call,'b',code,1,'signature');
   assert.equal(played.body.history[0].damage[1],expected);
 });
+
+test('ranked players can reconnect in grace, and the timeout scores once',async t=>{
+  let now=Date.now();
+  t.mock.method(Date,'now',()=>now);
+  const call=await setup(t);
+  await call('a','/arena-ranked/queue',pet('Bengal'));
+  const joined=(await call('b','/arena-ranked/queue',pet('Siamese'))).body.duel;
+  const code=joined.code;
+  assert.equal(joined.turnDueAt,now+45000);
+  assert.equal(joined.turnDeadline,now+60000);
+  const turn=(player,round,move)=>call(player,'/arena-duel/move',{code,round,move,ranked:true});
+  await turn('a',1,'swipe');
+  now+=51000;
+  const reconnected=(await call('b','/arena-ranked')).body.duel;
+  assert.equal(reconnected.phase,'active');
+  assert.equal(reconnected.opponentSubmitted,true);
+  assert.equal(reconnected.serverNow,now);
+  const next=(await turn('b',1,'guard')).body;
+  assert.equal(next.round,2);
+  assert.equal(next.turnDeadline,now+60000);
+  await turn('a',2,'swipe');
+  now=next.turnDeadline;
+  const [result,late]=await Promise.all([call('a','/arena-ranked'),turn('b',2,'swipe')]);
+  assert.equal(result.body.duel.phase,'finished');
+  assert.equal(result.body.duel.winner,result.body.duel.side);
+  assert.equal(result.body.duel.reason,'turn-timeout');
+  assert.equal(late.body.phase,'finished');
+  assert.equal(result.body.rating,1020);
+  assert.equal((await call('b','/arena-ranked')).body.rating,980);
+  assert.equal((await call('a','/arena-ranked')).body.wins,1);
+});
+
+test('two idle ranked players draw without changing ratings',async t=>{
+  let now=Date.now();
+  t.mock.method(Date,'now',()=>now);
+  const call=await setup(t);
+  await call('a','/arena-ranked/queue',pet('Bengal'));
+  const joined=(await call('b','/arena-ranked/queue',pet('Siamese'))).body.duel;
+  now=joined.turnDeadline;
+  const result=(await call('a','/arena-ranked')).body;
+  assert.equal(result.duel.reason,'turn-timeout');
+  assert.equal(result.duel.winner,null);
+  assert.equal(result.rating,1000);
+  assert.equal((await call('b','/arena-ranked')).body.rating,1000);
+});

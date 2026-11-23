@@ -19,6 +19,7 @@
   const memoryKey = 'pawtopia-arena-duel';
   const legalCode = /^[0-9a-f]{12}$/;
   let duel, pets = [], busy = false, playing = false, animation = 0, refreshTimer;
+  let clockTimer, clockDeadline = 0, clockDue = 0;
   let account = '', available = false, initializing = false, session = 0;
   let rankedAvailable = false, rank, rankTimer;
   const moveLabel = (breed, move) => {
@@ -98,12 +99,28 @@
     element('hp-'+side).textContent = hp+' / '+maximum+' HP';
   }
   function outcome() {
+    if (duel.reason==='turn-timeout') return duel.winner===null ? 'Both players ran out of time. The match is a draw.' :
+      duel.winner===duel.side ? 'You won. Your opponent ran out of time.' : 'Your turn timed out. Your opponent won.';
     return duel.reason === 'cancelled' ? 'Invite cancelled.' :
       duel.winner === null ? 'The duel ended in a draw.' :
       (duel.winner === duel.side ? 'You won!' : 'Your opponent won.') +
       (duel.reason === 'forfeit' ? (duel.winner === duel.side ? ' Your opponent forfeited.' : ' You forfeited.') : '');
   }
+  function renderClock() {
+    clearTimeout(clockTimer);
+    const clock=element('clock');
+    clock.hidden=!duel?.turnDeadline || duel.phase!=='active';
+    if(clock.hidden)return;
+    const now=Date.now();
+    const grace=now>=clockDue;
+    const seconds=Math.max(0,Math.ceil(((grace?clockDeadline:clockDue)-now)/1000));
+    clock.textContent=seconds ? (grace?'Reconnect grace: ':duel.submitted?'Opponent has ':'Choose a move: ')+seconds+'s' : 'Checking the result…';
+    if(document.hidden)return;
+    if(!seconds && !busy && !playing) refresh(false);
+    clockTimer=setTimeout(renderClock,seconds?1000:2500);
+  }
   function render() {
+    renderClock();
     element('ranked').hidden = !account || !rankedAvailable;
     element('rank-score').textContent = rank ? 'Rating '+rank.rating+' · '+rank.wins+' wins · '+rank.losses+' losses · '+rank.draws+' draws' : '';
     element('rank-start').hidden = Boolean(rank?.queued || (duel && duel.phase !== 'finished'));
@@ -201,6 +218,9 @@
   function update(next, animate = true) {
     const shouldReplay = animate && duel?.code === next.code && next.history.length > duel.history.length;
     duel = next;
+    const now=Date.now();
+    clockDue=now+(next.turnDueAt-next.serverNow);
+    clockDeadline=now+(next.turnDeadline-next.serverNow);
     if (!next.ranked) remember(next.code);
     if (shouldReplay) replay(next.history.at(-1));
     render();
@@ -379,6 +399,7 @@
     });
   });
   document.addEventListener('visibilitychange',()=>{
+    renderClock();
     if (!document.hidden && available) {
       readPets();
       if (duel && duel.phase !== 'finished' && !playing) refresh(false);
@@ -386,7 +407,14 @@
     } else scheduleRefresh();
     scheduleRankPoll();
   });
-  window.addEventListener('pageshow',init);
+  window.addEventListener('pageshow',()=>{
+    init();
+    if (available && duel?.phase==='active') refresh(false);
+  });
+  window.addEventListener('online',()=>{
+    if (available && duel?.phase==='active') refresh(false);
+    else init();
+  });
   window.addEventListener('storage',event=>{ if (event.key === 'pawtopia-online-key') init(); });
   window.addEventListener('pawtopia-save-changed',readPets);
   init();

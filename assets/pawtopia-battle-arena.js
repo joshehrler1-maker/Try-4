@@ -240,9 +240,19 @@
     }
     stage.style.setProperty('--foe-color',activeFoe.color);
     el('battle-foe-emblem').textContent=activeFoe.glyph;
+    const intent=engine.foeIntent?.(activeFoe,currentView?.match);
+    const intentLabel=el('battle-foe-intent');
+    if(intentLabel){
+      intentLabel.hidden=!intent || busy;
+      if(intent && !busy){
+        intentLabel.dataset.intent=intent.id;
+        intentLabel.textContent=intent.text+' '+intent.hint;
+      }
+    }
     if(foeArt&&el('battle-foe-art')){
-      foeArt.paint(el('battle-foe-art'),activeFoe,currentView?.match.finished?
-        (currentView.match.result==='win'?'defeat':currentView.match.result==='loss'?'victory':'idle'):'idle');
+      const finished=currentView?.match.finished;
+      const pose=finished?(currentView.match.result==='win'?'defeat':currentView.match.result==='loss'?'victory':'idle'):intent?.pose||'idle';
+      foeArt.paint(el('battle-foe-art'),activeFoe,pose,intent?.pose==='charge'?1:3);
       foeSprite.classList.add('has-foe-art');
     }
     el('stage-pet-name').textContent=activeCat?.name||'Your Cat';
