@@ -9,9 +9,11 @@
 .duel-fighter { min-width: 0; text-align: center; }
 .duel-fighter progress { display: block; width: 88%; margin: .3rem auto; accent-color: #87dfac; }
 .duel-actor { width: min(100%,14rem); min-height: 6rem; margin: .2rem auto; transition: transform 85ms ease-out, filter 90ms; }
-.duel-actor svg { display: block; width: 100%; height: auto; }
-.duel-fighter:last-child .duel-actor svg { transform: scaleX(-1); }
+.duel-art { display: grid; }
+.duel-art > svg, .duel-art > .battle-painted-body { display: block; grid-area: 1 / 1; width: 100%; height: auto; }
+.duel-art > svg { z-index: 1; }
+.duel-art--leftward { transform: scaleX(-1); }
 .duel-actor.duel-strike { transform: translateX(13%) scale(1.04); }
-.duel-fighter:last-child .duel-actor.duel-strike { transform: translateX(-13%) scale(1.04); }
+#duel-actor-1.duel-strike { transform: translateX(-13%) scale(1.04); }
 .duel-actor.duel-contact { filter: brightness(1.4) saturate(1.2); }
 @media (prefers-reduced-motion: reduce) { .duel-actor { transition: none; } }
