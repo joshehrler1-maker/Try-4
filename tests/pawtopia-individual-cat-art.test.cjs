@@ -115,10 +115,9 @@ test('arena uses posed characters during live attacks, and provides 12 free prev
     assert.ok(html.includes('data-battle-pose="'+pose+'"'),pose);
     assert.ok(css.includes('data-pose="'+pose+'"')||pose==='idle'||pose==='approach'||pose==='swipe'||pose==='victory'||pose==='defeat',pose);
   }
-  for(const action of ["playArtFrames(cat,'swipe'","hitMotion=playArtFrames(cat,reaction,310)","playArtFrames(cat,'victory'","playArtFrames(cat,'defeat'","guard?'guard'"]) {
-    assert.ok(uiScript.includes(action),'Missing live action sequence '+action);
-  }
-  assert.ok(uiScript.includes("paintCat(el('battle-cat-art'),cat.breed,state,frame)"));
+  assert.match(uiScript, /else await playExchange\(evt,visual,kit,cat,foe/);
+  assert.match(uiScript, /paintCat\(el\('battle-cat-art'\),cat\.breed,pose,stepped,from\)/);
+  assert.match(uiScript, /playArtFrames\(cat,won\?'victory':'defeat',430\)/);
   const {data,art}=setup();
   for(const breed of data.breeds){
     const target={innerHTML:'',dataset:{},style:{},classList:{add(){}}};

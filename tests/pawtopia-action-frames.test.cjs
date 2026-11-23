@@ -86,10 +86,11 @@ test('source routes six-frame drawings through both combat events and the no-cos
   const page=read('pawtopia-battle-arena.html');
   assert.ok(script.includes("async function playArtFrames(cat,state,duration,fromPose='swipe')"));
   assert.ok(script.includes('characterArt.smoothFrames)||characterArt.animationFrames||[3]'));
-  assert.ok(script.includes("paintCat(el('battle-cat-art'),cat.breed,state,frame)"));
-  assert.ok(script.includes("motion=playArtFrames(cat,'swipe'"));
-  assert.ok(script.includes("hitMotion=playArtFrames(cat,reaction,310)"));
-  assert.ok(script.includes('await Promise.all([motion,foeMotion,hitMotion])'));
+  assert.match(script, /const frame=motion\.sample\(clip,t,reach,steps\)/);
+  assert.match(script, /const response=motion\.reaction\(clip,t,defenderWidth/);
+  assert.match(script, /paint\(isPet,frame\.pose,frame\.frame,frame\.from\)/);
+  assert.match(script, /paint\(!isPet,response\.pose,response\.frame,response\.from\)/);
+  assert.match(script, /paintCat\(el\('battle-cat-art'\),cat\.breed,pose,stepped,from\)/);
   assert.ok(script.includes("await playArtFrames(cat,pose,pose==='idle'?1500:characterArt.timingFor(cat.breed,pose)"));
   assert.ok(script.includes('if(reduced())'));
   assert.match(page,/id="battle-art-preview-actions"/);

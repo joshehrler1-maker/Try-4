@@ -165,7 +165,11 @@
       const widget = window.turnstile.render('#signup-challenge',{sitekey,callback:value => {challenge = value;},
         'expired-callback':() => {challenge = '';}});
       button($('signup-controls'),'Create a free account',async () => {
-        if (!challenge) throw Error('Complete the signup check first.');
+        if (!challenge) {
+          status('Complete the signup check first.','account-status');
+          return;
+        }
+        status('','account-status');
         try {
           const account = await api.call('/accounts','POST',{challenge},'');
           await api.connect(account.key);
