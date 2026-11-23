@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {DatabaseSync} from 'node:sqlite';
 import test from 'node:test';
+import {runInNewContext} from 'node:vm';
 
 const workerSource = await readFile(new URL('../pawtopia-online/worker.js',import.meta.url),'utf8');
 const {default:worker} = await import('data:text/javascript;base64,'+Buffer.from(workerSource).toString('base64'));
@@ -187,4 +188,90 @@ test('an overlapping poll cannot put a player in two matches, and cancel removes
   assert.equal(statuses.filter(r=>r.body.duel).length,2);
   const waiting = ['a','b','c'][statuses.findIndex(r=>r.body.queued)];
   assert.equal((await call(waiting,'/arena-ranked/cancel',{})).body.queued,false);
+});
+
+const arenaScript = await readFile(new URL('../assets/pawtopia-arena-duels.js',import.meta.url),'utf8');
+const arenaHtml = await readFile(new URL('../pawtopia-battle-arena.html',import.meta.url),'utf8');
+
+function browserArena(call, player) {
+  const listeners = new Map(), timers = new Map(), windowListeners = new Map(), cache = new Map();
+  let timerId = 0, paints = 0;
+  let pets = [{breed:'Bengal',name:'First cat',battleId:'first'},{breed:'Bengal',name:'Second cat',battleId:'second'}];
+  const controls = new Map([...arenaHtml.matchAll(/id="(duel-[^"]+)"/g)].map(([,id])=>[id,{
+    id,value:'',textContent:'',hidden:false,disabled:false,
+    addEventListener(type,handler) { listeners.set(id+' '+type,handler); },
+    replaceChildren(...options) { this.value = options[0]?.value || ''; },
+    querySelectorAll() { return []; },
+    classList:{toggle(){},remove(){}}
+  }]));
+  const document = {hidden:false,getElementById:id=>id === 'arena-duels' ? {scrollIntoView(){}} : controls.get(id),
+    addEventListener(type,handler) { listeners.set(type,handler); }};
+  const window = {
+    PawtopiaOnline:{
+      key:()=>player,
+      async call(path,method,body) {
+        const response = await call(player,path,body);
+        if (response.status >= 400) throw Object.assign(new Error(response.body.error),{status:response.status});
+        return response.body;
+      }
+    },
+    PawtopiaSave:{read:()=>({companion:pets[0],otherCompanions:pets.slice(1)})},
+    PawtopiaBattleData:{breeds:['Bengal'],kitFor:()=>({signature:'Signature',ultimate:'Ultimate'})},
+    PawtopiaBattleCharacterArt:{paintFighter(){paints++;}},
+    PawtopiaBattleEngine:{level:()=>10,training:()=>pet('Bengal').stats},
+    matchMedia:()=>({matches:true}),confirm:()=>true,
+    addEventListener(type,handler) { windowListeners.set(type,handler); }
+  };
+  const context = {
+    window,document,URL,location:{href:'https://example.test/pawtopia-battle-arena.html',hash:''},
+    localStorage:{getItem:key=>cache.get(key),setItem:(key,value)=>cache.set(key,value),removeItem:key=>cache.delete(key)},
+    Option:class {constructor(label,value){this.label=label;this.value=value;}},
+    setTimeout(handler,ms){const id=++timerId;timers.set(id,{handler,ms});return id;},
+    clearTimeout:id=>timers.delete(id)
+  };
+  runInNewContext(arenaScript,context);
+  const flush = async()=>{for(let i=0;i<5;i++) await new Promise(resolve=>setImmediate(resolve));};
+  return {
+    flush,control:id=>controls.get('duel-'+id),
+    async click(id) { await listeners.get('duel-'+id+' click')(); await flush(); },
+    async tick(ms) {
+      const task = [...timers].find(([,timer])=>timer.ms === ms);
+      assert.ok(task,'Expected the '+ms+' ms refresh timer');
+      timers.delete(task[0]); await task[1].handler(); await flush();
+    },
+    reversePets() { pets.reverse(); windowListeners.get('pawtopia-save-changed')(); },
+    paints:()=>paints
+  };
+}
+
+test('the Arena detects a forfeit before either player moves and restores the result on reload',async t=>{
+  const call = await setup(t);
+  await call('a','/arena-ranked/queue',pet('Bengal'));
+  const ready = await call('b','/arena-ranked/queue',pet('Bengal'));
+  const page = browserArena(call,'a');
+  await page.flush();
+  assert.match(page.control('phase').textContent,/Round 1/);
+  const before = page.paints();
+  await page.tick(25000);
+  assert.equal(page.paints(),before,'An unchanged poll must not redraw the fighters');
+  await call('b','/arena-duel/leave',{code:ready.body.duel.code,ranked:true});
+  await page.tick(25000);
+  assert.match(page.control('phase').textContent,/You won.*opponent forfeited/);
+  assert.match(page.control('rank-score').textContent,/Rating 1020/);
+  const reopened = browserArena(call,'a');
+  await reopened.flush();
+  assert.match(reopened.control('phase').textContent,/You won/);
+});
+
+test('a rearranged cottage keeps the same cat selected for matchmaking',async t=>{
+  const call = await setup(t);
+  await call('b','/arena-ranked/queue',pet('Bengal'));
+  const page = browserArena(call,'a');
+  await page.flush();
+  page.control('pet').value = '1';
+  page.reversePets();
+  assert.equal(page.control('pet').value,'0');
+  await page.click('rank-start');
+  const result = (await call('a','/arena-ranked')).body.duel;
+  assert.equal(result.fighters[result.side].name,'Second cat');
 });

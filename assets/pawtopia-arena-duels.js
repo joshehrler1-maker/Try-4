@@ -17,7 +17,8 @@
   const memoryKey = 'pawtopia-arena-duel';
   const legalCode = /^[0-9a-f]{12}$/;
   let duel, pets = [], busy = false, playing = false, animation = 0, refreshTimer;
-  let account = '', available = false, rankedAvailable = false, rank, rankTimer;
+  let account = '', available = false, initializing = false, session = 0;
+  let rankedAvailable = false, rank, rankTimer;
   const moveLabel = (breed, move) => {
     if (move === 'fumble') return 'Missed swipe';
     const kit = data.kitFor(breed);
@@ -40,21 +41,23 @@
       stats:{level:engine.level(pet),...engine.training(pet)}};
   }
   function readPets() {
-    const old = fighter.value;
+    const previous = pets[Number(fighter.value)];
     const progress = save.read();
     pets = [progress.companion,...(Array.isArray(progress.otherCompanions) ? progress.otherCompanions : [])]
       .filter(pet => data.breeds.includes(pet?.breed));
     fighter.replaceChildren(...pets.map((pet,index) => new Option(pet.name+' · '+pet.breed+' · Lv. '+engine.level(pet),String(index))));
-    if (old && pets[Number(old)]) fighter.value = old;
+    const retained = previous ? pets.findIndex(pet => previous.battleId
+      ? pet.battleId === previous.battleId : pet.name === previous.name && pet.breed === previous.breed) : -1;
+    if (retained >= 0) fighter.value = String(retained);
     element('adopt').hidden = pets.length > 0;
     setControls();
   }
   function setControls() {
-    for (const action of ['create','join']) element(action).disabled = !available || busy || !pets.length || Boolean(rank?.queued);
-    element('restore').disabled = !available || busy || Boolean(rank?.queued);
-    element('rank-start').disabled = busy || (!pets.length && rank?.duel?.phase !== 'active');
+    for (const action of ['create','join']) element(action).disabled = !available || busy || playing || !pets.length || Boolean(rank?.queued);
+    element('restore').disabled = !available || busy || playing || Boolean(rank?.queued);
+    element('rank-start').disabled = busy || playing || (!pets.length && rank?.duel?.phase !== 'active');
     element('rank-cancel').disabled = busy;
-    element('leave').disabled = busy;
+    element('leave').disabled = busy || playing;
     element('refresh').disabled = busy || playing;
     element('replay').disabled = busy || playing || !duel?.history.length;
     for (const button of element('moves').querySelectorAll('[data-duel-move]')) {
@@ -68,11 +71,10 @@
   function scheduleRefresh() {
     clearTimeout(refreshTimer);
     if (document.hidden || !duel || duel.phase === 'finished' || !available) return;
-    if (!duel.submitted && duel.phase === 'active') return;
     refreshTimer = setTimeout(() => {
       if (!busy && !playing) refresh(false);
       else scheduleRefresh();
-    },15000);
+    },duel.phase === 'active' && !duel.submitted ? 25000 : 15000);
   }
   function draw(side, pose = 'idle', frame = 3, hp = duel?.fighters[side]?.hp) {
     const pet = duel?.fighters[side], body = element('art-'+side);
@@ -117,7 +119,8 @@
       'Round '+duel.round+' of 15 · '+(duel.submitted ? 'Waiting for your opponent’s move.' : 'Choose your move.');
     const latest = duel.history.at(-1);
     element('summary').textContent = latest ? duel.fighters.map((pet,i) =>
-      pet.alias+' used '+moveLabel(pet.breed,latest.moves[i])+' ('+latest.damage[i]+' damage)').join(' · ') : '';
+      latest.moves[i] === 'fumble' ? pet.alias+' missed its swipe' :
+        pet.alias+' used '+moveLabel(pet.breed,latest.moves[i])+' ('+latest.damage[i]+' damage)').join(' · ') : '';
     for (const [side,pet] of duel.fighters.entries()) {
       const stats = pet.stats;
       element('label-'+side).textContent = (pet.name ? pet.name+' · ' : '')+pet.breed+' · '+
@@ -176,43 +179,49 @@
     const shouldReplay = animate && duel?.code === next.code && next.history.length > duel.history.length;
     duel = next;
     if (!next.ranked) remember(next.code);
-    if (next.ranked && next.phase === 'finished' && rank?.duel?.phase !== 'finished') refreshRankSummary();
     if (shouldReplay) replay(next.history.at(-1));
     render();
   }
   async function perform(work, quiet = false) {
-    if (busy || !available) return;
+    if (busy || playing || !available) return;
+    const activeSession = session;
     const activeAccount = account;
+    const current = () => session === activeSession && api.key() === activeAccount;
     busy = true;
     setControls();
     try {
-      await work(() => api.key() === activeAccount);
-      if (!quiet && api.key() === activeAccount) status('');
+      await work(current);
+      if (current() && duel?.ranked && duel.phase === 'finished' && rank?.duel?.phase !== 'finished') {
+        await refreshRankSummary(current);
+      }
+      if (!quiet && current()) status('');
     } catch (error) {
-      if (api.key() === activeAccount) status(error.message || 'The arena is temporarily unavailable.');
+      if (current()) status(error.message || 'The arena is temporarily unavailable.');
     } finally {
-      busy = false;
-      setControls();
-      scheduleRefresh();
-      scheduleRankPoll();
+      if (session === activeSession) {
+        busy = false;
+        setControls();
+        scheduleRefresh();
+        scheduleRankPoll();
+      }
     }
   }
-  async function refreshRankSummary() {
-    const activeAccount = account;
+  async function refreshRankSummary(current) {
     try {
       const next = await api.call('/arena-ranked');
-      if (api.key() === activeAccount) { rank = next; render(); }
+      if (current()) { rank = next; render(); }
     } catch {}
   }
-  function applyRank(next, allowMatch = true) {
+  function applyRank(next, allowMatch = true, restoreResult = false) {
     rank = next;
-    if (allowMatch && next.duel?.phase === 'active') update(next.duel,false);
+    const match = next.duel;
+    if (allowMatch && match && (match.phase === 'active' || restoreResult)) update(match,false);
     else render();
     scheduleRankPoll();
   }
   function rankAction(action, payload) {
     return perform(async current => {
-      const next = await api.call('/arena-ranked/'+action,'POST',payload);
+      const next = await api.call('/arena-ranked/'+action,'POST',action === 'queue' ? selectedFighter() : payload);
       if (current()) applyRank(next);
     },action === 'poll');
   }
@@ -229,11 +238,12 @@
       if (!duel) return;
       try {
         const next = await api.call('/arena-duel?code='+duel.code+(duel.ranked ? '&ranked=1' : ''));
-        if (current()) update(next);
+        if (current() && (next.phase !== duel.phase || next.round !== duel.round || next.submitted !== duel.submitted)) update(next);
       } catch (error) {
         if (error.status === 404 && current()) {
+          if (duel.ranked && rank) rank = {...rank,duel:null};
+          else remember(null);
           duel = null;
-          remember(null);
           render();
         }
         throw error;
@@ -264,8 +274,12 @@
   }
   async function init() {
     const next = api.key();
-    if (next === account && available) { readPets(); return; }
+    if (next === account && (available || initializing)) { readPets(); return; }
+    const activeSession = ++session;
+    const current = () => session === activeSession && api.key() === next;
     account = next;
+    initializing = Boolean(next);
+    busy = false;
     available = false;
     rankedAvailable = false;
     rank = null;
@@ -281,19 +295,21 @@
     try {
       const capability = await api.call('/arena-duel/status');
       if (!capability.trainedPets) throw Error('Trained pet duels are pending deployment.');
-      if (api.key() !== next) return;
+      if (!current()) return;
       available = true;
       rankedAvailable = Boolean(capability.ranked);
       readPets();
       render();
       const known = readRemembered();
-      if (legalCode.test(known || '')) await restore(known,true);
-      if (rankedAvailable) {
+      if (!linkCode && legalCode.test(known || '')) await restore(known,true);
+      if (current() && rankedAvailable) {
         const nextRank = await api.call('/arena-ranked');
-        if (api.key() === next) applyRank(nextRank,!linkCode);
+        if (current()) applyRank(nextRank,!linkCode && (!duel || duel.phase === 'finished'),!nextRank.queued);
       }
     } catch {
-      if (api.key() === next) status('Player battles are temporarily unavailable. Try refreshing the page.');
+      if (current()) status('Player battles are temporarily unavailable. Try refreshing the page.');
+    } finally {
+      if (session === activeSession) initializing = false;
     }
   }
 
@@ -302,7 +318,7 @@
   element('account-link').href = linkCode ? 'pawtopia-online.html?duel='+linkCode : 'pawtopia-online.html';
   element('rank-start').addEventListener('click',()=>{
     if (rank?.duel?.phase === 'active') update(rank.duel,false);
-    else if (pets.length) rankAction('queue',selectedFighter());
+    else if (pets.length) rankAction('queue');
   });
   element('rank-cancel').addEventListener('click',()=>rankAction('cancel',{}));
   element('create').addEventListener('click',()=>enter(false));
@@ -336,8 +352,11 @@
     });
   });
   document.addEventListener('visibilitychange',()=>{
-    if (!document.hidden && available && duel && duel.phase !== 'finished') refresh(false);
-    else scheduleRefresh();
+    if (!document.hidden && available) {
+      readPets();
+      if (duel && duel.phase !== 'finished' && !playing) refresh(false);
+      else scheduleRefresh();
+    } else scheduleRefresh();
     scheduleRankPoll();
   });
   window.addEventListener('pageshow',init);
