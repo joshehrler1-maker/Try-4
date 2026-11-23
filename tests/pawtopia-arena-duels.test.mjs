@@ -1,0 +1,112 @@
+
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {DatabaseSync} from 'node:sqlite';
+import test from 'node:test';
+
+const workerSource = await readFile(new URL('../pawtopia-online/worker.js',import.meta.url),'utf8');
+const {default:worker} = await import('data:text/javascript;base64,'+Buffer.from(workerSource).toString('base64'));
+const schema = await readFile(new URL('../pawtopia-online/schema.sql',import.meta.url),'utf8');
+const origin = 'https://joshehrler1-maker.github.io';
+
+async function setup(t) {
+  const sqlite = new DatabaseSync(':memory:');
+  t.after(()=>sqlite.close());
+  sqlite.exec(schema);
+  const players = ['a','b','c'].map(letter=>({id:letter,alias:'Paw-'+letter,key:letter.repeat(64)}));
+  for (const player of players) {
+    const digest = await crypto.subtle.digest('SHA-256',Buffer.from(player.key));
+    sqlite.prepare('INSERT INTO player(id,token_hash,alias) VALUES(?,?,?)')
+      .run(player.id,Buffer.from(digest).toString('hex'),player.alias);
+  }
+  const env = {PAWTOPIA_ORIGIN:origin,DB:{prepare(sql) {
+    const statement = sqlite.prepare(sql);
+    return {bind(...args) { return {
+      async first() { return statement.get(...args) ?? null; },
+      async run() { return {meta:statement.run(...args)}; }
+    }; }};
+  }}};
+  return async (player,path,body) => {
+    const headers = {Origin:origin};
+    if (player) headers.Authorization = 'Bearer '+players.find(entry=>entry.id===player).key;
+    const request = new Request('https://worker.test'+path, {headers,method:body ? 'POST' : 'GET',
+      body:body ? JSON.stringify(body) : undefined});
+    const response = await worker.fetch(request,env);
+    return {status:response.status,body:await response.json()};
+  };
+}
+const root = '/arena-duel';
+const begin = call => call('a',root+'/create',{breed:'Bengal'});
+const move = (call,who,code,round,pick) => call(who,root+'/move',{code,round,move:pick});
+
+test('duel invites require accounts, approved breeds, and independent players',async t=>{
+  const call = await setup(t);
+  assert.equal((await call(null,root+'/status')).status,401);
+  assert.equal((await call('a',root+'/status')).body.enabled,true);
+  assert.equal((await call('a',root+'/create',{breed:'Fake Cat'})).status,400);
+  const started = await begin(call);
+  assert.equal(started.status,201);
+  const {code} = started.body;
+  assert.match(code,/^[0-9a-f]{12}$/);
+  assert.equal((await begin(call)).status,409);
+  assert.equal((await call('a',root+'/hosted')).body.duel.code,code);
+  assert.equal((await call('c',root+'?code='+code)).status,404);
+  assert.equal((await call('a',root+'/join',{breed:'Ragdoll',code})).status,400);
+  const joined = await call('b',root+'/join',{breed:'Sphynx',code});
+  assert.equal(joined.body.phase,'active');
+  assert.deepEqual(joined.body.fighters.map(({breed,hp})=>[breed,hp]),[['Bengal',100],['Sphynx',100]]);
+  assert.equal((await call('c',root+'/join',{breed:'Ragdoll',code})).status,409);
+  assert.equal((await call('c',root+'/leave',{code})).status,404);
+});
+
+test('private choices resolve once with guard, cooldown, replay and stale retries',async t=>{
+  const call = await setup(t);
+  const {code} = (await begin(call)).body;
+  await call('b',root+'/join',{breed:'Siamese',code});
+  assert.equal((await move(call,'a',code,1,'ultimate')).status,400);
+  assert.equal((await move(call,'a',code,1,'constructor')).status,400);
+  const pending = await move(call,'a',code,1,'signature');
+  assert.equal(pending.body.submitted,true);
+  const waiting = (await call('b',root+'?code='+code)).body;
+  assert.equal(waiting.submitted,false);
+  assert.deepEqual(waiting.history,[]);
+  assert.equal(waiting.choices,undefined);
+  assert.equal(waiting.host_id,undefined);
+  assert.equal((await move(call,'a',code,1,'swipe')).body.submitted,true);
+  const next = (await move(call,'b',code,1,'guard')).body;
+  assert.deepEqual(next.history[0],{round:1,moves:['signature','guard'],damage:[12,0],
+    hpBefore:[100,100],hpAfter:[100,88]});
+  assert.equal(next.round,2);
+  assert.equal((await move(call,'b',code,1,'guard')).body.history.length,1);
+  assert.equal((await move(call,'a',code,2,'signature')).status,400);
+  let responses = await Promise.all([move(call,'a',code,2,'swipe'),move(call,'b',code,2,'swipe')]);
+  if (responses[0].status === 409) await move(call,'a',code,2,'swipe');
+  if (responses[1].status === 409) await move(call,'b',code,2,'swipe');
+  assert.equal((await call('a',root+'?code='+code)).body.history.length,2);
+  await move(call,'a',code,3,'swipe');
+  await move(call,'b',code,3,'swipe');
+  const ultimate = await move(call,'a',code,4,'ultimate');
+  assert.equal(ultimate.body.submitted,true);
+  await move(call,'b',code,4,'guard');
+  assert.equal((await move(call,'a',code,5,'ultimate')).status,400);
+  const finished = await call('b',root+'/leave',{code});
+  assert.equal(finished.body.phase,'finished');
+  assert.equal(finished.body.winner,0);
+  assert.equal((await begin(call)).status,201);
+});
+
+test('a simultaneous knockout is a draw and guard-only duels stop after 15 rounds',async t=>{
+  const call = await setup(t);
+  for (const attack of ['swipe','guard']) {
+    const {code} = (await begin(call)).body;
+    await call('b',root+'/join',{breed:'Siamese',code});
+    let duel;
+    for (let round=1;round<=(attack==='swipe'?7:15);round++) {
+      await move(call,'a',code,round,attack);
+      duel = (await move(call,'b',code,round,attack)).body;
+    }
+    assert.equal(duel.phase,'finished');
+    assert.equal(duel.winner,null);
+    assert.equal(duel.reason,attack==='swipe'?'knockout':'round-limit');
+  }
+});

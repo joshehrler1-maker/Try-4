@@ -4,6 +4,10 @@
   const $ = id => document.getElementById(id);
   const status = (message,target='town-status') => { $(target).textContent = message; };
   if (!api) return;
+  const duelCode = new URLSearchParams(location.search).get('duel');
+  if (/^[0-9a-f]{12}$/.test(duelCode || '') && $('online-arena-link')) {
+    $('online-arena-link').href = 'pawtopia-battle-arena.html#duel-'+duelCode;
+  }
   $('online-disabled').hidden = true;
   $('online-enabled').hidden = false;
   $('cloud-settings').hidden = window.PawtopiaOnlineConfig.cloudSaves !== true;

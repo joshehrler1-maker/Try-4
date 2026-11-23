@@ -31,6 +31,7 @@ on:
       - 'pawtopia-arcade.html'
       - 'crystal-professional.*'
       - 'assets/**'
+      - 'pawtopia-online/**'
       - 'super-paw-3d.html'
       - 'hero-models.html'
       - 'story-bible.json'
@@ -62,6 +63,7 @@ jobs:
           node --test tests/companion-cottage-ui.test.cjs
           node --test tests/pawtopia-scout.test.cjs
           node --test tests/pawtopia-battle-arena.test.cjs
+          node --test tests/pawtopia-arena-duels.test.mjs
           node --test tests/pawtopia-individual-cat-art.test.cjs
           node --test tests/pawtopia-action-frames.test.cjs
           node --test tests/pawtopia-battle-gallery.test.cjs

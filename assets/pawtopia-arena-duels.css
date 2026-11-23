@@ -1,0 +1,17 @@
+
+#arena-duels { margin-block: 1.25rem; }
+#arena-duels [hidden] { display: none !important; }
+#arena-duels select, #arena-duels input { max-width: 100%; }
+#arena-duels button:disabled { opacity: .62; cursor: default; }
+.duel-lobby { display: grid; gap: .65rem; }
+.duel-actions, .duel-join { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem; }
+.duel-field { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .75rem; margin-block: .75rem; padding: .8rem; border-radius: 1rem; background: radial-gradient(ellipse at bottom,#395975,#142747 70%); overflow: hidden; }
+.duel-fighter { min-width: 0; text-align: center; }
+.duel-fighter progress { display: block; width: 88%; margin: .3rem auto; accent-color: #87dfac; }
+.duel-actor { width: min(100%,14rem); min-height: 6rem; margin: .2rem auto; transition: transform 85ms ease-out, filter 90ms; }
+.duel-actor svg { display: block; width: 100%; height: auto; }
+.duel-fighter:last-child .duel-actor svg { transform: scaleX(-1); }
+.duel-actor.duel-strike { transform: translateX(13%) scale(1.04); }
+.duel-fighter:last-child .duel-actor.duel-strike { transform: translateX(-13%) scale(1.04); }
+.duel-actor.duel-contact { filter: brightness(1.4) saturate(1.2); }
+@media (prefers-reduced-motion: reduce) { .duel-actor { transition: none; } }

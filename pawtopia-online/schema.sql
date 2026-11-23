@@ -78,3 +78,14 @@ CREATE TRIGGER IF NOT EXISTS deliver_owner_gift AFTER INSERT ON owner_gift BEGIN
            substr(NEW.id,17,4)||'-'||substr(NEW.id,21,12), NEW.player_id, NEW.pin
     WHERE NEW.pin IS NOT NULL;
 END;
+
+CREATE TABLE IF NOT EXISTS arena_duel (
+  code TEXT PRIMARY KEY,
+  host_id TEXT NOT NULL UNIQUE REFERENCES player(id) ON DELETE CASCADE,
+  guest_id TEXT REFERENCES player(id) ON DELETE CASCADE,
+  state TEXT NOT NULL,
+  phase TEXT NOT NULL CHECK (phase IN ('waiting','active','finished')),
+  revision INTEGER NOT NULL DEFAULT 0,
+  expires_at INTEGER NOT NULL,
+  CHECK (guest_id IS NULL OR guest_id <> host_id)
+);

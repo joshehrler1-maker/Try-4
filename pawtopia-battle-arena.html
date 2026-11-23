@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="assets/pawtopia-item-art.css?v=painted-1">
 <link rel="stylesheet" href="assets/pawtopia-pet-equipment.css?v=1">
 <link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
+<link rel="stylesheet" href="assets/pawtopia-arena-duels.css?v=1">
 <script defer src="assets/pawtopia-save.js?v=catalog-2569"></script>
 <script defer src="assets/pawtopia-upgrade-points.js?v=arena-rewards-1"></script>
 <script defer src="assets/pawtopia-battle-data.js?v=balance-1"></script>
@@ -31,6 +32,9 @@
 <script defer src="assets/pawtopia-battle-motion.js?v=duel-flow-1"></script>
 <script defer src="assets/game-fullscreen.js?v=arena-focus-1"></script>
 <script defer src="assets/pawtopia-battle-arena.js?v=fullscreen-1"></script>
+<script defer src="assets/pawtopia-online-config.js?v=production-1"></script>
+<script defer src="assets/pawtopia-cloud-save.js"></script>
+<script defer src="assets/pawtopia-arena-duels.js?v=1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
@@ -56,11 +60,63 @@
 <h1>Battle Arena</h1>
 <p>Every adopted cat can become a champion! Choose your companion, face a dog challenger, and <strong>watch the fight</strong> as pets move, strike, cast their unique skills, and celebrate victories.</p>
 <p>Battle through 207 dog challengers from smallest to largest, then face Baron Brasswhirl in his Clockwork Avatar.</p>
-<a class="primary" href="pawtopia-companions.html">Adopt or train a cat</a>
+<a class="primary" href="#arena-duels">Duel a friend</a>
+<a class="secondary" href="pawtopia-companions.html">Adopt or train a cat</a>
 <a class="secondary" href="pawtopia-battle-art-gallery.html">Preview all 56 fighter designs</a>
 </div>
 <img src="assets/scenes/town-arena.webp" width="500" height="500" loading="lazy" alt="Original Pawtopia arena environment art">
 </section>
+
+<section class="panel" id="arena-duels" aria-labelledby="duel-heading">
+  <h2 id="duel-heading">Player vs. player</h2>
+  <p>Challenge a friend with your adopted cats. Choose moves in secret. The round plays when both players are ready.</p>
+  <p class="mini">Both cats have 100 HP and four moves. Guard halves incoming damage. Signature recharges after two rounds, and ultimate unlocks in round 4 for one use. Duels do not award solo XP or loot.</p>
+  <p id="duel-account"><a id="duel-account-link" href="pawtopia-online.html">Sign in or create a free Pawtopia account</a> to duel.</p>
+  <p id="duel-notice" role="status"></p>
+  <div id="duel-lobby" class="duel-lobby" hidden>
+    <label for="duel-pet">Your adopted cat</label>
+    <select id="duel-pet"></select>
+    <p id="duel-adopt" hidden><a href="pawtopia-companions.html">Adopt a cat</a> before starting a duel.</p>
+    <div class="duel-actions">
+      <button id="duel-create" type="button">Create duel invite</button>
+      <button id="duel-restore" type="button">Resume my hosted duel</button>
+    </div>
+    <form id="duel-join-form" class="duel-join">
+      <label for="duel-invite">Friend’s invite code</label>
+      <input id="duel-invite" required maxlength="12" autocomplete="off" spellcheck="false" autocapitalize="off">
+      <button id="duel-join" type="submit">Join duel</button>
+    </form>
+  </div>
+  <div id="duel-match" hidden>
+    <p id="duel-phase" role="status"></p>
+    <p id="duel-code-line" hidden>Invite code <strong id="duel-code"></strong> · <a id="duel-share-link">Invite link</a></p>
+    <div id="duel-field" class="duel-field" hidden>
+      <div class="duel-fighter">
+        <strong id="duel-label-0"></strong>
+        <progress id="duel-health-0" max="100" value="100" aria-label="Host cat health"></progress>
+        <span id="duel-hp-0"></span><div id="duel-actor-0" class="duel-actor"><div id="duel-art-0" aria-hidden="true"></div></div>
+      </div>
+      <div class="duel-fighter">
+        <strong id="duel-label-1"></strong>
+        <progress id="duel-health-1" max="100" value="100" aria-label="Guest cat health"></progress>
+        <span id="duel-hp-1"></span><div id="duel-actor-1" class="duel-actor"><div id="duel-art-1" aria-hidden="true"></div></div>
+      </div>
+    </div>
+    <p id="duel-summary" aria-live="polite"></p>
+    <div id="duel-moves" class="duel-actions" role="group" aria-label="Duel moves">
+      <button type="button" data-duel-move="swipe">Paw Swipe</button>
+      <button type="button" data-duel-move="guard">Guard Curl</button>
+      <button type="button" data-duel-move="signature">Signature</button>
+      <button type="button" data-duel-move="ultimate">Ultimate</button>
+    </div>
+    <div class="duel-actions">
+      <button id="duel-refresh" type="button">Check for update</button>
+      <button id="duel-replay" type="button">Replay last round</button>
+      <button id="duel-leave" type="button">Forfeit duel</button>
+    </div>
+  </div>
+</section>
+
 <section class="select-panel" aria-label="Choose your fighter and challenge">
 <div class="arena-setup">
 <div>
@@ -169,7 +225,7 @@
 <div class="panel"><h2>Battle story</h2><ol id="battle-log" class="battle-log"><li>Adopt a cat and choose a challenger to begin.</li></ol></div>
 <div class="panel"><h2>Rewards &amp; training</h2><p><strong>Stronger foes give better XP, coins and loot.</strong> Higher ranks can award crystal shards, an arena toy and collectible medals. Every reward is fictional in-game currency or an item.</p><p>Train your cat's Strength, Defence, Movement, Endurance and Intelligence at Companion Cottage. Arena XP also levels your cat and unlocks moves.</p><p id="battle-trophies" class="mini">No trophies yet</p><a class="secondary-link" href="pawtopia-companions.html#companion-care">Visit Companion Training School</a></div>
 </section>
-<p class="disclosure">Free solo battles against computer-controlled clockwork opponents. No real-money betting, purchases, chat, account signup or player-versus-player features. Progress is saved only in this browser. Illustrated fighters battle on a stone floor. Each cat has its own illustrated head, coat, body, and tail.</p>
+<p class="disclosure">Solo battles save their progress in this browser. Online duels use Pawtopia accounts and in-game combat only. No real-money betting, purchases, or chat. Illustrated fighters battle on a stone floor. Each cat has its own illustrated head, coat, body, and tail.</p>
 
 <figure class="world-art" aria-hidden="true">
 <img src="assets/scenes/platform-combat.webp" alt="" loading="lazy" decoding="async">

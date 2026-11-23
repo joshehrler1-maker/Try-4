@@ -11,7 +11,7 @@ async function hash(text) {
 function fail(message, status = 400) {
   throw Object.assign(new Error(message), {status});
 }
-async function body(request) {
+async function body(request, limit = 262144) {
   const reader = request.body?.getReader();
   if (!reader) fail('Missing request data.');
   const decoder = new TextDecoder();
@@ -20,9 +20,9 @@ async function body(request) {
     const {done, value} = await reader.read();
     if (done) break;
     size += value.length;
-    if (size > 262144) {
+    if (size > limit) {
       await reader.cancel();
-      fail('Save exceeds the online size limit. Your local copy is still available.', 413);
+      fail(limit === 262144 ? 'Save exceeds the online size limit. Your local copy is still available.' : 'Arena request is too large.', 413);
     }
     data += decoder.decode(value, {stream:true});
   }
@@ -32,6 +32,110 @@ async function body(request) {
   } catch {}
   fail('Invalid request data.');
 }
+
+const duelBreeds = new Set(["Maine Coon","Siamese","Bengal","British Shorthair","Ragdoll","Sphynx","Abyssinian","American Bobtail","American Curl","American Shorthair","American Wirehair","Balinese","Birman","Bombay","Burmese","Burmilla","Chartreux","Cornish Rex","Devon Rex","Egyptian Mau","European Shorthair","Exotic Shorthair","Havana Brown","Japanese Bobtail","Khao Manee","Korat","LaPerm","Lykoi","Manx","Nebelung","Norwegian Forest Cat","Ocicat","Oriental Shorthair","Persian","Peterbald","Pixiebob","Ragamuffin","Russian Blue","Savannah","Scottish Fold","Selkirk Rex","Siberian","Singapura","Snowshoe","Somali","Tonkinese","Toyger","Turkish Angora","Turkish Van","York Chocolate","Australian Mist","Cymric","Donskoy","German Rex","Kurilian Bobtail","Sokoke"]);
+const duelCode = /^[0-9a-f]{12}$/;
+const duelMoves = {swipe:16, guard:0, signature:25, ultimate:34};
+const duelDay = 86400000;
+const newDuelFighter = (alias, breed) => ({alias, breed, hp:100, readyAt:1, ultimateUsed:false});
+
+function duelResponse(row, state, side) {
+  const {fighters, choices, round, history, winner, reason} = state;
+  return {code:row.code, phase:row.phase, side, fighters, round, history,
+    winner, reason, submitted:Boolean(choices[side]), expiresAt:row.expires_at};
+}
+function validDuelMove(fighter, move, round) {
+  return typeof move === 'string' && Object.hasOwn(duelMoves,move) &&
+    (move !== 'signature' || round >= fighter.readyAt) &&
+    (move !== 'ultimate' || (round >= 4 && !fighter.ultimateUsed));
+}
+function resolveDuelRound(state) {
+  const {fighters, choices, round} = state;
+  const damage = choices.map((move,i) => choices[1-i] === 'guard'
+    ? Math.floor(duelMoves[move]/2) : duelMoves[move]);
+  const hpBefore = fighters.map(fighter => fighter.hp);
+  fighters.forEach((fighter,i) => {
+    fighter.hp = Math.max(0,fighter.hp-damage[1-i]);
+    if (choices[i] === 'signature') fighter.readyAt = round+3;
+    if (choices[i] === 'ultimate') fighter.ultimateUsed = true;
+  });
+  state.history.push({round, moves:choices, damage, hpBefore, hpAfter:fighters.map(fighter=>fighter.hp)});
+  state.choices = [null,null];
+  state.round += 1;
+  const [a,b] = fighters.map(fighter=>fighter.hp);
+  if (!a || !b || round >= 15) {
+    state.winner = a === b ? null : a > b ? 0 : 1;
+    state.reason = !a || !b ? 'knockout' : 'round-limit';
+  }
+}
+
+async function handleDuel(route, request, player, db, json) {
+  const now = Date.now();
+  if (route === 'GET /arena-duel/status') {
+    await db('SELECT code FROM arena_duel LIMIT 1').first();
+    return json({enabled:true});
+  }
+  const creating = route === 'POST /arena-duel/create';
+  const input = request.method === 'POST' ? await body(request,4096) : null;
+  if (creating || route === 'POST /arena-duel/join') {
+    if (!duelBreeds.has(input.breed)) fail('Choose an adopted cat from your cottage.');
+  }
+  if (creating) {
+    const code = randomToken().slice(0,12);
+    const state = {fighters:[newDuelFighter(player.alias,input.breed)],choices:[null,null],
+      round:1,history:[],winner:null,reason:null};
+    const result = await db(`INSERT INTO arena_duel(code,host_id,state,phase,expires_at)
+      VALUES(?,?,?,'waiting',?)
+      ON CONFLICT(host_id) DO UPDATE SET code=excluded.code, guest_id=NULL,
+      state=excluded.state, phase='waiting', revision=0, expires_at=excluded.expires_at
+      WHERE arena_duel.phase='finished' OR arena_duel.expires_at <= ?`,
+      code,player.id,JSON.stringify(state),now+duelDay,now).run();
+    if (!result.meta.changes) fail('Finish or leave your existing hosted duel first.',409);
+    return json(duelResponse({code,phase:'waiting',expires_at:now+duelDay},state,0),201);
+  }
+  if (route === 'GET /arena-duel/hosted') {
+    const existing = await db('SELECT code, state, phase, expires_at FROM arena_duel WHERE host_id=? AND expires_at>?',player.id,now).first();
+    return json({duel:existing ? duelResponse(existing,JSON.parse(existing.state),0) : null});
+  }
+  const code = input?.code ?? new URL(request.url).searchParams.get('code');
+  if (typeof code !== 'string' || !duelCode.test(code)) fail('Enter a valid 12-character duel code.');
+  const row = await db('SELECT * FROM arena_duel WHERE code=? AND expires_at>?',code,now).first();
+  if (!row) fail('Duel not found or expired.',404);
+  const state = JSON.parse(row.state);
+  const side = row.host_id === player.id ? 0 : row.guest_id === player.id ? 1 : -1;
+  if (route === 'POST /arena-duel/join') {
+    if (side === 0) fail('Share this code with another Pawtopia player.');
+    if (side === 1) return json(duelResponse(row,state,1));
+    if (row.phase !== 'waiting') fail('This duel has already started.',409);
+    state.fighters.push(newDuelFighter(player.alias,input.breed));
+    const expiresAt = now+7*duelDay;
+    const result = await db(`UPDATE arena_duel SET guest_id=?, state=?, phase='active',
+      revision=revision+1, expires_at=? WHERE code=? AND phase='waiting' AND revision=?`,
+      player.id,JSON.stringify(state),expiresAt,code,row.revision).run();
+    if (!result.meta.changes) fail('This duel has already started.',409);
+    return json(duelResponse({...row,phase:'active',expires_at:expiresAt},state,1));
+  }
+  if (side < 0) fail('Duel not found or expired.',404);
+  if (route === 'GET /arena-duel') return json(duelResponse(row,state,side));
+  if (route !== 'POST /arena-duel/move' && route !== 'POST /arena-duel/leave') fail('Unknown arena action.',404);
+  if (row.phase === 'finished') return json(duelResponse(row,state,side));
+  if (route === 'POST /arena-duel/leave') {
+    state.winner = row.phase === 'active' ? 1-side : null;
+    state.reason = row.phase === 'active' ? 'forfeit' : 'cancelled';
+  } else {
+    if (row.phase !== 'active') fail('Wait for another player to join.');
+    if (input.round !== state.round || state.choices[side]) return json(duelResponse(row,state,side));
+    if (!validDuelMove(state.fighters[side],input.move,state.round)) fail('That move is unavailable this round.');
+    state.choices[side] = input.move;
+    if (state.choices.every(Boolean)) resolveDuelRound(state);
+  }
+  const phase = state.reason ? 'finished' : row.phase;
+  const result = await db('UPDATE arena_duel SET state=?, phase=?, revision=revision+1 WHERE code=? AND revision=?',
+    JSON.stringify(state),phase,code,row.revision).run();
+  if (!result.meta.changes) fail('The duel updated. Try your action again.',409);
+  return json(duelResponse({...row,phase},state,side));
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('origin');
@@ -63,6 +167,7 @@ export default {
       if (!tokenFormat.test(key)) fail('Enter your Pawtopia account key.',401);
       const player = await db('SELECT id,alias,public,club,tickets FROM player WHERE token_hash=?',await hash(key)).first();
       if (!player) fail('Account key was not recognized.',401);
+      if (new URL(request.url).pathname.startsWith('/arena-duel')) return await handleDuel(route,request,player,db,json);
       if (route === 'GET /session') return json({alias:player.alias});
       if ((route === 'GET /save' || route === 'PUT /save') && env.PAWTOPIA_CLOUD_SAVES !== 'enabled') {
         fail('Online save sync is disabled.', 404);
