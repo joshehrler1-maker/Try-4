@@ -7,7 +7,14 @@
 <meta name="description" content="Play original Super Paw Heroes mini-games, discover 25 side-scrolling adventures, and browse guest arcades with Whisker and Luna in Pawtopia.">
 <link rel="canonical" href="https://joshehrler1-maker.github.io/Try-4/pawtopia-arcade.html">
 <style>
-*{box-sizing:border-box}body{margin:0;background:#080f25;color:#f8f7ff;font:1rem/1.5 system-ui,sans-serif}header,main,footer{width:min(100% - 2rem,64rem);margin:auto}header{padding:1rem 0}a{color:#ffde87}h1{font-size:clamp(2.7rem,8vw,5rem);line-height:1;margin:.4rem 0}h2{margin:.3rem 0}.hero{min-height:24rem;display:grid;align-content:end;padding:clamp(1.25rem,5vw,3rem);border-radius:1.25rem;background:linear-gradient(0deg,#090f29 2%,#090f2960 75%),url(assets/whisker-luna-master.webp) center 30%/cover}.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.8rem;margin:1rem 0}.games button{text-align:left}button{font:inherit;min-height:48px;color:inherit;background:#222e59;border:1px solid #7789c4;border-radius:.75rem;padding:.55rem .8rem;cursor:pointer}button[aria-pressed=true],.start{background:#ffde87;color:#211b32;font-weight:750}button:focus-visible,a:focus-visible{outline:3px solid #8bf9ff;outline-offset:3px}.play{padding:1rem;border-radius:1rem;background:radial-gradient(ellipse at 50% 0,#33347a,#131b38 70%);border:1px solid #646eb0}.hud{display:flex;gap:1rem;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;max-width:25rem;margin:1rem auto}.grid button{aspect-ratio:1;font-size:clamp(1.15rem,6vw,2rem);padding:.15rem;touch-action:manipulation;background:linear-gradient(150deg,#344780,#1a2448)}.grid button:disabled{opacity:.78;cursor:default}.grid button[data-lit=true]{background:#554277;border-color:#d2a4ff}.sponsor{margin:5rem auto 2rem;max-width:46rem;padding:1.5rem;text-align:center;border:1px solid #536081;border-radius:.75rem;color:#d5dcf4}.sponsor small{display:block;text-transform:uppercase;letter-spacing:.12em}footer{padding:1rem 0 2rem}
+*{box-sizing:border-box}body{margin:0;background:#080f25;color:#f8f7ff;font:1rem/1.5 system-ui,sans-serif}header,main,footer{width:min(100% - 2rem,64rem);margin:auto}header{padding:1rem 0}a{color:#ffde87}h1{font-size:clamp(2.7rem,8vw,5rem);line-height:1;margin:.4rem 0}h2{margin:.3rem 0}.hero{min-height:24rem;display:grid;align-content:end;padding:clamp(1.25rem,5vw,3rem);border-radius:1.25rem;background:linear-gradient(0deg,#090f29 2%,#090f2960 75%),url(assets/whisker-luna-master.webp) center 30%/cover}.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.8rem;margin:1rem 0}.games button{text-align:left}button{font:inherit;min-height:48px;color:inherit;background:#222e59;border:1px solid #7789c4;border-radius:.75rem;padding:.55rem .8rem;cursor:pointer}button[aria-pressed=true],.start{background:#ffde87;color:#211b32;font-weight:750}button:focus-visible,a:focus-visible{outline:3px solid #8bf9ff;outline-offset:3px}.play{padding:1rem;border-radius:1rem;background:radial-gradient(ellipse at 50% 0,#33347a,#131b38 70%);border:1px solid #646eb0}.hud{display:flex;gap:1rem;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;max-width:25rem;margin:1rem auto}.grid button{aspect-ratio:1;font-size:clamp(1.15rem,6vw,2rem);padding:.15rem;touch-action:manipulation;background:linear-gradient(150deg,#344780,#1a2448)}.grid button:disabled{opacity:.78;cursor:default}.grid button[data-lit=true]{background:#554277;border-color:#d2a4ff}.sponsor{margin:5rem auto 2rem;max-width:46rem;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);overflow:hidden;border:1px solid #536081;border-radius:.75rem;background:#172240;color:#f1f3ff}
+.sponsor img{display:block;width:100%;height:100%;min-height:9rem;object-fit:cover}
+.sponsor-copy{padding:clamp(1rem,3vw,1.5rem)}
+.sponsor small{display:block;color:#e6d3ff;font-weight:650}
+.sponsor h2{margin:.35rem 0;font-size:clamp(1.2rem,3.2vw,1.65rem)}
+.sponsor p{margin:.5rem 0 .75rem}
+.sponsor a{display:inline-flex;align-items:center;min-height:44px;color:#ffe4a0;text-underline-offset:.2em}
+@media(max-width:560px){.sponsor{grid-template-columns:1fr}.sponsor img{height:8rem;min-height:0}}footer{padding:1rem 0 2rem}
 .game-directory{margin:1rem 0;padding:1rem;border-radius:1rem;background:#152044;border:1px solid #7789c4}.game-directory h2{color:#ffde87}.game-filters{display:flex;gap:.75rem;flex-wrap:wrap}.game-filters label{display:grid;flex:1 1 10rem}.game-filters input,.game-filters select{min-height:44px;padding:.5rem;border-radius:.5rem;font:inherit}.games [hidden]{display:none}.games button small{display:block;font-weight:500}.game-directory p{margin:.5rem 0 0}
 .echo-art[hidden],.echo-sound[hidden]{display:none}.echo-art{display:block;width:100%;height:auto;aspect-ratio:3/1;object-fit:cover;object-position:center;border-radius:.8rem;border:1px solid #b188ed;margin:.35rem 0 1rem}
 .play[data-game=crystal]{background:radial-gradient(ellipse at 50% 45%,#57328588,#16112be8 74%),url(assets/scenes/purple-mystic-halls.webp) center/cover;border-color:#9566c9}
@@ -112,7 +119,15 @@
 <h2 id="favourites-title">Favourites</h2><ul id="room-favourites"></ul>
 </section>
 </div>
-<aside class="sponsor" aria-label="House advertisement"><small>From Super Paw Heroes</small><a href="coloring-book.html">Try the free Crystal Catacombs coloring pages</a></aside>
+<aside class="sponsor" aria-labelledby="arcade-book-title">
+<img src="assets/scenes/catacombs.webp" alt="" loading="lazy" decoding="async">
+<div class="sponsor-copy">
+<small>Advertisement from Super Paw Heroes</small>
+<h2 id="arcade-book-title">Crystal Catacombs Coloring Book</h2>
+<p>Bring Whisker and Luna’s adventure to the coloring table. View three free sample pages and see the full printable book.</p>
+<a href="coloring-book.html">See the coloring book and free sample</a>
+</div>
+</aside>
 
 <figure class="world-art" aria-hidden="true">
 <img src="assets/scenes/world-art/scene-05.png" alt="" loading="lazy" decoding="async">
