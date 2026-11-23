@@ -100,7 +100,7 @@ public final class MainActivity extends Activity {
     }
     private void chooseImport() {
         if(!inStudio()||transferring){toast("Open Studio first and finish any backup operation.");return;}
-        new AlertDialog.Builder(this).setTitle("Restore workspace?").setMessage("This replaces your local studio drafts and transaction records. Export a backup first if needed.").setNegativeButton("Cancel",null).setPositiveButton("Choose backup",(d,w)->{
+        new AlertDialog.Builder(this).setTitle("Restore workspace?").setMessage("This replaces your local creative workspace. Export a backup first if needed.").setNegativeButton("Cancel",null).setPositiveButton("Choose backup",(d,w)->{
             Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json");startActivityForResult(intent,IMPORT);
         }).show();
     }
