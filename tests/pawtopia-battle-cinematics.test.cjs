@@ -148,7 +148,7 @@ test('cinematic changes cannot affect battle saves, payments or free-only behavi
   assert.ok(html.indexOf('pawtopia-battle-cinematics.js')<html.indexOf('pawtopia-battle-arena.js'));
   for(const name of ['battle-projectile','battle-impact-ring','arena-camera-shiver','arena-skill-shot'])
     assert.ok(css.includes(name),name);
-  assert.match(ui, /launchSkillProjectile\(visual,kit,duration\*\(clip\.contact-t\)\)/);
+  assert.match(ui, /launchSkillProjectile\(visual,kit,duration\*\(clip\.contact-t\),actorArt,defenderArt,family\)/);
   assert.match(ui, /setFrame\(clip\.contact\)/);
   assert.match(ui, /\(playArea\|\|stage\)\.scrollIntoView\?\./, 'Start/watch should reveal the fight stage on mobile');
   assert.ok(ui.includes('if(combat?.cameraShake)cameraContact(evt,visual,color,point)'));
