@@ -1,0 +1,76 @@
+.battle-stage[data-arena-theme="cottage"]{border-color:#d9cd9e}
+.battle-stage[data-arena-theme="cottage"] .battle-backdrop{
+  opacity:.95;background:linear-gradient(#fff2a22b,#26391f80),url("scenes/cottage.webp") center 47%/cover no-repeat;filter:saturate(1.1)
+}
+.battle-stage[data-arena-theme="crystal"]{border-color:#b19ae9}
+.battle-stage[data-arena-theme="crystal"] .battle-backdrop{
+  opacity:1;background:radial-gradient(circle at 23% 25%,#ffc57555,transparent 20%),radial-gradient(circle at 80% 24%,#ffe3a544,transparent 18%),linear-gradient(#45345722,#24143888),url("scenes/purple-mystic-halls.webp") center/cover no-repeat;filter:saturate(1.15)
+}
+.battle-stage[data-arena-theme="clockwork"]{border-color:#dba55e}
+.battle-stage[data-arena-theme="clockwork"] .battle-backdrop{
+  opacity:1;background:linear-gradient(#46291b44,#39211999),url("scenes/blue-tech-mines.webp") center/cover no-repeat;filter:sepia(.55) saturate(1.2)
+}
+.arena-stage-name{
+  position:absolute;z-index:2;top:8px;left:50%;transform:translateX(-50%);max-width:calc(100% - 14px);
+  padding:4px 12px;border:1px solid #dbbe7e;border-radius:999px;background:#182237f2;
+  color:#ffe6a8;text-align:center;font-size:clamp(.68rem,2.8vw,.88rem);font-weight:800;white-space:nowrap;pointer-events:none
+}
+.arena-clockwork{display:none}
+[data-arena-theme="clockwork"] .arena-clockwork{
+  display:flex;justify-content:space-between;position:absolute;z-index:-1;inset:10% 7% auto;color:#dfa76e80;
+  text-shadow:2px 3px #492b21;font-size:clamp(2.5rem,9vw,6rem);pointer-events:none
+}
+.arena-clockwork span{animation:arena-cog-turn 18s linear infinite}
+.arena-clockwork span+span{animation-direction:reverse;font-size:.75em}
+@keyframes arena-cog-turn{to{transform:rotate(1turn)}}
+.arena-faceoff:not([hidden]){
+  position:absolute;z-index:11;inset:22% 4% auto;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;gap:8px;padding:9px;border:1px solid #edca82;border-radius:14px;background:#172036f0;
+  color:#fff2d4;box-shadow:0 10px 25px #080a1c80;text-align:center;pointer-events:none
+}
+.arena-faceoff span{display:grid;gap:2px;overflow-wrap:anywhere}
+.arena-faceoff strong{font-size:clamp(.8rem,3.6vw,1.35rem);line-height:1.05}
+.arena-faceoff small{color:#e3d9aa}
+.arena-faceoff b{color:#ffcf74;font-family:Georgia,serif;font-style:italic}
+.arena-show-entrance [data-arena-entrance]{
+  --arena-offset:-36%;--arena-rise:-7%;--arena-drop:-2%;animation:arena-contender-arrives .65s ease-out both
+}
+.arena-show-entrance [data-arena-side="1"]{--arena-offset:36%}
+.arena-show-entrance [data-arena-entrance="bound"]{--arena-rise:-16%;--arena-drop:5%}
+.arena-show-entrance [data-arena-entrance="glide"]{--arena-rise:-2%;--arena-drop:0%}
+@keyframes arena-contender-arrives{
+  0%{translate:var(--arena-offset) 0;opacity:.2}57%{translate:0 var(--arena-rise)}
+  80%{translate:0 var(--arena-drop)}100%{translate:0 0;opacity:1}
+}
+.duel-field[data-arena-winner="0"] #duel-actor-0,
+.duel-field[data-arena-winner="1"] #duel-actor-1,
+#battle-pet-sprite.state-victory{animation:arena-victory-salute .65s ease-out both}
+[data-arena-entrance="bound"]{--salute-height:-13%;--salute-tilt:-4deg}
+[data-arena-entrance="glide"]{--salute-height:-3%;--salute-tilt:5deg}
+@keyframes arena-victory-salute{
+  45%{translate:0 var(--salute-height,-7%);rotate:var(--salute-tilt,0deg);filter:drop-shadow(0 0 12px #ffdc80a8)}
+}
+.arena-victory-card:not([hidden]){
+  display:grid;grid-template-columns:minmax(70px,24%) 1fr;gap:12px;align-items:center;
+  margin:14px 0;padding:12px;border:1px solid #e2be78;border-radius:15px;
+  background:radial-gradient(ellipse at 10% 25%,#644b52,#282942 72%);color:#fff3d7
+}
+.arena-victory-portrait{min-width:0;aspect-ratio:1}
+.arena-victory-portrait :is(svg,img){display:block;width:100%;height:100%;object-fit:contain}
+.arena-victory-card h3,.arena-victory-card p{margin:0 0 6px;overflow-wrap:anywhere}
+.arena-victory-card ul,.arena-scrapbook ol{list-style:none;margin:0;padding:0}
+.arena-victory-card ul{display:flex;flex-wrap:wrap;gap:5px}
+.arena-victory-card li,.arena-scrapbook li{
+  padding:3px 7px;border:1px solid #e4c7828c;border-radius:8px;background:#171f36;font-size:.8rem
+}
+.arena-scrapbook summary{font-weight:750;cursor:pointer}
+.arena-scrapbook ol{display:grid;grid-template-columns:repeat(auto-fit,minmax(65px,1fr));gap:6px;margin:8px 0 12px}
+.arena-scrapbook li{display:grid;text-align:center;gap:2px;padding:6px 2px;border-style:dashed;color:#cad6e8}
+.arena-scrapbook li::before{content:"◇";font-size:1.25rem;font-weight:800}
+.arena-scrapbook .arena-stamp-earned{border-style:solid;background:#473522;color:#ffdf90}
+.arena-scrapbook .arena-stamp-earned::before{content:"✪"}
+@media(max-width:650px){.battle-stage[data-arena-theme]{padding-top:32px}}
+html[data-battle-effects="low"] :is(.arena-clockwork span,.arena-show-entrance [data-arena-entrance],.duel-field[data-arena-winner] .duel-actor,#battle-pet-sprite.state-victory){animation:none}
+@media(prefers-reduced-motion:reduce){
+  .arena-clockwork span,.arena-show-entrance [data-arena-entrance],.duel-field[data-arena-winner] .duel-actor,#battle-pet-sprite.state-victory{animation:none}
+}

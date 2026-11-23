@@ -267,3 +267,22 @@ test('visual events report actual dodge, healing and guard state',()=>{
   assert.equal(incoming.effects.dodge,0);
   assert.equal(incoming.petHp,guard.petHp);
 });
+
+test('tournament scrapbook records each tier once and preserves older milestones',()=>{
+  const {engine}=createWorld(),p=fresh();
+  const win=()=>{
+    assert.equal(engine.start(p,0,0).ok,true);
+    let result;
+    for(let turn=0;turn<20&&!p.battleMatch.finished;turn++)result=engine.takeTurn(p,'swipe',guaranteed);
+    assert.equal(p.battleMatch.result,'win');
+    assert.deepEqual(clone(p.battleMatch.victoryRewards),clone(result.rewards));
+  };
+  win();
+  assert.equal(p.battleMatch.stampRank,1);
+  assert.deepEqual(clone(engine.profile(clone(p).companion).tierStamps),[1]);
+  win();
+  assert.equal(p.battleMatch.stampRank,undefined);
+  assert.deepEqual(clone(p.companion.battle.tierStamps),[1]);
+  p.companion.battle={wins:6,bestRank:6,trophies:['Bronze Paw Medal']};
+  assert.deepEqual(clone(engine.profile(p.companion).tierStamps),[4,6]);
+});

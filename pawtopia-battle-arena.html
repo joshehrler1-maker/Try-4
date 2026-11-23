@@ -20,7 +20,7 @@
 <script defer src="assets/pawtopia-battle-data.js?v=balance-1"></script>
 <script defer src="assets/pawtopia-item-tiers.js?v=shop-prices-3"></script>
 <script defer src="assets/pawtopia-items.js?v=balance-1"></script>
-<script defer src="assets/pawtopia-battle-engine.js?v=arena-fx-1"></script>
+<script defer src="assets/pawtopia-battle-engine.js?v=arena-tournament-1"></script>
 <script defer src="assets/pawtopia-battle-puppet.js?v=grounded-1"></script>
 <script defer src="assets/pawtopia-battle-character-art.js?v=motion-1"></script>
 <script defer src="assets/pawtopia-battle-foe-art.js?v=grounded-1"></script>
@@ -32,10 +32,12 @@
 <script defer src="assets/pawtopia-battle-motion.js?v=duel-flow-1"></script>
 <script defer src="assets/game-fullscreen.js?v=arena-focus-1"></script>
 <script defer src="assets/pawtopia-battle-effects.js?v=arena-fx-1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=arena-fx-1"></script>
+<link rel="stylesheet" href="assets/pawtopia-arena-tournament.css?v=arena-tournament-1">
+<script defer src="assets/pawtopia-arena-tournament.js?v=arena-tournament-1"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=arena-tournament-1"></script>
 <script defer src="assets/pawtopia-online-config.js?v=production-1"></script>
 <script defer src="assets/pawtopia-cloud-save.js"></script>
-<script defer src="assets/pawtopia-arena-duels.js?v=arena-fx-1"></script>
+<script defer src="assets/pawtopia-arena-duels.js?v=arena-tournament-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
@@ -107,6 +109,7 @@
     <p id="duel-code-line" hidden>Invite code <strong id="duel-code"></strong> · <a id="duel-share-link">Invite link</a></p>
     <div id="duel-field" class="duel-field" hidden>
       <div id="duel-effects" class="duel-effects" aria-hidden="true"></div>
+      <div class="arena-faceoff" id="arena-duel-faceoff" hidden></div>
       <div class="duel-fighter">
         <strong id="duel-label-0"></strong>
         <p class="mini" id="duel-stats-0"></p>
@@ -170,6 +173,9 @@
 <div class="arena-play-area" id="arena-play-area" data-fullscreen-game data-fullscreen-modal>
 <div class="battle-stage" id="battle-stage" aria-label="Animated turn-based battle field">
 <div class="battle-backdrop" aria-hidden="true"></div>
+<div class="arena-clockwork" aria-hidden="true"><span>⚙</span><span>⚙</span></div>
+<span id="arena-stage-name" class="arena-stage-name">Cottage Training Ground</span>
+<div class="arena-faceoff" id="arena-solo-faceoff" hidden></div>
 <canvas id="battle-3d" class="battle-3d-canvas" aria-hidden="true"></canvas>
 <div class="battler battler-pet" id="battle-pet-fighter">
 <div class="battler-ui"><span id="stage-pet-name">Your Cat</span><strong id="stage-pet-level">Lv 1</strong></div>
@@ -226,6 +232,10 @@
 <div class="battle-outcome" id="battle-outcome" role="status" aria-live="polite"></div>
 </div>
 </div>
+<article id="arena-victory-card" class="arena-victory-card" aria-labelledby="arena-victory-title" hidden>
+  <div class="arena-victory-portrait" id="arena-victory-portrait" aria-hidden="true"></div>
+  <div><h3 id="arena-victory-title"></h3><p id="arena-victory-caption"></p><ul id="arena-victory-rewards"></ul></div>
+</article>
 <p class="mini">Moves unlock at levels 1, 3, 6, and 10.</p>
 <details class="battle-art-gallery" id="battle-art-gallery">
 <summary>Preview your cat's custom art and nine individual poses</summary>
@@ -248,7 +258,7 @@
 </section>
 <section class="extra">
 <div class="panel"><h2>Battle story</h2><ol id="battle-log" class="battle-log"><li>Adopt a cat and choose a challenger to begin.</li></ol></div>
-<div class="panel"><h2>Rewards &amp; training</h2><p><strong>Stronger foes give better XP, coins and loot.</strong> Higher ranks can award crystal shards, an arena toy and collectible medals. Every reward is fictional in-game currency or an item.</p><p>Train your cat's Strength, Defence, Movement, Endurance and Intelligence at Companion Cottage. Arena XP also levels your cat and unlocks moves.</p><p id="battle-trophies" class="mini">No trophies yet</p><a class="secondary-link" href="pawtopia-companions.html#companion-care">Visit Companion Training School</a></div>
+<div class="panel"><h2>Rewards &amp; training</h2><p><strong>Stronger foes give better XP, coins and loot.</strong> Higher ranks can award crystal shards, an arena toy and collectible medals. Every reward is fictional in-game currency or an item.</p><p>Train your cat's Strength, Defence, Movement, Endurance and Intelligence at Companion Cottage. Arena XP also levels your cat and unlocks moves.</p><p id="battle-trophies" class="mini">No trophies yet</p><details class="arena-scrapbook"><summary>Arena scrapbook</summary><p id="arena-scrapbook-caption"></p><ol id="arena-scrapbook-stamps"></ol></details><a class="secondary-link" href="pawtopia-companions.html#companion-care">Visit Companion Training School</a></div>
 </section>
 <p class="disclosure">Solo battles save their progress in this browser. Online duels use Pawtopia accounts and in-game combat only. No real-money betting, purchases, or chat. Illustrated fighters battle on a stone floor. Each cat has its own illustrated head, coat, body, and tail.</p>
 

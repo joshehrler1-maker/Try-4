@@ -40,7 +40,14 @@
   }
   function profile(cat) {
     const a = cat?.battle || {};
-    return { level:level(cat), xp:safe(a.xp), nextXp:12+level(cat)*6, wins:safe(a.wins),
+    const stamps = new Set(Array.isArray(a.tierStamps) ? a.tierStamps : []);
+    // Earlier saves recorded the highest win and the three milestone trophies.
+    stamps.add(safe(a.bestRank));
+    if (a.trophies?.includes?.('Bronze Paw Medal')) stamps.add(4);
+    if (a.trophies?.includes?.('Silver Paw Medal')) stamps.add(8);
+    if (a.trophies?.includes?.('Golden Paw Crown')) stamps.add(12);
+    const tierStamps=[...stamps].filter(rank=>Number.isInteger(rank)&&rank>=1&&rank<=(data.bossRank||12)).sort((a,b)=>a-b);
+    return { tierStamps, level:level(cat), xp:safe(a.xp), nextXp:12+level(cat)*6, wins:safe(a.wins),
       losses:safe(a.losses), bestRank:safe(a.bestRank), trophies:Array.isArray(a.trophies)?a.trophies.filter(x=>typeof x==='string').slice(0,16):[] };
   }
   function ensure(cat) {
@@ -104,6 +111,10 @@
   }
   function grantVictory(progress,cat,foe) {
     const a=ensure(cat).battle;
+    const stamps=profile(cat).tierStamps;
+    const firstTierWin=!stamps.includes(foe.rank);
+    a.tierStamps=firstTierWin?[...stamps,foe.rank]:stamps;
+    if(firstTierWin)progress.battleMatch.stampRank=foe.rank;
     a.wins++;
     a.bestRank=Math.max(safe(a.bestRank),foe.rank);
     const previousLevel=level(cat),xpAward=foe.xp*3;
@@ -290,6 +301,7 @@
       rewards=grantVictory(progress,cat,foe);
       const upgrade=window.PawtopiaUpgradePoints?.awardBattleVictory?.(progress,foe.id);
       if(upgrade)rewards.push('+'+upgrade.amount+' Pet Upgrade Points');
+      match.victoryRewards=rewards.slice();
       events.push({who:'system',name:'Victory!',target:'none',damage:0,remaining:0,fx:'victory',detail:rewards.join(' · ')});
       match.history.push('Victory! '+rewards.join(' · '));match.history=match.history.slice(-24);
     } else if(match.hp<=0){

@@ -9,6 +9,8 @@
   const engine = window.PawtopiaBattleEngine;
   const motion = window.PawtopiaBattleMotion;
   const effects = window.PawtopiaBattleEffects;
+  const tournament = window.PawtopiaArenaTournament;
+  let previousEntrance = '';
   const unlocks = {swipe:1,guard:3,signature:6,ultimate:10};
   if (!section || !api || !save || !data || !art || !engine) return;
 
@@ -151,11 +153,23 @@
       'Round '+duel.round+' of 15 · '+(duel.submitted ? 'Move locked in. Waiting for your opponent.' :
         duel.opponentSubmitted ? 'Opponent ready. Choose your move.' : 'Choose your move.');
     const latest = duel.history.at(-1);
+    const field=element('field'), faceoff=document.getElementById('arena-duel-faceoff');
+    const arrival=duel.phase==='active' && duel.round===1 && !latest && !duel.submitted && duel.fighters.length===2;
+    if(arrival && previousEntrance!==duel.code && tournament){
+      previousEntrance=duel.code;
+      tournament.faceoff(field,faceoff,duel.fighters.map((pet,side)=>({
+        name:pet.name || pet.alias || pet.breed, level:pet.stats?.level || 1,
+        actor:element('actor-'+side), breed:pet.breed
+      })));
+    }else if(!arrival || playing) tournament?.clearFaceoff(field,faceoff);
+    if(tournament)field.dataset.arenaWinner=duel.phase==='finished' && duel.winner!==null && !playing ? String(duel.winner) : '';
+
     element('summary').textContent = latest ? duel.fighters.map((pet,i) =>
       latest.moves[i] === 'fumble' ? pet.alias+' missed its swipe' :
         pet.alias+' used '+moveLabel(pet.breed,latest.moves[i])+' ('+latest.damage[i]+' damage)').join(' · ') : '';
     for (const [side,pet] of duel.fighters.entries()) {
       const stats = pet.stats;
+      tournament?.styleFighter(element('actor-'+side),pet.breed);
       element('label-'+side).textContent = (pet.name ? pet.name+' · ' : '')+pet.breed+' · '+
         (side === duel.side ? 'You' : pet.alias)+(stats ? ' · Lv. '+stats.level : '');
       element('stats-'+side).textContent = stats

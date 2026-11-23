@@ -12,6 +12,7 @@
   const fx=window.PawtopiaBattleEffects;
   const lowEffects=()=>fx?.low()||reduced();
   const itemArt=window.PawtopiaItemArt;
+  const tournament=window.PawtopiaArenaTournament;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
   let challengerTier=0;
@@ -264,6 +265,9 @@
       stances.hidden=false;
     }
     stage.style.setProperty('--foe-color',activeFoe.color);
+    tournament?.soloTheme(stage,activeFoe);
+    tournament?.styleFighter(petSprite,activeCat?.breed);
+    tournament?.scrapbook(pet,stats);
     el('battle-foe-emblem').textContent=activeFoe.glyph;
     const intent=engine.foeIntent?.(activeFoe,currentView?.match);
     stage.dataset.foeIntent=intent && !busy ? intent.id : '';
@@ -308,6 +312,7 @@
       const li=document.createElement('li');li.textContent=text;return li;
     }));
     const finished=currentView?.match.finished;
+    tournament?.victoryCard(activeCat,activeFoe,currentView?.match);
     if(finished){
       const result=currentView.match.result;
       if(characterArt&&activeCat){
@@ -718,13 +723,23 @@
     selectedFoe=Number(choice.dataset.foe);render();
     status('Challenger selected: '+data.foes[selectedFoe].name+'. Start a battle when ready.');
   });
+  function playEntrance(){
+    const match=engine.matchInfo(save.read());
+    if(!match||!tournament)return;
+    render();
+    const {cat,foe}=match;
+    return tournament.faceoff(stage,el('arena-solo-faceoff'),[
+      {name:cat.name,level:engine.level(cat),actor:petSprite,breed:cat.breed},
+      {name:foe.name,level:foe.level,actor:foeSprite}
+    ]);
+  }
   el('battle-start').addEventListener('click',async()=>{
     if(busy)return;busy=true;
     try{
       const result=await saveAction(progress=>engine.start(progress,selectedPet,selectedFoe));
       if(result){
         status(result.message);
-        if(result.ok)showBattleStage();
+        if(result.ok){showBattleStage();await playEntrance();}
       }
     }catch{status('The battle could not be started safely.');}
     finally{busy=false;render();}
@@ -817,6 +832,8 @@
         const result=await saveAction(progress=>engine.start(progress,selectedPet,selectedFoe));
         if(!result?.ok){if(result)status(result.message);return;}
         status(result.message);
+        showBattleStage();
+        await playEntrance();
       }catch{
         status('Could not start the match safely.');
         return;
