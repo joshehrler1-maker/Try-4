@@ -169,8 +169,9 @@
     const rng=typeof random==='function'?random:Math.random;
     const rand=()=>clamp(Number(rng())||0,0,0.999999);
     const s=training(cat),kit=data.kitFor(cat.breed),events=[];
-    const makeEvent=(who,name,target,damage,remaining,fx,detail,reaction)=>events.push({
-      who,name,target,damage:Math.max(0,damage),remaining,fx,detail:detail||'',reaction
+    const makeEvent=(who,name,target,damage,remaining,fx,detail,reaction,restored=0,guarded=false)=>events.push({
+      who,name,target,damage:Math.max(0,damage),remaining,fx,detail:detail||'',reaction,restored,guarded,
+      petHp:match.hp, effects:{guard:match.guard, dodge:match.dodge, foeGuard:match.foeGuard, foeSlow:match.foeSlow}
     });
     const petAttack=()=>{
       if (moveId==='guard') {
@@ -180,9 +181,10 @@
         match.armoryCounterReady=!match.armoryCounterUsed && Boolean(gear.armoryRiposte);
         const restored=Math.min(petMaxHp-match.hp,safe(gear.guardHeal)+firstCurl);
         match.hp+=restored;
-        makeEvent('pet','Guard Curl','pet',0,match.hp,'guard',restored?'Blocks the next blow · restored '+restored+' HP':'Blocks the next blow');
+        makeEvent('pet','Guard Curl','pet',0,match.hp,'guard',restored?'Blocks the next blow · restored '+restored+' HP':'Blocks the next blow',undefined,restored);
         return;
       }
+      const startingHp=match.hp, guarded=Boolean(match.foeGuard);
       let damage=rawPower(moveId,cat,s);
       damage=clamp(damage-Math.floor(foe.defence/2)-Math.max(0,safe(match.foeGuard)-safe(gear.pierce)),1,450);
       if(moveId==='swipe' && !match.firstSwipeUsed) {
@@ -228,7 +230,7 @@
       if(rand()<Math.min(.17,.03+s.movement/400)){damage+=Math.max(1,Math.floor(damage/3))+safe(gear.armoryCritical);detail+=(detail?' · ':'')+'Critical!';}
       match.foeHp=Math.max(0,match.foeHp-damage);
       makeEvent('pet',move.name,'foe',damage,match.foeHp,
-        moveId==='swipe'?'swipe':kit.theme.type,detail);
+        moveId==='swipe'?'swipe':kit.theme.type,detail,undefined,match.hp-startingHp,guarded);
     };
     const intent=foeIntent(foe,match);
     const enemyAttack=()=>{
@@ -244,10 +246,12 @@
       if(match.foeSlow){damage=Math.max(1,damage-2);match.foeSlow=0;}
       const evaded=Boolean(match.dodge);
       if(evaded){match.dodge=0;damage=0;}
-      const blockedByCurl=match.armoryCounterReady && match.guard>0 && damage>0;
+      const guarded=match.guard>0 && damage>0;
+      const blockedByCurl=match.armoryCounterReady && guarded;
       if(match.guard){damage=Math.max(0,damage-match.guard);match.guard=0;}
       match.armoryCounterReady=false;
-      if(rand()<Math.min(.12,.03+foe.rank/180))damage+=Math.max(0,2-safe(gear.critBlock));
+      const critical=rand()<Math.min(.12,.03+foe.rank/180);
+      if(critical && !evaded)damage+=Math.max(0,2-safe(gear.critBlock));
       if(isHeavy)damage=Math.max(0,damage-safe(gear.heavyBlock)-safe(gear.marketHeavy));
       if(damage>0 && !match.firstBlocked){
         damage=Math.max(0,damage-safe(gear.firstBlock)-safe(gear.styleGuard));
@@ -258,13 +262,13 @@
       match.hp=Math.max(0,match.hp-damage);
       makeEvent('foe',isHeavy?(foe.isBoss?'Gear Fang Charge':'Rushing Charge'):(foe.isBoss?'Metal Paw Strike':'Paw Strike'),'pet',damage,match.hp,
         isHeavy?'impact':'swipe',damage===0?(evaded?'Dodged!':'Blocked!'):'',
-        damage>0?'hit':evaded?'dodge':'block');
+        damage>0?'hit':evaded?'dodge':'block',0,guarded);
       if(damage>0 && !match.armoryRecovered){
         match.armoryRecovered=true;
         const amount=match.hp>0 ? Math.min(petMaxHp-match.hp,safe(gear.armoryRecovery)) : 0;
         if(amount){
           match.hp+=amount;
-          makeEvent('pet','Armor Recovery','pet',0,match.hp,'guard','Restored '+amount+' HP');
+          makeEvent('pet','Armor Recovery','pet',0,match.hp,'guard','Restored '+amount+' HP',undefined,amount);
         }
       }
       if(blockedByCurl && match.hp>0){

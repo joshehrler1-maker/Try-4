@@ -8,6 +8,7 @@
   const art = window.PawtopiaBattleCharacterArt;
   const engine = window.PawtopiaBattleEngine;
   const motion = window.PawtopiaBattleMotion;
+  const effects = window.PawtopiaBattleEffects;
   const unlocks = {swipe:1,guard:3,signature:6,ultimate:10};
   if (!section || !api || !save || !data || !art || !engine) return;
 
@@ -214,8 +215,8 @@
       const amount=round.damage[side];
       const guarded=round.moves[1-side]==='guard';
       if(amount>0||guarded) {
-        duelEffect(guarded?'block':action.move==='ultimate'?'ultimate':action.skill?'signature':'hit',
-          x,y,guarded?'#8deedf':action.color,amount>0?'−'+amount:'Blocked');
+        const kind=guarded?'block':action.move==='ultimate'?'ultimate':action.skill?action.family:'hit';
+        duelEffect(kind,x,y,guarded?'#8deedf':action.color,amount>0?'−'+amount:'Blocked');
       }
     }
   }
@@ -225,6 +226,9 @@
       actor.style?.removeProperty('--duel-travel');
       actor.style?.removeProperty('--duel-feet');
       actor.classList.remove('duel-contact');
+      if(actor.dataset){actor.dataset.trail='';actor.dataset.shield='';}
+      const indicator=element('state-'+side);
+      if(indicator)indicator.hidden=true;
     }
     element('field').classList.remove('duel-ult-landed');
   }
@@ -248,10 +252,11 @@
         const skill=move==='signature'||move==='ultimate';
         const attack=move!=='guard'&&move!=='fumble';
         const technique=art.identityFor?.(pet.breed)?.technique;
+        const family=skill ? effects?.technique(technique)||'cast' : 'hit';
         const melee=attack&&(!skill||lungingStyles.has(technique));
         const clip=motion.plan({who:'pet',fx:move,damage:round.damage[side]},skill?{skill:move}:null,
           model,null,skill?art.timingFor?.(pet.breed,move):null);
-        return {move,skill,attack,melee,clip,color:kit.theme?.color||'#ffe09a'};
+        return {move,skill,attack,melee,clip,family,color:kit.theme?.color||'#ffe09a'};
       });
       const gap=Math.max(0,bodies[1].left+bodies[1].width*.32-(bodies[0].left+bodies[0].width*.68));
       const bothLunge=actions.every(action=>action.melee);
@@ -273,22 +278,34 @@
           const receivingHit=incoming>0 && beat>contact && beat<.82 && (action.move!=='guard'||beat>=.72);
           actor.style.setProperty('--duel-travel',direction(side)*(lunge-recoil)+'px');
           actor.style.setProperty('--duel-feet',String(Math.abs(lunge)/Math.max(1,reach[side])));
-          actor.classList.toggle('duel-contact',incoming>0 && beat===contact);
+          actor.classList.toggle('duel-contact',incoming>0 && beat===contact && !effects?.low());
+          const guarding=action.move==='guard' && !landed;
+          actor.dataset.shield=guarding?'on':'';
+          const guardIcon=element('state-'+side);
+          if(guardIcon)guardIcon.hidden=!guarding;
+          actor.dataset.trail=action.melee&&beat>=.52&&beat<=.64&&!effects?.low()
+            ? (action.skill?action.family:'swipe') : '';
+          actor.style.setProperty('--arena-trail-color',action.color);
           const pose=receivingHit?'impact':action.move==='fumble'?'fumble':sample.pose;
           const frame=receivingHit?Math.min(5,(beat-contact)*20):action.move==='fumble'?beat*5:sample.frame;
           draw(side,pose,Math.round(frame*2)/2,landed?round.hpAfter[side]:round.hpBefore[side],sample.from);
-          if(i===4 && action.attack) {
+          if(i===4 && action.attack && !effects?.low()) {
             const stage=element('field').getBoundingClientRect();
             const box=element('art-'+side).getBoundingClientRect();
             if(action.skill&&!action.melee) {
               const spark=duelEffect('trail',box.left-stage.left+box.width*.5,box.top-stage.top+box.height*.55,action.color);
-              spark.style.setProperty('--fx-distance',direction(side)*Math.abs(bodies[1].left-bodies[0].left)+'px');
+              const end=element('art-'+(1-side)).getBoundingClientRect();
+              const startX=box.left+box.width*.5,startY=box.top+box.height*.55;
+              spark.style.setProperty('--fx-distance',(end.left+end.width*(side===0?.32:.68)-startX)+'px');
+              spark.style.setProperty('--fx-rise',(end.top+end.height*.55-startY)+'px');
+              spark.style.setProperty('--fx-duration',(2*length/15)+'ms');
             }else duelEffect('dust',box.left-stage.left+box.width*.5,box.top-stage.top+box.height*.84,'#ddc19f');
           }
         }
         if(beat===contact) {
           playDuelContact(round,actions);
-          if(actions.some((action,side)=>action.move==='ultimate'&&round.damage[side]>0)) element('field').classList.add('duel-ult-landed');
+          if(!effects?.low()&&actions.some((action,side)=>action.move==='ultimate'&&round.damage[side]>0&&round.moves[1-side]!=='guard'))
+            element('field').classList.add('duel-ult-landed');
         }
         if(beat<1)await pause(length/15+(beat===contact?55:0));
       }

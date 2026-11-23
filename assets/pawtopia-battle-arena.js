@@ -9,6 +9,8 @@
   const cinematics=window.PawtopiaBattleCinematics;
   const watcher=window.PawtopiaBattleWatch;
   const sound=window.PawtopiaBattleSound;
+  const fx=window.PawtopiaBattleEffects;
+  const lowEffects=()=>fx?.low()||reduced();
   const itemArt=window.PawtopiaItemArt;
   const el=id=>document.getElementById(id);
   if(!save||!data||!engine||!el('battle-stage'))return;
@@ -142,6 +144,28 @@
     pick.disabled=blocked;
     pick.dataset.foe=String(data.foes.indexOf(recommendation));
   }
+  function renderEffects(state) {
+    for(const [side,signals] of [
+      ['pet', [['shield',state?.guard,'Guard'],['evade',state?.dodge,'Evasion']]],
+      ['foe', [['shield',state?.foeGuard,'Braced'],['slow',state?.foeSlow,'Slowed']]]
+    ]){
+      const icons=el('battle-effects-'+side);
+      if(!icons)continue;
+      const active=signals.filter(([,value])=>value>0);
+      const key=active.map(([type,,label])=>type+label).join();
+      if(icons.dataset.states===key)continue;
+      icons.dataset.states=key;
+      icons.replaceChildren(...active.map(([type,,label])=>{
+        const chip=document.createElement('span');
+        chip.className='arena-status-chip';
+        chip.dataset.state=type;
+        chip.textContent=label;
+        return chip;
+      }));
+      const sprite=side==='pet'?petSprite:foeSprite;
+      for(const [type,value] of signals)sprite.dataset[type]=value>0?'on':'';
+    }
+  }
   function render() {
     const progress=save.read(),cats=engine.fighters(progress),view=engine.matchInfo(progress);
     const fighting=view&&!view.match.finished;
@@ -158,6 +182,7 @@
       selectedFoe=data.foes.findIndex(enemy=>enemy.rank===unlockedTier);
     const pet=cats[selectedPet],foe=data.foes[selectedFoe];
     const currentView=view&&view.cat===pet&&view.foe.id===foe.id?view:null;
+    if(!busy)renderEffects(fighting?view.match:null);
     select.replaceChildren(...cats.map((cat,index)=>{
       const option=document.createElement('option');
       option.value=String(index);
@@ -324,8 +349,8 @@
   function hideCue() {
     el('battle-cue')?.classList.remove('is-visible');
   }
-  function launchSkillProjectile(visual,kit,travelMs) {
-    if(!visual?.skill||!kit||reduced())return;
+  function launchSkillProjectile(visual,kit,travelMs,actor,target,kind) {
+    if(!visual?.skill||!kit||lowEffects())return;
     const bolt=document.createElement('span');
     const name=String(kit.signature||'Skill');
     const initials=name.split(/[^A-Za-z0-9]+/).filter(Boolean).slice(0,2)
@@ -335,13 +360,19 @@
     bolt.dataset.type=visual.skill;
     bolt.dataset.fx=visual.fx;
     bolt.textContent=visual.skill==='ultimate'?visual.symbol:initials||visual.symbol;
+    const floor=stage.getBoundingClientRect(),start=actor.getBoundingClientRect(),end=target.getBoundingClientRect();
+    bolt.dataset.family=kind;
+    bolt.style.setProperty('--bolt-start',(start.left+start.width*.66-floor.left)+'px');
+    bolt.style.setProperty('--bolt-end',(end.left+end.width*.37-floor.left)+'px');
+    bolt.style.setProperty('--bolt-y',(start.top+start.height*.55-floor.top)+'px');
+    bolt.style.setProperty('--bolt-end-y',(end.top+end.height*.61-floor.top)+'px');
     bolt.style.setProperty('--bolt-color',visual.color);
     bolt.style.setProperty('--travel-time',Math.max(1,Math.round(travelMs))+'ms');
     el('battle-vfx').append(bolt);
     setTimeout(()=>bolt.remove(),travelMs);
   }
   function cameraContact(evt,visual,color,point) {
-    if(reduced())return;
+    if(lowEffects()||evt.guarded)return;
     const ring=document.createElement('span');
     ring.className='battle-impact-ring';
     ring.dataset.strength=visual?.power||'normal';
@@ -366,7 +397,8 @@
     const glyph=evt.fx==='frost'?'❄':evt.fx==='leaf'?'❧':
       evt.fx==='water'?'◈':evt.fx==='gear'?'⚙':evt.fx==='wind'?'➶':
       evt.fx==='shadow'?'✧':evt.fx==='star'?'★':evt.fx==='guard'?'◈':'✦';
-    const count=reduced()||evt.reaction==='dodge'?0:evt.fx==='guard'?6:evt.fx==='swipe'?8:16;
+    const count=lowEffects()||evt.reaction==='dodge'||evt.guarded||combat?.defense ? 0 :
+      fx?.compact()?4:visual?.power==='ultimate'?12:6;
     for(let n=0;n<count;n++){
       const particle=document.createElement('span');particle.className='burst-particle';particle.textContent=glyph;
       particle.style.setProperty('--hit-x',target);particle.style.setProperty('--hit-y',point.y);
@@ -378,10 +410,11 @@
       box.append(particle);setTimeout(()=>particle.remove(),900);
     }
     if(combat?.cameraShake)cameraContact(evt,visual,color,point);
-    if(combat?.defense){
+    if (combat?.defense||evt.guarded) {
       const label=document.createElement('span');
       label.className='defense-popup';
-      label.textContent=combat.label;
+      label.textContent=combat?.label||'GUARDED';
+      label.dataset.result=evt.reaction==='dodge'?'dodge':'shield';
       label.style.setProperty('--hit-x',target);
       label.style.setProperty('--hit-y',point.y);
       box.append(label);
@@ -482,6 +515,9 @@
     const speed=playbackSpeed;
     const duration=simple?130:clip.duration/speed;
     const skillAudio={theme:kit.theme.type,ultimate:clip.skill==='ultimate',side:evt.who};
+    const family=clip.skill ? fx?.technique(catArt?.fightingStyle?.technique)||'cast' : 'swipe';
+    const actorArt=el(isPet?'battle-cat-art':'battle-foe-art');
+    const defenderArt=el(isPet?'battle-foe-art':'battle-cat-art');
     const previous=new Map();
     function paint(pet,pose,frame,from){
       const frameStep=economical?1:.5;
@@ -494,7 +530,17 @@
     }
     function impact(){
       barAfter(evt);
-      showGearEffects(evt,equipped);
+      if(evt.effects)renderEffects(evt.effects);
+      if(evt.restored>0){
+        el('stage-pet-hp').value=evt.petHp;
+        el('stage-pet-hp-text').textContent=evt.petHp+'/'+el('stage-pet-hp').max+' HP';
+        const heal=addText(el('battle-vfx'),'span','+'+evt.restored+' HP','battle-heal-pop');
+        const bounds=petSprite.getBoundingClientRect(),floor=stage.getBoundingClientRect();
+        heal.style.left=(bounds.left-floor.left+bounds.width*.5)+'px';
+        heal.style.top=(bounds.top-floor.top+bounds.height*.63)+'px';
+        setTimeout(()=>heal.remove(),850);
+      }
+      if(!lowEffects())showGearEffects(evt,equipped);
       const at=evt.target===evt.who?actor:defender;
       const art=el(evt.target==='pet'?'battle-cat-art':'battle-foe-art');
       const bounds=art?.offsetWidth?art.getBoundingClientRect():at.getBoundingClientRect();
@@ -502,13 +548,13 @@
       const x=((bounds.left-floor.left+bounds.width*(clip.guard||clip.skill ? .5 : isPet ? .34 : .66))/Math.max(1,floor.width))*100;
       const y=((bounds.top-floor.top+bounds.height*.61)/Math.max(1,floor.height))*100;
       const point={x:Math.max(7,Math.min(93,x))+'%',y:Math.max(20,Math.min(83,y))+'%'};
-      burst(evt,clip.guard?'#84e4d8':isPet?kit.theme.color:foe.color,visual,point);
+      if(evt.name!=='Armor Recovery')burst(evt,clip.guard?'#84e4d8':isPet?kit.theme.color:foe.color,visual,point);
       if(!clip.guard)cueSound(evt.damage>0?(clip.skill?'spellHit':'hit'):clip.outcome==='dodge'?'step':'block',
         {...skillAudio,heavy:clip.charge||evt.damage>=22,side:evt.target});
     }
     const release=t=> {
       cueSound('cast',skillAudio);
-      launchSkillProjectile(visual,kit,duration*(clip.contact-t));
+      if(family==='cast')launchSkillProjectile(visual,kit,duration*(clip.contact-t),actorArt,defenderArt,family);
     };
     const setFrame=t=>{
       const frame=motion.sample(clip,t,reach,steps);
@@ -544,14 +590,29 @@
     }
     const now=()=>window.performance?.now?.()??Date.now();
     let start=now();
-    let released=false,landed=false,footfall=false,t=0;
+    let released=false,landed=false,footfall=false,echo=false,t=0;
     for(;;){
       t=Math.max(t,Math.min(1,(now()-start)/duration));
       if(clip.release!==null&&!released&&t>=clip.release){
         released=true;
         if(t<clip.contact)release(t);
       }
-      if(!footfall&&!clip.skill&&!clip.guard&&t>=Math.min(.35,clip.contact-.12)){
+      if(!echo&&clip.outcome==='dodge'&&!lowEffects()&&t>=clip.contact-.20){
+        echo=true;
+        const bounds=defenderArt.getBoundingClientRect(),floor=stage.getBoundingClientRect();
+        const image=document.createElement('img');
+        if(catArt && !isPet){
+          image.className='battle-dodge-echo';
+          image.alt='';
+          image.src='assets/scenes/pawtopia-fighters/cat-'+String(catArt.uniq+1).padStart(2,'0')+'.png';
+          image.style.left=(bounds.left-floor.left)+'px';
+          image.style.top=(bounds.top-floor.top)+'px';
+          image.style.width=bounds.width+'px';
+          image.style.height=bounds.height+'px';
+          el('battle-vfx').append(image);setTimeout(()=>image.remove(),350);
+        }
+      }
+      if(!footfall&&!lowEffects()&&!clip.skill&&!clip.guard&&t>=Math.min(.35,clip.contact-.12)){
         footfall=true;
         const bounds=actor.getBoundingClientRect(), floor=stage.getBoundingClientRect();
         const dust=document.createElement('span');
@@ -564,6 +625,11 @@
       if(!landed&&t>=clip.contact){
         landed=true;
         setFrame(clip.contact);
+        if(!clip.guard&&!lowEffects()&&family!=='cast'){
+          actor.dataset.trail=family;
+          actor.style.setProperty('--arena-trail-color',isPet?kit.theme.color:foe.color);
+          setTimeout(()=>{actor.dataset.trail='';},260);
+        }
         if(!clip.skill&&!clip.guard)cueSound('swipe',skillAudio);
         impact();
         if(clip.pause){

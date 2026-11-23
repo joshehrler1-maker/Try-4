@@ -81,3 +81,13 @@
   .duel-fighter > span { font-size:.78rem; }
 }
 @media (prefers-reduced-motion: reduce) { .duel-effect,.duel-ult-landed { animation:none; } .duel-actor { transition:none; } }
+
+.duel-effect[data-effect="block"]::before {border-radius:55% 55% 65% 65%;animation:arena-shield-ripple .52s ease-out both}
+.duel-effect[data-effect="rush"]::before {width:2.3rem;height:.9rem;transform:translate(-50%,-50%) skewX(-19deg)}
+.duel-effect[data-effect="sweep"]::before {width:2.5rem;height:2.1rem;border-radius:75% 40%;border-width:3px}
+.duel-effect[data-effect="cast"]::before {width:2.1rem;height:2.1rem;border-style:double;border-width:4px}
+.duel-effect[data-effect="block"] {text-shadow:0 2px 4px #051f22}
+.duel-effect[data-effect="trail"] {animation-duration:var(--fx-duration,.17s)}
+@keyframes duel-trail {from{opacity:.9;transform:translate(0,0) scaleX(.7)}to{opacity:.25;transform:translate(var(--fx-distance),var(--fx-rise,0px)) scaleX(1.6)}}
+[data-battle-effects="low"] .duel-effect,[data-battle-effects="low"] .duel-effect::before {animation:none}
+[data-battle-effects="low"] .duel-effect::before {box-shadow:none}

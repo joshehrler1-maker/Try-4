@@ -10,17 +10,17 @@
 <meta property="og:description" content="Watch your adopted cat face 207 dog challengers and Baron Brasswhirl, unlock special moves and earn free rewards.">
 <title>Pawtopia Battle Arena | Super Paw Heroes</title>
 <link rel="stylesheet" href="assets/game-fullscreen.css">
-<link rel="stylesheet" href="assets/pawtopia-battle-arena.css?v=arena-visual-1">
+<link rel="stylesheet" href="assets/pawtopia-battle-arena.css?v=arena-fx-1">
 <link rel="stylesheet" href="assets/pawtopia-item-art.css?v=painted-1">
 <link rel="stylesheet" href="assets/pawtopia-pet-equipment.css?v=1">
 <link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
-<link rel="stylesheet" href="assets/pawtopia-arena-duels.css?v=arena-visual-1">
+<link rel="stylesheet" href="assets/pawtopia-arena-duels.css?v=arena-fx-1">
 <script defer src="assets/pawtopia-save.js?v=catalog-2569"></script>
 <script defer src="assets/pawtopia-upgrade-points.js?v=arena-rewards-1"></script>
 <script defer src="assets/pawtopia-battle-data.js?v=balance-1"></script>
 <script defer src="assets/pawtopia-item-tiers.js?v=shop-prices-3"></script>
 <script defer src="assets/pawtopia-items.js?v=balance-1"></script>
-<script defer src="assets/pawtopia-battle-engine.js?v=arena-turns-1"></script>
+<script defer src="assets/pawtopia-battle-engine.js?v=arena-fx-1"></script>
 <script defer src="assets/pawtopia-battle-puppet.js?v=grounded-1"></script>
 <script defer src="assets/pawtopia-battle-character-art.js?v=motion-1"></script>
 <script defer src="assets/pawtopia-battle-foe-art.js?v=grounded-1"></script>
@@ -31,10 +31,11 @@
 <script defer src="assets/pawtopia-item-art.js?v=painted-1"></script>
 <script defer src="assets/pawtopia-battle-motion.js?v=duel-flow-1"></script>
 <script defer src="assets/game-fullscreen.js?v=arena-focus-1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=arena-visual-1"></script>
+<script defer src="assets/pawtopia-battle-effects.js?v=arena-fx-1"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=arena-fx-1"></script>
 <script defer src="assets/pawtopia-online-config.js?v=production-1"></script>
 <script defer src="assets/pawtopia-cloud-save.js"></script>
-<script defer src="assets/pawtopia-arena-duels.js?v=arena-visual-1"></script>
+<script defer src="assets/pawtopia-arena-duels.js?v=arena-fx-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
@@ -110,13 +111,13 @@
         <strong id="duel-label-0"></strong>
         <p class="mini" id="duel-stats-0"></p>
         <progress id="duel-health-0" max="100" value="100" aria-label="Host cat health"></progress>
-        <span id="duel-hp-0"></span><div id="duel-actor-0" class="duel-actor"><div id="duel-art-0" class="duel-art" aria-hidden="true"></div></div>
+        <span id="duel-hp-0"></span><span id="duel-state-0" class="arena-status-chip" data-state="shield" hidden>Guard</span><div id="duel-actor-0" class="duel-actor"><div id="duel-art-0" class="duel-art" aria-hidden="true"></div></div>
       </div>
       <div class="duel-fighter">
         <strong id="duel-label-1"></strong>
         <p class="mini" id="duel-stats-1"></p>
         <progress id="duel-health-1" max="100" value="100" aria-label="Guest cat health"></progress>
-        <span id="duel-hp-1"></span><div id="duel-actor-1" class="duel-actor"><div id="duel-art-1" class="duel-art duel-art--leftward" aria-hidden="true"></div></div>
+        <span id="duel-hp-1"></span><span id="duel-state-1" class="arena-status-chip" data-state="shield" hidden>Guard</span><div id="duel-actor-1" class="duel-actor"><div id="duel-art-1" class="duel-art duel-art--leftward" aria-hidden="true"></div></div>
       </div>
     </div>
     <div id="duel-moves" class="duel-actions" role="group" aria-label="Duel moves">
@@ -126,6 +127,7 @@
       <button type="button" data-duel-move="ultimate">Ultimate</button>
     </div>
     <p id="duel-summary" aria-live="polite"></p>
+    <label>Battle effects <select data-battle-effects><option value="standard">Standard</option><option value="low">Low Effects</option></select></label>
     <div class="duel-actions">
       <button id="duel-refresh" type="button">Check for update</button>
       <button id="duel-replay" type="button">Replay last round</button>
@@ -172,6 +174,7 @@
 <div class="battler battler-pet" id="battle-pet-fighter">
 <div class="battler-ui"><span id="stage-pet-name">Your Cat</span><strong id="stage-pet-level">Lv 1</strong></div>
 <div class="hp-row"><progress id="stage-pet-hp" max="20" value="20"></progress><span id="stage-pet-hp-text">20/20 HP</span></div>
+<div id="battle-effects-pet" class="arena-status-tray" aria-label="Your cat’s active effects"></div>
 <div class="fighter-sprite" id="battle-pet-sprite">
   <span class="pet-gear-aura" id="battle-gear-aura" aria-hidden="true" hidden></span>
   <span class="fighter-shadow" aria-hidden="true"></span>
@@ -185,6 +188,7 @@
 <div class="battler-ui"><span id="stage-foe-name">Dog Challenger</span><strong id="stage-foe-level">Lv 1</strong></div>
 <p id="battle-foe-intent" class="foe-intent" role="status" hidden></p>
 <div class="hp-row"><progress id="stage-foe-hp" max="20" value="20"></progress><span id="stage-foe-hp-text">20/20 HP</span></div>
+<div id="battle-effects-foe" class="arena-status-tray" aria-label="Challenger’s active effects"></div>
 <div class="fighter-sprite" id="battle-foe-sprite">
   <span class="fighter-shadow" aria-hidden="true"></span>
   <svg class="foe-illustration" viewBox="0 0 190 190" role="img" aria-label="Challenger illustration">
@@ -212,6 +216,7 @@
 <button id="battle-stop-watch" type="button" class="secondary" disabled>Stop watching</button>
 <div class="watch-speed"><label for="battle-speed">Animation speed</label>
 <select id="battle-speed" aria-label="Battle animation speed"><option value="1">Normal · 1×</option><option value="1.5">Faster · 1.5×</option><option value="2">Fast · 2×</option></select></div>
+<div class="watch-speed"><label>Battle effects <select data-battle-effects><option value="standard">Standard</option><option value="low">Low Effects</option></select></label></div>
 <div class="watch-speed"><label for="battle-quality">Character animation detail</label>
 <select id="battle-quality" aria-label="Character animation detail"><option value="smooth">Cinematic</option><option value="efficient">Battery saver</option></select></div>
 <button id="battle-forfeit" type="button" class="secondary">Forfeit current battle</button>

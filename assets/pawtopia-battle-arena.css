@@ -246,7 +246,7 @@ footer{padding:16px 0 28px;text-align:center}
 .battle-cue[data-power="strong"]{border-width:3px}
 .battle-projectile{
   position:absolute;z-index:7;display:grid;place-items:center;
-  left:var(--bolt-start,32%);top:51%;width:clamp(28px,7vw,56px);aspect-ratio:1;
+  left:var(--bolt-start,32%);top:var(--bolt-y,51%);width:clamp(28px,7vw,56px);aspect-ratio:1;
   border:3px solid var(--bolt-color,#f5daa5);border-radius:50%;
   background:radial-gradient(circle,#fff9de 3%,var(--bolt-color,#f5daa5) 42%,#222e648c 82%);
   color:#1b2550;font-weight:1000;font-size:clamp(.76rem,2vw,1.2rem);font-family:Georgia,serif;
@@ -280,7 +280,7 @@ footer{padding:16px 0 28px;text-align:center}
 @keyframes arena-skill-shot{
   0%{opacity:.1;transform:translate(-50%,-50%) scale(.45) rotate(-13deg)}
   35%{opacity:1;transform:translate(-50%,-75%) scale(1.23) rotate(18deg)}
-  100%{opacity:0;left:var(--bolt-end,68%);transform:translate(-50%,-50%) scale(.8) rotate(80deg)}
+  100%{opacity:0;left:var(--bolt-end,68%);top:var(--bolt-end-y,51%);transform:translate(-50%,-50%) scale(.8) rotate(80deg)}
 }
 @keyframes arena-sigil-spin{to{transform:rotate(360deg)}}
 @keyframes arena-contact{
@@ -457,4 +457,54 @@ footer{padding:16px 0 28px;text-align:center}
 }
 @media (prefers-reduced-motion: reduce) {
   .battle-stage[data-foe-intent] .battler-foe .fighter-sprite,.battle-foot-dust { animation:none; }
+}
+
+/* Changes to combat state are labelled even with animation effects reduced. */
+.arena-status-tray {display:flex;flex-wrap:wrap;justify-content:center;gap:.25rem;position:relative;z-index:4}
+.arena-status-chip {display:inline-flex;align-items:center;gap:.2rem;padding:.06rem .35rem;
+  border:1px solid currentColor;border-radius:1rem;background:#122131;color:#9ceadb;font-size:.72rem;font-weight:750}
+.arena-status-chip::before {content:"◇"}
+.arena-status-chip[data-state="evade"] {color:#d9bbfa}
+.arena-status-chip[data-state="evade"]::before {content:"↝"}
+.arena-status-chip[data-state="slow"] {color:#bbebff}
+.arena-status-chip[data-state="slow"]::before {content:"❄"}
+.fighter-sprite[data-shield="on"]::before,.duel-actor[data-shield="on"] .duel-art::after {
+  content:"";position:absolute;inset:33% 16% 13%;border:2px solid #9ceadbaa;border-radius:45%;
+  background:linear-gradient(155deg,transparent,#70ecc32c);box-shadow:inset 0 0 10px #95ffe22b;pointer-events:none
+}
+.fighter-sprite[data-slow="on"] .fighter-shadow {background:#80deffbb;box-shadow:0 0 11px #d8f8ff}
+.fighter-sprite[data-evade="on"] .fighter-shadow {background:#b29fe1a8}
+.battle-dodge-echo {position:absolute;object-fit:contain;pointer-events:none;opacity:.55;
+  filter:brightness(1.4) saturate(.55);animation:arena-echo .33s ease-out both}
+.battle-heal-pop {position:absolute;transform:translate(-50%,-50%);color:#bbffc9;font-weight:900;
+  white-space:nowrap;text-shadow:0 2px 4px #16232e;animation:duel-contact-rise .72s ease-out both}
+.battle-heal-pop::before {content:"";position:absolute;inset:-.25rem -.45rem;border-radius:50%;
+  box-shadow:0 0 12px #95ffbb9a;background:#60b97038;z-index:-1}
+.battle-vfx .defense-popup[data-result="dodge"] {color:#efdcff;border-style:dashed;border-color:#e9c8ff}
+.battle-vfx .defense-popup[data-result="shield"]::after {content:"";position:absolute;inset:-.35rem;
+  border:2px solid #b4ffee85;border-radius:60%;animation:arena-shield-ripple .55s ease-out both}
+[data-trail]:not([data-trail=""])::after {content:"";position:absolute;z-index:3;pointer-events:none;
+  top:53%;width:46%;height:14%;right:-1%;border-top:3px solid var(--arena-trail-color,#ffe4a6);
+  border-radius:60%;opacity:.8;transform:rotate(-20deg);filter:drop-shadow(0 0 5px var(--arena-trail-color,#ffe4a6))}
+[data-trail="rush"]::after {top:68%;height:4%;width:62%;transform:skewX(-20deg);box-shadow:0 5px 6px -3px var(--arena-trail-color)}
+[data-trail="sweep"]::after {top:45%;height:29%;width:56%;border-top-width:5px;transform:rotate(-29deg)}
+#battle-foe-sprite[data-trail]::after,#duel-actor-1[data-trail]::after {
+  right:auto;left:-1%;transform:scaleX(-1) rotate(-20deg)
+}
+@keyframes arena-echo {from{opacity:.58}to{opacity:0;transform:scale(.97)}}
+@keyframes arena-shield-ripple {from{opacity:.9;transform:scale(.7)}to{opacity:0;transform:scale(1.35)}}
+@media(max-width:620px){
+  .battle-vfx .damage-popup,.battle-vfx .defense-popup {top:var(--hit-y,65%);font-size:.78rem}
+  .battle-vfx .defense-popup {padding:.12rem .3rem}
+  .battle-vfx .damage-popup {margin-top:.82rem}
+  .arena-status-chip {font-size:.64rem}
+}
+[data-battle-effects="low"] .battle-heal-pop,
+[data-battle-effects="low"] .battle-vfx .defense-popup::after,
+[data-battle-effects="low"] .battle-vfx .damage-popup,
+[data-battle-effects="low"] .battle-vfx .defense-popup {animation:none}
+[data-battle-effects="low"] .battle-heal-pop::before,
+[data-battle-effects="low"] [data-trail]::after {box-shadow:none;filter:none}
+@media(prefers-reduced-motion:reduce){
+  .battle-heal-pop,.battle-vfx .defense-popup::after {animation:none}
 }

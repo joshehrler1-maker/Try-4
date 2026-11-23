@@ -246,3 +246,24 @@ test('solo cues match the actual strike, charge and brace for the current turn',
     assert.ok(turn.events.some(event=>event.who==='foe' && event.name===name));
   }
 });
+
+test('visual events report actual dodge, healing and guard state',()=>{
+  const {engine}=createWorld();
+  const progress=fresh();
+  progress.companion=cat('Mochi','Maine Coon',6);
+  assert.ok(engine.start(progress,0,0).ok);
+  const match=engine.matchInfo(progress).match;
+  match.hp-=7;
+  match.gear.guardHeal=3;
+  match.dodge=1;
+  const result=engine.takeTurn(progress,'guard',()=>0);
+  const guard=result.events.find(event=>event.name==='Guard Curl');
+  assert.equal(guard.restored,3);
+  assert.ok(guard.effects.guard>0);
+  assert.equal(guard.effects.dodge,1);
+  const incoming=result.events.find(event=>event.who==='foe');
+  assert.equal(incoming.reaction,'dodge');
+  assert.equal(incoming.damage,0,'A dodge must stay damage-free even when the opponent rolls a critical');
+  assert.equal(incoming.effects.dodge,0);
+  assert.equal(incoming.petHp,guard.petHp);
+});
