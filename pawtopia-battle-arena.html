@@ -34,7 +34,7 @@
 <script defer src="assets/pawtopia-battle-arena.js?v=fullscreen-1"></script>
 <script defer src="assets/pawtopia-online-config.js?v=production-1"></script>
 <script defer src="assets/pawtopia-cloud-save.js"></script>
-<script defer src="assets/pawtopia-arena-duels.js?v=1"></script>
+<script defer src="assets/pawtopia-arena-duels.js?v=trained-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
@@ -70,7 +70,7 @@
 <section class="panel" id="arena-duels" aria-labelledby="duel-heading">
   <h2 id="duel-heading">Player vs. player</h2>
   <p>Challenge a friend with your adopted cats. Choose moves in secret. The round plays when both players are ready.</p>
-  <p class="mini">Both cats have 100 HP and four moves. Guard halves incoming damage. Signature recharges after two rounds, and ultimate unlocks in round 4 for one use. Duels do not award solo XP or loot.</p>
+  <p class="mini">Your cat brings its level and training into the duel. Endurance raises health, strength and intelligence power attacks, and defence and movement reduce damage. Moves unlock at levels 1, 3, 6, and 10. Duels do not award solo XP or loot.</p>
   <p id="duel-account"><a id="duel-account-link" href="pawtopia-online.html">Sign in or create a free Pawtopia account</a> to duel.</p>
   <p id="duel-notice" role="status"></p>
   <div id="duel-lobby" class="duel-lobby" hidden>
@@ -93,11 +93,13 @@
     <div id="duel-field" class="duel-field" hidden>
       <div class="duel-fighter">
         <strong id="duel-label-0"></strong>
+        <p class="mini" id="duel-stats-0"></p>
         <progress id="duel-health-0" max="100" value="100" aria-label="Host cat health"></progress>
         <span id="duel-hp-0"></span><div id="duel-actor-0" class="duel-actor"><div id="duel-art-0" aria-hidden="true"></div></div>
       </div>
       <div class="duel-fighter">
         <strong id="duel-label-1"></strong>
+        <p class="mini" id="duel-stats-1"></p>
         <progress id="duel-health-1" max="100" value="100" aria-label="Guest cat health"></progress>
         <span id="duel-hp-1"></span><div id="duel-actor-1" class="duel-actor"><div id="duel-art-1" aria-hidden="true"></div></div>
       </div>

@@ -33,6 +33,6 @@ SELECT id, 10 FROM player WHERE alias = 'PASTE-PLAYER-ALIAS-HERE';
 ```
 
 ## Player-versus-player Arena
-Apply `migrations/001-arena-duels.sql` to production D1 before deploying the new Worker over the existing one. Fresh databases get the same table from `schema.sql`. The Arena uses the existing Pawtopia accounts. Invite codes last 24 hours before joining and 7 days once joined. Duel history is separate from solo progress, market rewards and cloud saves. Players choose an adopted cat locally, and the server validates the breed and supplies equal starting health and fixed move rules for both fighters.
+Apply `migrations/001-arena-duels.sql` to production D1 before deploying the new Worker over the existing one. Fresh databases get the same table from `schema.sql`. The Arena uses the existing Pawtopia accounts. Invite codes last 24 hours before joining and 7 days once joined. Duel history is separate from solo progress, market rewards and cloud saves. Each player selects an adopted cat from the local cottage. New duels take a snapshot of that cat’s level and five trained stats. The Worker validates the breed and bounds the submitted stats to the game’s training limits. Local cottage saves remain the source of these stats. A cat’s nickname is shown only to its owner. Duels already created under the original fixed rules keep those rules.
 
 Run `node --test tests/pawtopia-arena-duels.test.mjs` with Node 22.13 or later to test the Worker against SQLite.

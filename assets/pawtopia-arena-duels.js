@@ -6,7 +6,9 @@
   const save = window.PawtopiaSave;
   const data = window.PawtopiaBattleData;
   const art = window.PawtopiaBattleCharacterArt;
-  if (!section || !api || !save || !data || !art) return;
+  const engine = window.PawtopiaBattleEngine;
+  const unlocks = {swipe:1,guard:3,signature:6,ultimate:10};
+  if (!section || !api || !save || !data || !art || !engine) return;
 
   const element = id => document.getElementById('duel-'+id);
   const invite = element('invite');
@@ -35,7 +37,7 @@
     const progress = save.read();
     pets = [progress.companion,...(Array.isArray(progress.otherCompanions) ? progress.otherCompanions : [])]
       .filter(pet => data.breeds.includes(pet?.breed));
-    fighter.replaceChildren(...pets.map((pet,index) => new Option(pet.name+' · '+pet.breed,String(index))));
+    fighter.replaceChildren(...pets.map((pet,index) => new Option(pet.name+' · '+pet.breed+' · Lv. '+engine.level(pet),String(index))));
     if (old && pets[Number(old)]) fighter.value = old;
     element('adopt').hidden = pets.length > 0;
     setControls();
@@ -49,6 +51,7 @@
     for (const button of element('moves').querySelectorAll('[data-duel-move]')) {
       const pet = duel?.fighters[duel.side], move = button.dataset.duelMove;
       button.disabled = !pet || duel.phase !== 'active' || duel.submitted || busy || playing ||
+        (pet.stats && pet.stats.level < unlocks[move]) ||
         (move === 'signature' && duel.round < pet.readyAt) ||
         (move === 'ultimate' && (duel.round < 4 || pet.ultimateUsed));
     }
@@ -66,8 +69,10 @@
     const pet = duel?.fighters[side], body = element('art-'+side);
     if (!pet) { body.replaceChildren(); return; }
     art.paintFighter(body,pet.breed,pose,frame);
+    const maximum = pet.maxHp || 100;
+    element('health-'+side).max = maximum;
     element('health-'+side).value = hp;
-    element('hp-'+side).textContent = hp+' / 100 HP';
+    element('hp-'+side).textContent = hp+' / '+maximum+' HP';
   }
   function outcome() {
     return duel.reason === 'cancelled' ? 'Invite cancelled.' :
@@ -98,7 +103,13 @@
     element('summary').textContent = latest ? duel.fighters.map((pet,i) =>
       pet.alias+' used '+moveLabel(pet.breed,latest.moves[i])+' ('+latest.damage[i]+' damage)').join(' · ') : '';
     for (const [side,pet] of duel.fighters.entries()) {
-      element('label-'+side).textContent = pet.breed+' · '+(side === duel.side ? 'You' : pet.alias);
+      const stats = pet.stats;
+      element('label-'+side).textContent = (pet.name ? pet.name+' · ' : '')+pet.breed+' · '+
+        (side === duel.side ? 'You' : pet.alias)+(stats ? ' · Lv. '+stats.level : '');
+      element('stats-'+side).textContent = stats
+        ? 'STR '+stats.strength+' · DEF '+stats.defence+' · MOV '+stats.movement+
+          ' · END '+stats.endurance+' · INT '+stats.intelligence
+        : '';
       if (!playing) {
         const pose = duel.phase === 'finished' && duel.winner !== null ? (duel.winner === side ? 'victory' : 'defeat') : 'idle';
         draw(side,pose);
@@ -107,7 +118,8 @@
     const own = duel.fighters[duel.side];
     for (const button of element('moves').querySelectorAll('[data-duel-move]')) {
       const move = button.dataset.duelMove;
-      const note = move === 'ultimate' && own.ultimateUsed ? ' · used' :
+      const note = own.stats && own.stats.level < unlocks[move] ? ' · Lv. '+unlocks[move] :
+        move === 'ultimate' && own.ultimateUsed ? ' · used' :
         move === 'ultimate' && duel.round < 4 ? ' · round 4' :
         move === 'signature' && duel.round < own.readyAt ? ' · round '+own.readyAt : '';
       button.textContent = moveLabel(own.breed,move)+note;
@@ -202,7 +214,8 @@
       const code = invite.value.trim().toLowerCase();
       if (join && !legalCode.test(code)) throw Error('Enter a valid 12-character duel code.');
       const next = await api.call('/arena-duel/'+(join ? 'join' : 'create'),'POST',
-        {breed:pet.breed,...(join ? {code} : {})});
+        {name:String(pet.name || pet.breed).slice(0,40),breed:pet.breed,
+          stats:{level:engine.level(pet),...engine.training(pet)},...(join ? {code} : {})});
       if (current()) update(next,false);
     });
   }
@@ -220,7 +233,8 @@
     render();
     if (!next) return;
     try {
-      await api.call('/arena-duel/status');
+      const capability = await api.call('/arena-duel/status');
+      if (!capability.trainedPets) throw Error('Trained pet duels are pending deployment.');
       if (api.key() !== next) return;
       available = true;
       readPets();

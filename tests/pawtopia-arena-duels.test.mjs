@@ -36,14 +36,17 @@ async function setup(t) {
   };
 }
 const root = '/arena-duel';
-const begin = call => call('a',root+'/create',{breed:'Bengal'});
+const pet = (breed,stats={}) => ({breed,name:breed+' test cat',
+  stats:{level:10,strength:2,defence:2,movement:2,endurance:2,intelligence:2,...stats}});
+const begin = call => call('a',root+'/create',pet('Bengal'));
 const move = (call,who,code,round,pick) => call(who,root+'/move',{code,round,move:pick});
 
 test('duel invites require accounts, approved breeds, and independent players',async t=>{
   const call = await setup(t);
   assert.equal((await call(null,root+'/status')).status,401);
   assert.equal((await call('a',root+'/status')).body.enabled,true);
-  assert.equal((await call('a',root+'/create',{breed:'Fake Cat'})).status,400);
+  assert.equal((await call('a',root+'/create',pet('Fake Cat'))).status,400);
+  assert.equal((await call('a',root+'/create',{breed:'Bengal'})).status,400);
   const started = await begin(call);
   assert.equal(started.status,201);
   const {code} = started.body;
@@ -51,18 +54,18 @@ test('duel invites require accounts, approved breeds, and independent players',a
   assert.equal((await begin(call)).status,409);
   assert.equal((await call('a',root+'/hosted')).body.duel.code,code);
   assert.equal((await call('c',root+'?code='+code)).status,404);
-  assert.equal((await call('a',root+'/join',{breed:'Ragdoll',code})).status,400);
-  const joined = await call('b',root+'/join',{breed:'Sphynx',code});
+  assert.equal((await call('a',root+'/join',{...pet('Ragdoll'),code})).status,400);
+  const joined = await call('b',root+'/join',{...pet('Sphynx'),code});
   assert.equal(joined.body.phase,'active');
-  assert.deepEqual(joined.body.fighters.map(({breed,hp})=>[breed,hp]),[['Bengal',100],['Sphynx',100]]);
-  assert.equal((await call('c',root+'/join',{breed:'Ragdoll',code})).status,409);
+  assert.deepEqual(joined.body.fighters.map(({breed,hp})=>[breed,hp]),[['Bengal',40],['Sphynx',40]]);
+  assert.equal((await call('c',root+'/join',{...pet('Ragdoll'),code})).status,409);
   assert.equal((await call('c',root+'/leave',{code})).status,404);
 });
 
 test('private choices resolve once with guard, cooldown, replay and stale retries',async t=>{
   const call = await setup(t);
   const {code} = (await begin(call)).body;
-  await call('b',root+'/join',{breed:'Siamese',code});
+  await call('b',root+'/join',{...pet('Siamese'),code});
   assert.equal((await move(call,'a',code,1,'ultimate')).status,400);
   assert.equal((await move(call,'a',code,1,'constructor')).status,400);
   const pending = await move(call,'a',code,1,'signature');
@@ -74,8 +77,8 @@ test('private choices resolve once with guard, cooldown, replay and stale retrie
   assert.equal(waiting.host_id,undefined);
   assert.equal((await move(call,'a',code,1,'swipe')).body.submitted,true);
   const next = (await move(call,'b',code,1,'guard')).body;
-  assert.deepEqual(next.history[0],{round:1,moves:['signature','guard'],damage:[12,0],
-    hpBefore:[100,100],hpAfter:[100,88]});
+  assert.deepEqual(next.history[0],{round:1,moves:['signature','guard'],damage:[3,0],
+    hpBefore:[40,40],hpAfter:[40,37]});
   assert.equal(next.round,2);
   assert.equal((await move(call,'b',code,1,'guard')).body.history.length,1);
   assert.equal((await move(call,'a',code,2,'signature')).status,400);
@@ -99,9 +102,9 @@ test('a simultaneous knockout is a draw and guard-only duels stop after 15 round
   const call = await setup(t);
   for (const attack of ['swipe','guard']) {
     const {code} = (await begin(call)).body;
-    await call('b',root+'/join',{breed:'Siamese',code});
+    await call('b',root+'/join',{...pet('Siamese'),code});
     let duel;
-    for (let round=1;round<=(attack==='swipe'?7:15);round++) {
+    for (let round=1;round<=(attack==='swipe'?6:15);round++) {
       await move(call,'a',code,round,attack);
       duel = (await move(call,'b',code,round,attack)).body;
     }
@@ -109,4 +112,26 @@ test('a simultaneous knockout is a draw and guard-only duels stop after 15 round
     assert.equal(duel.winner,null);
     assert.equal(duel.reason,attack==='swipe'?'knockout':'round-limit');
   }
+});
+
+test('specific cats retain their trained stats, private names and level unlocks',async t=>{
+  const call = await setup(t);
+  const host = {...pet('Bengal',{level:12,strength:30,defence:6,movement:4,endurance:15,intelligence:18}),name:'Mochi'};
+  const guest = {...pet('Bengal',{level:2,strength:2,defence:8,movement:24,endurance:3,intelligence:2}),name:'Poppy'};
+  const invite = await call('a',root+'/create',host);
+  assert.equal(invite.body.fighters[0].maxHp,83);
+  assert.equal(invite.body.fighters[0].name,'Mochi');
+  const {code} = invite.body;
+  const joined = await call('b',root+'/join',{...guest,code});
+  assert.equal(joined.body.fighters[0].name,undefined);
+  assert.equal(joined.body.fighters[1].name,'Poppy');
+  assert.equal(joined.body.fighters[1].maxHp,27);
+  assert.equal(joined.body.fighters[0].stats.intelligence,18);
+  assert.equal((await move(call,'b',code,1,'guard')).status,400);
+  assert.equal((await move(call,'b',code,1,'signature')).status,400);
+  assert.equal((await move(call,'b',code,1,'swipe')).status,200);
+  const result = (await move(call,'a',code,1,'signature')).body;
+  assert.deepEqual(result.history[0].damage,[50,2]);
+  assert.deepEqual(result.history[0].hpAfter,[81,0]);
+  assert.equal(result.winner,0);
 });

@@ -37,22 +37,55 @@ const duelBreeds = new Set(["Maine Coon","Siamese","Bengal","British Shorthair",
 const duelCode = /^[0-9a-f]{12}$/;
 const duelMoves = {swipe:16, guard:0, signature:25, ultimate:34};
 const duelDay = 86400000;
-const newDuelFighter = (alias, breed) => ({alias, breed, hp:100, readyAt:1, ultimateUsed:false});
+const duelUnlocks = {swipe:1, guard:3, signature:6, ultimate:10};
+const trainingFields = ['strength','defence','movement','endurance','intelligence'];
+const boundedStat = (value, fallback, min, max) =>
+  Number.isSafeInteger(value) ? Math.min(max,Math.max(min,value)) : fallback;
+
+function newDuelFighter(alias, input, trained) {
+  if (!trained) return {alias,breed:input.breed,hp:100,readyAt:1,ultimateUsed:false};
+  const {name,stats:sheet} = input;
+  if (typeof name !== 'string' || !name.trim() || name.length > 40 ||
+      !sheet || !Number.isSafeInteger(sheet.level) ||
+      trainingFields.some(stat=>!Number.isSafeInteger(sheet[stat]))) fail('Choose a cat from your cottage again.');
+  const stats = {level:boundedStat(sheet.level,1,1,200)};
+  for (const stat of trainingFields) stats[stat] = boundedStat(sheet[stat],2,0,600);
+  const maxHp = Math.min(2000,14+stats.endurance*3+stats.level*2);
+  return {alias,breed:input.breed,name:name.trim(),stats,maxHp,hp:maxHp,readyAt:1,ultimateUsed:false};
+}
+
+function duelDamage(move, source, target, guarding) {
+  if (move === 'guard') return 0;
+  const {strength,level,intelligence,movement} = source.stats;
+  const base = move === 'swipe' ? 3+strength+Math.floor(level/3) :
+    move === 'signature' ? 5+strength+intelligence+Math.floor(level/2) :
+    10+strength*2+intelligence+level;
+  const afterDefence = Math.min(450,Math.max(1,base-Math.floor(target.stats.defence/2)));
+  const footwork = Math.min(Math.floor(afterDefence/4),
+    Math.max(0,Math.floor((target.stats.movement-movement)/4)));
+  const hit = afterDefence-footwork;
+  return guarding ? Math.max(0,Math.floor(hit/2)-Math.min(50,2+Math.floor(target.stats.defence/2))) : hit;
+}
 
 function duelResponse(row, state, side) {
   const {fighters, choices, round, history, winner, reason} = state;
-  return {code:row.code, phase:row.phase, side, fighters, round, history,
+  const roster = fighters.map(({name,...fighter},i)=>i === side && name ? {...fighter,name} : fighter);
+  return {code:row.code, phase:row.phase, side, fighters:roster, round, history,
     winner, reason, submitted:Boolean(choices[side]), expiresAt:row.expires_at};
 }
 function validDuelMove(fighter, move, round) {
   return typeof move === 'string' && Object.hasOwn(duelMoves,move) &&
+    (!fighter.stats || fighter.stats.level >= duelUnlocks[move]) &&
     (move !== 'signature' || round >= fighter.readyAt) &&
     (move !== 'ultimate' || (round >= 4 && !fighter.ultimateUsed));
 }
 function resolveDuelRound(state) {
   const {fighters, choices, round} = state;
-  const damage = choices.map((move,i) => choices[1-i] === 'guard'
-    ? Math.floor(duelMoves[move]/2) : duelMoves[move]);
+  const damage = choices.map((move,i) => {
+    const guarding = choices[1-i] === 'guard';
+    return state.trained ? duelDamage(move,fighters[i],fighters[1-i],guarding) :
+      guarding ? Math.floor(duelMoves[move]/2) : duelMoves[move];
+  });
   const hpBefore = fighters.map(fighter => fighter.hp);
   fighters.forEach((fighter,i) => {
     fighter.hp = Math.max(0,fighter.hp-damage[1-i]);
@@ -64,7 +97,9 @@ function resolveDuelRound(state) {
   state.round += 1;
   const [a,b] = fighters.map(fighter=>fighter.hp);
   if (!a || !b || round >= 15) {
-    state.winner = a === b ? null : a > b ? 0 : 1;
+    const first = a*(fighters[1].maxHp || 100);
+    const second = b*(fighters[0].maxHp || 100);
+    state.winner = first === second ? null : first > second ? 0 : 1;
     state.reason = !a || !b ? 'knockout' : 'round-limit';
   }
 }
@@ -73,7 +108,7 @@ async function handleDuel(route, request, player, db, json) {
   const now = Date.now();
   if (route === 'GET /arena-duel/status') {
     await db('SELECT code FROM arena_duel LIMIT 1').first();
-    return json({enabled:true});
+    return json({enabled:true,trainedPets:true});
   }
   const creating = route === 'POST /arena-duel/create';
   const input = request.method === 'POST' ? await body(request,4096) : null;
@@ -82,7 +117,7 @@ async function handleDuel(route, request, player, db, json) {
   }
   if (creating) {
     const code = randomToken().slice(0,12);
-    const state = {fighters:[newDuelFighter(player.alias,input.breed)],choices:[null,null],
+    const state = {trained:true,fighters:[newDuelFighter(player.alias,input,true)],choices:[null,null],
       round:1,history:[],winner:null,reason:null};
     const result = await db(`INSERT INTO arena_duel(code,host_id,state,phase,expires_at)
       VALUES(?,?,?,'waiting',?)
@@ -107,7 +142,7 @@ async function handleDuel(route, request, player, db, json) {
     if (side === 0) fail('Share this code with another Pawtopia player.');
     if (side === 1) return json(duelResponse(row,state,1));
     if (row.phase !== 'waiting') fail('This duel has already started.',409);
-    state.fighters.push(newDuelFighter(player.alias,input.breed));
+    state.fighters.push(newDuelFighter(player.alias,input,state.trained));
     const expiresAt = now+7*duelDay;
     const result = await db(`UPDATE arena_duel SET guest_id=?, state=?, phase='active',
       revision=revision+1, expires_at=? WHERE code=? AND phase='waiting' AND revision=?`,
