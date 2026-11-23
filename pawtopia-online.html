@@ -9,7 +9,7 @@
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/pawtopia-online-config.js?v=production-1"></script>
 <script defer src="assets/pawtopia-cloud-save.js?v=account-session-1"></script>
-<script defer src="assets/pawtopia-online-town.js?v=player-entry-1"></script>
+<script defer src="assets/pawtopia-online-town.js?v=account-upgrade-button-1"></script>
 <style>
   main section { margin-block: 1.25rem; }
   form label, form button { margin-block: .4rem; }
@@ -69,7 +69,8 @@
 </div>
 <div id="account-session" hidden>
 <p id="account-identity"></p>
-<form id="password-upgrade" hidden><h3>Set up username and password</h3>
+<button id="show-upgrade" type="button" aria-expanded="false" aria-controls="password-upgrade" hidden>Set up username and password</button>
+<form id="password-upgrade" aria-label="Set up username and password" hidden>
 <label for="upgrade-username">Username</label><input id="upgrade-username" name="username" type="text" maxlength="24" autocomplete="username" autocapitalize="off" spellcheck="false" required><label for="upgrade-password">Choose a password</label><input id="upgrade-password" name="password" type="password" maxlength="128" autocomplete="new-password" minlength="15" required>
 <p>Other players will see your username. Choose a nickname without personal information and a password with at least 15 characters. Save your recovery code before you leave. Your account key is retired after the upgrade.</p>
 <button type="submit">Upgrade this account</button></form>

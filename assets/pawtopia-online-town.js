@@ -11,7 +11,7 @@
     $('online-title').textContent = 'Welcome to Pawtopia';
     $('online-intro').textContent = 'Sign in to your Pawtopia account.';
     $('online-arena-link').hidden = true;
-    $('account-signin').after($('entry-actions'));
+    $('account-session').after($('entry-actions'));
     if (!api) {
       $('online-disabled').after($('entry-actions'));
       $('entry-actions').hidden = false;
@@ -25,6 +25,23 @@
   let passwordFormsAvailable = false;
   let accountAction = false;
   let challenge = '', widget;
+  const upgradeButton = $('show-upgrade');
+  const upgradeForm = $('password-upgrade');
+  let upgradeAccount = '';
+  function closeUpgrade() {
+    upgradeForm.hidden = true;
+    upgradeForm.reset();
+    upgradeButton.setAttribute('aria-expanded','false');
+  }
+  upgradeButton.addEventListener('click', () => {
+    if (!upgradeForm.hidden) {
+      closeUpgrade();
+      return;
+    }
+    upgradeForm.hidden = false;
+    upgradeButton.setAttribute('aria-expanded','true');
+    $('upgrade-username').focus();
+  });
   $('online-disabled').hidden = true;
   $('online-enabled').hidden = false;
   $('cloud-settings').hidden = window.PawtopiaOnlineConfig.cloudSaves !== true;
@@ -78,6 +95,11 @@
   async function render(enterIfSignedIn = false) {
     const account = api.key();
     const signedIn = Boolean(account);
+    if (account !== upgradeAccount) {
+      upgradeAccount = '';
+      upgradeButton.hidden = true;
+      closeUpgrade();
+    }
     $('account-signin').hidden = signedIn;
     $('account-session').hidden = !signedIn;
     $('cloud-opt-in').checked = api.syncEnabled();
@@ -105,7 +127,10 @@
     }
     if (api.key() !== account) return;
     $('account-identity').textContent = session.username ? 'Signed in as '+session.username : 'Signed in with an existing account key.';
-    $('password-upgrade').hidden = !passwordFormsAvailable || session.legacy === false;
+    const canUpgrade = passwordFormsAvailable && session.legacy === true;
+    upgradeButton.hidden = !canUpgrade;
+    if (canUpgrade) upgradeAccount = account;
+    else closeUpgrade();
     if (fromHome) {
       if (enterIfSignedIn && !session.legacy) location.replace(enterWorld.href);
       return;
