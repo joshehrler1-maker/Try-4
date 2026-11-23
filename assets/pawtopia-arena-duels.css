@@ -13,8 +13,6 @@
 .duel-art > svg, .duel-art > .battle-painted-body { display: block; grid-area: 1 / 1; width: 100%; height: auto; }
 .duel-art > svg { z-index: 1; }
 .duel-art--leftward { transform: scaleX(-1); }
-.duel-actor.duel-strike { transform: translateX(13%) scale(1.04); }
-#duel-actor-1.duel-strike { transform: translateX(-13%) scale(1.04); }
 .duel-actor.duel-contact { filter: brightness(1.4) saturate(1.2); }
 @media (prefers-reduced-motion: reduce) { .duel-actor { transition: none; } }
 
@@ -35,3 +33,51 @@
 }
 
 #duel-clock { margin: 0 0 .5rem; color: #ffe8a1; font-variant-numeric: tabular-nums; }
+
+.duel-field {
+  position:relative; isolation:isolate; align-items:end;
+  background:linear-gradient(#101d3199 12%,#20354a44 51%,#101b29ec 94%),
+    url("scenes/town-arena.webp") center 48% / cover, #142747;
+}
+.duel-field::before {
+  content:""; position:absolute; inset:53% -15% -35%; z-index:-1; pointer-events:none;
+  background:radial-gradient(ellipse at center,#ead2a86e,transparent 61%),linear-gradient(#78828c56,#111824bb);
+  transform:perspective(250px) rotateX(16deg);
+}
+.duel-actor { position:relative; isolation:isolate; transform:translateX(var(--duel-travel,0px)); transition:filter 90ms; }
+.duel-actor::before {
+  content:""; position:absolute; z-index:-1; left:21%; bottom:9%; width:58%; height:8%;
+  border-radius:50%; background:#070f18a8; filter:blur(5px);
+  transform:scaleX(calc(1 + var(--duel-feet,0) * .23));
+}
+.duel-art { grid-template-columns:minmax(0,1fr); }
+.duel-fighter { color:#f9f3e4; text-shadow:0 1px 4px #07101d; }
+.duel-effects { position:absolute; inset:0; z-index:3; pointer-events:none; }
+.duel-effect {
+  position:absolute; left:var(--fx-x); top:var(--fx-y); transform:translate(-50%,-50%);
+  color:var(--fx-color,#ffe09a); text-shadow:0 2px 4px #081522,0 0 5px #081522;
+  font-size:clamp(.9rem,3.4vw,1.35rem); font-weight:850; white-space:nowrap;
+  animation:duel-contact-rise .64s ease-out both;
+}
+.duel-effect::before { content:""; position:absolute; width:1.65rem; height:1.65rem; left:50%; top:50%;
+  transform:translate(-50%,-50%) rotate(45deg); border:2px solid currentColor; border-radius:.27rem;
+  box-shadow:0 0 .8rem currentColor; opacity:.82; }
+.duel-effect[data-effect="block"]::before { border-radius:50%; box-shadow:inset 0 0 .5rem currentColor; }
+.duel-effect[data-effect="signature"]::before,.duel-effect[data-effect="ultimate"]::before { width:2.2rem; height:2.2rem; border-radius:.65rem; }
+.duel-effect[data-effect="trail"] { width:1.15rem; height:.35rem; border-radius:50%; background:currentColor;
+  box-shadow:0 0 .8rem currentColor; animation:duel-trail .17s ease-in both; }
+.duel-effect[data-effect="dust"],.battle-foot-dust { width:.6rem; height:.32rem; border-radius:50%; background:#d9c7ac;
+  box-shadow:-.58rem .18rem #d4bf9c99,.57rem .1rem #f1d8a687; animation:arena-dust .42s ease-out both; }
+.duel-effect[data-effect="dust"]::before,.duel-effect[data-effect="trail"]::before { display:none; }
+.duel-ult-landed { animation:duel-stage-flash .3s ease-out both; }
+@keyframes duel-contact-rise { 0%{opacity:1;transform:translate(-50%,-50%) scale(.78)} 20%{transform:translate(-50%,-85%) scale(1.12)} 100%{opacity:0;transform:translate(-50%,-215%)} }
+@keyframes duel-trail { from { opacity:.9; transform:translateX(0) scaleX(.7); } to { opacity:.25; transform:translateX(var(--fx-distance)) scaleX(1.6); } }
+@keyframes duel-stage-flash { 0%{box-shadow:inset 0 0 1.65rem #ffe89988} 100%{box-shadow:inset 0 0 .2rem transparent} }
+@media (max-width:620px) {
+  .duel-field { gap:.18rem; padding:.4rem .25rem .15rem; }
+  .duel-actor { width:min(100%,10.5rem); margin:.12rem auto 0; }
+  .duel-fighter .mini { font-size:.65rem; line-height:1.24; }
+  .duel-fighter progress { margin:.18rem auto; }
+  .duel-fighter > span { font-size:.78rem; }
+}
+@media (prefers-reduced-motion: reduce) { .duel-effect,.duel-ult-landed { animation:none; } .duel-actor { transition:none; } }

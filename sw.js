@@ -1,6 +1,6 @@
 /* Static public content only. Never cache accounts, money, or private operations. */
 'use strict';
-const CACHE = 'try4-public-v149-arena-turns';
+const CACHE = 'try4-public-v150-arena-visuals';
 const FILES = ['crystal-professional.js','crystal-professional.css','face-review.js','assets/super-paw-rig.js','assets/whisker-luna-master.webp','assets/heroes-master.json','hero-models.html','approved-voices.js','voice-test.html','index.html','studio.html','studio.css','studio.js?v=creative-workspace-1','core.js','3d-games.html','super-paw-3d.html','cross-platform.css','cross-platform.js','app.js','manifest.webmanifest','app-icon.svg','offline.html','readiness.html','readiness.js','release-policy.json','super-paw-heroes.png','super-paw-wallpaper.png'];
 FILES.push("pawtopia-battle-art-gallery.html","assets/pawtopia-battle-art-gallery.css","assets/pawtopia-battle-art-gallery.js");
 FILES.push("assets/pawtopia-cat-flow.css");
@@ -206,7 +206,7 @@ FILES.push(
   'assets/pawtopia-battle-motion.js?v=duel-flow-1',
   'assets/pawtopia-battle-arena.js?v=duel-flow-1'
 );
-FILES.push('assets/pawtopia-battle-engine.js?v=arena-turns-1','assets/pawtopia-battle-arena.css?v=arena-turns-1','assets/pawtopia-arena-duels.css?v=arena-turns-1','assets/pawtopia-arena-duels.js?v=arena-turns-1','assets/pawtopia-battle-arena.js?v=arena-turns-1','assets/pawtopia-pet-equipment.js?v=arena-play-1','assets/game-fullscreen.js?v=arena-focus-1','assets/pawtopia-battle-arena.css?v=fullscreen-1',
+FILES.push('assets/pawtopia-battle-engine.js?v=arena-turns-1','assets/pawtopia-battle-arena.css?v=arena-visual-1','assets/pawtopia-arena-duels.css?v=arena-visual-1','assets/pawtopia-arena-duels.js?v=arena-visual-1','assets/pawtopia-battle-arena.js?v=arena-visual-1','assets/pawtopia-pet-equipment.js?v=arena-play-1','assets/game-fullscreen.js?v=arena-focus-1','assets/pawtopia-battle-arena.css?v=fullscreen-1',
   'assets/pawtopia-battle-arena.js?v=fullscreen-1');
 const gamePage = new URL('pawcade-side-scroll.html', self.registration.scope);
 const allowed = new Set(FILES.map(file => new URL(file, self.registration.scope).href));

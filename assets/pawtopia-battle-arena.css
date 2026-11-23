@@ -437,3 +437,24 @@ footer{padding:16px 0 28px;text-align:center}
 .foe-intent[data-intent="charge"] { background:#543125; color:#fff0bd; }
 .foe-intent[data-intent="brace"] { background:#21495a; color:#d9f7ff; }
 @media(max-width:470px){.foe-intent{font-size:.66rem;padding:.25rem;}}
+
+/* Short, readable pre-move cues and foot contact for the solo arena. */
+.battle-foot-dust { position:absolute; pointer-events:none; }
+@keyframes arena-dust { from{opacity:.8;transform:translate(-50%,-40%) scale(.65)} to{opacity:0;transform:translate(-50%,-100%) scale(2.25)} }
+.battle-stage[data-foe-intent="charge"] .battler-foe .fighter-sprite { transform-origin:center 85%; animation:foe-charge-tell .48s ease-out both; }
+.battle-stage[data-foe-intent="brace"] .battler-foe .fighter-sprite { transform-origin:center 88%; animation:foe-brace-tell .34s ease-out both; }
+@keyframes foe-charge-tell {0%{transform:translateX(0) scaleY(1)}55%{transform:translateX(4%) scaleY(.92)}100%{transform:translateX(2%) scaleY(.96)}}
+@keyframes foe-brace-tell {0%{transform:scale(1)}60%{transform:scale(1.05,.94)}100%{transform:scale(1.025,.97)}}
+.battle-stage .fighter-shadow { bottom:5%; height:11%; background:#070f1cba; filter:blur(5px); }
+@media (max-width:620px) {
+  #arena-play-area:not(:fullscreen,.game-fullscreen-expanded) .battle-stage {
+    grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr); padding-inline:7px; gap:2px;
+  }
+  #arena-play-area:not(:fullscreen,.game-fullscreen-expanded) .fighter-sprite { width:min(100%,176px); }
+  #arena-play-area:not(:fullscreen,.game-fullscreen-expanded) .battler-ui { font-size:.75rem; }
+  .battle-center { font-size:1rem; }
+  .arena-control-dock .move-grid button { min-height:52px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .battle-stage[data-foe-intent] .battler-foe .fighter-sprite,.battle-foot-dust { animation:none; }
+}

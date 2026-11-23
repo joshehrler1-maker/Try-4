@@ -10,11 +10,11 @@
 <meta property="og:description" content="Watch your adopted cat face 207 dog challengers and Baron Brasswhirl, unlock special moves and earn free rewards.">
 <title>Pawtopia Battle Arena | Super Paw Heroes</title>
 <link rel="stylesheet" href="assets/game-fullscreen.css">
-<link rel="stylesheet" href="assets/pawtopia-battle-arena.css?v=arena-turns-1">
+<link rel="stylesheet" href="assets/pawtopia-battle-arena.css?v=arena-visual-1">
 <link rel="stylesheet" href="assets/pawtopia-item-art.css?v=painted-1">
 <link rel="stylesheet" href="assets/pawtopia-pet-equipment.css?v=1">
 <link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
-<link rel="stylesheet" href="assets/pawtopia-arena-duels.css?v=arena-turns-1">
+<link rel="stylesheet" href="assets/pawtopia-arena-duels.css?v=arena-visual-1">
 <script defer src="assets/pawtopia-save.js?v=catalog-2569"></script>
 <script defer src="assets/pawtopia-upgrade-points.js?v=arena-rewards-1"></script>
 <script defer src="assets/pawtopia-battle-data.js?v=balance-1"></script>
@@ -31,10 +31,10 @@
 <script defer src="assets/pawtopia-item-art.js?v=painted-1"></script>
 <script defer src="assets/pawtopia-battle-motion.js?v=duel-flow-1"></script>
 <script defer src="assets/game-fullscreen.js?v=arena-focus-1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=arena-turns-1"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=arena-visual-1"></script>
 <script defer src="assets/pawtopia-online-config.js?v=production-1"></script>
 <script defer src="assets/pawtopia-cloud-save.js"></script>
-<script defer src="assets/pawtopia-arena-duels.js?v=arena-turns-1"></script>
+<script defer src="assets/pawtopia-arena-duels.js?v=arena-visual-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
@@ -105,6 +105,7 @@
     <p id="duel-clock" class="mini" hidden></p>
     <p id="duel-code-line" hidden>Invite code <strong id="duel-code"></strong> · <a id="duel-share-link">Invite link</a></p>
     <div id="duel-field" class="duel-field" hidden>
+      <div id="duel-effects" class="duel-effects" aria-hidden="true"></div>
       <div class="duel-fighter">
         <strong id="duel-label-0"></strong>
         <p class="mini" id="duel-stats-0"></p>

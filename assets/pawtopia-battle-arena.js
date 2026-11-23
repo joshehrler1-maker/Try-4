@@ -241,6 +241,7 @@
     stage.style.setProperty('--foe-color',activeFoe.color);
     el('battle-foe-emblem').textContent=activeFoe.glyph;
     const intent=engine.foeIntent?.(activeFoe,currentView?.match);
+    stage.dataset.foeIntent=intent && !busy ? intent.id : '';
     const intentLabel=el('battle-foe-intent');
     if(intentLabel){
       intentLabel.hidden=!intent || busy;
@@ -348,14 +349,14 @@
     ring.style.setProperty('--hit-y',point.y);
     ring.style.setProperty('--effect-color',color);
     const backdropClass=visual?.power==='ultimate'?'stage-power-contact':
-      evt.who==='pet'?'stage-contact-pet':'stage-contact-foe';
+      /Charge/.test(evt.name)?'stage-contact-foe':null;
     stage.classList.remove('stage-power-contact','stage-contact-pet','stage-contact-foe');
     void stage.offsetWidth;
-    stage.classList.add(backdropClass);
+    if(backdropClass)stage.classList.add(backdropClass);
     el('battle-vfx').append(ring);
     setTimeout(()=>{
       ring.remove();
-      stage.classList.remove(backdropClass);
+      if(backdropClass)stage.classList.remove(backdropClass);
     },500);
   }
   function burst(evt,color,visual,point) {
@@ -543,12 +544,22 @@
     }
     const now=()=>window.performance?.now?.()??Date.now();
     let start=now();
-    let released=false,landed=false,t=0;
+    let released=false,landed=false,footfall=false,t=0;
     for(;;){
       t=Math.max(t,Math.min(1,(now()-start)/duration));
       if(clip.release!==null&&!released&&t>=clip.release){
         released=true;
         if(t<clip.contact)release(t);
+      }
+      if(!footfall&&!clip.skill&&!clip.guard&&t>=Math.min(.35,clip.contact-.12)){
+        footfall=true;
+        const bounds=actor.getBoundingClientRect(), floor=stage.getBoundingClientRect();
+        const dust=document.createElement('span');
+        dust.className='battle-foot-dust';
+        dust.style.left=(bounds.left-floor.left+bounds.width*.52)+'px';
+        dust.style.top=(bounds.bottom-floor.top-bounds.height*.12)+'px';
+        el('battle-vfx').append(dust);
+        setTimeout(()=>dust.remove(),450);
       }
       if(!landed&&t>=clip.contact){
         landed=true;
@@ -576,6 +587,7 @@
     gearAura(equipped);
     const idle=()=>({x:0,depth:0,pose:'idle',frame:3});
     const stance={pet:idle(),foe:idle()};
+    stage.dataset.foeIntent='';
     stage.classList.add('has-fighter-timeline');
     try{
       for(const [index,evt] of events.entries()){

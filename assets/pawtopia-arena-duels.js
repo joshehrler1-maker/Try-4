@@ -7,6 +7,7 @@
   const data = window.PawtopiaBattleData;
   const art = window.PawtopiaBattleCharacterArt;
   const engine = window.PawtopiaBattleEngine;
+  const motion = window.PawtopiaBattleMotion;
   const unlocks = {swipe:1,guard:3,signature:6,ultimate:10};
   if (!section || !api || !save || !data || !art || !engine) return;
 
@@ -89,10 +90,10 @@
       else scheduleRefresh();
     },duel.phase === 'active' && !duel.submitted ? 25000 : 15000);
   }
-  function draw(side, pose = 'idle', frame = 3, hp = duel?.fighters[side]?.hp) {
+  function draw(side, pose = 'idle', frame = 3, hp = duel?.fighters[side]?.hp, from) {
     const pet = duel?.fighters[side], body = element('art-'+side);
     if (!pet) { body.replaceChildren(); return; }
-    art.paintFighter(body,pet.breed,pose === 'fumble' ? 'recover' : pose,frame);
+    art.paintFighter(body,pet.breed,pose === 'fumble' ? 'recover' : pose,frame,from);
     const maximum = pet.maxHp || 100;
     element('health-'+side).max = maximum;
     element('health-'+side).value = hp;
@@ -187,30 +188,114 @@
     scheduleRefresh();
   }
   const pause = ms => new Promise(resolve => setTimeout(resolve,ms));
+  const lungingStyles = new Set(['rush','pounce','maul','lance','feint','whirl','thunder']);
+  const direction = side => side===0 ? 1 : -1;
+  function duelEffect(kind,x,y,color,label='') {
+    const layer=element('effects');
+    const spark=document.createElement('span');
+    spark.className='duel-effect';
+    spark.dataset.effect=kind;
+    spark.style.setProperty('--fx-x',x+'px');
+    spark.style.setProperty('--fx-y',y+'px');
+    spark.style.setProperty('--fx-color',color);
+    spark.textContent=label;
+    layer.append(spark);
+    setTimeout(()=>spark.remove(),820);
+    return spark;
+  }
+  function playDuelContact(round, actions) {
+    const field=element('field');
+    const stage=field.getBoundingClientRect();
+    for (const [side,action] of actions.entries()) {
+      if (!action.attack) continue;
+      const target=element('art-'+(1-side)).getBoundingClientRect();
+      const x=target.left-stage.left+target.width*(side===0?.32:.68);
+      const y=target.top-stage.top+target.height*.55;
+      const amount=round.damage[side];
+      const guarded=round.moves[1-side]==='guard';
+      if(amount>0||guarded) {
+        duelEffect(guarded?'block':action.move==='ultimate'?'ultimate':action.skill?'signature':'hit',
+          x,y,guarded?'#8deedf':action.color,amount>0?'−'+amount:'Blocked');
+      }
+    }
+  }
+  function resetDuelArt() {
+    for (const side of [0,1]) {
+      const actor=element('actor-'+side);
+      actor.style?.removeProperty('--duel-travel');
+      actor.style?.removeProperty('--duel-feet');
+      actor.classList.remove('duel-contact');
+    }
+    element('field').classList.remove('duel-ult-landed');
+  }
   async function replay(round) {
     if (!round || !duel || playing) return;
-    const token = ++animation;
-    playing = true;
+    const token=++animation;
+    playing=true;
     setControls();
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const still=window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      !motion || typeof element('field').getBoundingClientRect!=='function';
     try {
-      let frameIndex = 0;
-      for (const frame of (reduced ? [3] : [0,1,2,3,4,5])) {
-        if (token !== animation) return;
-        const contact = frame >= 3;
-        for (const [side,move] of round.moves.entries()) {
-          draw(side,move,frame,contact ? round.hpAfter[side] : round.hpBefore[side]);
-          element('actor-'+side).classList.toggle('duel-strike',!reduced && move !== 'guard' && move !== 'fumble' && frame >= 1 && frame <= 3);
-          element('actor-'+side).classList.toggle('duel-contact',!reduced && contact && frame < 5 && round.damage[1-side] > 0);
+      if(still) {
+        for(const [side,move] of round.moves.entries()) {
+          draw(side,round.damage[1-side]>0 && move!=='guard'?'impact':move,3,round.hpAfter[side]);
         }
-        frameIndex++;
-        if (frameIndex < 6 && !reduced) await pause(85);
+        return;
       }
-      if (!reduced) await pause(175);
+      const bodies=[0,1].map(side=>element('art-'+side).getBoundingClientRect());
+      const actions=round.moves.map((move,side)=>{
+        const pet=duel.fighters[side], model=art.getArt?.(pet.breed), kit=data.kitFor(pet.breed);
+        const skill=move==='signature'||move==='ultimate';
+        const attack=move!=='guard'&&move!=='fumble';
+        const technique=art.identityFor?.(pet.breed)?.technique;
+        const melee=attack&&(!skill||lungingStyles.has(technique));
+        const clip=motion.plan({who:'pet',fx:move,damage:round.damage[side]},skill?{skill:move}:null,
+          model,null,skill?art.timingFor?.(pet.breed,move):null);
+        return {move,skill,attack,melee,clip,color:kit.theme?.color||'#ffe09a'};
+      });
+      const gap=Math.max(0,bodies[1].left+bodies[1].width*.32-(bodies[0].left+bodies[0].width*.68));
+      const bothLunge=actions.every(action=>action.melee);
+      const reach=actions.map(action=>action.melee ? gap/(bothLunge?2:1) : 0);
+      const length=Math.max(...actions.map(action=>action.clip.duration));
+      const contact=.58;
+      for(const [i,beat] of [0,.10,.20,.31,.43,.52,contact,.64,.72,.82,.91,1].entries()){
+        if(token!==animation)return;
+        const landed=beat>=contact;
+        for(const [side,action] of actions.entries()){
+          const actor=element('actor-'+side);
+          const incoming=round.damage[1-side];
+          const local=landed?action.clip.contact+(1-action.clip.contact)*(beat-contact)/(1-contact):
+            action.clip.contact*beat/contact;
+          const sample=motion.sample(action.clip,local,reach[side],Math.max(1,Math.min(3,Math.round(reach[side]/45))));
+          const lunge=action.skill&&action.melee ? Math.sin(Math.PI/2*(landed?(1-beat)/(1-contact):beat/contact))*reach[side] : sample.x;
+          const recoil=landed && actions[1-side].attack && (incoming>0||action.move==='guard') ?
+            Math.sin(Math.PI*(beat-contact)/(1-contact))*bodies[side].width*(incoming>0?.12:.035) : 0;
+          const receivingHit=incoming>0 && beat>contact && beat<.82 && (action.move!=='guard'||beat>=.72);
+          actor.style.setProperty('--duel-travel',direction(side)*(lunge-recoil)+'px');
+          actor.style.setProperty('--duel-feet',String(Math.abs(lunge)/Math.max(1,reach[side])));
+          actor.classList.toggle('duel-contact',incoming>0 && beat===contact);
+          const pose=receivingHit?'impact':action.move==='fumble'?'fumble':sample.pose;
+          const frame=receivingHit?Math.min(5,(beat-contact)*20):action.move==='fumble'?beat*5:sample.frame;
+          draw(side,pose,Math.round(frame*2)/2,landed?round.hpAfter[side]:round.hpBefore[side],sample.from);
+          if(i===4 && action.attack) {
+            const stage=element('field').getBoundingClientRect();
+            const box=element('art-'+side).getBoundingClientRect();
+            if(action.skill&&!action.melee) {
+              const spark=duelEffect('trail',box.left-stage.left+box.width*.5,box.top-stage.top+box.height*.55,action.color);
+              spark.style.setProperty('--fx-distance',direction(side)*Math.abs(bodies[1].left-bodies[0].left)+'px');
+            }else duelEffect('dust',box.left-stage.left+box.width*.5,box.top-stage.top+box.height*.84,'#ddc19f');
+          }
+        }
+        if(beat===contact) {
+          playDuelContact(round,actions);
+          if(actions.some((action,side)=>action.move==='ultimate'&&round.damage[side]>0)) element('field').classList.add('duel-ult-landed');
+        }
+        if(beat<1)await pause(length/15+(beat===contact?55:0));
+      }
     } finally {
-      if (token === animation) {
-        playing = false;
-        for (const side of [0,1]) element('actor-'+side).classList.remove('duel-strike','duel-contact');
+      if(token===animation) {
+        playing=false;
+        resetDuelArt();
         render();
       }
     }
@@ -329,7 +414,8 @@
     clearTimeout(rankTimer);
     animation++;
     playing = false;
-    for (const side of [0,1]) element('actor-'+side).classList.remove('duel-strike','duel-contact');
+    resetDuelArt();
+    element('effects').replaceChildren();
     duel = null;
     clearTimeout(refreshTimer);
     status('');
