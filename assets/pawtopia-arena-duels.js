@@ -17,8 +17,9 @@
   const memoryKey = 'pawtopia-arena-duel';
   const legalCode = /^[0-9a-f]{12}$/;
   let duel, pets = [], busy = false, playing = false, animation = 0, refreshTimer;
-  let account = '', available = false;
+  let account = '', available = false, rankedAvailable = false, rank, rankTimer;
   const moveLabel = (breed, move) => {
+    if (move === 'fumble') return 'Missed swipe';
     const kit = data.kitFor(breed);
     return {swipe:'Paw Swipe',guard:'Guard Curl',signature:kit.signature,ultimate:kit.ultimate}[move];
   };
@@ -32,6 +33,12 @@
       else localStorage.removeItem(memoryKey);
     } catch {}
   }
+  function selectedFighter() {
+    const pet = pets[Number(fighter.value)];
+    if (!pet) throw Error('Choose an adopted cat first.');
+    return {name:String(pet.name || pet.breed).slice(0,40),breed:pet.breed,
+      stats:{level:engine.level(pet),...engine.training(pet)}};
+  }
   function readPets() {
     const old = fighter.value;
     const progress = save.read();
@@ -43,8 +50,10 @@
     setControls();
   }
   function setControls() {
-    for (const action of ['create','join']) element(action).disabled = !available || busy || !pets.length;
-    element('restore').disabled = !available || busy;
+    for (const action of ['create','join']) element(action).disabled = !available || busy || !pets.length || Boolean(rank?.queued);
+    element('restore').disabled = !available || busy || Boolean(rank?.queued);
+    element('rank-start').disabled = busy || (!pets.length && rank?.duel?.phase !== 'active');
+    element('rank-cancel').disabled = busy;
     element('leave').disabled = busy;
     element('refresh').disabled = busy || playing;
     element('replay').disabled = busy || playing || !duel?.history.length;
@@ -68,7 +77,7 @@
   function draw(side, pose = 'idle', frame = 3, hp = duel?.fighters[side]?.hp) {
     const pet = duel?.fighters[side], body = element('art-'+side);
     if (!pet) { body.replaceChildren(); return; }
-    art.paintFighter(body,pet.breed,pose,frame);
+    art.paintFighter(body,pet.breed,pose === 'fumble' ? 'recover' : pose,frame);
     const maximum = pet.maxHp || 100;
     element('health-'+side).max = maximum;
     element('health-'+side).value = hp;
@@ -81,6 +90,12 @@
       (duel.reason === 'forfeit' ? (duel.winner === duel.side ? ' Your opponent forfeited.' : ' You forfeited.') : '');
   }
   function render() {
+    element('ranked').hidden = !account || !rankedAvailable;
+    element('rank-score').textContent = rank ? 'Rating '+rank.rating+' · '+rank.wins+' wins · '+rank.losses+' losses · '+rank.draws+' draws' : '';
+    element('rank-start').hidden = Boolean(rank?.queued || (duel && duel.phase !== 'finished'));
+    element('rank-start').textContent = rank?.duel?.phase === 'active' ? 'Resume ranked battle' : 'Find ranked opponent';
+    element('rank-cancel').hidden = !rank?.queued;
+    element('rank-message').textContent = rank?.queued ? 'Looking for another player…' : '';
     element('account').hidden = Boolean(account);
     element('lobby').hidden = !account || !available || Boolean(duel && duel.phase !== 'finished');
     element('match').hidden = !duel;
@@ -96,6 +111,7 @@
     share.hash = 'duel-'+duel.code;
     share.search = '';
     element('share-link').href = share.href;
+    element('mode').textContent = duel.bot ? 'Arena Bot · Practice match' : duel.ranked ? 'Ranked player match' : 'Private invite duel';
     element('phase').textContent = waiting ? 'Waiting for a friend to join.' :
       duel.phase === 'finished' ? outcome() :
       'Round '+duel.round+' of 15 · '+(duel.submitted ? 'Waiting for your opponent’s move.' : 'Choose your move.');
@@ -141,7 +157,7 @@
         const contact = frame >= 3;
         for (const [side,move] of round.moves.entries()) {
           draw(side,move,frame,contact ? round.hpAfter[side] : round.hpBefore[side]);
-          element('actor-'+side).classList.toggle('duel-strike',!reduced && move !== 'guard' && frame >= 1 && frame <= 3);
+          element('actor-'+side).classList.toggle('duel-strike',!reduced && move !== 'guard' && move !== 'fumble' && frame >= 1 && frame <= 3);
           element('actor-'+side).classList.toggle('duel-contact',!reduced && contact && frame < 5 && round.damage[1-side] > 0);
         }
         frameIndex++;
@@ -159,7 +175,8 @@
   function update(next, animate = true) {
     const shouldReplay = animate && duel?.code === next.code && next.history.length > duel.history.length;
     duel = next;
-    remember(next.code);
+    if (!next.ranked) remember(next.code);
+    if (next.ranked && next.phase === 'finished' && rank?.duel?.phase !== 'finished') refreshRankSummary();
     if (shouldReplay) replay(next.history.at(-1));
     render();
   }
@@ -177,13 +194,41 @@
       busy = false;
       setControls();
       scheduleRefresh();
+      scheduleRankPoll();
     }
+  }
+  async function refreshRankSummary() {
+    const activeAccount = account;
+    try {
+      const next = await api.call('/arena-ranked');
+      if (api.key() === activeAccount) { rank = next; render(); }
+    } catch {}
+  }
+  function applyRank(next, allowMatch = true) {
+    rank = next;
+    if (allowMatch && next.duel?.phase === 'active') update(next.duel,false);
+    else render();
+    scheduleRankPoll();
+  }
+  function rankAction(action, payload) {
+    return perform(async current => {
+      const next = await api.call('/arena-ranked/'+action,'POST',payload);
+      if (current()) applyRank(next);
+    },action === 'poll');
+  }
+  function scheduleRankPoll() {
+    clearTimeout(rankTimer);
+    if (!rank?.queued || document.hidden) return;
+    rankTimer = setTimeout(() => {
+      if (busy) scheduleRankPoll();
+      else rankAction('poll',{});
+    },3000);
   }
   function refresh(manual) {
     return perform(async current => {
       if (!duel) return;
       try {
-        const next = await api.call('/arena-duel?code='+duel.code);
+        const next = await api.call('/arena-duel?code='+duel.code+(duel.ranked ? '&ranked=1' : ''));
         if (current()) update(next);
       } catch (error) {
         if (error.status === 404 && current()) {
@@ -209,13 +254,11 @@
   }
   function enter(join) {
     return perform(async current => {
-      const pet = pets[Number(fighter.value)];
-      if (!pet) throw Error('Choose an adopted cat first.');
+      const selected = selectedFighter();
       const code = invite.value.trim().toLowerCase();
       if (join && !legalCode.test(code)) throw Error('Enter a valid 12-character duel code.');
       const next = await api.call('/arena-duel/'+(join ? 'join' : 'create'),'POST',
-        {name:String(pet.name || pet.breed).slice(0,40),breed:pet.breed,
-          stats:{level:engine.level(pet),...engine.training(pet)},...(join ? {code} : {})});
+        {...selected,...(join ? {code} : {})});
       if (current()) update(next,false);
     });
   }
@@ -224,6 +267,9 @@
     if (next === account && available) { readPets(); return; }
     account = next;
     available = false;
+    rankedAvailable = false;
+    rank = null;
+    clearTimeout(rankTimer);
     animation++;
     playing = false;
     for (const side of [0,1]) element('actor-'+side).classList.remove('duel-strike','duel-contact');
@@ -237,10 +283,15 @@
       if (!capability.trainedPets) throw Error('Trained pet duels are pending deployment.');
       if (api.key() !== next) return;
       available = true;
+      rankedAvailable = Boolean(capability.ranked);
       readPets();
       render();
       const known = readRemembered();
       if (legalCode.test(known || '')) await restore(known,true);
+      if (rankedAvailable) {
+        const nextRank = await api.call('/arena-ranked');
+        if (api.key() === next) applyRank(nextRank,!linkCode);
+      }
     } catch {
       if (api.key() === next) status('Player battles are temporarily unavailable. Try refreshing the page.');
     }
@@ -249,6 +300,11 @@
   const linkCode = location.hash.match(/^#duel-([0-9a-f]{12})$/)?.[1];
   if (linkCode) { invite.value = linkCode; section.scrollIntoView(); }
   element('account-link').href = linkCode ? 'pawtopia-online.html?duel='+linkCode : 'pawtopia-online.html';
+  element('rank-start').addEventListener('click',()=>{
+    if (rank?.duel?.phase === 'active') update(rank.duel,false);
+    else if (pets.length) rankAction('queue',selectedFighter());
+  });
+  element('rank-cancel').addEventListener('click',()=>rankAction('cancel',{}));
   element('create').addEventListener('click',()=>enter(false));
   element('join-form').addEventListener('submit',event=>{ event.preventDefault(); enter(true); });
   element('restore').addEventListener('click',()=>perform(async current => {
@@ -261,7 +317,7 @@
   element('leave').addEventListener('click',()=>{
     if (!duel || !window.confirm(duel.phase === 'waiting' ? 'Cancel this invite?' : 'Forfeit this duel?')) return;
     perform(async current => {
-      const next = await api.call('/arena-duel/leave','POST',{code:duel.code});
+      const next = await api.call('/arena-duel/leave','POST',{code:duel.code,ranked:duel.ranked});
       if (current()) update(next);
     });
   });
@@ -269,7 +325,7 @@
     const move = event.target.closest('button')?.dataset.duelMove;
     if (!move || !duel || playing) return;
     perform(async current => {
-      const request = {code:duel.code,round:duel.round,move};
+      const request = {code:duel.code,round:duel.round,move,ranked:duel.ranked};
       let next;
       try { next = await api.call('/arena-duel/move','POST',request); }
       catch (error) {
@@ -282,6 +338,7 @@
   document.addEventListener('visibilitychange',()=>{
     if (!document.hidden && available && duel && duel.phase !== 'finished') refresh(false);
     else scheduleRefresh();
+    scheduleRankPoll();
   });
   window.addEventListener('pageshow',init);
   window.addEventListener('storage',event=>{ if (event.key === 'pawtopia-online-key') init(); });

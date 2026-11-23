@@ -55,7 +55,7 @@ function newDuelFighter(alias, input, trained) {
 }
 
 function duelDamage(move, source, target, guarding) {
-  if (move === 'guard') return 0;
+  if (move === 'guard' || move === 'fumble') return 0;
   const {strength,level,intelligence,movement} = source.stats;
   const base = move === 'swipe' ? 3+strength+Math.floor(level/3) :
     move === 'signature' ? 5+strength+intelligence+Math.floor(level/2) :
@@ -71,6 +71,7 @@ function duelResponse(row, state, side) {
   const {fighters, choices, round, history, winner, reason} = state;
   const roster = fighters.map(({name,...fighter},i)=>i === side && name ? {...fighter,name} : fighter);
   return {code:row.code, phase:row.phase, side, fighters:roster, round, history,
+    ranked:Boolean(state.ranked), bot:Boolean(state.bot),
     winner, reason, submitted:Boolean(choices[side]), expiresAt:row.expires_at};
 }
 function validDuelMove(fighter, move, round) {
@@ -104,11 +105,85 @@ function resolveDuelRound(state) {
   }
 }
 
+const rankedWait = 12000;
+const rankedPresence = 35000;
+
+function rankedBot(fighter) {
+  const bot = newDuelFighter('Arena Bot',{breed:fighter.breed,name:'Arena Bot',stats:fighter.stats},true);
+  // An opening signature cannot end the match before the bot's second mistake.
+  const opening = 5+fighter.stats.strength+fighter.stats.intelligence+Math.floor(fighter.stats.level/2);
+  bot.maxHp = Math.max(bot.maxHp,Math.min(451,opening+1));
+  bot.hp = bot.maxHp;
+  return bot;
+}
+function rankedBotMove(state) {
+  if (state.round <= 2) return 'fumble';
+  return ['ultimate','signature','swipe'].find(move=>validDuelMove(state.fighters[1],move,state.round));
+}
+async function rankedView(player, db, now) {
+  const slot = await db('SELECT * FROM arena_ranked_player WHERE player_id=?',player.id).first();
+  const match = slot?.match_code ? await db('SELECT * FROM arena_ranked_match WHERE code=? AND expires_at>?',
+    slot.match_code,now).first() : null;
+  return {rating:slot?.rating ?? 1000,wins:slot?.wins ?? 0,losses:slot?.losses ?? 0,draws:slot?.draws ?? 0,
+    queued:Boolean(slot?.queued_at && slot.seen_at > now-rankedPresence),
+    duel:match ? duelResponse(match,JSON.parse(match.state),match.host_id === player.id ? 0 : 1) : null};
+}
+async function handleRanked(route, request, player, db, json) {
+  const now = Date.now(), fresh = now-rankedPresence;
+  if (route === 'POST /arena-ranked/queue') {
+    const input = await body(request,4096);
+    if (!duelBreeds.has(input.breed)) fail('Choose an adopted cat from your cottage.');
+    const fighter = JSON.stringify(newDuelFighter(player.alias,input,true));
+    await db(`INSERT INTO arena_ranked_player(player_id,queued_at,seen_at,fighter) VALUES(?,?,?,?)
+      ON CONFLICT(player_id) DO UPDATE SET queued_at=excluded.queued_at,seen_at=excluded.seen_at,
+      fighter=excluded.fighter,match_code=NULL
+      WHERE (arena_ranked_player.queued_at IS NULL OR arena_ranked_player.seen_at<=?)
+      AND NOT EXISTS(SELECT 1 FROM arena_ranked_match WHERE code=arena_ranked_player.match_code
+        AND phase='active' AND expires_at>?)`,player.id,now,now,fighter,fresh,now).run();
+  } else if (route === 'POST /arena-ranked/cancel') {
+    await db('UPDATE arena_ranked_player SET queued_at=NULL,seen_at=NULL,fighter=NULL WHERE player_id=? AND match_code IS NULL',player.id).run();
+    return json(await rankedView(player,db,now));
+  } else if (route === 'POST /arena-ranked/poll') {
+    await db('UPDATE arena_ranked_player SET seen_at=? WHERE player_id=? AND queued_at IS NOT NULL AND seen_at>? AND match_code IS NULL',
+      now,player.id,fresh).run();
+  } else if (route === 'GET /arena-ranked') return json(await rankedView(player,db,now));
+  else fail('Unknown ranked arena action.',404);
+
+  const own = await db('SELECT * FROM arena_ranked_player WHERE player_id=? AND queued_at IS NOT NULL AND seen_at>? AND match_code IS NULL',
+    player.id,fresh).first();
+  if (!own) return json(await rankedView(player,db,now));
+  const rival = await db(`SELECT * FROM (SELECT player_id,fighter,queued_at FROM arena_ranked_player
+    WHERE player_id<>? AND queued_at IS NOT NULL AND seen_at>? AND match_code IS NULL
+    ORDER BY seen_at DESC LIMIT 64) ORDER BY RANDOM() LIMIT 1`,player.id,fresh).first();
+  if (!rival && now-own.queued_at < rankedWait) return json(await rankedView(player,db,now));
+  const first = JSON.parse(own.fighter);
+  const state = {ranked:true,bot:!rival,trained:true,
+    fighters:[first,rival ? JSON.parse(rival.fighter) : rankedBot(first)],
+    choices:[null,null],round:1,history:[],winner:null,reason:null};
+  const code = randomToken().slice(0,12), expiresAt = now+duelDay;
+  const ownStillQueued = 'host.player_id=? AND host.queued_at=? AND host.seen_at>? AND host.match_code IS NULL';
+  if (rival) {
+    await db(`INSERT INTO arena_ranked_match(code,host_id,guest_id,state,phase,expires_at)
+      SELECT ?,host.player_id,guest.player_id,?,'active',?
+      FROM arena_ranked_player host JOIN arena_ranked_player guest ON guest.player_id=?
+      WHERE ${ownStillQueued} AND guest.queued_at=? AND guest.seen_at>? AND guest.match_code IS NULL`,
+      code,JSON.stringify(state),expiresAt,rival.player_id,player.id,own.queued_at,fresh,rival.queued_at,fresh).run();
+  } else {
+    // Recheck availability in the same write. The assignment trigger claims both seats atomically.
+    await db(`INSERT INTO arena_ranked_match(code,host_id,state,phase,expires_at)
+      SELECT ?,host.player_id,?,'active',? FROM arena_ranked_player host WHERE ${ownStillQueued}
+      AND NOT EXISTS(SELECT 1 FROM arena_ranked_player WHERE player_id<>host.player_id
+        AND queued_at IS NOT NULL AND seen_at>? AND match_code IS NULL)`,
+      code,JSON.stringify(state),expiresAt,player.id,own.queued_at,fresh,fresh).run();
+  }
+  return json(await rankedView(player,db,now));
+}
+
 async function handleDuel(route, request, player, db, json) {
   const now = Date.now();
   if (route === 'GET /arena-duel/status') {
     await db('SELECT code FROM arena_duel LIMIT 1').first();
-    return json({enabled:true,trainedPets:true});
+    return json({enabled:true,trainedPets:true,ranked:true});
   }
   const creating = route === 'POST /arena-duel/create';
   const input = request.method === 'POST' ? await body(request,4096) : null;
@@ -134,7 +209,10 @@ async function handleDuel(route, request, player, db, json) {
   }
   const code = input?.code ?? new URL(request.url).searchParams.get('code');
   if (typeof code !== 'string' || !duelCode.test(code)) fail('Enter a valid 12-character duel code.');
-  const row = await db('SELECT * FROM arena_duel WHERE code=? AND expires_at>?',code,now).first();
+  const ranked = input?.ranked === true || new URL(request.url).searchParams.get('ranked') === '1';
+  if (ranked && route === 'POST /arena-duel/join') fail('Join ranked battles from the queue.');
+  const table = ranked ? 'arena_ranked_match' : 'arena_duel';
+  const row = await db(`SELECT * FROM ${table} WHERE code=? AND expires_at>?`,code,now).first();
   if (!row) fail('Duel not found or expired.',404);
   const state = JSON.parse(row.state);
   const side = row.host_id === player.id ? 0 : row.guest_id === player.id ? 1 : -1;
@@ -162,10 +240,11 @@ async function handleDuel(route, request, player, db, json) {
     if (input.round !== state.round || state.choices[side]) return json(duelResponse(row,state,side));
     if (!validDuelMove(state.fighters[side],input.move,state.round)) fail('That move is unavailable this round.');
     state.choices[side] = input.move;
+    if (state.bot) state.choices[1] = rankedBotMove(state);
     if (state.choices.every(Boolean)) resolveDuelRound(state);
   }
   const phase = state.reason ? 'finished' : row.phase;
-  const result = await db('UPDATE arena_duel SET state=?, phase=?, revision=revision+1 WHERE code=? AND revision=?',
+  const result = await db(`UPDATE ${table} SET state=?, phase=?, revision=revision+1 WHERE code=? AND revision=?`,
     JSON.stringify(state),phase,code,row.revision).run();
   if (!result.meta.changes) fail('The duel updated. Try your action again.',409);
   return json(duelResponse({...row,phase},state,side));
@@ -202,6 +281,7 @@ export default {
       if (!tokenFormat.test(key)) fail('Enter your Pawtopia account key.',401);
       const player = await db('SELECT id,alias,public,club,tickets FROM player WHERE token_hash=?',await hash(key)).first();
       if (!player) fail('Account key was not recognized.',401);
+      if (new URL(request.url).pathname.startsWith('/arena-ranked')) return await handleRanked(route,request,player,db,json);
       if (new URL(request.url).pathname.startsWith('/arena-duel')) return await handleDuel(route,request,player,db,json);
       if (route === 'GET /session') return json({alias:player.alias});
       if ((route === 'GET /save' || route === 'PUT /save') && env.PAWTOPIA_CLOUD_SAVES !== 'enabled') {

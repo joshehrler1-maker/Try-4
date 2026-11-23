@@ -135,3 +135,56 @@ test('specific cats retain their trained stats, private names and level unlocks'
   assert.deepEqual(result.history[0].hpAfter,[81,0]);
   assert.equal(result.winner,0);
 });
+
+test('ranked matchmaking claims both real players and scores a result once',async t=>{
+  const call = await setup(t);
+  const first = await call('a','/arena-ranked/queue',pet('Bengal'));
+  assert.equal(first.body.queued,true);
+  assert.equal(first.body.duel,null);
+  const queued = await call('b','/arena-ranked/queue',pet('Siamese'));
+  assert.equal(queued.body.duel.ranked,true);
+  assert.equal(queued.body.duel.bot,false);
+  const {code} = queued.body.duel;
+  const rival = (await call('a','/arena-ranked')).body;
+  assert.equal(rival.duel.code,code);
+  assert.notEqual(rival.duel.side,queued.body.duel.side);
+  assert.equal((await call('c','/arena-duel?code='+code+'&ranked=1')).status,404);
+  await call('a','/arena-duel/move',{code,round:1,move:'signature',ranked:true});
+  const played = await call('b','/arena-duel/move',{code,round:1,move:'guard',ranked:true});
+  assert.equal(played.body.history.length,1);
+  await call('a','/arena-duel/leave',{code,ranked:true});
+  await call('a','/arena-duel/leave',{code,ranked:true});
+  const [winner,loser] = await Promise.all([call('b','/arena-ranked'),call('a','/arena-ranked')]);
+  assert.deepEqual([winner.body.rating,winner.body.wins,loser.body.rating,loser.body.losses],[1020,1,980,1]);
+});
+
+test('bot fallback waits, makes two mistakes, and leaves rating unchanged',async t=>{
+  let now = Date.now();
+  t.mock.method(Date,'now',()=>now);
+  const call = await setup(t);
+  await call('a','/arena-ranked/queue',pet('Bengal',{strength:600,intelligence:600,endurance:0}));
+  now += 11999;
+  assert.equal((await call('a','/arena-ranked/poll',{})).body.duel,null);
+  now += 1;
+  const {code,bot,fighters} = (await call('a','/arena-ranked/poll',{})).body.duel;
+  assert.equal(bot,true);
+  assert.equal(fighters[1].alias,'Arena Bot');
+  const one = await call('a','/arena-duel/move',{code,round:1,move:'signature',ranked:true});
+  assert.equal(one.body.phase,'active');
+  const two = await call('a','/arena-duel/move',{code,round:2,move:'swipe',ranked:true});
+  assert.deepEqual(two.body.history.map(r=>r.moves[1]),['fumble','fumble']);
+  assert.equal(two.body.winner,0);
+  const profile = (await call('a','/arena-ranked')).body;
+  assert.deepEqual([profile.rating,profile.wins,profile.losses],[1000,0,0]);
+});
+
+test('an overlapping poll cannot put a player in two matches, and cancel removes a search',async t=>{
+  const call = await setup(t);
+  await call('a','/arena-ranked/queue',pet('Bengal'));
+  await Promise.all([call('b','/arena-ranked/queue',pet('Siamese')),call('c','/arena-ranked/queue',pet('Ragdoll'))]);
+  const statuses = await Promise.all(['a','b','c'].map(id=>call(id,'/arena-ranked')));
+  assert.equal(new Set(statuses.map(r=>r.body.duel?.code).filter(Boolean)).size,1);
+  assert.equal(statuses.filter(r=>r.body.duel).length,2);
+  const waiting = ['a','b','c'][statuses.findIndex(r=>r.body.queued)];
+  assert.equal((await call(waiting,'/arena-ranked/cancel',{})).body.queued,false);
+});
