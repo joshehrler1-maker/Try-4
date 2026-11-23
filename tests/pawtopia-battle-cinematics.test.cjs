@@ -10,7 +10,7 @@ const scripts=[
   'assets/pawtopia-battle-data.js','assets/pawtopia-battle-engine.js',
   'assets/pawtopia-battle-character-art.js','assets/pawtopia-battle-foe-art.js',
   'assets/pawtopia-battle-watch.js','assets/pawtopia-battle-cinematics.js',
-  'assets/pawtopia-battle-arena.js'
+  'assets/pawtopia-battle-arena.js','assets/pawtopia-battle-motion.js'
 ].map(read);
 const copy=obj=>JSON.parse(JSON.stringify(obj));
 
@@ -75,6 +75,8 @@ class Element{
   closest(query){return query.startsWith('button')&&this.tag==='button'?this:null;}
   remove(){this.removed=true;}
   get offsetWidth(){return 110;}
+  get clientWidth(){return 440;}
+  getBoundingClientRect(){return {left: 0, top: 0, width: this.offsetWidth, height: 200};}
 }
 function app(reduced=false){
   const nodes=new Map,document={hidden:false,getElementById(id){
@@ -92,7 +94,9 @@ function app(reduced=false){
       if(message)saved=working;
       return message;
     }}};
-  const setTimeout=fn=>{Promise.resolve().then(fn);return 1;};
+  let clock=0;
+  window.performance={now:()=>clock};
+  const setTimeout=(fn,delay=0)=>{Promise.resolve().then(()=>{clock+=delay;fn();});return 1;};
   for(const source of scripts)vm.runInNewContext(source,{window,document,setTimeout});
   return {el,window,getSaved:()=>copy(saved)};
 }
@@ -144,9 +148,10 @@ test('cinematic changes cannot affect battle saves, payments or free-only behavi
   assert.ok(html.indexOf('pawtopia-battle-cinematics.js')<html.indexOf('pawtopia-battle-arena.js'));
   for(const name of ['battle-projectile','battle-impact-ring','arena-camera-shiver','arena-skill-shot'])
     assert.ok(css.includes(name),name);
-  assert.ok(ui.includes('await projectile;'));
-  assert.ok(ui.includes('stage.scrollIntoView?.'), 'Start/watch should reveal the fight stage on mobile');
-  assert.ok(ui.includes('cameraContact(evt,visual,color)'));
+  assert.match(ui, /launchSkillProjectile\(visual,kit,duration\*\(clip\.contact-t\)\)/);
+  assert.match(ui, /setFrame\(clip\.contact\)/);
+  assert.match(ui, /\(playArea\|\|stage\)\.scrollIntoView\?\./, 'Start/watch should reveal the fight stage on mobile');
+  assert.ok(ui.includes('if(combat?.cameraShake)cameraContact(evt,visual,color,point)'));
   assert.ok(sw.includes('"assets/pawtopia-battle-cinematics.js"'));
   assert.ok(read('.github/workflows/verify.yml').includes('tests/pawtopia-battle-cinematics.test.cjs'));
   assert.doesNotMatch(cine,/\bfetch\s*\(|XMLHttpRequest|WebSocket|localStorage|sendBeacon/);

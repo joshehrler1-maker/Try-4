@@ -10,7 +10,7 @@ const read=rel=>fs.readFileSync(path.join(root,rel),'utf8');
 const sources=[
   'assets/pawtopia-battle-data.js','assets/pawtopia-battle-engine.js',
   'assets/pawtopia-battle-character-art.js','assets/pawtopia-battle-foe-art.js',
-  'assets/pawtopia-battle-watch.js','assets/pawtopia-battle-arena.js'
+  'assets/pawtopia-battle-watch.js','assets/pawtopia-battle-motion.js','assets/pawtopia-battle-arena.js'
 ].map(read);
 const html=read('pawtopia-battle-arena.html');
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -42,6 +42,8 @@ class MockElement {
   closest(selector){return selector.startsWith('button')&&this.tag==='button'?this:null;}
   remove(){this.removed=true;}
   get offsetWidth(){return 150;}
+  get clientWidth(){return 440;}
+  getBoundingClientRect(){return {left: 0, top: 0, width: this.offsetWidth, height: 200};}
 }
 function startPage(initial=fresh(),options={}){
   let state=clone(initial),saves=0,ignoredSaved=0;
@@ -61,7 +63,9 @@ function startPage(initial=fresh(),options={}){
       }
     }};
   // No timers are left running after unit tests. Each wait resolves on a microtask.
-  const fakeSetTimeout=fn=>{Promise.resolve().then(fn);return 1;};
+  let clock=0;
+  window.performance={now:()=>clock};
+  const fakeSetTimeout=(fn,delay=0)=>{Promise.resolve().then(()=>{clock+=delay;fn();});return 1;};
   for(const source of sources)vm.runInNewContext(source,{window,document,setTimeout:fakeSetTimeout});
   return {window,document,el,handlers,getState:()=>clone(state),
     getSaves:()=>saves,getIgnored:()=>ignoredSaved};
@@ -174,7 +178,7 @@ test('backgrounding a watch pauses it, and stop releases it without extra turns'
 });
 
 test('watch controls and offline script are present, but user data and network calls are untouched',()=>{
-  const watchScript=sources[4],ui=sources[5];
+  const watchScript=sources[4],ui=sources.at(-1);
   for(const id of ['battle-watch','battle-pause','battle-stop-watch','battle-speed'])
     assert.ok(html.includes('id="'+id+'"'),id);
   assert.ok(html.indexOf('pawtopia-battle-watch.js')<html.indexOf('pawtopia-battle-arena.js'));

@@ -122,7 +122,7 @@ test('both arena and gallery display idle breathing and protect reduced-motion/m
  }
  assert.ok(worker.includes('"assets/pawtopia-cat-flow.css"'));
  assert.ok(uiSource.includes('characterArt.flowFrames'));
- assert.ok(uiSource.includes("playArtFrames(cat,'recover',220,fromPose)"));
+ assert.match(uiSource, /playArtFrames\(cat,'recover',240,pose\)/);
  assert.ok(uiSource.includes("frameQuality==='efficient'"));
  assert.ok(uiSource.includes('if(reduced())'));
  assert.ok(gallerySource.includes('art.flowFrames||art.smoothFrames||art.animationFrames'));
@@ -133,7 +133,8 @@ test('actual turn plays transition recovery after attack and previews cannot spe
  const assets=[
  dataSource,read('assets/pawtopia-battle-engine.js'),artSource,
  read('assets/pawtopia-battle-foe-art.js'),
- read('assets/pawtopia-battle-watch.js'),read('assets/pawtopia-battle-cinematics.js'),uiSource
+ read('assets/pawtopia-battle-watch.js'),read('assets/pawtopia-battle-cinematics.js'),
+ read('assets/pawtopia-battle-motion.js'),uiSource
  ];
  class Element {
    constructor(tag='div'){
@@ -158,6 +159,8 @@ test('actual turn plays transition recovery after attack and previews cannot spe
    closest(selector){return selector.startsWith('button')&&this.tag==='button'?this:null}
    remove(){this.removed=true}
    get offsetWidth(){return 120}
+   get clientWidth(){return 440}
+   getBoundingClientRect(){return {left: 0, top: 0, width: this.offsetWidth, height: 200};}
    scrollIntoView(){}
  }
  const nodes=new Map;
@@ -168,7 +171,9 @@ test('actual turn plays transition recovery after attack and previews cannot spe
    otherCompanions:[]};
  const window={addEventListener(){},matchMedia:()=>({matches:false}),
    PawtopiaSave:{read:()=>copy(progress),update:async f=>{const next=copy(progress),message=f(next);if(message)progress=next;return message;}}};
- const fakeSetTimeout=fn=>{Promise.resolve().then(fn);return 1};
+ let clock=0;
+ window.performance={now:()=>clock};
+ const fakeSetTimeout=(fn,delay=0)=>{Promise.resolve().then(()=>{clock+=delay;fn();});return 1;};
  for(const script of assets)vm.runInNewContext(script,{window,document,setTimeout:fakeSetTimeout});
  const before=progress.coins;
  for(const pose of ['walk','run','recover']){

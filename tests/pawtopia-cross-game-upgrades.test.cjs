@@ -12,7 +12,9 @@ function world(fail=false){
   vm.runInNewContext(read('assets/pawtopia-save.js'),ctx);
   vm.runInNewContext(read('assets/pawtopia-battle-data.js'),ctx);
   vm.runInNewContext(read('assets/pawtopia-upgrade-points.js'),ctx);
+  vm.runInNewContext(read('assets/pawtopia-battle-engine.js'),ctx);
   return {api:window.PawtopiaUpgradePoints,save:window.PawtopiaSave,
+    engine:window.PawtopiaBattleEngine,
     roster:window.PawtopiaBattleData.foes,
     load:obj=>{raw=JSON.stringify(obj)},raw:()=>raw};
 }
@@ -57,6 +59,18 @@ test('every breed can earn the same tier award once per day for a recorded victo
  w.load({...w.save.read(),battleMatch:{foeId:'foe-10',finished:true,result:'win'}});
  assert.equal((await w.api.claim('battle-win','foe-10','victory')).granted,0);
  assert.equal(w.api.state().balance,4);
+});
+test('the arena awards upgrade points in the same saved turn as a victory',async()=>{
+ const w=world();
+ const fighter=cat(30);
+ fighter.stats.strength=40;
+ w.load({companion:fighter});
+ const initial=await w.save.update(progress=>w.engine.start(progress,0,0).message);
+ assert.match(initial,/challenges/);
+ const message=await w.save.update(progress=>w.engine.takeTurn(progress,'swipe',()=>.5).message);
+ assert.match(message,/Victory!.*2 Pet Upgrade Points/);
+ assert.equal(w.api.state().balance,2);
+ assert.equal((await w.api.claim('battle-win','foe-1','victory')).granted,0);
 });
 test('four total guest launch bonuses, with no invented external game wins',async()=>{
  const w=world();
@@ -131,7 +145,6 @@ test('all local and publisher game families use the shared save and declared rew
   ['pawtopia-arcade.html',"claim('mini',mode,'score-'+target)"],
   ['assets/guest-arcade.js',"claim('guest-launch',id,'launch')"],
   ['assets/guest-3d-arcade.js',"claim('guest3d-launch',id,'launch')"],
-  ['assets/pawtopia-battle-arena.js',"claim('battle-win',finished.foe.id,'victory')"],
   ['assets/pawtopia-scout-trails.js',"claim('scout',areaId,'solved')"]
  ])assert.ok(read(file).includes(expr),file);
  assert.ok(read('assets/companion-cottage.js').includes('upgrades.train(training.value)'));
