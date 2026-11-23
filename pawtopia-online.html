@@ -9,15 +9,13 @@
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/pawtopia-online-config.js?v=production-1"></script>
 <script defer src="assets/pawtopia-cloud-save.js?v=account-session-1"></script>
-<script defer src="assets/pawtopia-online-town.js?v=account-upgrade-button-1"></script>
+<script defer src="assets/pawtopia-online-town.js?v=welcome-art-1"></script>
 <style>
   main section { margin-block: 1.25rem; }
   form label, form button { margin-block: .4rem; }
   button, input, select { max-width:100%; }
   #account-status:empty, #town-status:empty { display:none; }
   #key-display { width: min(100%, 40rem); }
-  .site-entry .world-art, .site-entry #account-links { display:none; }
-  .site-entry #online-enabled, .site-entry #online-disabled { max-width:30rem; margin-inline:auto; }
   #entry-actions { margin-block:1rem; }
   #account-signin form, #password-upgrade { max-width:30rem; }
   #account-signin label, #password-upgrade label { display:block; }
@@ -27,6 +25,7 @@
 </style>
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
+<link rel="stylesheet" href="assets/pawtopia-welcome.css?v=1">
 </head>
 <body>
 <main>
@@ -36,11 +35,14 @@
 </figure>
 
 <p id="account-links"><a href="pawtopia-town.html">Town Square</a> · <a href="pawtopia-progress.html#backup-title">Save backups</a></p>
-<section class="hero">
+<section class="hero" id="online-hero">
 <h1 id="online-title">Pawtopia Players</h1>
 <p><a id="online-arena-link" href="pawtopia-battle-arena.html#arena-duels">Back to player battles</a></p>
 <p id="online-intro">Visit player shops, trade collectible pins, and join a club.</p>
 </section>
+<figure class="welcome-heroes">
+<img src="assets/whisker-luna-master.webp" alt="Whisker and Luna welcome you to Pawtopia" loading="lazy" decoding="async">
+</figure>
 <p id="online-disabled">Online features are awaiting server setup. You can still <a href="pawtopia-progress.html#backup-title">download your progress and move it to another device</a>.</p>
 <div id="online-enabled" hidden>
 <section aria-labelledby="account-title">
@@ -54,7 +56,17 @@
 </div>
 
 <div id="account-signin">
-<form id="password-signin" hidden><label for="signin-username">Username</label><input id="signin-username" name="username" type="text" maxlength="24" autocomplete="username" autocapitalize="off" spellcheck="false" required><label for="signin-password">Password</label><input id="signin-password" name="password" type="password" maxlength="128" autocomplete="current-password" required><button type="submit">Sign in</button></form>
+<form id="password-signin" hidden>
+<div class="welcome-field">
+<label for="signin-username">Username</label>
+<input id="signin-username" name="username" type="text" maxlength="24" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+</div>
+<div class="welcome-field">
+<label for="signin-password">Password</label>
+<input id="signin-password" name="password" type="password" maxlength="128" autocomplete="current-password" required>
+</div>
+<button type="submit">Sign in</button>
+</form>
 <details id="new-account-details" hidden><summary>Create a free account</summary>
 <form id="password-signup"><label for="signup-username">Username</label><input id="signup-username" name="username" type="text" maxlength="24" autocomplete="username" autocapitalize="off" spellcheck="false" required><label for="signup-password">Choose a password</label><input id="signup-password" name="password" type="password" maxlength="128" autocomplete="new-password" minlength="15" required>
 <p>Other players will see your username. Choose a nickname without personal information and a password with at least 15 characters.</p>

@@ -9,8 +9,8 @@
   if (fromHome) {
     document.body.classList.add('site-entry');
     $('online-title').textContent = 'Welcome to Pawtopia';
-    $('online-intro').textContent = 'Sign in to your Pawtopia account.';
-    $('online-arena-link').hidden = true;
+    $('online-intro').textContent = 'Meet your cat companion and make yourself at home.';
+    $('online-arena-link').parentElement.hidden = true;
     $('account-session').after($('entry-actions'));
     if (!api) {
       $('online-disabled').after($('entry-actions'));
