@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Sunflower Flight Stitched Desert original thread-spool wind marker"><defs><linearGradient id="frame" x1=".08" y1=".04" x2=".92" y2="1"><stop stop-color="#fff5c6"/><stop offset=".29" stop-color="#e9bb8c"/><stop offset=".65" stop-color="#98719a"/><stop offset="1" stop-color="#e9bb8c"/></linearGradient><radialGradient id="glow"><stop stop-color="#f9f5ac" stop-opacity=".85"/><stop offset=".45" stop-color="#fff5c6" stop-opacity=".4"/><stop offset="1" stop-color="#f9f5ac" stop-opacity="0"/></radialGradient></defs><ellipse cx="90" cy="92" rx="67" ry="67" fill="url(#glow)" opacity=".6"/>
-<path d="M44 162V24l14-13 16 9-1 142" fill="#e0b685" stroke="#fff2c2" stroke-width="5"/>
-<path d="M77 160V60h66v100" fill="url(#frame)" stroke="#fff4d9" stroke-width="5"/>
-<path d="M73 56h73l6 13-6 15H73l-7-15z" fill="#c6a2b7" stroke="#ffeff1" stroke-width="4"/>
-<path d="M73 145h73l7 15H65z" fill="#c59aa2" stroke="#fff1dc" stroke-width="5"/>
-<path d="M87 85h45v58H87z" fill="#e8c37e" stroke="#f5f1d1" stroke-width="3"/>
-<path d="M88 91q22 8 43-2m-43 15q22 8 43-2m-43 15q22 8 43-2m-43 15q22 8 43-2" stroke="#b4739f" stroke-width="4" fill="none"/>
-<path d="M34 28q-19 34 7 50 18 11 7 28" fill="none" stroke="#ffeece" stroke-width="4" stroke-dasharray="7 4"/>
-<path d="M20 162h139" stroke="#b8919a" stroke-width="9"/><path d="M38 13h29" stroke="#fff8de" stroke-width="4"/></svg>

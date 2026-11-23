@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Neon Circuit Dungeon Heat original overdrive coil"><defs><linearGradient id="frame" x1=".08" y1=".04" x2=".92" y2="1"><stop stop-color="#ffdd9c"/><stop offset=".29" stop-color="#fa7794"/><stop offset=".65" stop-color="#3e234c"/><stop offset="1" stop-color="#fa7794"/></linearGradient><radialGradient id="glow"><stop stop-color="#fcffc2" stop-opacity=".85"/><stop offset=".45" stop-color="#ffdd9c" stop-opacity=".4"/><stop offset="1" stop-color="#fcffc2" stop-opacity="0"/></radialGradient></defs><ellipse cx="91" cy="74" rx="70" ry="73" fill="url(#glow)"/>
-<path d="M36 162V64l18-31h71l19 31v98" fill="#2b2248" stroke="#ee93cb" stroke-width="6"/>
-<path d="M49 66h82v84H49z" fill="#201e38" stroke="#fcdaa0" stroke-width="4"/>
-<path d="M64 40h55l10 20H54z" fill="url(#frame)" stroke="#ffe8a9" stroke-width="3"/>
-<path d="M57 133q30-15 65 0M57 118q30-15 65 0M57 102q30-15 65 0" fill="none" stroke="#ffb66d" stroke-width="8"/>
-<path d="M57 133q30-15 65 0M57 118q30-15 65 0M57 102q30-15 65 0" fill="none" stroke="#ffe6a0" stroke-width="2"/>
-<circle cx="89" cy="78" r="21" fill="#fcbb62" stroke="#fff2b7" stroke-width="5"/>
-<circle cx="89" cy="78" r="10" fill="#fffad2"/>
-<path d="M27 156h128" stroke="#75456a" stroke-width="11"/><path d="m17 81 15-12-5 18 13-3m124 2-18-8 9 17-14-2" fill="none" stroke="#f8d3a2" stroke-width="4"/></svg>

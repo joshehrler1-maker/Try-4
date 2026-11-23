@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Tower Reset original finish-clock monument"><defs><linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff9eb"/><stop offset=".3" stop-color="#ffb4da"/><stop offset=".7" stop-color="#735ce4"/><stop offset="1" stop-color="#1f244e"/></linearGradient><radialGradient id="glow"><stop stop-color="#a2ffea" stop-opacity=".8"/><stop offset=".45" stop-color="#ffb4da" stop-opacity=".3"/><stop offset="1" stop-color="#735ce4" stop-opacity="0"/></radialGradient></defs><ellipse cx="91" cy="90" rx="78" ry="76" fill="url(#glow)" opacity=".6"/>
-<path d="M39 164V41h104v123" fill="#31244e" stroke="#f7c3e9" stroke-width="5"/><path d="M53 49h78v100H53z" fill="url(#metal)" stroke="#e7ddfd" stroke-width="4"/>
-<circle cx="91" cy="92" r="41" fill="#222858" stroke="#b4ffee" stroke-width="5"/><circle cx="91" cy="92" r="28" fill="#596db6" stroke="#fff2bd" stroke-width="3"/>
-<path d="M90 66v29l21 15" stroke="#fcfbe4" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="90" cy="93" r="6" fill="#fff7d7"/>
-<path d="M56 39 90 16l34 23z" fill="#e794bd" stroke="#ffeddc" stroke-width="4"/>
-<path d="M20 164h140" stroke="#655c93" stroke-width="9"/><path d="M62 140h60" stroke="#c4ffed" stroke-width="4"/></svg>

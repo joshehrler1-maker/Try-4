@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Marble Temple Moon Gate original carved lunar key relief"><defs><linearGradient id="frame" x1=".08" y1=".04" x2=".92" y2="1"><stop stop-color="#f5eacb"/><stop offset=".29" stop-color="#b0acd0"/><stop offset=".65" stop-color="#494660"/><stop offset="1" stop-color="#b0acd0"/></linearGradient><radialGradient id="glow"><stop stop-color="#eff7ff" stop-opacity=".85"/><stop offset=".45" stop-color="#f5eacb" stop-opacity=".4"/><stop offset="1" stop-color="#eff7ff" stop-opacity="0"/></radialGradient></defs><ellipse cx="92" cy="88" rx="69" ry="70" fill="url(#glow)" opacity=".47"/>
-<path d="M32 161V69Q32 17 90 8q57 10 58 61v92" fill="url(#frame)" stroke="#f4e9d1" stroke-width="7"/>
-<path d="M46 159V74q2-45 44-51 43 5 44 51v85" fill="#36394f" stroke="#dfd8da" stroke-width="4"/>
-<circle cx="90" cy="75" r="32" fill="#55536f" stroke="#dfd4d2" stroke-width="4"/>
-<path d="M89 49a23 23 0 1 0 22 35 24 24 0 1 1-22-35" fill="#f7f3d7"/>
-<path d="M87 93v41m-11-20h22" stroke="#efd6a4" stroke-width="10" stroke-linecap="round"/>
-<circle cx="87" cy="86" r="12" fill="#ece4c9" stroke="#998bb3" stroke-width="5"/>
-<path d="M56 146h65M58 34l-10-7m74 7 10-8" stroke="#d5c2b4" stroke-width="4"/>
-<path d="M24 161h132" stroke="#a9a2ae" stroke-width="10"/></svg>

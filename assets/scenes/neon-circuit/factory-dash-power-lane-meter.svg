@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="170" viewBox="0 0 180 170" role="img" aria-label="Factory Dash neon power lane meter"><defs><linearGradient id="surface" x1=".02" y1=".04" x2=".98" y2=".95"><stop stop-color="#fff7e7"/><stop offset=".25" stop-color="#ffca91"/><stop offset=".69" stop-color="#a554bf"/><stop offset="1" stop-color="#1b2656"/></linearGradient><radialGradient id="light"><stop stop-color="#92ffe6" stop-opacity=".8"/><stop offset=".45" stop-color="#ffca91" stop-opacity=".27"/><stop offset="1" stop-color="#ffca91" stop-opacity="0"/></radialGradient></defs><ellipse cx="89" cy="83" rx="72" ry="70" fill="url(#light)" opacity=".65"/>
-<path d="M30 164V29h120v135" fill="#29274d" stroke="#e4c2fb" stroke-width="6"/><path d="M43 47h94v99H43z" fill="url(#surface)" stroke="#ffecd7" stroke-width="4"/>
-<path d="M60 126V64h16v62m14-33V64h16v62m14-45v45" stroke="#324f78" stroke-width="8"/>
-<path d="M56 105h22m9-21h22m7-19h11" stroke="#b9ffe5" stroke-width="6"/>
-<path d="m69 33 16-21 13 21 13-21" stroke="#fff9c4" stroke-width="6" fill="none"/>
-<circle cx="90" cy="47" r="9" fill="#fafcbb" stroke="#d7afe7" stroke-width="4"/>
-<path d="M19 164h142" stroke="#7f598a" stroke-width="9"/></svg>
