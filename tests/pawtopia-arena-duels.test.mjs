@@ -20,16 +20,26 @@ async function setup(t) {
     sqlite.prepare('INSERT INTO player(id,token_hash,alias) VALUES(?,?,?)')
       .run(player.id,Buffer.from(digest).toString('hex'),player.alias);
   }
-  const env = {PAWTOPIA_ORIGIN:origin,DB:{prepare(sql) {
+  const env = {PAWTOPIA_ORIGIN:origin,TURNSTILE_SECRET:'test-only',DB:{
+    async batch(queries) {
+      sqlite.exec('BEGIN');
+      try {
+        const result = queries.map(query=>query.runSync());
+        sqlite.exec('COMMIT');
+        return result;
+      } catch (error) { sqlite.exec('ROLLBACK'); throw error; }
+    },
+    prepare(sql) {
     const statement = sqlite.prepare(sql);
     return {bind(...args) { return {
       async first() { return statement.get(...args) ?? null; },
-      async run() { return {meta:statement.run(...args)}; }
+      runSync() { return {meta:statement.run(...args)}; },
+      async run() { return this.runSync(); }
     }; }};
   }}};
   return async (player,path,body) => {
     const headers = {Origin:origin};
-    if (player) headers.Authorization = 'Bearer '+players.find(entry=>entry.id===player).key;
+    if (player) headers.Authorization = 'Bearer '+(players.find(entry=>entry.id===player)?.key ?? player);
     const request = new Request('https://worker.test'+path, {headers,method:body ? 'POST' : 'GET',
       body:body ? JSON.stringify(body) : undefined});
     const response = await worker.fetch(request,env);
@@ -274,4 +284,56 @@ test('a rearranged cottage keeps the same cat selected for matchmaking',async t=
   await page.click('rank-start');
   const result = (await call('a','/arena-ranked')).body.duel;
   assert.equal(result.fighters[result.side].name,'Second cat');
+});
+
+const secret = 'f'.repeat(64);
+const newSecret = 'e'.repeat(64);
+test('upgrading keeps the existing player, retires its key and allows username sign-in',async t=>{
+  const call = await setup(t);
+  const prior = await call('a','/session');
+  await call('a','/arena-ranked/queue',pet('Bengal'));
+  const upgraded = await call('a','/auth/upgrade',{username:'Mochi_12',proof:secret});
+  assert.equal(upgraded.status,201);
+  assert.match(upgraded.body.recovery,/^[a-f0-9]{64}$/);
+  assert.equal((await call('a','/session')).status,401);
+  const signedIn = await call(null,'/auth/login',{username:'MOCHI_12',proof:secret});
+  assert.equal(signedIn.status,200);
+  assert.deepEqual((await call(signedIn.body.key,'/session')).body,{alias:prior.body.alias,username:'mochi_12',legacy:false});
+  assert.equal((await call(signedIn.body.key,'/arena-ranked')).body.queued,true);
+  assert.equal((await call(signedIn.body.key,'/auth/logout',{})).status,200);
+  assert.equal((await call(signedIn.body.key,'/session')).status,401);
+});
+test('signup requires Turnstile and duplicate usernames cannot create another player',async t=>{
+  const call = await setup(t);
+  t.mock.method(globalThis,'fetch',async()=>Response.json({success:true,hostname:'joshehrler1-maker.github.io'}));
+  assert.equal((await call(null,'/auth/signup',{username:'shadow',proof:secret})).status,400);
+  const once = await call(null,'/auth/signup',{username:'Shadow',proof:secret,challenge:'widget-token'});
+  assert.equal(once.status,201);
+  assert.equal((await call(null,'/auth/signup',{username:'shadow',proof:newSecret,challenge:'widget-token'})).status,409);
+  assert.equal((await call(once.body.key,'/session')).body.username,'shadow');
+});
+test('password recovery is single-use, rotates the code and revokes every old session',async t=>{
+  const call = await setup(t);
+  const first = await call('a','/auth/upgrade',{username:'whiskers',proof:secret});
+  const another = await call(null,'/auth/login',{username:'whiskers',proof:secret});
+  const input = {username:'whiskers',proof:newSecret,recovery:first.body.recovery};
+  const attempts = await Promise.all([call(null,'/auth/recover',input),call(null,'/auth/recover',input)]);
+  assert.deepEqual(attempts.map(result=>result.status).sort(),[200,401]);
+  const recovered = attempts.find(result=>result.status===200).body;
+  assert.notEqual(recovered.recovery,first.body.recovery);
+  assert.equal((await call(first.body.key,'/session')).status,401);
+  assert.equal((await call(another.body.key,'/session')).status,401);
+  assert.equal((await call(recovered.key,'/session')).body.username,'whiskers');
+  assert.equal((await call(null,'/auth/login',{username:'whiskers',proof:secret})).status,401);
+  assert.equal((await call(null,'/auth/login',{username:'whiskers',proof:newSecret})).status,200);
+});
+test('repeated login failures are throttled and unknown usernames get the same login error',async t=>{
+  const call = await setup(t);
+  await call('a','/auth/upgrade',{username:'kitty',proof:secret});
+  const unknown = await call(null,'/auth/login',{username:'unknown',proof:newSecret});
+  for(let i=0;i<8;i++) {
+    const denied = await call(null,'/auth/login',{username:'kitty',proof:newSecret});
+    assert.deepEqual(denied,unknown);
+  }
+  assert.equal((await call(null,'/auth/login',{username:'kitty',proof:secret})).status,429);
 });

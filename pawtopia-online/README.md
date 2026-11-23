@@ -38,3 +38,5 @@ Apply `migrations/001-arena-duels.sql` to production D1 before deploying the new
 Run `node --test tests/pawtopia-arena-duels.test.mjs` with Node 22.13 or later to test the Worker against SQLite.
 
 For ranked matchmaking, apply `migrations/002-ranked-duels.sql` before deploying the Worker. D1 triggers assign seats atomically and update each player’s rating once. Only completed human matches change the rating. Bot practice uses the same round engine and opens with two missed moves.
+
+Apply `migrations/003-player-passwords.sql` before deploying username sign-in. Browser PBKDF2-SHA-256 uses 600,000 iterations with an application-specific username salt. The Worker stores a hash of the password-derived proof and of recovery/session tokens. Treat the proof as a password-equivalent secret. Upgrades keep the player ID and retire the legacy key. Resetting a password rotates the recovery code and revokes prior sessions.

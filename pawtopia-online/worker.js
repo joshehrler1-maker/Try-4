@@ -250,6 +250,110 @@ async function handleDuel(route, request, player, db, json) {
   return json(duelResponse({...row,phase},state,side));
 }
 
+
+const authName = /^[a-z][a-z0-9_]{2,23}$/;
+const sessionDuration = 30*86400000;
+const authWindow = 15*60000;
+const normalizedUsername = value => typeof value === 'string' ? value.trim().toLowerCase() : '';
+
+function validLoginInput(input) {
+  const username = normalizedUsername(input.username);
+  if (!authName.test(username)) fail('Use 3–24 letters, numbers, or underscores, starting with a letter.');
+  if (!tokenFormat.test(input.proof || '') || typeof input.proof !== 'string') fail('A password is required.');
+  return username;
+}
+const proofHash = proof => hash('Pawtopia password proof v1:'+proof);
+const recoveryHash = code => hash('Pawtopia recovery v1:'+code);
+function equalHash(a,b) {
+  let difference = 0;
+  for (let i=0;i<64;i++) difference |= a.charCodeAt(i)^b.charCodeAt(i);
+  return difference === 0;
+}
+async function limitAuth(db,bucket,limit,now) {
+  const result = await db(`INSERT INTO player_auth_attempt(bucket,expires_at,hits) VALUES(?,?,1)
+    ON CONFLICT(bucket) DO UPDATE SET
+      hits=CASE WHEN player_auth_attempt.expires_at<=? THEN 1 ELSE player_auth_attempt.hits+1 END,
+      expires_at=CASE WHEN player_auth_attempt.expires_at<=? THEN excluded.expires_at ELSE player_auth_attempt.expires_at END
+    WHERE player_auth_attempt.expires_at<=? OR player_auth_attempt.hits<?
+    RETURNING hits`,bucket,now+authWindow,now,now,now,limit).first();
+  if (!result) fail('Too many attempts. Try again in 15 minutes.',429);
+}
+async function signupCheck(input, env, origin) {
+  if (!env.TURNSTILE_SECRET || typeof input.challenge !== 'string' || !input.challenge || input.challenge.length > 2048)
+    fail('Complete the signup check.');
+  const verify = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{
+    method:'POST',body:new URLSearchParams({secret:env.TURNSTILE_SECRET,response:input.challenge})
+  });
+  const result = await verify.json();
+  if (!result.success || result.hostname !== new URL(origin).hostname) fail('Complete the signup check again.');
+}
+async function issuePasswordSession(db,playerId,generation,now) {
+  const key = randomToken();
+  const insert = db(`INSERT INTO player_session(token_hash,player_id,expires_at)
+    SELECT ?,player_id,? FROM player_login WHERE player_id=? AND recovery_hash=?`,
+    await hash(key),now+sessionDuration,playerId,generation);
+  return {key,insert};
+}
+async function accountAuth(route,request,origin,env,db,json,player) {
+  const now = Date.now();
+  if (route === 'GET /auth/status') return json({passwords:true});
+  const input = await body(request,4096);
+  const username = validLoginInput(input);
+  const source = request.headers.get('CF-Connecting-IP') || 'unavailable';
+  const scope = route === 'POST /auth/login' ? 'login' : 'manage';
+  await limitAuth(db,scope+':source:'+await hash(source),scope === 'login' ? 35 : 20,now);
+  await db('DELETE FROM player_auth_attempt WHERE bucket IN (SELECT bucket FROM player_auth_attempt WHERE expires_at<=? LIMIT 8)',now).run();
+  const digest = await proofHash(input.proof);
+
+  if (route === 'POST /auth/signup' || route === 'POST /auth/upgrade') {
+    const signup = route === 'POST /auth/signup';
+    if (signup) await signupCheck(input,env,origin);
+    else if (!player || player.username) fail('Sign in with your existing account key to set up a username.',409);
+    const id = signup ? crypto.randomUUID() : player.id;
+    const recovery = randomToken(), generation = await recoveryHash(recovery);
+    const session = await issuePasswordSession(db,id,generation,now);
+    const operations = [];
+    if (signup) operations.push(db(`INSERT INTO player(id,token_hash,alias)
+      SELECT ?,?,? WHERE NOT EXISTS(SELECT 1 FROM player_login WHERE username=?)`,
+      id,await hash(randomToken()),'Paw-'+id.replaceAll('-','').slice(0,12),username));
+    operations.push(db(`INSERT OR IGNORE INTO player_login(player_id,username,proof_hash,recovery_hash)
+      SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM player WHERE id=?)`,id,username,digest,generation,id));
+    if (!signup) operations.push(db(`UPDATE player SET token_hash=? WHERE id=? AND EXISTS(
+      SELECT 1 FROM player_login WHERE player_id=? AND recovery_hash=?)`,await hash(randomToken()),id,id,generation));
+    operations.push(session.insert);
+    const results = await env.DB.batch(operations);
+    if (!results.at(-1).meta.changes) fail('That username is unavailable or the account is already upgraded.',409);
+    return json({key:session.key,recovery},201);
+  }
+
+  const row = await db('SELECT player_id,proof_hash,recovery_hash FROM player_login WHERE username=?',username).first();
+  await limitAuth(db,scope+':username:'+await hash(username),scope === 'login' ? 8 : 5,now);
+  if (route === 'POST /auth/login') {
+    if (!equalHash(digest,row?.proof_hash ?? '0'.repeat(64)) || !row) fail('Username or password is incorrect.',401);
+    const session = await issuePasswordSession(db,row.player_id,row.recovery_hash,now);
+    const result = await session.insert.run();
+    if (!result.meta.changes) fail('Sign-in changed. Try again.',409);
+    await db('DELETE FROM player_session WHERE token_hash IN (SELECT token_hash FROM player_session WHERE expires_at<=? LIMIT 8)',now).run();
+    return json({key:session.key});
+  }
+  if (route !== 'POST /auth/recover') fail('Unknown account action.',404);
+  const submitted = typeof input.recovery === 'string' && tokenFormat.test(input.recovery) ? input.recovery : '';
+  const recovered = await recoveryHash(submitted);
+  if (!equalHash(recovered,row?.recovery_hash ?? '0'.repeat(64)) || !row || !submitted)
+    fail('Username or recovery code is incorrect.',401);
+  const recovery = randomToken(), generation = await recoveryHash(recovery);
+  const session = await issuePasswordSession(db,row.player_id,generation,now);
+  const results = await env.DB.batch([
+    db('UPDATE player_login SET proof_hash=?, recovery_hash=? WHERE player_id=? AND recovery_hash=?',
+      digest,generation,row.player_id,recovered),
+    db(`DELETE FROM player_session WHERE player_id=? AND EXISTS(
+      SELECT 1 FROM player_login WHERE player_id=? AND recovery_hash=?)`,row.player_id,row.player_id,generation),
+    session.insert
+  ]);
+  if (!results[0].meta.changes) fail('Username or recovery code is incorrect.',401);
+  return json({key:session.key,recovery});
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('origin');
@@ -263,27 +367,28 @@ export default {
     const db = (sql,...args) => env.DB.prepare(sql).bind(...args);
     const route = request.method + ' ' + new URL(request.url).pathname;
     try {
-      if (route === 'POST /accounts') {
-        const data = await body(request);
-        if (!env.TURNSTILE_SECRET || typeof data.challenge !== 'string' || data.challenge.length > 2048)
-          fail('Complete the signup check.');
-        const verify = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{
-          method:'POST',body:new URLSearchParams({secret:env.TURNSTILE_SECRET,response:data.challenge})
-        });
-        const result = await verify.json();
-        if (!result.success || result.hostname !== new URL(origin).hostname) fail('Complete the signup check again.');
-        const id = crypto.randomUUID(), key = randomToken();
-        const alias = 'Paw-' + id.replaceAll('-','').slice(0,12);
-        await db('INSERT INTO player(id,token_hash,alias) VALUES(?,?,?)',id,await hash(key),alias).run();
-        return json({key,alias},201);
-      }
+      if (['GET /auth/status','POST /auth/signup','POST /auth/login','POST /auth/recover'].includes(route))
+        return await accountAuth(route,request,origin,env,db,json);
+      if (route === 'POST /accounts') fail('Refresh Pawtopia Players to create a username and password.',409);
       const key = request.headers.get('authorization')?.match(/^Bearer (.+)$/)?.[1] || '';
-      if (!tokenFormat.test(key)) fail('Enter your Pawtopia account key.',401);
-      const player = await db('SELECT id,alias,public,club,tickets FROM player WHERE token_hash=?',await hash(key)).first();
-      if (!player) fail('Account key was not recognized.',401);
+      if (!tokenFormat.test(key)) fail('Sign in to your Pawtopia account.',401);
+      const fingerprint = await hash(key);
+      const player = await db(`SELECT id,alias,public,club,tickets,username FROM (
+        SELECT p.id,p.alias,p.public,p.club,p.tickets,l.username FROM player_session s
+        JOIN player p ON p.id=s.player_id JOIN player_login l ON l.player_id=p.id
+        WHERE s.token_hash=? AND s.expires_at>?
+        UNION ALL SELECT p.id,p.alias,p.public,p.club,p.tickets,NULL FROM player p
+        WHERE p.token_hash=? AND NOT EXISTS(SELECT 1 FROM player_login WHERE player_id=p.id)
+      ) LIMIT 1`,fingerprint,Date.now(),fingerprint).first();
+      if (!player) fail('Sign-in expired or was not recognized. Sign in again.',401);
+      if (route === 'POST /auth/upgrade') return await accountAuth(route,request,origin,env,db,json,player);
+      if (route === 'POST /auth/logout') {
+        await db('DELETE FROM player_session WHERE token_hash=? AND player_id=?',fingerprint,player.id).run();
+        return json({signedOut:true});
+      }
       if (new URL(request.url).pathname.startsWith('/arena-ranked')) return await handleRanked(route,request,player,db,json);
       if (new URL(request.url).pathname.startsWith('/arena-duel')) return await handleDuel(route,request,player,db,json);
-      if (route === 'GET /session') return json({alias:player.alias});
+      if (route === 'GET /session') return json({alias:player.alias,username:player.username,legacy:!player.username});
       if ((route === 'GET /save' || route === 'PUT /save') && env.PAWTOPIA_CLOUD_SAVES !== 'enabled') {
         fail('Online save sync is disabled.', 404);
       }

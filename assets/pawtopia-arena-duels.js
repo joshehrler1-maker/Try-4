@@ -306,8 +306,12 @@
         const nextRank = await api.call('/arena-ranked');
         if (current()) applyRank(nextRank,!linkCode && (!duel || duel.phase === 'finished'),!nextRank.queued);
       }
-    } catch {
-      if (current()) status('Player battles are temporarily unavailable. Try refreshing the page.');
+    } catch (error) {
+      if (current() && error.status === 401) {
+        api.disconnect();
+        await init();
+        status('Sign-in expired. Sign in again to play online.');
+      } else if (current()) status('Player battles are temporarily unavailable. Try refreshing the page.');
     } finally {
       if (session === activeSession) initializing = false;
     }

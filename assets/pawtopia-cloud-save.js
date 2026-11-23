@@ -99,11 +99,13 @@
       busy = false;
     }
   }
-  async function connect(account) {
+  async function connect(account, replaces = '') {
+    const prior = key();
     if (!/^[0-9a-f]{64}$/.test(account)) throw Error('Enter the complete Pawtopia account key.');
-    if (key() !== account && key()) throw Error('Sign out before switching accounts.');
+    if (prior && prior !== account && prior !== replaces) throw Error('Sign out before switching accounts.');
     await call('/session','GET',undefined,account);
-    if (key() !== account) {
+    if (key() !== prior) throw Error('Sign-in changed in another tab. Sign in again.');
+    if (prior !== account && !replaces) {
       localStorage.removeItem(syncKey);
       localStorage.removeItem(consentKey);
     }

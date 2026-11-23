@@ -8,6 +8,9 @@
   if (/^[0-9a-f]{12}$/.test(duelCode || '') && $('online-arena-link')) {
     $('online-arena-link').href = 'pawtopia-battle-arena.html#duel-'+duelCode;
   }
+  let passwordFormsAvailable = false;
+  let accountAction = false;
+  let challenge = '', widget;
   $('online-disabled').hidden = true;
   $('online-enabled').hidden = false;
   $('cloud-settings').hidden = window.PawtopiaOnlineConfig.cloudSaves !== true;
@@ -74,6 +77,17 @@
       $('gift-inbox').replaceChildren();
       return;
     }
+    let session;
+    try { session = await api.call('/session','GET',undefined,account); }
+    catch (error) {
+      if (error.status !== 401 || api.key() !== account) throw error;
+      api.disconnect();
+      status('Sign-in expired. Please sign in again.','account-status');
+      return render();
+    }
+    if (api.key() !== account) return;
+    $('account-identity').textContent = session.username ? 'Signed in as '+session.username : 'Signed in with an existing account key.';
+    $('password-upgrade').hidden = !passwordFormsAvailable || session.legacy === false;
     const data = await api.call('/town','GET',undefined,account);
     if (api.key()!==account) return;
     const {player,mine,market,board,clubs,puzzle,adoptions=[],gifts=[]} = data;
@@ -126,25 +140,76 @@
     $(id).addEventListener('submit',async event => {
       event.preventDefault();
       const control = event.submitter;
+      const isAccount = id.startsWith('password-') || id === 'legacy-signin';
+      if (isAccount && accountAction) return;
+      if (isAccount) accountAction = true;
       if (control) control.disabled = true;
       try { await handler(); }
-      catch (error) { status(error.message, id === 'account-signin' ? 'account-status' : 'town-status'); }
-      finally { if (control) control.disabled = false; }
+      catch (error) { status(error.message,isAccount ? 'account-status' : 'town-status'); }
+      finally {
+        if (isAccount) accountAction = false;
+        if (control) control.disabled = false;
+      }
     });
   }
-  submit('account-signin',async () => {
-    await api.connect($('account-key').value.trim());
+  async function passwordProof(username,password) {
+    const encoder = new TextEncoder();
+    const salt = encoder.encode('Pawtopia Players password v1:'+username);
+    const key = await crypto.subtle.importKey('raw',encoder.encode(password.normalize('NFC')),'PBKDF2',false,['deriveBits']);
+    const proof = await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt,iterations:600000},key,256);
+    return Array.from(new Uint8Array(proof),byte=>byte.toString(16).padStart(2,'0')).join('');
+  }
+  function showRecovery(code = '') {
+    $('key-display').value = code;
+    $('account-recovery').hidden = !code;
+  }
+  $('hide-recovery').addEventListener('click',()=>showRecovery());
+  async function passwordAction(mode,prefix) {
+    if (!passwordFormsAvailable) throw Error('Password sign-in is temporarily unavailable.');
+    const username = $(prefix+'-username').value.trim().toLowerCase();
+    const passwordInput = $(prefix+'-password');
+    const password = passwordInput.value.normalize('NFC');
+    if (!/^[a-z][a-z0-9_]{2,23}$/.test(username)) throw Error('Use 3–24 letters, numbers, or underscores, starting with a letter.');
+    if (mode !== 'login' && Array.from(password).length < 15) throw Error('Choose a password with at least 15 characters.');
+    if (mode === 'signup' && !challenge) throw Error('Complete the signup check first.');
+    const prior = mode === 'upgrade' ? api.key() : '';
+    status('Working…','account-status');
+    const payload = {username,proof:await passwordProof(username,password)};
+    if (mode === 'signup') payload.challenge = challenge;
+    if (mode === 'recover') payload.recovery = $('recover-code').value.trim().toLowerCase();
+    try {
+      const result = await api.call('/auth/'+mode,'POST',payload,prior);
+      passwordInput.value = '';
+      if (mode === 'recover') $('recover-code').value = '';
+      showRecovery(result.recovery);
+      await api.connect(result.key,prior);
+      status(mode === 'upgrade' ? 'Account upgraded. Use your username and password next time.' : 'Signed in.','account-status');
+      await render();
+    } finally {
+      if (mode === 'signup' && widget !== undefined) {
+        challenge = '';
+        window.turnstile.reset(widget);
+      }
+    }
+  }
+  submit('password-signin',()=>passwordAction('login','signin'));
+  submit('password-signup',()=>passwordAction('signup','signup'));
+  submit('password-recover',()=>passwordAction('recover','recover'));
+  submit('password-upgrade',()=>passwordAction('upgrade','upgrade'));
+  submit('legacy-signin',async () => {
+    await api.connect($('account-key').value.trim().toLowerCase());
     $('account-key').value = '';
+    status('','account-status');
     await render();
   });
-  button($('account-buttons'),'Show account key',async () => {
-    $('key-display').hidden = !$('key-display').hidden;
-    $('key-display').value = $('key-display').hidden ? '' : api.key();
-  });
   button($('account-buttons'),'Sign out',async () => {
+    const account = api.key();
+    try { if (passwordFormsAvailable) await api.call('/auth/logout','POST',undefined,account); }
+    catch {}
+    if (api.key() !== account) return;
     api.disconnect();
-    $('key-display').value = '';
-    $('key-display').hidden = true;
+    showRecovery();
+    status('Signed out.','account-status');
     await render();
   });
   button($('cloud-conflict'),'Use this device’s save',() => api.sync('local'));
@@ -159,36 +224,23 @@
   });
   submit('profile',() => action('/profile',{public:$('public-profile').checked,club:$('player-club').value || null}));
   submit('puzzle',() => action('/puzzle',{answer:$('puzzle-answer').valueAsNumber}));
-  const sitekey = window.PawtopiaOnlineConfig.turnstileSiteKey;
-  if (sitekey) {
-    const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-    script.async = true;
-    script.onload = () => {
-      let challenge = '';
-      const widget = window.turnstile.render('#signup-challenge',{sitekey,callback:value => {challenge = value;},
-        'expired-callback':() => {challenge = '';}});
-      button($('signup-controls'),'Create a free account',async () => {
-        if (!challenge) {
-          status('Complete the signup check first.','account-status');
-          return;
-        }
-        status('','account-status');
-        try {
-          const account = await api.call('/accounts','POST',{challenge},'');
-          await api.connect(account.key);
-          $('key-display').value = account.key;
-          $('key-display').hidden = false;
-          await render();
-        } catch (error) {
-          status(error.message,'account-status');
-        } finally {
-          challenge = '';
-          window.turnstile.reset(widget);
-        }
-      });
-    };
-    document.head.append(script);
+  async function init() {
+    try { passwordFormsAvailable = Boolean((await api.call('/auth/status','GET',undefined,'')).passwords); }
+    catch {}
+    for (const id of ['password-signin','new-account-details','recover-details']) $(id).hidden = !passwordFormsAvailable;
+    if (!passwordFormsAvailable && !api.key()) $('legacy-details').open = true;
+    const sitekey = window.PawtopiaOnlineConfig.turnstileSiteKey;
+    if (sitekey && passwordFormsAvailable) {
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async = true;
+      script.onload = () => {
+        widget = window.turnstile.render('#signup-challenge',{sitekey,
+          callback:value=>{challenge=value;},'expired-callback':()=>{challenge='';}});
+      };
+      document.head.append(script);
+    }
+    await render();
   }
-  render().catch(error => status(error.message,'account-status'));
+  init().catch(error=>status(error.message,'account-status'));
 })();
