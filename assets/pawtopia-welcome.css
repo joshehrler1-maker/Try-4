@@ -72,7 +72,7 @@
   height:auto;
   max-height:28rem;
   object-fit:cover;
-  object-position:center;
+  object-position:center 24%;
   border-radius:1.05rem;
 }
 
@@ -225,6 +225,6 @@
   .site-entry #online-intro { margin-top:.45rem; }
   .site-entry .welcome-heroes img {
     height:clamp(8rem,29vw,13rem);
-    object-position:center 39%;
+    object-position:center 14%;
   }
 }
