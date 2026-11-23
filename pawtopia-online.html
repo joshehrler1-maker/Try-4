@@ -9,13 +9,21 @@
 <script defer src="assets/pawtopia-save.js"></script>
 <script defer src="assets/pawtopia-online-config.js?v=production-1"></script>
 <script defer src="assets/pawtopia-cloud-save.js?v=account-session-1"></script>
-<script defer src="assets/pawtopia-online-town.js?v=password-1"></script>
+<script defer src="assets/pawtopia-online-town.js?v=player-entry-1"></script>
 <style>
   main section { margin-block: 1.25rem; }
   form label, form button { margin-block: .4rem; }
   button, input, select { max-width:100%; }
   #account-status:empty, #town-status:empty { display:none; }
   #key-display { width: min(100%, 40rem); }
+  .site-entry .world-art, .site-entry #account-links { display:none; }
+  .site-entry #online-enabled, .site-entry #online-disabled { max-width:30rem; margin-inline:auto; }
+  #entry-actions { margin-block:1rem; }
+  #account-signin form, #password-upgrade { max-width:30rem; }
+  #account-signin label, #password-upgrade label { display:block; }
+  #account-signin input, #password-upgrade input { box-sizing:border-box; width:100%; }
+  #account-signin details { margin-block:1rem; }
+  #account-signin form button { display:block; margin-top:.75rem; }
 </style>
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
@@ -27,17 +35,18 @@
 <img src="assets/scenes/town-trading.webp" alt="" loading="lazy" decoding="async">
 </figure>
 
-<p><a href="pawtopia-town.html">Town Square</a> · <a href="pawtopia-progress.html#backup-title">Save backups</a></p>
+<p id="account-links"><a href="pawtopia-town.html">Town Square</a> · <a href="pawtopia-progress.html#backup-title">Save backups</a></p>
 <section class="hero">
-<h1>Pawtopia Players</h1>
+<h1 id="online-title">Pawtopia Players</h1>
 <p><a id="online-arena-link" href="pawtopia-battle-arena.html#arena-duels">Back to player battles</a></p>
-<p>Visit player shops, trade collectible pins, and join a club.</p>
+<p id="online-intro">Visit player shops, trade collectible pins, and join a club.</p>
 </section>
 <p id="online-disabled">Online features are awaiting server setup. You can still <a href="pawtopia-progress.html#backup-title">download your progress and move it to another device</a>.</p>
 <div id="online-enabled" hidden>
 <section aria-labelledby="account-title">
 <h2 id="account-title">Your Pawtopia account</h2>
 <p id="account-status" role="status"></p>
+<p id="entry-actions" hidden><a id="enter-world" href="index.html#pawtopia">Continue as a guest</a></p>
 <div id="account-recovery" hidden>
 <p><strong>Save your recovery code now.</strong> Keep it somewhere private. You can use it once to reset your password.</p>
 <input id="key-display" aria-label="One-time recovery code" readonly autocomplete="off">
@@ -48,7 +57,7 @@
 <form id="password-signin" hidden><label for="signin-username">Username</label><input id="signin-username" name="username" type="text" maxlength="24" autocomplete="username" autocapitalize="off" spellcheck="false" required><label for="signin-password">Password</label><input id="signin-password" name="password" type="password" maxlength="128" autocomplete="current-password" required><button type="submit">Sign in</button></form>
 <details id="new-account-details" hidden><summary>Create a free account</summary>
 <form id="password-signup"><label for="signup-username">Username</label><input id="signup-username" name="username" type="text" maxlength="24" autocomplete="username" autocapitalize="off" spellcheck="false" required><label for="signup-password">Choose a password</label><input id="signup-password" name="password" type="password" maxlength="128" autocomplete="new-password" minlength="15" required>
-<p>Use at least 15 characters. Save the recovery code shown after signup.</p>
+<p>Other players will see your username. Choose a nickname without personal information and a password with at least 15 characters.</p>
 <div id="signup-challenge"></div><button type="submit">Create account</button></form></details>
 <details id="recover-details" hidden><summary>Forgot your password?</summary>
 <form id="password-recover"><label for="recover-username">Username</label><input id="recover-username" name="username" type="text" maxlength="24" autocomplete="username" autocapitalize="off" spellcheck="false" required>
@@ -62,7 +71,7 @@
 <p id="account-identity"></p>
 <form id="password-upgrade" hidden><h3>Set up username and password</h3>
 <label for="upgrade-username">Username</label><input id="upgrade-username" name="username" type="text" maxlength="24" autocomplete="username" autocapitalize="off" spellcheck="false" required><label for="upgrade-password">Choose a password</label><input id="upgrade-password" name="password" type="password" maxlength="128" autocomplete="new-password" minlength="15" required>
-<p>Use at least 15 characters. Save the recovery code before you leave. Your current key is retired after the upgrade.</p>
+<p>Other players will see your username. Choose a nickname without personal information and a password with at least 15 characters. Save your recovery code before you leave. Your account key is retired after the upgrade.</p>
 <button type="submit">Upgrade this account</button></form>
 <div id="account-buttons"></div>
 <div id="cloud-settings" hidden>
@@ -70,7 +79,7 @@
 <p>Sync uploads game progress, including cat names and any bios you wrote. Leave it off to keep game progress in this browser. Turning it off stops future sync from this browser.</p>
 <p id="cloud-status" role="status"></p><div id="cloud-conflict" hidden></div>
 </div>
-<p>Public listings show a generated player alias. Leaderboard sharing is optional.</p>
+<p>Player battles and listings show your player name. Leaderboard sharing is optional.</p>
 </div>
 </section>
 <div id="online-features" hidden>
@@ -79,7 +88,7 @@
 <h2 id="profile-title">Profile and clubs</h2>
 <p id="player-profile"></p>
 <form id="profile">
-<label><input id="public-profile" type="checkbox"> Show my Pawtopia alias and club on the leaderboard</label>
+<label><input id="public-profile" type="checkbox"> Show my player name and club on the leaderboard</label>
 <label for="player-club">Club</label>
 <select id="player-club"><option value="">No club</option><option>Scouts</option><option>Builders</option><option>Guardians</option></select>
 <button>Save profile</button>
@@ -111,7 +120,7 @@
 </section>
 <section aria-labelledby="market-title">
 <h2 id="market-title">Player shops and trades</h2>
-<p>Market tickets are play rewards. Players earn them by solving the town puzzle. Listings display your Pawtopia alias.</p>
+<p>Market tickets are play rewards. Players earn them by solving the town puzzle. Listings display your player name.</p>
 <h3>My pins</h3>
 <label for="listing-kind">List for tickets or swap for a pin</label>
 <select id="listing-kind"><option value="">Sell for tickets</option><option>Lantern pin</option><option>Glowbell pin</option><option>Sunbeam pin</option><option>Crystal pin</option></select>

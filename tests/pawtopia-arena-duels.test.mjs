@@ -33,6 +33,7 @@ async function setup(t) {
     const statement = sqlite.prepare(sql);
     return {bind(...args) { return {
       async first() { return statement.get(...args) ?? null; },
+      async all() { return {results:statement.all(...args)}; },
       runSync() { return {meta:statement.run(...args)}; },
       async run() { return this.runSync(); }
     }; }};
@@ -290,7 +291,7 @@ const secret = 'f'.repeat(64);
 const newSecret = 'e'.repeat(64);
 test('upgrading keeps the existing player, retires its key and allows username sign-in',async t=>{
   const call = await setup(t);
-  const prior = await call('a','/session');
+  assert.equal((await call('a','/session')).body.alias,'Paw-a');
   await call('a','/arena-ranked/queue',pet('Bengal'));
   const upgraded = await call('a','/auth/upgrade',{username:'Mochi_12',proof:secret});
   assert.equal(upgraded.status,201);
@@ -298,8 +299,10 @@ test('upgrading keeps the existing player, retires its key and allows username s
   assert.equal((await call('a','/session')).status,401);
   const signedIn = await call(null,'/auth/login',{username:'MOCHI_12',proof:secret});
   assert.equal(signedIn.status,200);
-  assert.deepEqual((await call(signedIn.body.key,'/session')).body,{alias:prior.body.alias,username:'mochi_12',legacy:false});
+  assert.deepEqual((await call(signedIn.body.key,'/session')).body,{alias:'mochi_12',username:'mochi_12',legacy:false});
   assert.equal((await call(signedIn.body.key,'/arena-ranked')).body.queued,true);
+  const duel = await call(signedIn.body.key,root+'/create',pet('Bengal'));
+  assert.equal(duel.body.fighters[0].alias,'mochi_12');
   assert.equal((await call(signedIn.body.key,'/auth/logout',{})).status,200);
   assert.equal((await call(signedIn.body.key,'/session')).status,401);
 });
@@ -336,4 +339,20 @@ test('repeated login failures are throttled and unknown usernames get the same l
     assert.deepEqual(denied,unknown);
   }
   assert.equal((await call(null,'/auth/login',{username:'kitty',proof:secret})).status,429);
+});
+
+test('town profile, listings and opted-in leaderboard use the public username',async t=>{
+  const call = await setup(t);
+  const upgraded = await call('a','/auth/upgrade',{username:'mochi',proof:secret});
+  const key = upgraded.body.key;
+  const town = (await call(key,'/town')).body;
+  assert.equal(town.player.alias,'mochi');
+  assert.equal((await call(key,'/puzzle',{answer:town.puzzle.first+town.puzzle.second})).status,200);
+  const pin = (await call(key,'/town')).body.mine[0];
+  assert.equal((await call(key,'/listing',{item:pin.id,price:2,wanted:null})).status,200);
+  const before = (await call('b','/town')).body;
+  assert.equal(before.market[0].alias,'mochi');
+  assert.deepEqual(before.board,[]);
+  assert.equal((await call(key,'/profile',{public:true,club:null})).status,200);
+  assert.equal((await call('b','/town')).body.board[0].alias,'mochi');
 });

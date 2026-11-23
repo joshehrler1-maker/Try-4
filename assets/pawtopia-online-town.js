@@ -3,8 +3,22 @@
   const api = window.PawtopiaOnline;
   const $ = id => document.getElementById(id);
   const status = (message,target='town-status') => { $(target).textContent = message; };
+  const params = new URLSearchParams(location.search);
+  const fromHome = params.get('entry') === 'home';
+  const enterWorld = $('enter-world');
+  if (fromHome) {
+    document.body.classList.add('site-entry');
+    $('online-title').textContent = 'Welcome to Pawtopia';
+    $('online-intro').textContent = 'Sign in to your Pawtopia account.';
+    $('online-arena-link').hidden = true;
+    $('account-signin').after($('entry-actions'));
+    if (!api) {
+      $('online-disabled').after($('entry-actions'));
+      $('entry-actions').hidden = false;
+    }
+  }
   if (!api) return;
-  const duelCode = new URLSearchParams(location.search).get('duel');
+  const duelCode = params.get('duel');
   if (/^[0-9a-f]{12}$/.test(duelCode || '') && $('online-arena-link')) {
     $('online-arena-link').href = 'pawtopia-battle-arena.html#duel-'+duelCode;
   }
@@ -61,13 +75,17 @@
       button(row,'Remove shared nickname',() => action('/adoptions',{remove:pet.id}));
     }
   }
-  async function render() {
+  async function render(enterIfSignedIn = false) {
     const account = api.key();
     const signedIn = Boolean(account);
     $('account-signin').hidden = signedIn;
     $('account-session').hidden = !signedIn;
     $('cloud-opt-in').checked = api.syncEnabled();
-    $('online-features').hidden = !signedIn;
+    $('online-features').hidden = !signedIn || fromHome;
+    if (fromHome) {
+      enterWorld.textContent = signedIn ? 'Continue to Pawtopia' : 'Continue as a guest';
+      $('entry-actions').hidden = false;
+    }
     if (!signedIn) {
       $('account-key').value = '';
       $('cloud-status').textContent = '';
@@ -88,6 +106,10 @@
     if (api.key() !== account) return;
     $('account-identity').textContent = session.username ? 'Signed in as '+session.username : 'Signed in with an existing account key.';
     $('password-upgrade').hidden = !passwordFormsAvailable || session.legacy === false;
+    if (fromHome) {
+      if (enterIfSignedIn && !session.legacy) location.replace(enterWorld.href);
+      return;
+    }
     const data = await api.call('/town','GET',undefined,account);
     if (api.key()!==account) return;
     const {player,mine,market,board,clubs,puzzle,adoptions=[],gifts=[]} = data;
@@ -163,7 +185,10 @@
     $('key-display').value = code;
     $('account-recovery').hidden = !code;
   }
-  $('hide-recovery').addEventListener('click',()=>showRecovery());
+  $('hide-recovery').addEventListener('click',() => {
+    showRecovery();
+    if (fromHome) location.replace(enterWorld.href);
+  });
   async function passwordAction(mode,prefix) {
     if (!passwordFormsAvailable) throw Error('Password sign-in is temporarily unavailable.');
     const username = $(prefix+'-username').value.trim().toLowerCase();
@@ -184,7 +209,7 @@
       showRecovery(result.recovery);
       await api.connect(result.key,prior);
       status(mode === 'upgrade' ? 'Account upgraded. Use your username and password next time.' : 'Signed in.','account-status');
-      await render();
+      await render(mode === 'login');
     } finally {
       if (mode === 'signup' && widget !== undefined) {
         challenge = '';
@@ -240,7 +265,7 @@
       };
       document.head.append(script);
     }
-    await render();
+    await render(true);
   }
   init().catch(error=>status(error.message,'account-status'));
 })();

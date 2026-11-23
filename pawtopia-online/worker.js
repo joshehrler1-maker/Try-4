@@ -374,7 +374,7 @@ export default {
       if (!tokenFormat.test(key)) fail('Sign in to your Pawtopia account.',401);
       const fingerprint = await hash(key);
       const player = await db(`SELECT id,alias,public,club,tickets,username FROM (
-        SELECT p.id,p.alias,p.public,p.club,p.tickets,l.username FROM player_session s
+        SELECT p.id,l.username AS alias,p.public,p.club,p.tickets,l.username FROM player_session s
         JOIN player p ON p.id=s.player_id JOIN player_login l ON l.player_id=p.id
         WHERE s.token_hash=? AND s.expires_at>?
         UNION ALL SELECT p.id,p.alias,p.public,p.club,p.tickets,NULL FROM player p
@@ -441,8 +441,8 @@ export default {
       if (route === 'GET /town') {
         const [mine,market,board,members,today,adoptions,gifts] = await Promise.all([
           db('SELECT i.id,i.kind,l.price,l.wanted,l.id AS listing FROM item i LEFT JOIN listing l ON l.id=i.id WHERE i.owner=? ORDER BY i.id LIMIT 300',id).all(),
-          db('SELECT l.id,p.alias,i.kind,l.price,l.wanted,l.seller=? AS mine FROM listing l JOIN item i ON i.id=l.id JOIN player p ON p.id=l.seller ORDER BY l.id LIMIT 100',id).all(),
-          db('SELECT p.alias,p.club,COUNT(*) AS score FROM solved s JOIN player p ON p.id=s.player_id WHERE s.month=? AND p.public=1 GROUP BY p.id ORDER BY score DESC,p.alias LIMIT 25',month).all(),
+          db('SELECT l.id,COALESCE(a.username,p.alias) AS alias,i.kind,l.price,l.wanted,l.seller=? AS mine FROM listing l JOIN item i ON i.id=l.id JOIN player p ON p.id=l.seller LEFT JOIN player_login a ON a.player_id=p.id ORDER BY l.id LIMIT 100',id).all(),
+          db('SELECT COALESCE(a.username,p.alias) AS alias,p.club,COUNT(*) AS score FROM solved s JOIN player p ON p.id=s.player_id LEFT JOIN player_login a ON a.player_id=p.id WHERE s.month=? AND p.public=1 GROUP BY p.id ORDER BY score DESC,alias LIMIT 25',month).all(),
           db('SELECT club,COUNT(*) AS count FROM player WHERE public=1 AND club IS NOT NULL GROUP BY club').all(),
           db('SELECT kind FROM solved WHERE player_id=? AND day=?',id,day).first(),
           db('SELECT id,nickname,breed FROM shared_pet WHERE player_id=? ORDER BY shared_at,id',id).all(),
