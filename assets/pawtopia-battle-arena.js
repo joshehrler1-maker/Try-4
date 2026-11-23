@@ -111,6 +111,37 @@
       setTimeout(()=>effect.remove(),reduced()?500:720/playbackSpeed);
     }
   }
+  function renderRecommendation(progress,stats,unlockedTier,blocked) {
+    const heading=el('next-challenge'), reward=el('arena-recommendation-rewards'), pick=el('arena-select-recommended');
+    if(!reward||!pick)return;
+    if(!stats) {
+      heading.textContent='Adopt a cat to get a recommendation.';
+      reward.textContent='';
+      pick.hidden=true;
+      return;
+    }
+    const targetTier=Math.min(unlockedTier,stats.bestRank+1);
+    const candidates=data.foes.filter(foe=>foe.rank<=targetTier && foe.level<=stats.level+2);
+    const recommendation=candidates.reduce((best,foe)=>!best||foe.rank>best.rank||
+      (foe.rank===best.rank&&Math.abs(foe.level-stats.level)<Math.abs(best.level-stats.level))?foe:best,null)
+      || data.foes.find(foe=>foe.rank===1);
+    heading.textContent=recommendation.name+' · Tier '+recommendation.rank+' · Suggested Lv '+recommendation.level;
+    const medal=['Bronze Paw Medal','Silver Paw Medal','Golden Paw Crown'][[4,8,12].indexOf(recommendation.rank)];
+    const extras=[];
+    if(recommendation.rank<=3 && (stats.wins+1)%2===0)extras.push('1 snack');
+    if(recommendation.rank>=4) {
+      const shards=1+Math.floor((recommendation.rank-4)/3);
+      extras.push(shards+' crystal shard'+(shards===1?'':'s'));
+    }
+    if(recommendation.rank>=7 && !progress.toy)extras.push('first Crystal Toy');
+    if(medal&&!stats.trophies.includes(medal))extras.push('first-win '+medal);
+    const daily=data.battlePoints?.(recommendation.rank)||2;
+    reward.textContent=[recommendation.coins+' Paw Coins',recommendation.xp*3+' XP',...extras,
+      daily+' upgrade points on the first win in this tier today'].join(' · ');
+    pick.hidden=false;
+    pick.disabled=blocked;
+    pick.dataset.foe=String(data.foes.indexOf(recommendation));
+  }
   function render() {
     const progress=save.read(),cats=engine.fighters(progress),view=engine.matchInfo(progress);
     const fighting=view&&!view.match.finished;
@@ -171,7 +202,7 @@
     const target=Math.max(2,foe.level);
     el('battle-preparation').textContent='Suggested preparation for '+foe.name+
       ': level '+foe.level+' and about '+target+' in each combat stat. Gear can help make up the difference.';
-    el('next-challenge').textContent=unlockedTier===data.bossRank?'Baron Brasswhirl unlocked':'Unlocked through tier '+unlockedTier+' of '+data.bossRank;
+    renderRecommendation(progress,stats,unlockedTier,busy||Boolean(fighting)||watchMode);
     const choices=data.foes.flatMap((enemy,index)=>{
       if(enemy.rank!==tier)return [];
       const locked=enemy.rank>engine.unlocked(progress);
@@ -576,6 +607,13 @@
   select.addEventListener('change',()=>{
     const num=Number(select.value);
     if(Number.isInteger(num)){selectedPet=num;render();}
+  });
+  el('arena-select-recommended')?.addEventListener('click',event=>{
+    const index=Number(event.currentTarget.dataset.foe);
+    if(!data.foes[index]||event.currentTarget.disabled)return;
+    selectedFoe=index;
+    challengerTier=data.foes[index].rank;
+    render();
   });
   el('battle-foe-tier')?.addEventListener('change',event=>{
     const tier=Number(event.target.value);

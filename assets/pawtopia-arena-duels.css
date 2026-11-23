@@ -17,3 +17,19 @@
 #duel-actor-1.duel-strike { transform: translateX(-13%) scale(1.04); }
 .duel-actor.duel-contact { filter: brightness(1.4) saturate(1.2); }
 @media (prefers-reduced-motion: reduce) { .duel-actor { transition: none; } }
+
+#duel-match { scroll-margin-block-start: 1rem; }
+#duel-phase { margin: .3rem 0 .55rem; }
+#duel-moves { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .45rem; margin-block: .55rem; }
+#duel-moves button { min-height: 52px; white-space: normal; text-align: start; overflow-wrap: anywhere; font-weight: 750; }
+#duel-moves small { display: block; margin-top: .16rem; font-size: .75rem; font-weight: 500; }
+#duel-moves small[hidden] { display: none; }
+@media (max-width: 620px) {
+  #duel-moves { grid-template-columns: repeat(2,minmax(0,1fr)); position: sticky; bottom: 0; z-index: 2;
+    padding: .35rem .15rem max(.35rem,env(safe-area-inset-bottom)); background: #17253d; }
+  .duel-field { padding: .45rem .35rem; gap: .4rem; }
+  .duel-fighter strong { font-size: .9rem; overflow-wrap: anywhere; }
+  .duel-fighter .mini { margin: .2rem 0; font-size: .68rem; }
+  .duel-actor { width: min(100%,9rem); min-height: 0; }
+  #duel-summary { font-size: .83rem; }
+}

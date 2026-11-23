@@ -10,7 +10,7 @@ const {default:worker} = await import('data:text/javascript;base64,'+Buffer.from
 const schema = await readFile(new URL('../pawtopia-online/schema.sql',import.meta.url),'utf8');
 const origin = 'https://joshehrler1-maker.github.io';
 
-async function setup(t) {
+async function setup(t, ratings = {}) {
   const sqlite = new DatabaseSync(':memory:');
   t.after(()=>sqlite.close());
   sqlite.exec(schema);
@@ -19,6 +19,9 @@ async function setup(t) {
     const digest = await crypto.subtle.digest('SHA-256',Buffer.from(player.key));
     sqlite.prepare('INSERT INTO player(id,token_hash,alias) VALUES(?,?,?)')
       .run(player.id,Buffer.from(digest).toString('hex'),player.alias);
+  }
+  for (const [id,rating] of Object.entries(ratings)) {
+    sqlite.prepare('INSERT INTO arena_ranked_player(player_id,rating) VALUES(?,?)').run(id,rating);
   }
   const env = {PAWTOPIA_ORIGIN:origin,TURNSTILE_SECRET:'test-only',DB:{
     async batch(queries) {
@@ -355,4 +358,42 @@ test('town profile, listings and opted-in leaderboard use the public username',a
   assert.deepEqual(before.board,[]);
   assert.equal((await call(key,'/profile',{public:true,club:null})).status,200);
   assert.equal((await call('b','/town')).body.board[0].alias,'mochi');
+});
+
+test('ranked expands rating and pet strength ranges without changing combat stats',async t=>{
+  let now=Date.now();
+  t.mock.method(Date,'now',()=>now);
+  const call=await setup(t,{a:1000,b:1180,c:1000});
+  await call('a','/arena-ranked/queue',pet('Bengal'));
+  const near=(await call('b','/arena-ranked/queue',pet('Siamese',{strength:30}))).body;
+  assert.equal(near.duel,null);
+  const far=(await call('c','/arena-ranked/queue',pet('Ragdoll',{level:200,strength:150}))).body;
+  assert.equal(far.duel,null);
+  now+=4999;
+  const narrow=(await call('a','/arena-ranked/poll',{})).body;
+  assert.equal(narrow.duel,null);
+  assert.equal(narrow.widened,false);
+  now+=1;
+  const match=(await call('a','/arena-ranked/poll',{})).body.duel;
+  assert.equal(match.bot,false);
+  assert.deepEqual(match.fighters.map(pet=>pet.stats.strength),[2,30]);
+  assert.equal((await call('c','/arena-ranked')).body.queued,true);
+});
+
+test('move previews match applied damage and waiting status keeps the opponent move private',async t=>{
+  const call=await setup(t);
+  const invite=await begin(call);
+  const code=invite.body.code;
+  const joined=(await call('b',root+'/join',{code,...pet('Siamese')})).body;
+  const expected=joined.movePreview.attacks.signature.guarded;
+  assert.ok(expected<=joined.movePreview.attacks.signature.damage);
+  assert.equal(joined.movePreview.guardBlock,3);
+  const host=await move(call,'a',code,1,'guard');
+  assert.equal(host.body.submitted,true);
+  const waiting=(await call('b',root+'?code='+code)).body;
+  assert.equal(waiting.opponentSubmitted,true);
+  assert.equal(waiting.submitted,false);
+  assert.deepEqual(waiting.history,[]);
+  const played=await move(call,'b',code,1,'signature');
+  assert.equal(played.body.history[0].damage[1],expected);
 });

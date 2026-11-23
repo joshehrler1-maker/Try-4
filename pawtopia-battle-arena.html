@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="assets/pawtopia-item-art.css?v=painted-1">
 <link rel="stylesheet" href="assets/pawtopia-pet-equipment.css?v=1">
 <link rel="stylesheet" href="assets/pawtopia-cat-flow.css">
-<link rel="stylesheet" href="assets/pawtopia-arena-duels.css?v=facing-1">
+<link rel="stylesheet" href="assets/pawtopia-arena-duels.css?v=arena-play-1">
 <script defer src="assets/pawtopia-save.js?v=catalog-2569"></script>
 <script defer src="assets/pawtopia-upgrade-points.js?v=arena-rewards-1"></script>
 <script defer src="assets/pawtopia-battle-data.js?v=balance-1"></script>
@@ -31,10 +31,10 @@
 <script defer src="assets/pawtopia-item-art.js?v=painted-1"></script>
 <script defer src="assets/pawtopia-battle-motion.js?v=duel-flow-1"></script>
 <script defer src="assets/game-fullscreen.js?v=arena-focus-1"></script>
-<script defer src="assets/pawtopia-battle-arena.js?v=fullscreen-1"></script>
+<script defer src="assets/pawtopia-battle-arena.js?v=arena-play-1"></script>
 <script defer src="assets/pawtopia-online-config.js?v=production-1"></script>
 <script defer src="assets/pawtopia-cloud-save.js"></script>
-<script defer src="assets/pawtopia-arena-duels.js?v=account-expiry-1"></script>
+<script defer src="assets/pawtopia-arena-duels.js?v=arena-play-1"></script>
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
@@ -76,6 +76,8 @@
   <div id="duel-lobby" class="duel-lobby" hidden>
     <label for="duel-pet">Your adopted cat</label>
     <select id="duel-pet"></select>
+    <a id="duel-equipment" href="pawtopia-pet-equipment.html?mode=duel" hidden>View this cat’s equipment</a>
+    <p class="mini">Equipment bonuses apply in Solo. Invite and Ranked use your cat’s level and trained stats.</p>
     <p id="duel-adopt" hidden><a href="pawtopia-companions.html">Adopt a cat</a> before starting a duel.</p>
     <div class="duel-actions">
       <button id="duel-create" type="button">Create duel invite</button>
@@ -89,7 +91,7 @@
   </div>
   <section id="duel-ranked" aria-labelledby="duel-rank-heading" hidden>
     <h3 id="duel-rank-heading">Ranked matchmaking</h3>
-    <p class="mini">Searches for a real player first. After about 12 seconds, an Arena Bot can play a practice match. Only matches against players change your rating.</p>
+    <p class="mini">Looks for players near your rating and your cat’s strength, then widens the search. If there’s no close match after about 12 seconds, an Arena Bot can play a practice match. Only matches against players change your rating.</p>
     <p id="duel-rank-score"></p>
     <p id="duel-rank-message" role="status"></p>
     <div class="duel-actions">
@@ -115,13 +117,13 @@
         <span id="duel-hp-1"></span><div id="duel-actor-1" class="duel-actor"><div id="duel-art-1" class="duel-art duel-art--leftward" aria-hidden="true"></div></div>
       </div>
     </div>
-    <p id="duel-summary" aria-live="polite"></p>
     <div id="duel-moves" class="duel-actions" role="group" aria-label="Duel moves">
       <button type="button" data-duel-move="swipe">Paw Swipe</button>
       <button type="button" data-duel-move="guard">Guard Curl</button>
       <button type="button" data-duel-move="signature">Signature</button>
       <button type="button" data-duel-move="ultimate">Ultimate</button>
     </div>
+    <p id="duel-summary" aria-live="polite"></p>
     <div class="duel-actions">
       <button id="duel-refresh" type="button">Check for update</button>
       <button id="duel-replay" type="button">Replay last round</button>
@@ -143,6 +145,8 @@
 <div>
 <h2>Next challenge</h2>
 <div id="next-challenge" class="next-challenge">Training arena</div>
+<p id="arena-recommendation-rewards" class="mini"></p>
+<button id="arena-select-recommended" type="button" hidden>Select recommended challenger</button>
 <p class="mini">Win in your highest unlocked tier to open the next one. Each tier awards upgrade points on its first win of the day.</p>
 </div>
 </div>

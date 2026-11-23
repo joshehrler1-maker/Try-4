@@ -14,6 +14,8 @@
   const invite = element('invite');
   const notice = element('notice');
   const fighter = element('pet');
+  const initialPet = new URL(location.href).searchParams.get('pet');
+  let roster = [];
   const memoryKey = 'pawtopia-arena-duel';
   const legalCode = /^[0-9a-f]{12}$/;
   let duel, pets = [], busy = false, playing = false, animation = 0, refreshTimer;
@@ -43,15 +45,25 @@
   function readPets() {
     const previous = pets[Number(fighter.value)];
     const progress = save.read();
-    pets = [progress.companion,...(Array.isArray(progress.otherCompanions) ? progress.otherCompanions : [])]
-      .filter(pet => data.breeds.includes(pet?.breed));
+    roster = [progress.companion,...(Array.isArray(progress.otherCompanions) ? progress.otherCompanions : [])].filter(Boolean).slice(0,6);
+    pets = roster.filter(pet => data.breeds.includes(pet.breed));
     fighter.replaceChildren(...pets.map((pet,index) => new Option(pet.name+' · '+pet.breed+' · Lv. '+engine.level(pet),String(index))));
     const retained = previous ? pets.findIndex(pet => previous.battleId
       ? pet.battleId === previous.battleId : pet.name === previous.name && pet.breed === previous.breed) : -1;
+    const requested = /^[0-5]$/.test(initialPet || '') ? pets.indexOf(roster[Number(initialPet)]) : -1;
     if (retained >= 0) fighter.value = String(retained);
+    else if (requested >= 0) fighter.value = String(requested);
+    updateEquipmentLink();
     element('adopt').hidden = pets.length > 0;
     setControls();
   }
+  function updateEquipmentLink() {
+    const link = element('equipment');
+    const slot = roster.indexOf(pets[Number(fighter.value)]);
+    link.hidden = slot < 0;
+    if (slot >= 0) link.href = 'pawtopia-pet-equipment.html?mode=duel&pet='+slot;
+  }
+  fighter.addEventListener('change',updateEquipmentLink);
   function setControls() {
     for (const action of ['create','join']) element(action).disabled = !available || busy || playing || !pets.length || Boolean(rank?.queued);
     element('restore').disabled = !available || busy || playing || Boolean(rank?.queued);
@@ -97,7 +109,8 @@
     element('rank-start').hidden = Boolean(rank?.queued || (duel && duel.phase !== 'finished'));
     element('rank-start').textContent = rank?.duel?.phase === 'active' ? 'Resume ranked battle' : 'Find ranked opponent';
     element('rank-cancel').hidden = !rank?.queued;
-    element('rank-message').textContent = rank?.queued ? 'Looking for another player…' : '';
+    element('rank-message').textContent = !rank?.queued ? '' :
+      rank.widened ? 'Widening the search for another player…' : 'Looking for a player near your rating and pet strength…';
     element('account').hidden = Boolean(account);
     element('lobby').hidden = !account || !available || Boolean(duel && duel.phase !== 'finished');
     element('match').hidden = !duel;
@@ -116,7 +129,8 @@
     element('mode').textContent = duel.bot ? 'Arena Bot · Practice match' : duel.ranked ? 'Ranked player match' : 'Private invite duel';
     element('phase').textContent = waiting ? 'Waiting for a friend to join.' :
       duel.phase === 'finished' ? outcome() :
-      'Round '+duel.round+' of 15 · '+(duel.submitted ? 'Waiting for your opponent’s move.' : 'Choose your move.');
+      'Round '+duel.round+' of 15 · '+(duel.submitted ? 'Move locked in. Waiting for your opponent.' :
+        duel.opponentSubmitted ? 'Opponent ready. Choose your move.' : 'Choose your move.');
     const latest = duel.history.at(-1);
     element('summary').textContent = latest ? duel.fighters.map((pet,i) =>
       latest.moves[i] === 'fumble' ? pet.alias+' missed its swipe' :
@@ -141,7 +155,16 @@
         move === 'ultimate' && own.ultimateUsed ? ' · used' :
         move === 'ultimate' && duel.round < 4 ? ' · round 4' :
         move === 'signature' && duel.round < own.readyAt ? ' · round '+own.readyAt : '';
-      button.textContent = moveLabel(own.breed,move)+note;
+      const preview = duel.movePreview;
+      const amount = preview?.attacks[move];
+      const estimate = note ? note.slice(3) :
+        move === 'guard' && preview ? 'Half damage, then blocks '+preview.guardBlock+' more' :
+        amount ? amount.damage+' damage · '+amount.guarded+' if guarded'+
+          (move==='signature'?' · every 3 rounds':move==='ultimate'?' · once per duel':'') : '';
+      const description = document.createElement('small');
+      description.textContent = estimate;
+      description.hidden = !estimate;
+      button.replaceChildren(moveLabel(own.breed,move),description);
     }
     setControls();
     scheduleRefresh();
@@ -238,7 +261,7 @@
       if (!duel) return;
       try {
         const next = await api.call('/arena-duel?code='+duel.code+(duel.ranked ? '&ranked=1' : ''));
-        if (current() && (next.phase !== duel.phase || next.round !== duel.round || next.submitted !== duel.submitted)) update(next);
+        if (current() && (next.phase !== duel.phase || next.round !== duel.round || next.submitted !== duel.submitted || next.opponentSubmitted !== duel.opponentSubmitted)) update(next);
       } catch (error) {
         if (error.status === 404 && current()) {
           if (duel.ranked && rank) rank = {...rank,duel:null};

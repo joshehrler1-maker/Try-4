@@ -72,8 +72,20 @@ function duelResponse(row, state, side) {
   const roster = fighters.map(({name,...fighter},i)=>i === side && name ? {...fighter,name} : fighter);
   return {code:row.code, phase:row.phase, side, fighters:roster, round, history,
     ranked:Boolean(state.ranked), bot:Boolean(state.bot),
-    winner, reason, submitted:Boolean(choices[side]), expiresAt:row.expires_at};
+    winner, reason, submitted:Boolean(choices[side]), opponentSubmitted:Boolean(choices[1-side]),
+    movePreview: fighters.length===2 && state.trained && row.phase==='active' ? duelMovePreview(fighters[side],fighters[1-side]) : null,
+    expiresAt:row.expires_at};
 }
+function duelMovePreview(source,target) {
+  return {
+    attacks: Object.fromEntries(['swipe','signature','ultimate'].map(move=>[move,{
+      damage:duelDamage(move,source,target,false),
+      guarded:duelDamage(move,source,target,true)
+    }])),
+    guardBlock:Math.min(50,2+Math.floor(source.stats.defence/2))
+  };
+}
+
 function validDuelMove(fighter, move, round) {
   return typeof move === 'string' && Object.hasOwn(duelMoves,move) &&
     (!fighter.stats || fighter.stats.level >= duelUnlocks[move]) &&
@@ -107,6 +119,21 @@ function resolveDuelRound(state) {
 
 const rankedWait = 12000;
 const rankedPresence = 35000;
+const rankedWidening = 5000;
+const powerFromStats = stats => stats.level*5 + trainingFields.reduce((sum,stat)=>sum+stats[stat],0);
+// Use the queued snapshot on both sides so a matching window never changes a cat's battle stats.
+const queuedPower = ['level',...trainingFields]
+  .map(field=>"json_extract(fighter,'$.stats."+field+"')"+(field==='level'?'*5':'')).join('+');
+const eligibleRivals = `WITH candidates AS (
+  SELECT player_id,fighter,queued_at,rating,(${queuedPower}) AS power,
+    MIN(2,CAST(MIN(?, ?-queued_at)/${rankedWidening} AS INTEGER)) AS widening
+  FROM arena_ranked_player
+  WHERE player_id<>? AND queued_at IS NOT NULL AND seen_at>? AND match_code IS NULL
+  ORDER BY seen_at DESC LIMIT 64
+), eligible AS (
+  SELECT * FROM candidates WHERE ABS(rating-?)<=125*(1+widening)
+    AND ABS(power-?)<=MAX(20,MIN(power,?)/4)*(1+widening)
+)`;
 
 function rankedBot(fighter) {
   const bot = newDuelFighter('Arena Bot',{breed:fighter.breed,name:'Arena Bot',stats:fighter.stats},true);
@@ -124,8 +151,9 @@ async function rankedView(player, db, now) {
   const slot = await db('SELECT * FROM arena_ranked_player WHERE player_id=?',player.id).first();
   const match = slot?.match_code ? await db('SELECT * FROM arena_ranked_match WHERE code=? AND expires_at>?',
     slot.match_code,now).first() : null;
+  const queued=Boolean(slot?.queued_at && slot.seen_at > now-rankedPresence);
   return {rating:slot?.rating ?? 1000,wins:slot?.wins ?? 0,losses:slot?.losses ?? 0,draws:slot?.draws ?? 0,
-    queued:Boolean(slot?.queued_at && slot.seen_at > now-rankedPresence),
+    queued, widened:queued && now-slot.queued_at>=rankedWidening,
     duel:match ? duelResponse(match,JSON.parse(match.state),match.host_id === player.id ? 0 : 1) : null};
 }
 async function handleRanked(route, request, player, db, json) {
@@ -152,11 +180,11 @@ async function handleRanked(route, request, player, db, json) {
   const own = await db('SELECT * FROM arena_ranked_player WHERE player_id=? AND queued_at IS NOT NULL AND seen_at>? AND match_code IS NULL',
     player.id,fresh).first();
   if (!own) return json(await rankedView(player,db,now));
-  const rival = await db(`SELECT * FROM (SELECT player_id,fighter,queued_at FROM arena_ranked_player
-    WHERE player_id<>? AND queued_at IS NOT NULL AND seen_at>? AND match_code IS NULL
-    ORDER BY seen_at DESC LIMIT 64) ORDER BY RANDOM() LIMIT 1`,player.id,fresh).first();
-  if (!rival && now-own.queued_at < rankedWait) return json(await rankedView(player,db,now));
   const first = JSON.parse(own.fighter);
+  const power = powerFromStats(first.stats);
+  const rivalArgs = [now-own.queued_at,now,player.id,fresh,own.rating,power,power];
+  const rival = await db(`${eligibleRivals} SELECT * FROM eligible ORDER BY RANDOM() LIMIT 1`,...rivalArgs).first();
+  if (!rival && now-own.queued_at < rankedWait) return json(await rankedView(player,db,now));
   const state = {ranked:true,bot:!rival,trained:true,
     fighters:[first,rival ? JSON.parse(rival.fighter) : rankedBot(first)],
     choices:[null,null],round:1,history:[],winner:null,reason:null};
@@ -170,11 +198,10 @@ async function handleRanked(route, request, player, db, json) {
       code,JSON.stringify(state),expiresAt,rival.player_id,player.id,own.queued_at,fresh,rival.queued_at,fresh).run();
   } else {
     // Recheck availability in the same write. The assignment trigger claims both seats atomically.
-    await db(`INSERT INTO arena_ranked_match(code,host_id,state,phase,expires_at)
+    await db(`${eligibleRivals} INSERT INTO arena_ranked_match(code,host_id,state,phase,expires_at)
       SELECT ?,host.player_id,?,'active',? FROM arena_ranked_player host WHERE ${ownStillQueued}
-      AND NOT EXISTS(SELECT 1 FROM arena_ranked_player WHERE player_id<>host.player_id
-        AND queued_at IS NOT NULL AND seen_at>? AND match_code IS NULL)`,
-      code,JSON.stringify(state),expiresAt,player.id,own.queued_at,fresh,fresh).run();
+      AND NOT EXISTS(SELECT 1 FROM eligible)`,
+      ...rivalArgs,code,JSON.stringify(state),expiresAt,player.id,own.queued_at,fresh).run();
   }
   return json(await rankedView(player,db,now));
 }

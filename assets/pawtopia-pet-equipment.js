@@ -225,7 +225,8 @@
     if(!cat)add(petSelect,'option','No adopted pet');
     petSelect.disabled=!cat||busy;
     petSelect.value=cat?String(selected):'';
-    $('equipment-return').href='pawtopia-battle-arena.html'+(cat?'?pet='+selected:'');
+    $('equipment-return').href='pawtopia-battle-arena.html'+(cat?'?pet='+selected:'')+
+      (query.get('mode')==='duel'?'#arena-duels':'');
     $('equipment-empty').hidden=Boolean(cat);
     $('equipment-pet-panels').hidden=!cat;
     if(cat){
