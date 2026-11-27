@@ -224,11 +224,12 @@
           bricks.x+=.5*mod(floor(bricks.y),2.0);
           vec2 tile=fract(bricks);
           vec2 border=min(tile,1.0-tile);
-          float surface=smoothstep(.025,.052,min(border.x,border.y));
+          float surface=smoothstep(.008,.035,min(border.x,border.y));
           float grain=fract(sin(dot(floor(bricks),vec2(13.2,76.1)))*17431.31);
           vec3 slate=mix(vec3(.20,.23,.30),vec3(.37,.41,.49),grain);
           slate+=.047*sin(w.x*59.0+sin(w.z*43.0))*sin(w.z*48.0);
-          lit=mix(vec3(.11,.15,.21),slate,surface);
+          lit=mix(vec3(.23,.23,.25),slate,surface);
+          lit+=vec3(.16,.075,.022)*(1.0-smoothstep(-4.0,2.0,w.x));
           float ring=1.0-smoothstep(.025,.05,abs(length(w.xz*vec2(1.0,1.42))-2.05));
           lit=mix(lit,vec3(.60,.46,.29),ring*.65);
           lit*=mix(.80,1.12,clamp((w.z+2.1)*.18,0.0,1.0));

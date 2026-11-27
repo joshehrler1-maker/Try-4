@@ -236,7 +236,18 @@
       button.dataset.foe=String(index);
       button.disabled=locked||busy||Boolean(fighting)||watchMode;
       button.setAttribute('aria-pressed',String(selectedFoe===index));
-      addText(button,'strong',(locked?'🔒 ':'')+enemy.glyph+' '+enemy.name);
+      const portrait=document.createElement('img');
+      portrait.className='challenger-portrait';
+      portrait.alt='';
+      portrait.loading='lazy';
+      const model=foeArt.profile(enemy);
+      const illustration=()=> 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(foeArt.drawing(model));
+      if(model.dog){
+        portrait.onerror=()=>{portrait.onerror=null;portrait.src=illustration();};
+        portrait.src='assets/scenes/pawtopia-dogs/'+model.id+'.png';
+      }else portrait.src=illustration();
+      button.append(portrait);
+      addText(button,'strong',(locked?'🔒 ':'')+enemy.name);
       addText(button,'small',enemy.sizeLabel+' · Recommended Lv '+enemy.level);
       addText(button,'small',enemy.coins+' Paw Coins · '+(enemy.xp*3)+' XP · '+(data.battlePoints?.(enemy.rank)||2)+' daily upgrade points / tier');
       addText(button,'small',enemy.loot);
@@ -288,6 +299,7 @@
     el('stage-pet-name').textContent=activeCat?.name||'Your Cat';
     el('stage-pet-level').textContent='Lv '+(activeCat?engine.level(activeCat):1);
     el('stage-foe-name').textContent=activeFoe.name;
+    el('arena-matchup').textContent=(activeCat?.name||'Your cat')+' vs '+activeFoe.name;
     el('stage-foe-level').textContent='Lv '+activeFoe.level;
     const petMax=currentView?currentView.petMaxHp:activeCat?engine.maxHp(activeCat):20;
     const petHP=currentView?currentView.petHp:petMax;
@@ -422,7 +434,9 @@
       label.dataset.result=evt.reaction==='dodge'?'dodge':'shield';
       label.style.setProperty('--hit-x',target);
       label.style.setProperty('--hit-y',point.y);
-      box.append(label);
+      const health=el(evt.target==='pet'?'stage-pet-hp':'stage-foe-hp').parentElement;
+      if(label.dataset.result==='shield')label.textContent='🛡 '+label.textContent;
+      health.append(label);
       setTimeout(()=>label.remove(),900);
     }
     if(evt.damage>0) {

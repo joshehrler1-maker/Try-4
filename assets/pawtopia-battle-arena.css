@@ -508,3 +508,22 @@ footer{padding:16px 0 28px;text-align:center}
 @media(prefers-reduced-motion:reduce){
   .battle-heal-pop,.battle-vfx .defense-popup::after {animation:none}
 }
+
+#battle-stage .battle-center {visibility:hidden}
+#battle-stage .fighter-sprite {scale:1.13}
+#battle-pet-sprite {left:8%}
+#battle-foe-sprite {right:8%}
+#battle-stage .fighter-shadow {width:58%;height:8%;filter:blur(4px)}
+#battle-stage .hp-row {position:relative}
+#battle-stage .hp-row .defense-popup {left:50%;top:100%;transform:translateX(-50%);animation:none;white-space:nowrap}
+#battle-stage .battle-cue {top:1%;left:50%!important;width:30%;gap:0;padding:2px 5px}
+#battle-stage:has(.battle-cue.is-visible) .arena-stage-name {opacity:0}
+.challenger-portrait {width:58px;height:58px;object-fit:cover;object-position:50% 30%;border-radius:50%;background:#24334b}
+@media (orientation:landscape) and (max-height:540px) {
+  #battle-moves {grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+  #battle-moves button {min-height:44px;padding:5px;gap:0}
+  #battle-moves .locked {justify-content:center}
+  #battle-moves .locked strong,#battle-moves .move-description {display:none}
+  #battle-moves .locked::before {content:"🔒"}
+  #battle-stage .battle-cue {font-size:.7rem;width:34%}
+}
