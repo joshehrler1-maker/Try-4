@@ -186,7 +186,8 @@
         float edge=pow(1.0-max(0.0,dot(v,eye)),2.5);
         float highlight=pow(max(0.0,dot(v,normalize(sun+eye))),mix(20.0,75.0,roughness));
         float fiber=sin(p.y*97.0+sin(p.x*63.0)*2.7)*sin(p.z*81.0);
-        vec3 light=vec3(.50,.53,.66)+diffuse*vec3(.69,.57,.41);
+        float band=.38*smoothstep(.10,.16,diffuse)+.34*smoothstep(.48,.53,diffuse)+.12*diffuse;
+        vec3 light=vec3(.49,.52,.67)+band*vec3(.93,.78,.61);
         vec3 tint=base;
         float bristle=0.0;
         if(coat.x>.5){
@@ -220,6 +221,7 @@
         }
         vec3 lit=tint*light + vec3(.54,.71,1.0)*max(0.0,dot(v,rim))*edge*.36;
         lit+=vec3(1.0,.85,.66)*highlight*mix(.085,.53,roughness)*(coat.x>.5?.44:1.0);
+        lit*=1.0-.46*smoothstep(.62,.96,edge);
         lit+=tint*fiber*.020*(1.0-roughness);
         lit+=tint*edge*max(0.0,bristle)*.12;
         if(stone>.5){
@@ -317,7 +319,7 @@
       gl.depthMask(true);
     }
     function actorMatrices(x,p,direction,scale) {
-      const yaw=turnY(direction*(.44+p.turn)), dimensions=size(scale,scale,scale);
+      const yaw=turnY(direction*((chase?1.24:.44)+p.turn)), dimensions=size(scale,scale,scale);
       const root=multiply(multiply(multiply(position(x,p.lift-p.stance.crouch,p.z),
         tilt(-p.bend*direction)),yaw),dimensions);
       const feet=multiply(multiply(position(x,p.lift>.04?p.lift:0,p.z),yaw),dimensions);
@@ -349,7 +351,12 @@
       const bodyCoat=coat?{params:[...coat.params.slice(0,3),2],shade:trim}:null;
       draw(root,[0,1.02,.025],[.413*shape,.57,.324],fur,{coat:bodyCoat});
       draw(root,[0,1.39,.065],[long?.373:.296,.237,.272],fur,{coat});
-      if(long)draw(root,[0,1.30,.11],[.44,.266,.31],fur,{coat});
+      if(long){
+        draw(root,[0,1.30,.11],[.44,.266,.31],fur,{coat});
+        for(const side of [-1,1])for(let i=0;i<3;i++)
+          draw(root,[side*(.30+.035*i),1.46+i*.09,.18],[.095,.19,.11],i===1?marks:fur,
+            {shape:'cone',rotate:tilt(PI+side*(.41+i*.15)),coat:neutralCoat});
+      }
       draw(root,[0,1.40,.11],[.356,.066,.299],a.cape,{metal:.28});
       draw(root,[0,1.343,.405],[.063,.074,.035],jewel,{metal:.65});
 
@@ -427,6 +434,28 @@
       }
     }
     function houndModel(root,feet,a,p,t) {
+      if(chase&&a.dog){
+        const fur=a.color,cream=a.rank%2?'#edd6ac':'#beb0a4',nose='#292232';
+        const stocky=a.rank>=6?1.18:1;
+        draw(root,[0,.79,0],[.31*stocky,.36,.58],fur);
+        draw(root,[0,.99,.34],[.27,.37,.29],cream);
+        draw(root,[0,1.38,.48],[.36,.35,.32],fur);
+        draw(root,[0,1.28,.75],[.21,.145,.25],cream);
+        draw(root,[0,1.34,.958],[.096,.067,.065],nose);
+        for(const k of [-1,1]){
+          draw(root,[k*.26,1.72,.48],[.15,a.rank<4?.32:.20,.10],fur,{shape:'cone',rotate:tilt(-k*.29)});
+          draw(root,[k*.26,1.73,.54],[.082,.17,.05],'#bd837e',{shape:'cone',rotate:tilt(-k*.29)});
+          draw(root,[k*.18,1.45,.743],[.073,.084,.044],nose);
+          draw(root,[k*.18-.018,1.478,.776],[.019,.019,.012],'#fff8df');
+          for(const j of [-1,1]){
+            const step=k*j*p.step*.42;
+            draw(feet,[k*.205,.43,j*.34+step*.5],[.104,.33,.115],fur,{rotate:turnX(step)});
+            draw(feet,[k*.205,.13,j*.34+.055+step],[.108,.08,.147],cream);
+          }
+        }
+        draw(root,[0,1.02,-.53],[.085,.29,.09],fur,{rotate:turnX(-.65+p.step*.25)});
+        return;
+      }
       const brass=a.color,iron=a.body,bone=a.metal,led=a.eye;
       const big=a.rank>=9;
       draw(root,[0,.97,0],[.48,.58,.37],iron,{metal:.65});
@@ -517,8 +546,9 @@
       const ratio=w/h, steady=Boolean(reduced?.matches);
       const after=impact&&!steady?clamp((now-impact.time)/410,0,1):1;
       const kick=Math.sin(after*PI)*.16*(impact?.power?1.55:1);
-      const baseView=multiply(position(-kick*.25,-1.42,-Math.max(6.4,8.3/ratio)+kick),turnX(.18));
-      const angle=chase?.72+(steady?0:kick*.25):0;
+      const distance=chase?Math.max(4.9,(fighterGap*.95+1.25)/ratio):Math.max(6.4,8.3/ratio);
+      const baseView=multiply(position(-kick*.25,chase?-1.12:-1.42,-distance+kick),turnX(chase?.11:.18));
+      const angle=chase?.43+(steady?0:kick*.25):0;
       const view=chase?multiply(baseView,turnY(angle)):baseView;
       gl.uniformMatrix4fv(uniforms.view,false,multiply(perspective(ratio),view));
       draw(identity(),[0,0,0],[5.5,1,4.4],'#596171',{shape:'plane',stone:1});
@@ -527,9 +557,9 @@
         if(!profile)continue;
         const [action,t]=current(side,now);
         const p=motion(action,t,stance,steady);
-        const x=direction*(-fighterGap*.5+p.shift);
+        const x=direction*(-fighterGap*.5+Math.min(p.shift,Math.max(.08,fighterGap-.83)));
         shadow(x,p.z,p.lift);
-        const scale=side==='foe'?profile.size*(profile.rank>=9?1.10:1):.96+(profile.uniq%5)*.018;
+        const scale=side==='foe'?(chase&&profile.dog?Math.max(.84,profile.size):profile.size)*(profile.rank>=9?1.10:1):.96+(profile.uniq%5)*.018;
         const {root,feet}=actorMatrices(x,p,direction,scale);
         if(side==='pet')catModel(root,feet,profile,p,elapsed);
         else houndModel(root,feet,profile,p,elapsed);

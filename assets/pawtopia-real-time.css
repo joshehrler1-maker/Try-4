@@ -13,3 +13,7 @@
 .rush-arc,.rush-finish{background:transparent;width:17%;height:13%;border-top:4px solid var(--tint);animation:rush-impact .45s ease-out forwards}.rush-finish{border:4px solid gold}
 @keyframes rush-flight{to{left:63%;top:45%;opacity:0}}@keyframes rush-impact{to{transform:scale(1.8);opacity:0}}
 @media(prefers-reduced-motion:reduce){.rush-fx{display:none}}
+#rush-field{background:radial-gradient(ellipse at 22% 30%,#ffe4af 0%,transparent 34%),linear-gradient(#607ca6 0%,#b4c4d0 40%,#e8ccac 64%,#795d56 100%)}
+#rush-field::before,#rush-field::after{content:"";position:absolute;inset:18% 0 15%;background:#82909d;clip-path:polygon(0 53%,12% 30%,21% 45%,36% 9%,49% 40%,57% 28%,73% 55%,85% 20%,100% 47%,100% 100%,0 100%);pointer-events:none}
+#rush-field::after{inset:33% 0 6%;background:#687684;clip-path:polygon(0 30%,18% 56%,34% 45%,49% 72%,64% 44%,78% 59%,100% 20%,100% 100%,0 100%)}
+#rush-canvas,.rush-paint{z-index:1}.rush-hud,#rush-status,.rush-fx{z-index:2}
