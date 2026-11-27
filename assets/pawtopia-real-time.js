@@ -121,12 +121,17 @@
         }else{state.combo=0;message('Out of reach');}
       }
       if(!state.clash&&clock>=state.next-.72&&!state.warning){
-        state.warning=true;field.dataset.warning='on';state.targetGap=1.35;
-        message(state.heavy?'Heavy charge · dodge':'Quick pounce · dodge');pose('foe','approach',690);
+        state.warning=true;field.dataset.warning='on';state.turn++;
+        const pattern=state.heavy?'heavy':(state.turn+state.foeIndex)%3===0?'shot':(state.turn+state.foeIndex)%3===1?'feint':'pounce';
+        state.enemyReach=pattern==='shot'?4:pattern==='heavy'?1.8:2.15;
+        state.targetGap=pattern==='shot'?3.1:pattern==='feint'?1.9:1.35;
+        const tell={heavy:'Heavy charge',shot:'Ranged shot',feint:'Feint',pounce:'Quick pounce'};
+        message(tell[pattern]+' · dodge');
+        pose('foe',pattern==='shot'?'signature':pattern==='feint'?'slipLeft':'approach',690);
       }
       if(!state.clash&&clock>=state.next){
         pose('foe','charge',450);
-        if(clock<=state.safeUntil||state.gap>2.15){state.counterUntil=clock+.95;message('Missed you · counter!');state.meter=Math.min(100,state.meter+12);}
+        if(clock<=state.safeUntil||state.gap>state.enemyReach){state.counterUntil=clock+.95;message('Missed you · counter!');state.meter=Math.min(100,state.meter+12);}
         else{state.hp=Math.max(0,state.hp-state.foeDamage);state.combo=0;state.pending=null;state.ready=clock+.28;
           pose('pet','impact',300);scene?.hit('pet','#ffbc73',state.heavy);message('Hit · −'+state.foeDamage+' HP');}
         state.next=clock+state.cadence+Math.random()*.55;state.warning=false;field.dataset.warning='';
@@ -163,7 +168,7 @@
     if(!reserve.length)reserve.push({cat:art.getArt(cat.breed==='Bengal'?'Siamese':'Bengal'),hp:100});
     const index=data.foes.indexOf(foe);
     Object.assign(state,{reserve,swapReady:0,gap:2.25,targetGap:2.25,meter:0,clash:0,counterUntil:0,
-      heavy:foe.rank>=6,foeDamage:8+foe.rank+(index%3),cadence:1.45+foe.rank*.09+(index%4)*.1});
+      turn:0,foeIndex:index,enemyReach:2.15,heavy:foe.rank>=6,foeDamage:8+foe.rank+(index%3),cadence:1.45+foe.rank*.09+(index%4)*.1});
     clock=0;last=performance.now();start.textContent='Pause';message('Fight');refresh();loop=requestAnimationFrame(tick);
   };
   for(const b of moves)b.onclick=()=>act(b.dataset.rush);
