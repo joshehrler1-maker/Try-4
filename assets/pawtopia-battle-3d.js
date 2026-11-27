@@ -120,7 +120,10 @@
       if(!steady&&(t+n*.12)%5.2>5.04)p.eyes=.12;
       return p;
     }
-    if(state==='walk'||state==='run'||state==='approach'){
+    if(state==='slipLeft'||state==='slipRight'){
+      const direction=state==='slipLeft'?-1:1;
+      p.z=direction*.85*peak;p.turn=direction*.32*peak;p.curl=.38*peak;p.step=.32*peak;
+    }else if(state==='walk'||state==='run'||state==='approach'){
       p.shift=peak*(state==='run'?.87:.52)*style.reach;
       p.step=Math.sin(t*TAU*(1+n%3*.5))*peak*(state==='walk'?.2:.36);
       p.bend=(.12+style.crouch*.38)*peak;
@@ -152,7 +155,7 @@
     }
     return p;
   }
-  function create(canvas,stage,{floorOnly=false}={}) {
+  function create(canvas,stage,{floorOnly=false,chase=false}={}) {
     if(!canvas||!stage)return null;
     let gl;
     try{gl=canvas.getContext('webgl',{alpha:true,antialias:true,premultipliedAlpha:false});}catch{return null;}
@@ -513,7 +516,9 @@
       const ratio=w/h, steady=Boolean(reduced?.matches);
       const after=impact&&!steady?clamp((now-impact.time)/410,0,1):1;
       const kick=Math.sin(after*PI)*.16*(impact?.power?1.55:1);
-      const view=multiply(position(-kick*.25,-1.42,-Math.max(6.4,8.3/ratio)+kick),turnX(.18));
+      const baseView=multiply(position(-kick*.25,-1.42,-Math.max(6.4,8.3/ratio)+kick),turnX(.18));
+      const angle=chase?1.00+(steady?0:kick*.25):0;
+      const view=chase?multiply(baseView,turnY(angle)):baseView;
       gl.uniformMatrix4fv(uniforms.view,false,multiply(perspective(ratio),view));
       draw(identity(),[0,0,0],[5.5,1,4.4],'#596171',{shape:'plane',stone:1});
       const elapsed=steady?0:now*.001;

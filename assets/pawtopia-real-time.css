@@ -1,0 +1,9 @@
+#rush-field{position:relative;isolation:isolate;height:clamp(220px,52svh,450px);overflow:hidden;touch-action:none;user-select:none;border-radius:16px;background:linear-gradient(#19133126,#32254561),url("scenes/town-arena.webp") center 50%/cover}
+#rush-canvas,.rush-paint{position:absolute;inset:0;width:100%;height:100%}
+.rush-paint{display:none;align-items:end;justify-content:space-around;padding-bottom:3%}
+#rush-field[data-painted=true] .rush-paint{display:flex}
+.rush-paint>div{width:32%;position:relative;display:grid}.rush-paint>div>*{grid-area:1/1;width:100%;height:auto}
+.rush-hud{position:absolute;inset:8px 10px auto;display:flex;justify-content:space-between;pointer-events:none}.rush-hud label{display:grid;width:36%;background:#14223de8;border-radius:8px;padding:4px 9px;color:white}.rush-hud progress{width:100%;accent-color:#69efbf}
+#rush-status{position:absolute;bottom:5%;left:50%;transform:translateX(-50%);white-space:nowrap;background:#17263de6;color:white;padding:4px 12px;border-radius:16px;pointer-events:none}
+#rush-field[data-warning=on]{box-shadow:inset 0 0 0 4px #ffbf70}#rush-field[data-warning=on] #rush-status{background:#69350a;color:#fff1ca}
+.rush-dock{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:.5rem 0}.rush-dock button{min-height:46px;font-weight:800;border-radius:10px;color:white;background:#304c76;border:1px solid #8daacc}.rush-dock button:first-child{background:#724b19}.rush-dock button:disabled{opacity:.55}#rush-energy{accent-color:#fac961}

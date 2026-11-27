@@ -26,7 +26,7 @@
 <script defer src="assets/pawtopia-battle-foe-art.js?v=grounded-1"></script>
 <script defer src="assets/pawtopia-battle-watch.js"></script>
 <script defer src="assets/pawtopia-battle-cinematics.js?v=duel-flow-1"></script>
-<script defer src="assets/pawtopia-battle-3d.js?v=ring-closeup"></script>
+<script defer src="assets/pawtopia-battle-3d.js?v=chase-1"></script>
 <script defer src="assets/pawtopia-battle-sound.js?v=1"></script>
 <script defer src="assets/pawtopia-item-art.js?v=painted-1"></script>
 <script defer src="assets/pawtopia-battle-motion.js?v=martial-forms-1"></script>
@@ -41,6 +41,8 @@
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
+<link rel="stylesheet" href="assets/pawtopia-real-time.css">
+<script defer src="assets/pawtopia-real-time.js"></script>
 </head>
 <body>
 <a class="skip" href="#arena-main">Skip to Battle Arena</a>
@@ -61,7 +63,7 @@
 <div class="welcome-copy">
 <p class="eyebrow">Pawtopia · Original, free pet battles</p>
 <h1>Battle Arena</h1>
-<p id="arena-matchup"></p><a class="primary" href="#arena-play-area">Jump to battle</a>
+<p id="arena-matchup"></p><a class="primary" href="#rush-mode">Play 3D battle</a> <a class="secondary" href="#arena-play-area">Jump to turn-based battle</a>
 <p>Every adopted cat can become a champion! Choose your companion, face a dog challenger, and <strong>watch the fight</strong> as pets move, strike, cast their unique skills, and celebrate victories.</p>
 <p>Battle through 207 dog challengers from smallest to largest, then face Baron Brasswhirl in his Clockwork Avatar.</p>
 <a class="primary" href="#arena-duels">Online pet battles</a>
@@ -71,6 +73,18 @@
 <img src="assets/scenes/town-arena.webp" width="500" height="500" loading="lazy" alt="Original Pawtopia arena environment art">
 </section>
 
+<section id="rush-mode" class="panel" aria-labelledby="rush-title">
+<h2 id="rush-title">3D sparring arena</h2>
+<p>Tap to strike, swipe sideways to dodge, or hold the ring to charge energy. Chain three strikes for a stronger finish. Practice with your selected matchup or the starter Maine Coon.</p>
+<div id="rush-field" data-painted="false">
+<canvas id="rush-canvas" aria-hidden="true"></canvas>
+<div class="rush-paint" aria-hidden="true"><div id="rush-cat"></div><div id="rush-dog"></div></div>
+<div class="rush-hud"><label><span id="rush-pet-name">Your fighter</span><progress id="rush-life" value="100" max="100"></progress></label><label><span id="rush-foe-name">Challenger</span><progress id="rush-enemy-life" value="100" max="100"></progress></label></div>
+<strong id="rush-status" role="status">Ready to spar</strong>
+</div>
+<div class="rush-dock"><button id="rush-start">Start fight</button><button data-rush="strike" disabled>Strike</button><button data-rush="burst" disabled>Signature</button><button data-rush="dodge" disabled>Dodge</button></div>
+<label>Energy <progress id="rush-energy" value="70" max="100"></progress></label>
+</section>
 <section class="panel" id="arena-duels" aria-labelledby="duel-heading">
   <h2 id="duel-heading">Player vs. player</h2>
   <p>Find a ranked opponent or challenge a friend by invite. Choose moves in secret. The round plays when both fighters are ready.</p>
