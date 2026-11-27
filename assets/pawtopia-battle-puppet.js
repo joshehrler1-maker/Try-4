@@ -122,22 +122,26 @@
     }
     if(art.dog===true)return dogMotion(art,pose,frame);
     if(['walk','run','approach'].includes(pose)){
-      const d=Math.sin(frame/5*Math.PI*(pose==='walk'?2:4))*(pose==='walk'?10:16)*(1+(art.uniq%7)*.05);
-      const lift=Math.abs(d)*.6;
+      const stance=art.fightingStyle;
+      const grounded=stance.footwork==='root'||stance.footwork==='coil';
+      const cycle=frame/5*Math.PI*(pose==='run'?4:2);
+      const d=Math.sin(cycle)*(pose==='walk'?9:13)*(grounded?.72:1)*(1+stance.amplitude/32);
+      const lift=Math.abs(d)*(grounded?.24:.6);
       return [[d*.28,lift*.1],[-d*.55,-Math.max(0,d)*.6],[d,-Math.max(0,d)*.9],
         [-d,-Math.max(0,-d)*.9],[1,-lift*.4],[-d*.3,-lift*.25],[0,-lift*.4]];
     }
-    if(pose==='signature'||pose==='ultimate'){
+    if(['swipe','guard','signature','ultimate'].includes(pose)){
       const style=personal(art,pose,frame);
       const power=pose==='ultimate'?1.23:1;
       const pulse=Math.sin(frame/5*Math.PI)**2;
       const leap=['comet','pounce'].includes(style.technique);
       const pivot=style.technique==='whirl';
-      const push=['rush','lance'].includes(style.technique);
       const lead=[style.lead[0]*power*.78,(style.lead[1]*.75-5*pulse)*power];
       const off=[style.offhand[0]*power*.58,style.offhand[1]*power*.65];
-      const hands=style.leadIndex===0&&art.uniq>=8?[off,lead]:[lead,off];
-      return [...hands,[pivot?-11*pulse:0,leap?-7*pulse:0],[push||pivot?9*pulse:0,leap?-14*pulse:0],
+      const hands=style.leadIndex===0?[off,lead]:[lead,off];
+      const moving=[style.foot[0]+(pivot?-6*pulse:0),style.foot[1]-(leap?5*pulse:0)];
+      const feet=style.leadIndex===0?[zero,moving]:[moving,zero];
+      return [...hands,...feet,
         [style.torso[0]*.2,-4*pulse],[pivot?-23*pulse:-8*pulse,6*pulse],
         [style.torso[0]*.48*power,style.torso[1]*.37*power-(leap?12*pulse:0)]];
     }

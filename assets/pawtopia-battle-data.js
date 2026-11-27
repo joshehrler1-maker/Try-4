@@ -282,8 +282,9 @@
   }
   function movesFor(cat) {
     const kit = kitFor(cat?.breed);
+    const form=window.PawtopiaBattleCharacterArt?.identityFor(kit.breed)?.form;
     return [
-      { id:'swipe', name:'Paw Swipe', level:1, description:'Shared reliable basic attack' },
+      { id:'swipe', name:'Paw Swipe', level:1, description:form ? form+' opening' : 'Shared reliable basic attack' },
       { id:'guard', name:'Guard Curl', level:3, description:'Block and counter a portion of the next blow' },
       { id:'signature', name:(cat?.name || kit.breed) + '’s ' + kit.signature, level:6, description:'Unique ' + kit.theme.type + ' technique · ' + kit.theme.bonus },
       { id:'ultimate', name:(cat?.name || kit.breed) + '’s ' + kit.ultimate, level:10, description:'Powerful once-per-battle signature finale' }

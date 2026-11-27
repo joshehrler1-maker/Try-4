@@ -51,7 +51,7 @@
       const travel=fraction(t,approach,approachEnd);
       const stride=travel*steps;
       return {pose:'approach',frame:travel===1?5:(stride-Math.floor(stride))*5,
-        x:reach*(travel*1.085-.085)};
+        x:reach*(ease(travel)*1.085-.085)};
     }
     const hold=contact+(clip.outcome==='block' ? .018 : .055);
     const recover=contact+.19;
@@ -62,7 +62,7 @@
     }
     const back=fraction(t,recover,1),stride=back*Math.max(1,steps-1);
     return {pose:back>=1?'idle':'approach',frame:(1-(stride-Math.floor(stride)))*5,
-      x:reach*(clip.outcome==='dodge'?1.10:clip.outcome==='block' ? .78 : .9)*(1-back)};
+      x:reach*(clip.outcome==='dodge'?1.10:clip.outcome==='block' ? .78 : .9)*(1-ease(back))};
   }
   function reaction(clip,t,width,defender,keep) {
     const start=clip.contact-.20;

@@ -539,7 +539,7 @@
     const defenderArt=el(isPet?'battle-foe-art':'battle-cat-art');
     const previous=new Map();
     function paint(pet,pose,frame,from){
-      const frameStep=economical?1:.5;
+      const frameStep=economical?1:.25;
       const stepped=Math.round(frame/frameStep)*frameStep;
       const key=pose+'|'+stepped+'|'+(from||'');
       if(previous.get(pet)===key)return;

@@ -70,6 +70,65 @@
   // Authored individually for each approved breed and named battle skill.
   // Each fighter has a distinct fighting identity, dominant paw, reach, arc,
   // windup rhythm and balance. Styles are data, not reused silhouette motion.
+  // Pawtopia forms are original exhibition choreography inspired by these disciplines.
+  const forms = {
+    "Maine Coon": ["Hung Gar","Iron Bridge","root",8],
+    "Siamese": ["Wing Chun","Rolling Bridge","coil",5],
+    "Bengal": ["Taekwondo","Turning Crescent","kick",15],
+    "British Shorthair": ["Goju-ryu","Breathing Circle","root",7],
+    "Ragdoll": ["Aikido","Flowing Turn","circle",11],
+    "Sphynx": ["Capoeira Angola","Low Compass","sway",14],
+    "Abyssinian": ["Northern Praying Mantis","Seven Star Step","step",10],
+    "American Bobtail": ["Choy Li Fut","Wheel Arc","circle",14],
+    "American Curl": ["Baguazhang","Changing Palm","circle",12],
+    "American Shorthair": ["Shotokan","Gliding Advance","step",12],
+    "American Wirehair": ["Southern Praying Mantis","Spring Bridge","coil",8],
+    "Balinese": ["Pencak Silat","Flower Step","sway",10],
+    "Birman": ["Shorin-ryu","Rising Wave","step",8],
+    "Bombay": ["Western boxing","Slip and Roll","sway",8],
+    "Burmese": ["Bando","Panther Step","step",11],
+    "Burmilla": ["Yang-style Tai Chi","Cloud Hands","circle",7],
+    "Chartreux": ["Bajiquan","Sinking Step","root",13],
+    "Cornish Rex": ["Capoeira Regional","Crescent Wheel","kick",13],
+    "Devon Rex": ["White Crane","Crane Balance","balance",9],
+    "Egyptian Mau": ["Wushu Changquan","Soaring Crescent","kick",14],
+    "European Shorthair": ["Savate","Pendulum Change","kick",10],
+    "Exotic Shorthair": ["Sumo","Mountain Shift","root",14],
+    "Havana Brown": ["Tang Soo Do","Wheel Turn","kick",12],
+    "Japanese Bobtail": ["Wado-ryu","Passing Step","sway",9],
+    "Khao Manee": ["Shito-ryu","Diamond Pivot","balance",8],
+    "Korat": ["Muay Thai","Switch Rhythm","balance",13],
+    "LaPerm": ["Chen-style Tai Chi","Silk Reeling","coil",10],
+    "Lykoi": ["Chuo Jiao","Shadow Step","kick",11],
+    "Manx": ["Hapkido","Returning Arc","circle",10],
+    "Nebelung": ["Wu-style Tai Chi","Mist Turn","sway",7],
+    "Norwegian Forest Cat": ["Shuai Jiao","Cross Step","root",12],
+    "Ocicat": ["Lethwei","Rolling Advance","step",13],
+    "Oriental Shorthair": ["Xingyiquan","Arrow Step","step",14],
+    "Persian": ["Meihuaquan","Plum Blossom Turn","balance",11],
+    "Peterbald": ["Jeet Kune Do","Broken Rhythm","step",9],
+    "Pixiebob": ["Sanda","Spring Step","balance",12],
+    "Ragamuffin": ["Judo","Wheel Entry","circle",9],
+    "Russian Blue": ["Systema","Spiral Step","sway",11],
+    "Savannah": ["Dambe","Gathering Step","step",15],
+    "Scottish Fold": ["Uechi-ryu","Turtle Bridge","root",6],
+    "Selkirk Rex": ["Glima","Turning Balance","balance",10],
+    "Siberian": ["Sambo","Snow Pivot","circle",13],
+    "Singapura": ["Bak Mei","Thunder Spring","coil",11],
+    "Snowshoe": ["Liuhebafa","Water Step","sway",12],
+    "Somali": ["Taekkyeon","Rhythmic Crescent","kick",9],
+    "Tonkinese": ["Panantukan","Twilight Weave","sway",13],
+    "Toyger": ["Tiger Kung Fu","Striped Bridge","root",11],
+    "Turkish Angora": ["Fan Ziquan","Pearl Cascade","coil",12],
+    "Turkish Van": ["Shorinji Kempo","Lake Turn","circle",8],
+    "York Chocolate": ["Kyokushin","Deep Stance","root",10],
+    "Australian Mist": ["Enshin Karate","Outside Circle","circle",15],
+    "Cymric": ["Swiss Schwingen","Alpine Pivot","balance",14],
+    "Donskoy": ["Yiquan","Coiled Spring","coil",9],
+    "German Rex": ["Tongbeiquan","Pendulum Arc","coil",13],
+    "Kurilian Bobtail": ["Gongkwon Yusul","Tide Change","balance",7],
+    "Sokoke": ["Kalaripayattu","Canopy Flow","kick",16]
+  };
   const fightingStyles = Object.freeze([
     ['Maine Coon','Timber Claw','Heavy Overhand','maul','right',33,17,7],
     ['Siamese','Moonlight Prism','Twin Moon Cross','prism','left',21,29,3],
@@ -128,7 +187,7 @@
     ['Kurilian Bobtail','Island Current','Island Flow','wave','right',32,33,7],
     ['Sokoke','Canopy Zigzag','Canopy Rush','rush','left',42,23,12]
   ].map(([breed,signature,label,technique,lead,reach,arc,tempo],index)=>Object.freeze({
-    breed,signature,label,technique,lead,reach,arc,tempo,serial:index+1
+    breed,signature,label:forms[breed][0]+" · "+forms[breed][1],form:forms[breed][1],footwork:forms[breed][2],amplitude:forms[breed][3],technique,lead,reach,arc,tempo,serial:index+1
   })));
   // Geometry is authored per technique, then personalized by all 56 individual
   // profiles. Six key-positions cover recoil, anticipation, contact and recovery.
@@ -430,8 +489,30 @@
     const lead=delta(route.lead);
     const offhand=delta(route.off);
     const torso=delta(route.body);
+    // Start the weight transfer before the reaching paw, then let the tail settle last.
+    const t=Math.max(0,Math.min(1,frame/5));
+    const envelope=Math.sin(Math.PI*t)**2;
+    const turn=Math.sin(2*Math.PI*t)*envelope*style.amplitude*power;
+    const rise=envelope*style.amplitude*power;
+    const foot=[0,0];
+    switch(style.footwork){
+      case 'kick': foot[0]=rise*2.2;foot[1]=-rise*1.8;torso[0]-=rise*.7;break;
+      case 'circle': foot[0]=turn;foot[1]=-rise*.5;torso[0]+=turn;offhand[0]-=turn;break;
+      case 'sway': torso[0]-=turn*1.6;torso[1]+=rise*.7;lead[0]+=turn;break;
+      case 'root': torso[1]+=rise;torso[0]-=turn*.5;offhand[1]-=rise*.6;break;
+      case 'balance': foot[1]=-rise*1.4;foot[0]=turn*.5;offhand[0]-=rise;break;
+      case 'step': foot[0]=rise;foot[1]=-Math.max(0,turn);torso[0]+=rise*.8;break;
+      case 'coil': torso[0]+=turn;lead[0]-=turn;offhand[0]+=turn*.8;break;
+    }
+    // A finale adds a second beat as the lead paw retracts.
+    if(pose==='ultimate' && t>.6){
+      const follow=Math.sin(Math.PI*(t-.6)/.4)**2*style.amplitude;
+      offhand[0]+=follow*1.35;
+      offhand[1]-=follow*.7;
+      torso[0]-=follow*.45;
+    }
     const leadIndex=style.lead==='left'?0:1;
-    return Object.freeze({leadIndex,lead,offhand,torso,label:style.label,technique:style.technique});
+    return Object.freeze({leadIndex,lead,offhand,torso,foot,label:style.label,technique:style.technique});
   }
   // A small grounded weight shift makes the back/torso react to paw force.
   // Feet remain independent of the torso so they do not float with the strike.
@@ -504,6 +585,9 @@
       drawn[i][2]=Math.min(219,Math.max(4,drawn[i][2]+delta[0]));
       drawn[i][3]=Math.min(220,Math.max(12,drawn[i][3]+delta[1]));
     }
+    const movingFoot=drawn[2+individual.leadIndex];
+    movingFoot[0]+=individual.foot[0];
+    movingFoot[1]+=individual.foot[1];
     const headAngle=Math.round(target[4]*weight+
       (pose==='impact'?-counter*.2:0)+individual.torso[0]*.14);
     drawn.push(headAngle);
