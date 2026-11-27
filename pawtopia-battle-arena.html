@@ -26,7 +26,7 @@
 <script defer src="assets/pawtopia-battle-foe-art.js?v=grounded-1"></script>
 <script defer src="assets/pawtopia-battle-watch.js"></script>
 <script defer src="assets/pawtopia-battle-cinematics.js?v=duel-flow-1"></script>
-<script defer src="assets/pawtopia-battle-3d.js?v=chase-1"></script>
+<script defer src="assets/pawtopia-battle-3d.js?v=range2"></script>
 <script defer src="assets/pawtopia-battle-sound.js?v=1"></script>
 <script defer src="assets/pawtopia-item-art.js?v=painted-1"></script>
 <script defer src="assets/pawtopia-battle-motion.js?v=martial-forms-1"></script>
@@ -41,8 +41,8 @@
 <link rel="stylesheet" href="assets/pawtopia-battle-3d.css?v=dogs-painted">
 
 <link rel="stylesheet" href="assets/super-paw-world-art.css?v=1">
-<link rel="stylesheet" href="assets/pawtopia-real-time.css">
-<script defer src="assets/pawtopia-real-time.js"></script>
+<link rel="stylesheet" href="assets/pawtopia-real-time.css?v=range2">
+<script defer src="assets/pawtopia-real-time.js?v=range2"></script>
 </head>
 <body>
 <a class="skip" href="#arena-main">Skip to Battle Arena</a>
@@ -75,7 +75,7 @@
 
 <section id="rush-mode" class="panel" aria-labelledby="rush-title">
 <h2 id="rush-title">3D sparring arena</h2>
-<p>Tap to strike, swipe sideways to dodge, or hold the ring to charge energy. Chain three strikes for a stronger finish. Practice with your selected matchup or the starter Maine Coon.</p>
+<p>Swipe up to approach, down to retreat, and sideways to dodge. Tap for a swipe, pounce, or shot depending on distance. Hold to charge. Tag an adopted ally or a guest training partner for cover.</p>
 <div id="rush-field" data-painted="false">
 <canvas id="rush-canvas" aria-hidden="true"></canvas>
 <div class="rush-paint" aria-hidden="true"><div id="rush-cat"></div><div id="rush-dog"></div></div>
@@ -83,6 +83,8 @@
 <strong id="rush-status" role="status">Ready to spar</strong>
 </div>
 <div class="rush-dock"><button id="rush-start">Start fight</button><button data-rush="strike" disabled>Strike</button><button data-rush="burst" disabled>Signature</button><button data-rush="dodge" disabled>Dodge</button></div>
+<div class="rush-dock rush-footwork"><button data-rush="advance" disabled>Approach</button><button data-rush="retreat" disabled>Retreat</button><button data-rush="swap" id="rush-swap" disabled>Tag ally</button></div>
+<div class="rush-meters"><strong id="rush-range">Mid</strong><label>Dodge <progress id="rush-evade" value="1" max="1"></progress></label><label>Finisher <progress id="rush-meter" value="0" max="100"></progress></label></div>
 <label>Energy <progress id="rush-energy" value="70" max="100"></progress></label>
 </section>
 <section class="panel" id="arena-duels" aria-labelledby="duel-heading">

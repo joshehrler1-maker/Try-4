@@ -497,6 +497,7 @@
       if(dt>=tr.duration)return tr.end==='idle'?['idle',now*.001]:[tr.end,1];
       return [tr.name,clamp(dt/tr.duration,0,1)];
     }
+    let fighterGap=3.18;
     function render(now) {
       raf=0;
       if(lost||!visible||document.hidden)return;
@@ -517,7 +518,7 @@
       const after=impact&&!steady?clamp((now-impact.time)/410,0,1):1;
       const kick=Math.sin(after*PI)*.16*(impact?.power?1.55:1);
       const baseView=multiply(position(-kick*.25,-1.42,-Math.max(6.4,8.3/ratio)+kick),turnX(.18));
-      const angle=chase?1.00+(steady?0:kick*.25):0;
+      const angle=chase?.72+(steady?0:kick*.25):0;
       const view=chase?multiply(baseView,turnY(angle)):baseView;
       gl.uniformMatrix4fv(uniforms.view,false,multiply(perspective(ratio),view));
       draw(identity(),[0,0,0],[5.5,1,4.4],'#596171',{shape:'plane',stone:1});
@@ -526,7 +527,7 @@
         if(!profile)continue;
         const [action,t]=current(side,now);
         const p=motion(action,t,stance,steady);
-        const x=direction*(-1.59+p.shift);
+        const x=direction*(-fighterGap*.5+p.shift);
         shadow(x,p.z,p.lift);
         const scale=side==='foe'?profile.size*(profile.rank>=9?1.10:1):.96+(profile.uniq%5)*.018;
         const {root,feet}=actorMatrices(x,p,direction,scale);
@@ -582,9 +583,9 @@
     reduced?.addEventListener?.('change',schedule);
     stage.classList.add(floorOnly?'battle-has-floor':'battle-has-3d');
     schedule();
-    return {roster,pose,
+    return {roster,pose,spacing(value){fighterGap=value;},
       active:()=>!lost,
-      hit(who,tint,power){impact={time:window.performance.now(),x:who==='pet'?-1.59:1.59,tint,power};schedule();}
+      hit(who,tint,power){impact={time:window.performance.now(),x:(who==='pet'?-1:1)*fighterGap*.5,tint,power};schedule();}
     };
   }
   window.PawtopiaBattle3D=Object.freeze({create,profileFor});

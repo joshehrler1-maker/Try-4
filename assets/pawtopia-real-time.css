@@ -7,3 +7,9 @@
 #rush-status{position:absolute;bottom:5%;left:50%;transform:translateX(-50%);white-space:nowrap;background:#17263de6;color:white;padding:4px 12px;border-radius:16px;pointer-events:none}
 #rush-field[data-warning=on]{box-shadow:inset 0 0 0 4px #ffbf70}#rush-field[data-warning=on] #rush-status{background:#69350a;color:#fff1ca}
 .rush-dock{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:.5rem 0}.rush-dock button{min-height:46px;font-weight:800;border-radius:10px;color:white;background:#304c76;border:1px solid #8daacc}.rush-dock button:first-child{background:#724b19}.rush-dock button:disabled{opacity:.55}#rush-energy{accent-color:#fac961}
+.rush-dock.rush-footwork{grid-template-columns:1fr 1fr 1.5fr}.rush-meters{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.rush-meters progress{width:4rem}
+#rush-cat{translate:calc(-1 * var(--spread,0px)) 0}#rush-dog{translate:var(--spread,0px) 0}
+.rush-fx{position:absolute;pointer-events:none;left:39%;top:55%;width:1.2rem;height:.65rem;background:var(--tint);border-radius:100%;box-shadow:0 0 12px var(--tint);animation:rush-flight .32s ease-in forwards}
+.rush-arc,.rush-finish{background:transparent;width:17%;height:13%;border-top:4px solid var(--tint);animation:rush-impact .45s ease-out forwards}.rush-finish{border:4px solid gold}
+@keyframes rush-flight{to{left:63%;top:45%;opacity:0}}@keyframes rush-impact{to{transform:scale(1.8);opacity:0}}
+@media(prefers-reduced-motion:reduce){.rush-fx{display:none}}
