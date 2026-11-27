@@ -27,7 +27,7 @@
     }
   }
   function end(won){
-    state.live=false;charging=false;field.dataset.warning='';
+    state.live=false;origin=null;charging=false;field.dataset.warning='';
     pose('pet',won?'victory':'defeat',650,won?'victory':'defeat');
     pose('foe',won?'defeat':'victory',650,won?'defeat':'victory');
     message(won?'Victory!':'Defeat · Try another round');
@@ -84,7 +84,7 @@
     if(pounce)shift(-1.35);
     if(ultimate)state.targetGap=1.15;
     state.energy-=cost;
-    state.combo=!burst&&band==='Close'&&clock-state.previous<1.2?state.combo%3+1:1;
+    state.combo=!burst&&band==='Close'?(clock-state.previous<1.2?state.combo%3+1:1):0;
     state.previous=clock;
     const finisher=state.combo===3;
     const delay=ultimate?.46:projectile?.33:pounce?.32:.17;
@@ -104,12 +104,13 @@
     state.energy=Math.min(100,state.energy+dt*(charging?30:7));
     if(state.clash){
       if(clock>state.clash+.3){state.clash=0;state.hp=Math.max(0,state.hp-7);message('Clash lost');if(!state.hp){end(false);return;}}
-      else if(clock>=state.clash-.2)message('Clash · tap Strike now!');
+      else if(Math.abs(clock-state.clash)<.25)message('Clash · tap Strike now!');
+      else if(clock>=state.clash+.25)message('Clash · too late');
     }else{
       const hit=state.pending;
       if(hit&&clock>=hit.at){
         state.pending=null;
-        if(state.warning&&hit.pounce&&state.next-clock<.38&&state.gap<=hit.reach){
+        if(state.warning&&['pounce','heavy'].includes(state.pattern)&&hit.pounce&&state.next-clock<.38&&state.gap<=hit.reach){
           state.clash=clock+.45;state.next=clock+2.3;state.warning=false;field.dataset.warning='';message('Clash · get ready');
         }else if(state.gap<=hit.reach){
           state.enemy=Math.max(0,state.enemy-hit.damage-(hit.counter?6:0));
@@ -123,6 +124,7 @@
       if(!state.clash&&clock>=state.next-.72&&!state.warning){
         state.warning=true;field.dataset.warning='on';state.turn++;
         const pattern=state.heavy?'heavy':(state.turn+state.foeIndex)%3===0?'shot':(state.turn+state.foeIndex)%3===1?'feint':'pounce';
+        state.pattern=pattern;
         state.enemyReach=pattern==='shot'?4:pattern==='heavy'?1.8:2.15;
         state.targetGap=pattern==='shot'?3.1:pattern==='feint'?1.9:1.35;
         const tell={heavy:'Heavy charge',shot:'Ranged shot',feint:'Feint',pounce:'Quick pounce'};
@@ -130,7 +132,7 @@
         pose('foe',pattern==='shot'?'signature':pattern==='feint'?'slipLeft':'approach',690);
       }
       if(!state.clash&&clock>=state.next){
-        pose('foe','charge',450);
+        pose('foe',state.pattern==='shot'?'signature':'charge',450);
         if(clock<=state.safeUntil||state.gap>state.enemyReach){state.counterUntil=clock+.95;message('Missed you · counter!');state.meter=Math.min(100,state.meter+12);}
         else{state.hp=Math.max(0,state.hp-state.foeDamage);state.combo=0;state.pending=null;state.ready=clock+.28;
           pose('pet','impact',300);scene?.hit('pet','#ffbc73',state.heavy);message('Hit · −'+state.foeDamage+' HP');}
@@ -173,16 +175,19 @@
   };
   for(const b of moves)b.onclick=()=>act(b.dataset.rush);
   field.onpointerdown=e=>{
-    if(!state?.live||state.paused)return;
-    origin={x:e.clientX,y:e.clientY,time:performance.now()};field.setPointerCapture(e.pointerId);charging=true;
+    if(!state?.live||state.paused||origin)return;
+    origin={pointerId:e.pointerId,x:e.clientX,y:e.clientY,time:performance.now()};field.setPointerCapture(e.pointerId);charging=true;
   };
   field.onpointerup=e=>{
-    charging=false;if(!origin)return;
+    if(origin?.pointerId!==e.pointerId)return;
+    charging=false;
     const dx=e.clientX-origin.x,dy=e.clientY-origin.y,elapsed=performance.now()-origin.time;origin=null;
     if(Math.abs(dx)>28&&Math.abs(dx)>Math.abs(dy))act('dodge',Math.sign(dx));
     else if(Math.abs(dy)>28)act(dy<0?'advance':'retreat');
     else if(elapsed<280&&Math.abs(dy)<24)act('strike');
   };
-  field.onpointercancel=()=>{charging=false;origin=null;};
+  field.onpointercancel=field.onlostpointercapture=e=>{
+    if(origin?.pointerId===e.pointerId){charging=false;origin=null;}
+  };
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&state?.live&&!state.paused)pause();});
 })();
