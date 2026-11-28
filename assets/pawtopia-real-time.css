@@ -17,3 +17,8 @@
 #rush-field::before,#rush-field::after{content:"";position:absolute;inset:18% 0 15%;background:#82909d;clip-path:polygon(0 53%,12% 30%,21% 45%,36% 9%,49% 40%,57% 28%,73% 55%,85% 20%,100% 47%,100% 100%,0 100%);pointer-events:none}
 #rush-field::after{inset:33% 0 6%;background:#687684;clip-path:polygon(0 30%,18% 56%,34% 45%,49% 72%,64% 44%,78% 59%,100% 20%,100% 100%,0 100%)}
 #rush-canvas,.rush-paint{z-index:1}.rush-hud,#rush-status,.rush-fx{z-index:2}
+
+#rush-field{background:radial-gradient(ellipse at 20% 28%,#fff4cf 0,transparent 30%),linear-gradient(#467dac,#a5dfed 39%,#f4dbab 75%,#877667)}
+.rush-dock button[data-rush]{background:linear-gradient(150deg,#4b7794,#18304d 74%);border-bottom:3px solid #84c2cb}
+.rush-dock button[data-rush="burst"]{background:linear-gradient(150deg,#815b9b,#352849);border-color:#d5b3ee}
+.rush-hud label{border-bottom:2px solid #9bcbb9}.rush-hud label:last-child{border-color:#e7a17b}

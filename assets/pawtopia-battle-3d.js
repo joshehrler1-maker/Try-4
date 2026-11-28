@@ -527,6 +527,7 @@
       return [tr.name,clamp(dt/tr.duration,0,1)];
     }
     let fighterGap=3.18;
+    let cameraX=0,cameraZ=0,cameraTime=0;
     function render(now) {
       raf=0;
       if(lost||!visible||document.hidden)return;
@@ -546,12 +547,26 @@
       const ratio=w/h, steady=Boolean(reduced?.matches);
       const after=impact&&!steady?clamp((now-impact.time)/410,0,1):1;
       const kick=Math.sin(after*PI)*.16*(impact?.power?1.55:1);
-      const distance=chase?Math.max(5.15,(fighterGap*.53+1.02)/(ratio*Math.tan(.36))+.65):Math.max(6.4,8.3/ratio);
+      const [petAction,phase]=current('pet',now);
+      const body=pet?motion(petAction,phase,petStance,steady):{shift:0,z:0};
+      const follow=1-Math.exp(-Math.min(.12,(now-cameraTime)/1000)*9);
+      cameraTime=now;
+      cameraX+=(-fighterGap*.5+body.shift*.44-cameraX)*follow;
+      cameraZ+=(body.z*.52-cameraZ)*follow;
+      const distance=chase?Math.max(4.45,2.0/Math.max(.45,ratio)):Math.max(6.4,8.3/ratio);
       const baseView=multiply(position(-kick*.25,chase?-1.12:-1.42,-distance+kick),turnX(chase?.11:.18));
-      const angle=chase?.43+(steady?0:kick*.25):0;
-      const view=chase?multiply(baseView,turnY(angle)):baseView;
+      const angle=chase?1.14+(steady?0:kick*.12):0;
+      const view=chase?multiply(multiply(baseView,turnY(angle)),position(-cameraX-.48,0,-cameraZ-.14)):baseView;
       gl.uniformMatrix4fv(uniforms.view,false,multiply(perspective(ratio),view));
       draw(identity(),[0,0,0],[5.5,1,4.4],'#596171',{shape:'plane',stone:1});
+      if(chase){
+        // Distant rock spires give the tracking shot a fixed point of reference.
+        for(let i=0;i<9;i++){
+          const z=(i-4)*1.65, height=.85+.55*Math.cos(i*2.1);
+          draw(identity(),[6.3+i%3,height*.5,z],[.85,height,.68],'#687d95',{shape:'cone'});
+          draw(identity(),[6.3+i%3,height*1.34,z],[.24,height*.28,.19],'#dce5df',{shape:'cone'});
+        }
+      }
       const elapsed=steady?0:now*.001;
       for(const [side,profile,stance,direction] of [['pet',pet,petStance,1],['foe',foe,foeStance,-1]]){
         if(!profile)continue;
@@ -564,6 +579,13 @@
         if(side==='pet')catModel(root,feet,profile,p,elapsed);
         else houndModel(root,feet,profile,p,elapsed);
         skillEffect(root,side==='pet'?{color:style?.color||profile.color}:profile,p,action,t);
+      }
+      if(chase&&pet&&!steady&&['charge','slipLeft','slipRight','ultimate'].includes(petAction)){
+        const pulse=Math.sin(PI*phase);
+        for(let i=0;i<5;i++){
+          const lane=(i-2)*.12;
+          draw(identity(),[cameraX-.32-phase*.38,1.10+lane,body.z+lane*.7],[.35*pulse+.012,.013,.018],pet.color,{shape:'detail',emit:.85,opacity:.60*pulse});
+        }
       }
       if(after<1 && impact){
         const count=efficient?7:15;
