@@ -553,10 +553,10 @@
       cameraTime=now;
       cameraX+=(-fighterGap*.5+body.shift*.44-cameraX)*follow;
       cameraZ+=(body.z*.52-cameraZ)*follow;
-      const distance=chase?Math.max(4.45,2.0/Math.max(.45,ratio)):Math.max(6.4,8.3/ratio);
+      const distance=chase?Math.max(5.45,3.75/Math.max(.45,ratio)):Math.max(6.4,8.3/ratio);
       const baseView=multiply(position(-kick*.25,chase?-1.12:-1.42,-distance+kick),turnX(chase?.11:.18));
-      const angle=chase?1.14+(steady?0:kick*.12):0;
-      const view=chase?multiply(multiply(baseView,turnY(angle)),position(-cameraX-.48,0,-cameraZ-.14)):baseView;
+      const angle=chase?.94+(steady?0:kick*.12):0;
+      const view=chase?multiply(multiply(baseView,turnY(angle)),position(-cameraX-.95,0,-cameraZ-.18)):baseView;
       gl.uniformMatrix4fv(uniforms.view,false,multiply(perspective(ratio),view));
       draw(identity(),[0,0,0],[5.5,1,4.4],'#596171',{shape:'plane',stone:1});
       if(chase){
