@@ -122,13 +122,14 @@
     }
     if(state==='slipLeft'||state==='slipRight'){
       const direction=state==='slipLeft'?-1:1;
-      p.z=direction*.85*peak;p.turn=direction*.32*peak;p.curl=.38*peak;p.step=.32*peak;
+      const slip=t<.23?smooth(t/.23):1-smooth((t-.23)/.77);
+      p.z=direction*.91*slip;p.turn=direction*.41*slip;p.curl=.48*slip;p.step=.38*slip;
     }else if(state==='walk'||state==='run'||state==='approach'){
       p.shift=peak*(state==='run'?.87:.52)*style.reach;
       p.step=Math.sin(t*TAU*(1+n%3*.5))*peak*(state==='walk'?.2:.36);
       p.bend=(.12+style.crouch*.38)*peak;
       p.z=style.weight*peak*2;
-    }else if(state==='swipe'||state==='charge'){
+    }else if(state==='swipe'||state==='cross'||state==='charge'){
       const contact=.40+(n%7)*.012, prep=.19+(n%4)*.019;
       const attack=t<prep?-.36*smooth(t/prep):t<contact?
         mix(-.36,1,smooth((t-prep)/(contact-prep))):1-smooth((t-contact)/(1-contact));
@@ -137,6 +138,10 @@
       p.bend+=attack*.12;
       p.force=Math.max(0,attack);
       p.step+=attack*.15;
+      p.turn+=style.lead*attack*(state==='cross'?-.48:.28);
+      if(state==='cross'){const lead=p.paw;p.paw=p.offhand+.14*peak;p.offhand=lead;}
+      p.curl+=Math.max(0,-attack)*.8;
+      p.lift-=Math.max(0,-attack)*.22;
     }else if(state==='guard'){
       p.curl=peak*(.72+style.crouch*.5);p.bend=(-.13+style.weight)*peak;
       p.shift=-.13*peak;p.lift=-.12*peak;p.force=peak;p.offhand=peak*.24;
@@ -144,9 +149,14 @@
       const force=peak, power=state==='ultimate'?1.23:1;
       p.shift=.13*peak;p.force=peak;
       techniquePose(p,style,t,force,power);
-    }else if(state==='impact'){
-      p.shift=-.35*peak*style.reach;p.bend=(-.33-style.crouch*.45)*peak;
-      p.turn=-.17*peak*style.lead;p.lift=-.07*peak;p.eyes=1-.7*peak;
+     }else if(state==='impact'||state==='knockback'){
+      const heavy=state==='knockback';
+      const recoil=t<.16?smooth(t/.16):1-smooth((t-.16)/.84);
+      const landing=Math.sin(PI*clamp((t-.52)/.48,0,1));
+      p.shift=-(heavy?.76:.32)*recoil;p.turn=-style.lead*.31*recoil;
+      p.bend=-.46*recoil+.19*landing;p.step=.35*landing;
+      p.lift=heavy?.29*recoil-.13*landing:-.055*recoil;
+      p.paw=.21*recoil;p.offhand=.32*recoil;p.eyes=1-.73*recoil;
     }else if(state==='victory'){
       p.lift=Math.abs(Math.sin(t*PI*2))*(.16+style.arc*.45);
       p.paw=.58+style.depth*.8+.12*peak;p.turn=(.13+style.arc*.31)*Math.sin(t*TAU);p.force=peak;
@@ -302,12 +312,45 @@
       draw(parent,a.map((x,i)=>(x+b[i])*.5),[width,length*.63,width*.92],tint,{rotate,metal,coat,shape:'detail'});
     }
 
+    // Sweep a continuous tapered sleeve through the shoulder, elbow and wrist.
+    // Fixed topology keeps the outline intact as the elbow folds.
+    const sides=10, rings=7, limbVertices=new Float32Array((rings-1)*sides*36);
+    const limbRing=new Float32Array(rings*sides*6);
+    meshes.skin={buffer:gl.createBuffer(),length:limbVertices.length/6};
+    function skinLimb(parent,a,b,c,width,tint,coat){
+      for(let row=0;row<rings;row++){
+        const t=row/(rings-1),u=1-t;
+        const center=a.map((v,i)=>u*u*v+2*u*t*b[i]+t*t*c[i]);
+        const tangent=a.map((v,i)=>u*(b[i]-v)+t*(c[i]-b[i]));
+        const len=Math.hypot(...tangent)||1;
+        const [x,y,z]=tangent.map(v=>v/len);
+        const planar=Math.hypot(y,z)||1;
+        const radius=width*(.94-.28*t+.13*Math.sin(PI*t));
+        for(let col=0;col<sides;col++){
+          const angle=TAU*col/sides,co=Math.cos(angle),si=Math.sin(angle);
+          const nx=si*planar,ny=(co*z-si*x*y)/planar,nz=(-co*y-si*x*z)/planar;
+          limbRing.set([center[0]+radius*nx,center[1]+radius*ny,center[2]+radius*nz,nx,ny,nz],(row*sides+col)*6);
+        }
+      }
+      let out=0;
+      for(let row=0;row<rings-1;row++)for(let col=0;col<sides;col++){
+        const a=row*sides+col,b=row*sides+(col+1)%sides;
+        for(const v of [a,b,b+sides,a,b+sides,a+sides]){
+          const offset=v*6;
+          for(let i=0;i<6;i++)limbVertices[out++]=limbRing[offset+i];
+        }
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER,meshes.skin.buffer);
+      gl.bufferData(gl.ARRAY_BUFFER,limbVertices,gl.DYNAMIC_DRAW);
+      draw(parent,[0,0,0],[1,1,1],tint,{shape:'skin',coat});
+    }
     function world(m,v){
       return [0,1,2].map(i=>m[i]*v[0]+m[i+4]*v[1]+m[i+8]*v[2]+m[i+12]);
     }
     function leg(body,feet,hip,toe,width,color,metal=0,coat=null){
       const a=world(body,hip),b=world(feet,toe);
       const knee=a.map((v,i)=>mix(v,b[i],.54)+(i===2?.10:0));
+      if(chase){skinLimb(identity(),a,knee,b,width,color,coat);return;}
       limb(identity(),a,knee,width,color,metal,coat);
       limb(identity(),knee,b,width*.82,color,metal,coat);
     }
@@ -418,8 +461,11 @@
         const shoulder=[side*.324,1.203,.018];
         const elbow=[side*(.405+reach*.17),.96+reach*.19+p.curl*.19+lift*.52,.16+reach*.21+stanceGuard];
         const hand=[side*(.398+reach*.26),.698+reach*.48+p.curl*.40+lift,.25+reach*.48+stanceGuard];
-        limb(root,shoulder,elbow,.109,fur,.05,neutralCoat);
-        limb(root,elbow,hand,.094,pawColor,.05,neutralCoat);
+        if(chase)skinLimb(root,shoulder,elbow,hand,.125,fur,neutralCoat);
+        else{
+          limb(root,shoulder,elbow,.109,fur,.05,neutralCoat);
+          limb(root,elbow,hand,.094,pawColor,.05,neutralCoat);
+        }
         catPaw(root,hand,pawColor,neutralCoat,true);
       }
       if(a.tail!=='none'){

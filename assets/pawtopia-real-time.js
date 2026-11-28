@@ -8,8 +8,8 @@
   const moves=Array.from(document.querySelectorAll('[data-rush]'));
   function pose(side,name,duration,end='idle'){
     if(scene?.active())scene.pose(side,name,duration,end);
-    else if(side==='pet')art.paintFighter(get('rush-cat'),cat.breed,name,3);
-    else dogs.paint(get('rush-dog'),foe,name,3);
+    else if(side==='pet')art.paintFighter(get('rush-cat'),cat.breed,name==='cross'?'swipe':name==='knockback'?'impact':name,3);
+    else dogs.paint(get('rush-dog'),foe,name==='knockback'?'impact':name,3);
   }
   function message(value){if(status.textContent!==value)status.textContent=value;}
   function refresh(){
@@ -91,7 +91,7 @@
     state.ready=clock+delay+(finisher||burst?.4:.16);
     state.pending={at:clock+delay,reach:projectile?4:1.82,damage:ultimate?35:burst?16+Math.round(form.amplitude*.45):projectile?5:finisher?13:8,
       knock:ultimate||finisher||(burst&&form.footwork==='kick'),counter,pounce};
-    pose('pet',ultimate?'ultimate':burst||projectile?'signature':pounce||finisher?'charge':'swipe',(delay+.25)*1000);
+    pose('pet',ultimate?'ultimate':burst||projectile?'signature':pounce||finisher?'charge':state.combo===2?'cross':'swipe',(delay+.25)*1000);
     if(projectile||ultimate||burst)effect(ultimate?'finish':projectile?'shot':'arc');
     message(ultimate?'Team finisher':burst?form.form:projectile?'Ranged shot':pounce?'Pounce':counter?'Counter':state.combo+' hit combo');
   }
@@ -115,7 +115,7 @@
         }else if(state.gap<=hit.reach){
           state.enemy=Math.max(0,state.enemy-hit.damage-(hit.counter?6:0));
           state.meter=Math.min(100,state.meter+(hit.counter?24:10));
-          pose('foe','impact',300);scene?.hit('foe',cat.color,hit.knock);
+          pose('foe',hit.knock?'knockback':'impact',hit.knock?470:265);scene?.hit('foe',cat.color,hit.knock);
           if(hit.knock){shift(1.45);state.combo=0;}
           if(state.warning){state.warning=false;field.dataset.warning='';state.next=clock+1.05;}
           if(!state.enemy){end(true);return;}
@@ -135,7 +135,7 @@
         pose('foe',state.pattern==='shot'?'signature':'charge',450);
         if(clock<=state.safeUntil||state.gap>state.enemyReach){state.counterUntil=clock+.95;message('Missed you · counter!');state.meter=Math.min(100,state.meter+12);}
         else{state.hp=Math.max(0,state.hp-state.foeDamage);state.combo=0;state.pending=null;state.ready=clock+.28;
-          pose('pet','impact',300);scene?.hit('pet','#ffbc73',state.heavy);message('Hit · −'+state.foeDamage+' HP');}
+          pose('pet',state.heavy?'knockback':'impact',state.heavy?470:265);scene?.hit('pet','#ffbc73',state.heavy);message('Hit · −'+state.foeDamage+' HP');}
         state.next=clock+state.cadence+Math.random()*.55;state.warning=false;field.dataset.warning='';
         if(!state.hp){end(false);return;}
       }
