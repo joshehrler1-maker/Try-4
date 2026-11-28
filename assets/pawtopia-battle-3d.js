@@ -231,7 +231,11 @@
         }
         vec3 lit=tint*light + vec3(.54,.71,1.0)*max(0.0,dot(v,rim))*edge*.36;
         lit+=vec3(1.0,.85,.66)*highlight*mix(.085,.53,roughness)*(coat.x>.5?.44:1.0);
-        lit*=1.0-.46*smoothstep(.62,.96,edge);
+        // Ink the silhouette and flatten the specular response on fur.
+        if(stone<.5 && coat.x>.5){
+          lit=mix(lit,tint*vec3(.43,.48,.68),.36*(1.0-smoothstep(.14,.20,diffuse)));
+          lit=mix(lit,vec3(.09,.09,.14),.82*smoothstep(.61,.86,edge));
+        }else lit*=1.0-.46*smoothstep(.62,.96,edge);
         lit+=tint*fiber*.020*(1.0-roughness);
         lit+=tint*edge*max(0.0,bristle)*.12;
         if(stone>.5){
@@ -573,6 +577,26 @@
       return [tr.name,clamp(dt/tr.duration,0,1)];
     }
     let fighterGap=3.18;
+    const pillars=[{x:2.3,z:-1.6},{x:2.7,z:1.8},{x:-1.4,z:-2.2},{x:3.4,z:-.3}];
+    const breaks=new Map();
+    function templePillars(now,steady){
+      for(const pillar of pillars){
+        const {x,z}=pillar;
+        draw(identity(),[x,.09,z],[.47,.11,.47],'#42516a',{shape:'detail'});
+        if(!breaks.has(pillar)){
+          draw(identity(),[x,.61,z],[.28,.64,.28],'#596785',{shape:'cone'});
+          draw(identity(),[x,1.12,z],[.23,.36,.23],'#67d6de',{shape:'cone',emit:.23});
+          continue;
+        }
+        const t=steady?1:clamp((now-breaks.get(pillar))/590,0,1);
+        for(let i=0;i<5;i++){
+          const a=i*2.4,travel=(.28+i*.083)*t;
+          const height=(1-t)*.72+t*.09+Math.sin(PI*t)*(.28+i*.045);
+          draw(identity(),[x+Math.cos(a)*travel,height,z+Math.sin(a)*travel],
+            [.095+i*.014,.13,.11],i%2?'#67d6de':'#596785',{shape:'cone',rotate:tilt(a+2*t)});
+        }
+      }
+    }
     let cameraX=0,cameraZ=0,cameraTime=0;
     function render(now) {
       raf=0;
@@ -605,14 +629,7 @@
       const view=chase?multiply(multiply(baseView,turnY(angle)),position(-cameraX-.95,0,-cameraZ-.18)):baseView;
       gl.uniformMatrix4fv(uniforms.view,false,multiply(perspective(ratio),view));
       draw(identity(),[0,0,0],[5.5,1,4.4],'#596171',{shape:'plane',stone:1});
-      if(chase){
-        // Distant rock spires give the tracking shot a fixed point of reference.
-        for(let i=0;i<9;i++){
-          const z=(i-4)*1.65, height=.85+.55*Math.cos(i*2.1);
-          draw(identity(),[6.3+i%3,height*.5,z],[.85,height,.68],'#687d95',{shape:'cone'});
-          draw(identity(),[6.3+i%3,height*1.34,z],[.24,height*.28,.19],'#dce5df',{shape:'cone'});
-        }
-      }
+      if(chase)templePillars(now,steady);
       const elapsed=steady?0:now*.001;
       for(const [side,profile,stance,direction] of [['pet',pet,petStance,1],['foe',foe,foeStance,-1]]){
         if(!profile)continue;
@@ -682,8 +699,15 @@
     stage.classList.add(floorOnly?'battle-has-floor':'battle-has-3d');
     schedule();
     return {roster,pose,spacing(value){fighterGap=value;},
+      resetArena(){breaks.clear();schedule();},
       active:()=>!lost,
-      hit(who,tint,power){impact={time:window.performance.now(),x:(who==='pet'?-1:1)*fighterGap*.5,tint,power};schedule();}
+      hit(who,tint,power){
+        if(chase&&power){
+          const targetX=(who==='pet'?-1:1)*fighterGap*.5;
+          const nearest=pillars.filter(p=>!breaks.has(p)).sort((a,b)=>Math.hypot(a.x-targetX,a.z)-Math.hypot(b.x-targetX,b.z))[0];
+          if(nearest)breaks.set(nearest,window.performance.now());
+        }
+        impact={time:window.performance.now(),x:(who==='pet'?-1:1)*fighterGap*.5,tint,power};schedule();}
     };
   }
   window.PawtopiaBattle3D=Object.freeze({create,profileFor});

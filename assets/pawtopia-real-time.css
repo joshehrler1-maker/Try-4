@@ -22,3 +22,10 @@
 .rush-dock button[data-rush]{background:linear-gradient(150deg,#4b7794,#18304d 74%);border-bottom:3px solid #84c2cb}
 .rush-dock button[data-rush="burst"]{background:linear-gradient(150deg,#815b9b,#352849);border-color:#d5b3ee}
 .rush-hud label{border-bottom:2px solid #9bcbb9}.rush-hud label:last-child{border-color:#e7a17b}
+
+#rush-field{background:#8299ac url("scenes/crystal-temple-arena.jpg") center 43%/cover no-repeat}
+#rush-field::before,#rush-field::after{display:none}
+.rush-hud label{grid-template-columns:30px minmax(0,1fr);column-gap:5px;align-items:center;line-height:1.05}
+.rush-hud label img{width:30px;height:33px;object-fit:cover;object-position:50% 23%;grid-row:span 2;border-radius:4px;background:#243449}
+.rush-hud label img:not([src]){visibility:hidden}
+.rush-hud label span{font-size:clamp(.7rem,2vw,.94rem);overflow-wrap:anywhere}

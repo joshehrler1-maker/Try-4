@@ -11,6 +11,12 @@
     else if(side==='pet')art.paintFighter(get('rush-cat'),cat.breed,name==='cross'?'swipe':name==='knockback'?'impact':name,3);
     else dogs.paint(get('rush-dog'),foe,name==='knockback'?'impact':name,3);
   }
+  function portraits(){
+    get('rush-cat-portrait').src='assets/scenes/pawtopia-fighters/cat-'+String(cat.uniq+1).padStart(2,'0')+'.png';
+    const model=dogs.profile(foe),portrait=get('rush-foe-portrait');
+    const fallback=()=>{portrait.onerror=null;portrait.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(dogs.drawing(model));};
+    if(model.dog){portrait.onerror=fallback;portrait.src='assets/scenes/pawtopia-dogs/'+model.id+'.png';}else fallback();
+  }
   function message(value){if(status.textContent!==value)status.textContent=value;}
   function refresh(){
     get('rush-life').value=state.hp;
@@ -50,7 +56,7 @@
     state.reserve.push({cat,hp:state.hp});cat=ally.cat;state.hp=ally.hp;
     state.swapReady=clock+8;state.safeUntil=clock+.8;state.pending=null;state.combo=0;
     scene?.roster(cat,dogs.profile(foe),data.kitFor(cat.breed),{efficient:true});
-    get('rush-pet-name').textContent=cat.breed;pose('pet','guard',480);message(cat.breed+' covers!');
+    portraits();get('rush-pet-name').textContent=cat.breed;pose('pet','guard',480);message(cat.breed+' covers!');
   }
   function act(move,side=1){
     if(!state?.live||state.paused)return;
@@ -157,9 +163,10 @@
     foe=data.foes[Number(selected?.dataset.foe)||0];
     if(scene===undefined)scene=window.PawtopiaBattle3D?.create(get('rush-canvas'),field,{chase:true})||null;
     field.dataset.painted=String(!scene?.active());
+    scene?.resetArena();
     scene?.roster(cat,dogs.profile(foe),data.kitFor(cat.breed),{efficient:true});
     pose('pet','idle',1);pose('foe','idle',1);
-    get('rush-pet-name').textContent=cat.breed;get('rush-foe-name').textContent=foe.name;
+    portraits();get('rush-pet-name').textContent=cat.breed;get('rush-foe-name').textContent=foe.name;
     state={live:true,hp:100,enemy:100,energy:70,combo:0,previous:-5,ready:0,safeUntil:-1,evadeReady:0,next:2.4};
     const choices=Array.from(get('battle-pet-select').options);
     const reserve=choices.filter(o=>!o.selected).slice(0,2).map(o=>{
