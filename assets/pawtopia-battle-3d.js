@@ -146,7 +146,7 @@
     const lead=style.lead*(beat===1?-1:1);
     const curve=Math.sin(PI*t);
     p.curl=.29+.34*load;p.lift=-.09*load;
-    p.shift=-.12*load+extend*.25*style.reach;
+    p.shift=-(.10+style.depth*.16)*load+extend*.25*style.reach;
     p.turn=lead*(-.25*load+.42*extend);p.bend=.20*extend;
     p.paw=beat===1?.17:extend*style.reach;p.offhand=beat===1?extend*style.reach:.19;
     p.force=extend;
@@ -736,6 +736,11 @@
         shadow(x,p.z,p.lift);
         const scale=side==='foe'?(chase&&profile.dog?Math.max(.84,profile.size):profile.size)*(profile.rank>=9?1.10:1):.96+(profile.uniq%5)*.018;
         const {root,feet}=actorMatrices(x,p,direction,scale);
+        if(chase&&side==='pet'&&action.startsWith('combo')){
+          // Anchor the foot frame to the starting stance while the hips transfer weight.
+          feet[12]=direction*(-fighterGap*.5);
+          feet[14]=0;
+        }
         if(side==='pet')catModel(root,feet,profile,p,elapsed);
         else houndModel(root,feet,profile,p,elapsed);
         skillEffect(root,side==='pet'?{color:style?.color||profile.color}:profile,p,action,t);
