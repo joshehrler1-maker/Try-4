@@ -435,7 +435,7 @@
     }
     function houndModel(root,feet,a,p,t) {
       if(chase&&a.dog){
-        const fur=a.color,cream=a.rank%2?'#edd6ac':'#beb0a4',nose='#292232';
+        const fur=a.breed==='Chihuahua'?'#be895c':a.color,cream=a.rank%2?'#edd6ac':'#beb0a4',nose='#292232';
         const stocky=a.rank>=6?1.18:1;
         draw(root,[0,.79,0],[.31*stocky,.36,.58],fur);
         draw(root,[0,.99,.34],[.27,.37,.29],cream);
@@ -546,7 +546,7 @@
       const ratio=w/h, steady=Boolean(reduced?.matches);
       const after=impact&&!steady?clamp((now-impact.time)/410,0,1):1;
       const kick=Math.sin(after*PI)*.16*(impact?.power?1.55:1);
-      const distance=chase?Math.max(4.9,(fighterGap*.95+1.25)/ratio):Math.max(6.4,8.3/ratio);
+      const distance=chase?Math.max(5.15,(fighterGap*.53+1.02)/(ratio*Math.tan(.36))+.65):Math.max(6.4,8.3/ratio);
       const baseView=multiply(position(-kick*.25,chase?-1.12:-1.42,-distance+kick),turnX(chase?.11:.18));
       const angle=chase?.43+(steady?0:kick*.25):0;
       const view=chase?multiply(baseView,turnY(angle)):baseView;
