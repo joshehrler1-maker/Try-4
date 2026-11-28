@@ -78,6 +78,95 @@
     ['Cryowolf corkscrew','whirl',.31,.21,.27,1],['Brass hammer','maul',.43,.09,.30,-1],
     ['Commander counter','shield',.37,.18,.13,1],['Clockwork comet','comet',.41,.15,.34,-1]
   ];
+  const breedCombos={
+    "Maine Coon": ["brace","bridge","drive"],
+    "Siamese": ["brush","cross","flurry"],
+    "Bengal": ["check","crescent","wheel"],
+    "British Shorthair": ["circle","brace","drive"],
+    "Ragdoll": ["yield","spiral","turn"],
+    "Sphynx": ["sway","sweep","wheel"],
+    "Abyssinian": ["hook","check","flurry"],
+    "American Bobtail": ["circle","arc","wheel"],
+    "American Curl": ["turn","brush","spiral"],
+    "American Shorthair": ["step","cross","drive"],
+    "American Wirehair": ["check","bridge","spring"],
+    "Balinese": ["sway","turn","sweep"],
+    "Birman": ["brush","step","spring"],
+    "Bombay": ["slip","cross","hook"],
+    "Burmese": ["step","hook","drive"],
+    "Burmilla": ["yield","brush","circle"],
+    "Chartreux": ["brace","step","drive"],
+    "Cornish Rex": ["sway","wheel","crescent"],
+    "Devon Rex": ["balance","brush","spring"],
+    "Egyptian Mau": ["step","rise","crescent"],
+    "European Shorthair": ["sway","check","wheel"],
+    "Exotic Shorthair": ["brace","push","drive"],
+    "Havana Brown": ["check","turn","wheel"],
+    "Japanese Bobtail": ["slip","step","cross"],
+    "Khao Manee": ["balance","cross","arc"],
+    "Korat": ["check","knee","turn"],
+    "LaPerm": ["coil","brush","spiral"],
+    "Lykoi": ["step","crescent","sweep"],
+    "Manx": ["yield","turn","arc"],
+    "Nebelung": ["yield","circle","push"],
+    "Norwegian Forest Cat": ["brace","turn","sweep"],
+    "Ocicat": ["slip","knee","drive"],
+    "Oriental Shorthair": ["step","bridge","spring"],
+    "Persian": ["balance","step","turn"],
+    "Peterbald": ["slip","check","spring"],
+    "Pixiebob": ["step","sweep","knee"],
+    "Ragamuffin": ["yield","step","sweep"],
+    "Russian Blue": ["sway","coil","turn"],
+    "Savannah": ["brace","cross","drive"],
+    "Scottish Fold": ["brush","circle","spring"],
+    "Selkirk Rex": ["balance","turn","sweep"],
+    "Siberian": ["step","hook","sweep"],
+    "Singapura": ["coil","bridge","spring"],
+    "Snowshoe": ["sway","brush","push"],
+    "Somali": ["sway","crescent","wheel"],
+    "Tonkinese": ["slip","hook","cross"],
+    "Toyger": ["brace","hook","arc"],
+    "Turkish Angora": ["brush","cross","flurry"],
+    "Turkish Van": ["yield","bridge","turn"],
+    "York Chocolate": ["check","knee","drive"],
+    "Australian Mist": ["circle","slip","sweep"],
+    "Cymric": ["balance","hook","turn"],
+    "Donskoy": ["brace","coil","spring"],
+    "German Rex": ["coil","arc","flurry"],
+    "Kurilian Bobtail": ["check","turn","knee"],
+    "Sokoke": ["balance","rise","wheel"]
+  };
+  // The shared action clock peaks when the combat rules resolve contact.
+  function comboPose(p,style,state,t){
+    const beat=Number(state.slice(-1))-1;
+    const move=style.combo[beat];
+    const contact=.405;
+    const load=Math.sin(PI*clamp(t/.23,0,1));
+    const extend=t<contact?smooth((t-.20)/(contact-.20)):1-smooth((t-contact-.035)/(1-contact-.035));
+    const lead=style.lead*(beat===1?-1:1);
+    const curve=Math.sin(PI*t);
+    p.curl=.29+.34*load;p.lift=-.09*load;
+    p.shift=-.12*load+extend*.25*style.reach;
+    p.turn=lead*(-.25*load+.42*extend);p.bend=.20*extend;
+    p.paw=beat===1?.17:extend*style.reach;p.offhand=beat===1?extend*style.reach:.19;
+    p.force=extend;
+    if(['knee','crescent','wheel','sweep','rise'].includes(move)){
+      p.kicking=lead;p.knee=(.28+.35*(move!=='sweep'))*curve;
+      p.kick=(move==='knee'?.33:.93)*extend;p.arcKick=(move==='crescent'||move==='wheel')?.38*curve:0;
+      p.turn+=lead*(move==='wheel'?1.28:.45)*extend;p.bend=-.20*extend;p.paw*=.38;
+    }else if(['brush','hook','arc','circle','spiral','turn'].includes(move)){
+      p.turn+=lead*(move==='spiral'||move==='turn'?.91:.47)*curve;p.overhead=curve*(move==='arc'?.55:.19);
+      p.z=lead*.19*curve;
+    }else if(['yield','slip','sway','check','balance','brace','coil'].includes(move)){
+      p.shift-=.33*curve;p.bend-=.23*curve;p.z=lead*.25*curve;p.curl+=.46*curve;
+      p.offhand+=.32*extend;
+    }else if(move==='flurry'){
+      p.offhand+=.62*Math.sin(2*PI*t)**2;p.paw+=.22*curve;
+    }else{
+      p.shift+=.28*extend;p.bend+=.16*extend;p.offhand+=move==='bridge'||move==='push'?.51*extend:0;
+    }
+    return p;
+  }
   function profileFor(actor,foe=false){
     if(foe){
       const [label,technique,spread,depth,crouch,lead]=houndStyles[(actor.rank||1)-1]||houndStyles[0];
@@ -85,7 +174,7 @@
         arc:.18+actor.rank*.022,speed:1.7+actor.rank*.09,weight:(actor.rank%3-1)*.052,index:actor.rank-1};
     }
     const n=actor.uniq,style=actor.fightingStyle||{},spin=(n*19)%56;
-    return {label:style.label||actor.breed,technique:style.technique||'pounce',
+    return {combo:breedCombos[actor.breed]||breedCombos['Maine Coon'],label:style.label||actor.breed,technique:style.technique||'pounce',
       lead:style.lead==='left'?-1:1,spread:.21+(spin%8)*.018,
       depth:.10+((spin*3)%11)*.015,crouch:.055+((n*13)%17)*.012,
       reach:.79+(style.reach||24)*.014,arc:.12+(style.arc||23)*.011,
@@ -113,6 +202,7 @@
     const p={shift:0,lift:0,bend:0,paw:0,offhand:0,curl:0,step:0,turn:0,force:0,eyes:1,
       overhead:0,z:0,stance:style};
     const peak=Math.sin(clamp(t,0,1)*PI), n=style.index;
+    if(state.startsWith('combo')&&style.combo)return comboPose(p,style,state,t);
     if(state==='idle'){
       p.curl=.08+style.crouch*.7;
       p.bend=style.weight*.6;
@@ -384,6 +474,11 @@
       }
     }
     function catModel(root,feet,a,p,t) {
+      const stocky=['British Shorthair','Exotic Shorthair','Persian','Cymric','Manx','Chartreux','Selkirk Rex'].includes(a.breed);
+      const rangy=['Siamese','Oriental Shorthair','Savannah','Cornish Rex','Peterbald','Balinese','Sphynx'].includes(a.breed);
+      const build=stocky?1.12:rangy?.85:1, height=stocky?.93:rangy?1.09:1;
+      root=multiply(root,size(build,height,stocky?1.1:1));
+      feet=multiply(feet,size(build,height,stocky?1.1:1));
       const long=a.tail==='plume'||a.ears==='tuft';
       const slim=['large','curl'].includes(a.ears)&&a.tail!=='plume';
       const flatFace=['Persian','Exotic Shorthair','British Shorthair'].includes(a.breed);
@@ -457,14 +552,16 @@
         }
         const lead=side===p.stance.lead,step=p.step*side;
         const hip=[side*.211,.67,.017];
+        const kicking=p.kicking===side;
         const toe=[side*p.stance.spread,.100+Math.max(0,step)*.31,.20+(lead?1:-1)*p.stance.depth+step*.42];
+        if(kicking){toe[0]+=side*p.arcKick;toe[1]+=p.knee;toe[2]+=p.kick;}
         leg(root,feet,hip,toe,slim?.099:.119,pawColor,.05,neutralCoat);
         catPaw(feet,toe,pawColor,neutralCoat);
 
         const reach=lead?p.paw:p.offhand, stanceGuard=p.stance.depth*(lead?1:.46), lift=p.overhead*(lead?1:.36);
         const shoulder=[side*.324,1.203,.018];
         const elbow=[side*(.405+reach*.17),.96+reach*.19+p.curl*.19+lift*.52,.16+reach*.21+stanceGuard];
-        const hand=[side*(.398+reach*.26),.698+reach*.48+p.curl*.40+lift,.25+reach*.48+stanceGuard];
+        const hand=[side*(.35-reach*.10),.83+reach*.43+p.curl*.40+lift,.25+reach*.66+stanceGuard];
         if(chase)skinLimb(root,shoulder,elbow,hand,.125,fur,neutralCoat);
         else{
           limb(root,shoulder,elbow,.109,fur,.05,neutralCoat);
@@ -476,7 +573,7 @@
         const count=a.tail==='bob'?2:6,thick=a.tail==='plume'?.131:a.tail==='thick'?.094:.061;
         let last=[-.218,.675,-.226];
         for(let i=1;i<=count;i++){
-          const end=[-.231-i*.093,.67+i*.087+.074*Math.sin(t*2.8-i*.50),-.22-i*.073];
+          const end=[-.231-i*.093,.67+i*.087+.074*Math.sin(t*2.8-i*.50),-.22-i*.073-p.turn*i*.024];
           limb(root,last,end,thick*(1-i*.088),i%2===0&&a.pattern==='tabby'?trim:fur,.04,neutralCoat);
           last=end;
         }

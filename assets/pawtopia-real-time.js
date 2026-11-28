@@ -8,7 +8,7 @@
   const moves=Array.from(document.querySelectorAll('[data-rush]'));
   function pose(side,name,duration,end='idle'){
     if(scene?.active())scene.pose(side,name,duration,end);
-    else if(side==='pet')art.paintFighter(get('rush-cat'),cat.breed,name==='cross'?'swipe':name==='knockback'?'impact':name,3);
+    else if(side==='pet')art.paintFighter(get('rush-cat'),cat.breed,name.startsWith('combo')?'swipe':name==='knockback'?'impact':name,3);
     else dogs.paint(get('rush-dog'),foe,name==='knockback'?'impact':name,3);
   }
   function portraits(){
@@ -97,7 +97,7 @@
     state.ready=clock+delay+(finisher||burst?.4:.16);
     state.pending={at:clock+delay,reach:projectile?4:1.82,damage:ultimate?35:burst?16+Math.round(form.amplitude*.45):projectile?5:finisher?13:8,
       knock:ultimate||finisher||(burst&&form.footwork==='kick'),counter,pounce};
-    pose('pet',ultimate?'ultimate':burst||projectile?'signature':pounce||finisher?'charge':state.combo===2?'cross':'swipe',(delay+.25)*1000);
+    pose('pet',ultimate?'ultimate':burst||projectile?'signature':pounce?'charge':'combo'+state.combo,(delay+.25)*1000);
     if(projectile||ultimate||burst)effect(ultimate?'finish':projectile?'shot':'arc');
     message(ultimate?'Team finisher':burst?form.form:projectile?'Ranged shot':pounce?'Pounce':counter?'Counter':state.combo+' hit combo');
   }
